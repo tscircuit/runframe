@@ -14,8 +14,7 @@ import { ErrorBoundary } from "react-error-boundary"
 import { ErrorTabContent } from "./ErrorTabContent"
 import { SchematicViewer } from "@tscircuit/schematic-viewer"
 import PreviewEmptyState from "./PreviewEmptyState"
-// import { CircuitJsonTableViewer } from "./TableViewer/CircuitJsonTableViewer"
-// import { CircuitToSvgWithMouseControl } from "./CircuitToSvgWithMouseControl"
+import { CircuitJsonTableViewer } from "./CircuitJsonTableViewer/CircuitJsonTableViewer"
 import { BomTable } from "./BomTable"
 import {
   CheckIcon,
@@ -319,13 +318,13 @@ export const CircuitJsonPreview = ({
                 isFullScreen ? "h-[calc(100vh-96px)]" : "h-[620px]",
               )}
             >
-              {/* <ErrorBoundary fallback={<div>Error loading JSON viewer</div>}>
+              <ErrorBoundary fallback={<div>Error loading JSON viewer</div>}>
                 {circuitJson ? (
                   <CircuitJsonTableViewer elements={circuitJson as any} />
                 ) : (
-                  <PreviewEmptyState triggerRunTsx={triggerRunTsx} />
+                  <PreviewEmptyState onRunClicked={onRunClicked} />
                 )}
-              </ErrorBoundary> */}
+              </ErrorBoundary>
             </div>
           </TabsContent>
           <TabsContent value="error">

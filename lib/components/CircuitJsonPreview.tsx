@@ -31,6 +31,7 @@ import {
 } from "./ui/dropdown-menu"
 import { Button } from "./ui/button"
 import { PcbViewerWithContainerHeight } from "./PcbViewerWithContainerHeight"
+import { useStyles } from "lib/hooks/use-styles"
 
 export interface PreviewContentProps {
   code?: string
@@ -83,6 +84,7 @@ export const CircuitJsonPreview = ({
   manualEditsFileContent,
   onManualEditsFileContentChange,
 }: PreviewContentProps) => {
+  useStyles()
   const [activeTab, setActiveTab] = useState(showCodeTab ? "code" : "pcb")
 
   useEffect(() => {
@@ -269,7 +271,12 @@ export const CircuitJsonPreview = ({
             >
               <ErrorBoundary fallback={<div>Error loading Schematic</div>}>
                 {circuitJson ? (
-                  <SchematicViewer circuitJson={circuitJson} />
+                  <SchematicViewer
+                    circuitJson={circuitJson}
+                    containerStyle={{
+                      height: "100%",
+                    }}
+                  />
                 ) : (
                   <PreviewEmptyState onRunClicked={onRunClicked} />
                 )}

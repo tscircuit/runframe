@@ -42,6 +42,7 @@
         "noUselessElse": "off",
         "noNonNullAssertion": "off",
         "useNumberNamespace": "off",
+        "noUnusedTemplateLiteral": "off",
         "useFilenamingConvention": {
           "level": "error",
           "options": {

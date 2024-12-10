@@ -3,7 +3,8 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "start": "cosmos"
+    "start": "cosmos",
+    "build:css": "bun run scripts/build-css.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
@@ -29,7 +30,7 @@
     "@tscircuit/3d-viewer": "^0.0.46",
     "@tscircuit/eval-webworker": "^0.0.4",
     "@tscircuit/pcb-viewer": "^1.10.21",
-    "@tscircuit/schematic-viewer": "^2.0.0",
+    "@tscircuit/schematic-viewer": "2.0.3",
     "cssnano": "^7.0.6",
     "lucide-react": "^0.468.0",
     "react-cosmos-plugin-vite": "^6.2.0",

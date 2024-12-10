@@ -176,3 +176,5 @@ dist
 
 .vscode
 .aider*
+*.generated.ts
+lib/hooks/styles.generated.ts

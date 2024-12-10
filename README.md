@@ -4,6 +4,8 @@ A React component that runs tscircuit inside a webworker and shows you the PCB,
 Schematic, 3D and other previews.
 
 - Automatically imports other snippets and libraries if imported
+- Runs inside webworker (doesn't block the main thread)
+- Converts typescript to javascript using babel
 
 ```tsx
 import { RunFrame } from "@tscircuit/runframe"

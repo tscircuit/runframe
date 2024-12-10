@@ -2,11 +2,17 @@
   "compilerOptions": {
     // Enable latest features
     "lib": ["ESNext", "DOM"],
-    "target": "ESNext",
+    "target": "ES2020",
     "module": "ESNext",
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "lib/*": ["lib/*"]
+    },
+    "esModuleInterop": true,
 
     // Bundler mode
     "moduleResolution": "bundler",

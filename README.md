@@ -7,6 +7,8 @@ Schematic, 3D and other previews.
 - Runs inside webworker (doesn't block the main thread)
 - Converts typescript to javascript using babel
 
+## Usage
+
 ```tsx
 import { RunFrame } from "@tscircuit/runframe"
 
@@ -29,3 +31,8 @@ circuit.add(
   />
 )
 ```
+
+> Note: You should have tailwind installed in the parent project, this library
+> works without installing tailwind but without the "css reset" things will look
+> a bit off (e.g. you might see serif fonts), create an issue if that's
+> cumbersome because we removed it to save 5kb

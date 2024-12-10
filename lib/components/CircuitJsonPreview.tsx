@@ -43,6 +43,7 @@ export interface PreviewContentProps {
   circuitJsonKey?: string
   className?: string
   showCodeTab?: boolean
+  codeTabContent?: React.ReactNode
   showJsonTab?: boolean
   showImportAndFormatButtons?: boolean
   headerClassName?: string
@@ -66,6 +67,7 @@ export const CircuitJsonPreview = ({
   circuitJsonKey = "",
   circuitJson,
   showCodeTab = false,
+  codeTabContent,
   showJsonTab = true,
   showImportAndFormatButtons = true,
   className,
@@ -102,7 +104,7 @@ export const CircuitJsonPreview = ({
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
-          className="flex-grow flex flex-col"
+          className="flex-grow flex flex-col p-2"
         >
           <div className={cn("flex items-center gap-2", headerClassName)}>
             {leftHeaderContent}
@@ -214,26 +216,16 @@ export const CircuitJsonPreview = ({
               </Button>
             )}
           </div>
-          {/* {showCodeTab && (
+          {showCodeTab && (
             <TabsContent value="code" className="flex-grow overflow-hidden">
-              <div className="h-full">
-                <CodeEditor
-                  initialCode={code}
-                  manualEditsFileContent={manualEditsFileContent ?? ""}
-                  isStreaming={isStreaming}
-                  onCodeChange={onCodeChange!}
-                  onDtsChange={onDtsChange!}
-                  readOnly={readOnly}
-                  showImportAndFormatButtons={showImportAndFormatButtons}
-                />
-              </div>
+              <div className="h-full">{codeTabContent}</div>
             </TabsContent>
-          )} */}
+          )}
 
           <TabsContent value="pcb">
             <div
               className={cn(
-                "mt-4 overflow-hidden",
+                "overflow-hidden",
                 isFullScreen ? "h-[calc(100vh-96px)]" : "h-[620px]",
               )}
             >
@@ -272,7 +264,7 @@ export const CircuitJsonPreview = ({
           <TabsContent value="schematic">
             <div
               className={cn(
-                "mt-4 overflow-auto",
+                "overflow-auto",
                 isFullScreen ? "h-[calc(100vh-96px)]" : "h-[620px]",
               )}
             >
@@ -289,7 +281,7 @@ export const CircuitJsonPreview = ({
           <TabsContent value="cad">
             <div
               className={cn(
-                "mt-4 overflow-auto",
+                "overflow-auto",
                 isFullScreen ? "h-[calc(100vh-96px)]" : "h-[620px]",
               )}
             >
@@ -306,7 +298,7 @@ export const CircuitJsonPreview = ({
           <TabsContent value="bom">
             <div
               className={cn(
-                "mt-4 overflow-auto",
+                "overflow-auto",
                 isFullScreen ? "h-[calc(100vh-96px)]" : "h-[620px]",
               )}
             >
@@ -323,7 +315,7 @@ export const CircuitJsonPreview = ({
           <TabsContent value="circuitjson">
             <div
               className={cn(
-                "mt-4 overflow-auto",
+                "overflow-auto",
                 isFullScreen ? "h-[calc(100vh-96px)]" : "h-[620px]",
               )}
             >

@@ -178,3 +178,5 @@ dist
 .aider*
 *.generated.ts
 lib/hooks/styles.generated.ts
+.vercel
+cosmos-export

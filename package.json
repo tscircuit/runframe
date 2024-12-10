@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "start": "cosmos",
-    "build:css": "bun run scripts/build-css.ts"
+    "build:css": "bun run scripts/build-css.ts",
+    "build:site": "cosmos-export",
+    "vercel-build": "bun run build:css && cosmos-export"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

@@ -1,5 +1,7 @@
 # @tscircuit/runframe
 
+[tscircuit](https://github.com/tscircuit/tscircuit) ⋅ [View Examples](https://runframe.vercel.app)
+
 A React component that runs tscircuit inside a webworker and shows you the PCB,
 Schematic, 3D and other previews.
 

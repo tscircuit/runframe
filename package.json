@@ -1,0 +1,21 @@
+{
+  "name": "@tscircuit/runframe",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "vite": "^6.0.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@tscircuit/3d-viewer": "^0.0.46",
+    "@tscircuit/pcb-viewer": "^1.10.21"
+  }
+}

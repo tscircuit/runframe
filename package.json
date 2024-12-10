@@ -6,6 +6,7 @@
     "start": "cosmos",
     "build:css": "bun run scripts/build-css.ts",
     "build:site": "cosmos-export",
+    "build:cli": "vite build",
     "vercel-build": "bun run build:css && cosmos-export"
   },
   "devDependencies": {

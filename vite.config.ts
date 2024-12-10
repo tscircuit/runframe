@@ -12,4 +12,6 @@ export default defineConfig({
   define: {
     global: {},
   },
+  root: ".",
+  publicDir: "public",
 })

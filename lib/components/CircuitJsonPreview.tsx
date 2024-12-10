@@ -34,11 +34,11 @@ import { Button } from "./ui/button"
 import { PcbViewerWithContainerHeight } from "./PcbViewerWithContainerHeight"
 
 export interface PreviewContentProps {
-  code: string
+  code?: string
   readOnly?: boolean
-  triggerRunTsx: () => void
-  tsxRunTriggerCount: number
-  errorMessage: string | null
+  onRunClicked?: () => void
+  tsxRunTriggerCount?: number
+  errorMessage?: string | null
   circuitJson: any
   circuitJsonKey?: string
   className?: string
@@ -54,12 +54,13 @@ export interface PreviewContentProps {
   onCodeChange?: (code: string) => void
   onDtsChange?: (dts: string) => void
   manualEditsFileContent?: string
+  hasCodeChangedSinceLastRun?: boolean
   onManualEditsFileContentChange?: (newmanualEditsFileContent: string) => void
 }
 
-export const PreviewContent = ({
+export const CircuitJsonPreview = ({
   code,
-  triggerRunTsx,
+  onRunClicked = () => {},
   tsxRunTriggerCount,
   errorMessage,
   circuitJsonKey = "",
@@ -75,21 +76,13 @@ export const PreviewContent = ({
   onToggleFullScreen,
   isFullScreen,
   isRunningCode,
+  hasCodeChangedSinceLastRun,
   onCodeChange,
   onDtsChange,
   manualEditsFileContent,
   onManualEditsFileContentChange,
 }: PreviewContentProps) => {
   const [activeTab, setActiveTab] = useState(showCodeTab ? "code" : "pcb")
-  const [lastRunHash, setLastRunHash] = useState("")
-
-  const currentCodeHash = code + "\n" + manualEditsFileContent
-  const hasCodeChangedSinceLastRun = lastRunHash !== currentCodeHash
-
-  useEffect(() => {
-    if (tsxRunTriggerCount === 0) return
-    setLastRunHash(currentCodeHash)
-  }, [tsxRunTriggerCount])
 
   useEffect(() => {
     if (errorMessage) {
@@ -114,11 +107,11 @@ export const PreviewContent = ({
           <div className={cn("flex items-center gap-2", headerClassName)}>
             {leftHeaderContent}
             {leftHeaderContent && <div className="flex-grow" />}
-            <RunButton
+            {/* <RunButton
               onClick={() => triggerRunTsx()}
               disabled={!hasCodeChangedSinceLastRun && tsxRunTriggerCount !== 0}
               isRunningCode={isRunningCode}
-            />
+            /> */}
             {!leftHeaderContent && <div className="flex-grow" />}
             <TabsList>
               {showCodeTab && <TabsTrigger value="code">Code</TabsTrigger>}
@@ -270,7 +263,7 @@ export const PreviewContent = ({
                     // }}
                   />
                 ) : (
-                  <PreviewEmptyState triggerRunTsx={triggerRunTsx} />
+                  <PreviewEmptyState onRunClicked={onRunClicked} />
                 )}
               </ErrorBoundary>
             </div>
@@ -287,7 +280,7 @@ export const PreviewContent = ({
                 {circuitJson ? (
                   <SchematicViewer circuitJson={circuitJson} />
                 ) : (
-                  <PreviewEmptyState triggerRunTsx={triggerRunTsx} />
+                  <PreviewEmptyState onRunClicked={onRunClicked} />
                 )}
               </ErrorBoundary>
             </div>
@@ -304,7 +297,7 @@ export const PreviewContent = ({
                 {circuitJson ? (
                   <CadViewer soup={circuitJson as any} />
                 ) : (
-                  <PreviewEmptyState triggerRunTsx={triggerRunTsx} />
+                  <PreviewEmptyState onRunClicked={onRunClicked} />
                 )}
               </ErrorBoundary>
             </div>
@@ -321,7 +314,7 @@ export const PreviewContent = ({
                 {circuitJson ? (
                   <BomTable circuitJson={circuitJson} />
                 ) : (
-                  <PreviewEmptyState triggerRunTsx={triggerRunTsx} />
+                  <PreviewEmptyState onRunClicked={onRunClicked} />
                 )}
               </ErrorBoundary>
             </div>
@@ -334,20 +327,20 @@ export const PreviewContent = ({
                 isFullScreen ? "h-[calc(100vh-96px)]" : "h-[620px]",
               )}
             >
-              <ErrorBoundary fallback={<div>Error loading JSON viewer</div>}>
+              {/* <ErrorBoundary fallback={<div>Error loading JSON viewer</div>}>
                 {circuitJson ? (
                   <CircuitJsonTableViewer elements={circuitJson as any} />
                 ) : (
                   <PreviewEmptyState triggerRunTsx={triggerRunTsx} />
                 )}
-              </ErrorBoundary>
+              </ErrorBoundary> */}
             </div>
           </TabsContent>
           <TabsContent value="error">
             {circuitJson || errorMessage ? (
               <ErrorTabContent code={code} errorMessage={errorMessage} />
             ) : (
-              <PreviewEmptyState triggerRunTsx={triggerRunTsx} />
+              <PreviewEmptyState onRunClicked={onRunClicked} />
             )}
           </TabsContent>
         </Tabs>

@@ -1,5 +1,3 @@
 export default {
-  content: [
-    './lib/**/*.{js,jsx,ts,tsx}',
-  ],
+  content: ["./lib/**/*.{js,jsx,ts,tsx}"],
 }

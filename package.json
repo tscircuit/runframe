@@ -6,6 +6,9 @@
     "start": "cosmos",
     "build:css": "bun run scripts/build-css.ts",
     "build:site": "cosmos-export",
+    "build:cli": "vite build",
+    "format:check": "biome format .",
+    "format": "biome format --write .",
     "vercel-build": "bun run build:css && cosmos-export"
   },
   "devDependencies": {
@@ -30,9 +33,10 @@
     "@radix-ui/react-icons": "^1.3.2",
     "@radix-ui/react-tabs": "^1.1.1",
     "@tscircuit/3d-viewer": "^0.0.46",
-    "@tscircuit/eval-webworker": "^0.0.4",
-    "@tscircuit/pcb-viewer": "^1.10.21",
+    "@tscircuit/eval-webworker": "^0.0.20",
+    "@tscircuit/pcb-viewer": "^1.10.22",
     "@tscircuit/schematic-viewer": "2.0.3",
+    "comlink": "^4.4.2",
     "cssnano": "^7.0.6",
     "lucide-react": "^0.468.0",
     "react-cosmos-plugin-vite": "^6.2.0",

@@ -2,6 +2,9 @@ import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
 import { CircuitJsonPreview } from "./CircuitJsonPreview"
 import { useEffect, useState } from "react"
 
+// @ts-ignore
+import evalWebWorkerBlobUrl from "@tscircuit/eval-webworker/blob-url"
+
 interface Props {
   /**
    * Map of filenames to file contents that will be available in the worker
@@ -39,17 +42,27 @@ export const RunFrame = (props: Props) => {
 
   useEffect(() => {
     async function runWorker() {
-      const worker = await createCircuitWebWorker({})
+      const worker = await createCircuitWebWorker({
+        webWorkerUrl: evalWebWorkerBlobUrl,
+        verbose: true,
+      })
       const $finished = worker.executeWithFsMap({
         entrypoint: props.entrypoint,
         fsMap: props.fsMap,
       })
-      setCircuitJson(await worker.getCircuitJson())
+      console.log("waiting for execution to finish...")
       await $finished
+      console.log("waiting for initial circuit json...")
+      setCircuitJson(await worker.getCircuitJson())
+      console.log("got initial circuit json")
+      await $finished.catch((e) => {
+        console.error(e)
+      })
       setCircuitJson(await worker.getCircuitJson())
     }
     runWorker()
   }, [props.fsMap])
 
+  console.log({ circuitJson })
   return <CircuitJsonPreview circuitJson={circuitJson} />
 }

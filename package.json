@@ -7,6 +7,8 @@
     "build:css": "bun run scripts/build-css.ts",
     "build:site": "cosmos-export",
     "build:cli": "vite build",
+    "format:check": "biome format .",
+    "format": "biome format --write .",
     "vercel-build": "bun run build:css && cosmos-export"
   },
   "devDependencies": {

@@ -22,5 +22,20 @@ circuit.add(
     }, 500)
   }, [])
 
+  if (
+    typeof window !== "undefined" &&
+    window.location.origin.includes("vercel.app")
+  ) {
+    return (
+      <div>
+        <h1>RunFrame with API</h1>
+        <p>
+          We don't currently deploy the API to vercel, try locally! The vite
+          plugin will automatically load it.
+        </p>
+      </div>
+    )
+  }
+
   return <RunFrameWithApi />
 }

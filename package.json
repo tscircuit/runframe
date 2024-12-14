@@ -4,9 +4,12 @@
   "type": "module",
   "scripts": {
     "start": "cosmos",
+    "build": "bun run build:lib",
+    "build:lib": "bun run build:css && bun run build:cli && bun run build:standalone",
     "build:css": "bun run scripts/build-css.ts",
     "build:site": "cosmos-export",
     "build:cli": "vite build",
+    "build:standalone": "tsup ./lib/components/RunFrameWithApi/standalone.tsx --sourcemap inline --format esm",
     "format:check": "biome format .",
     "format": "biome format --write .",
     "vercel-build": "bun run build:css && cosmos-export"
@@ -23,6 +26,7 @@
     "react-cosmos": "^6.2.1",
     "react-dom": "18",
     "tailwindcss": "^3.4.16",
+    "tsup": "^8.3.5",
     "vite": "^6.0.3"
   },
   "peerDependencies": {
@@ -34,8 +38,10 @@
     "@radix-ui/react-tabs": "^1.1.1",
     "@tscircuit/3d-viewer": "^0.0.53",
     "@tscircuit/eval-webworker": "^0.0.21",
+    "@tscircuit/file-server": "^0.0.5",
     "@tscircuit/pcb-viewer": "^1.10.22",
     "@tscircuit/schematic-viewer": "2.0.3",
+    "circuit-to-svg": "^0.0.91",
     "comlink": "^4.4.2",
     "cssnano": "^7.0.6",
     "lucide-react": "^0.468.0",

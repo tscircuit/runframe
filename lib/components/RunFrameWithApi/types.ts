@@ -29,6 +29,13 @@ export interface RunFrameState {
   stopPolling: () => void
 }
 
+export interface RunFrameWithApiProps {
+  /**
+   * Base URL for the API endpoints
+   */
+  apiBaseUrl?: string
+}
+
 declare global {
   interface Window {
     API_BASE_URL: string

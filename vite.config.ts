@@ -60,7 +60,11 @@ export default defineConfig({
     },
   },
   define: {
-    global: {},
+    global: {
+      process: {
+        env: {},
+      },
+    },
   },
   root: ".",
   publicDir: "public",

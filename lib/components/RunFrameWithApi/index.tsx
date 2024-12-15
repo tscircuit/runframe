@@ -4,6 +4,9 @@ import { useRunFrameStore, selectCurrentFileMap } from "./store"
 import type { RunFrameWithApiProps } from "./types"
 
 const guessEntrypoint = (files: string[]) =>
+  files.find((file) => file.includes("entrypoint.")) ??
+  files.find((file) => file.includes("index.")) ??
+  files.find((file) => file.includes("main.")) ??
   files.find((file) => file.endsWith(".tsx"))
 
 export const RunFrameWithApi = ({ apiBaseUrl }: RunFrameWithApiProps) => {
@@ -23,9 +26,9 @@ export const RunFrameWithApi = ({ apiBaseUrl }: RunFrameWithApiProps) => {
     return () => stopPolling()
   }, [startPolling, stopPolling])
 
-  const entrypoint = guessEntrypoint(Object.keys(fsMap))
+  const entrypoint = guessEntrypoint(Object.keys(fsMap)) ?? "entrypoint.tsx"
 
-  if (!entrypoint) {
+  if (!fsMap[entrypoint]) {
     return <div>No entrypoint found for Run Frame!</div>
   }
 

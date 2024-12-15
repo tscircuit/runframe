@@ -1,8 +1,16 @@
 {
   "name": "@tscircuit/runframe",
-  "main": "dist/index.js",
+  "main": "dist/preview.js",
   "type": "module",
   "version": "0.0.1",
+  "exports": {
+    ".": "./dist/preview.js",
+    "./preview": "./dist/preview.js",
+    "./runner": "./dist/runner.js"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "start": "cosmos",
     "build": "bun run build:css && bun run build:standalone && bun run build:lib",

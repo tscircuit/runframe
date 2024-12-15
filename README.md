@@ -12,7 +12,7 @@ Schematic, 3D and other previews.
 ## Usage
 
 ```tsx
-import { RunFrame } from "@tscircuit/runframe"
+import { RunFrame } from "@tscircuit/runframe/runner"
 
 const App = () => (
   <RunFrame
@@ -39,7 +39,7 @@ circuit.add(
 If you already have circuit JSON and just want to display it:
 
 ```tsx
-import { CircuitJsonPreview } from "@tscircuit/runframe"
+import { CircuitJsonPreview } from "@tscircuit/runframe/preview"
 
 const App = () => (
   <CircuitJsonPreview

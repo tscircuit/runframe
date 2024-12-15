@@ -61,7 +61,9 @@ export default defineConfig({
   },
   define: {
     global: {
-      process: {},
+      process: {
+        env: {},
+      },
     },
   },
   root: ".",

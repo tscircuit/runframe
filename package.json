@@ -10,7 +10,7 @@
     "build:css": "bun run scripts/build-css.ts",
     "build:site": "cosmos-export",
     "build:cli": "vite build",
-    "build:standalone": "tsup ./lib/components/RunFrameWithApi/standalone.tsx --sourcemap inline --format esm",
+    "build:standalone": "tsup ./lib/components/RunFrameWithApi/standalone.tsx --sourcemap inline --platform browser --format esm",
     "format:check": "biome format .",
     "format": "biome format --write .",
     "vercel-build": "bun run build:css && cosmos-export"

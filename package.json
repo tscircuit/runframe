@@ -6,10 +6,9 @@
   "scripts": {
     "start": "cosmos",
     "build": "bun run build:lib",
-    "build:lib": "bun run build:standalone && bun run build:css && bun run build:cli",
+    "build:lib": "bun run build:css && bun run build:standalone",
     "build:css": "bun run scripts/build-css.ts",
     "build:site": "cosmos-export",
-    "build:cli": "vite build",
     "build:standalone": "STANDALONE=1 vite build",
     "format:check": "biome format .",
     "format": "biome format --write .",

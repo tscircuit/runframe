@@ -5,8 +5,8 @@
   "version": "0.0.1",
   "scripts": {
     "start": "cosmos",
-    "build": "bun run build:lib",
-    "build:lib": "bun run build:css && bun run build:standalone",
+    "build": "bun run build:css && bun run build:standalone && bun run build:lib",
+    "build:lib": "tsup-node lib/preview.ts lib/runner.ts --platform browser --format esm --dts",
     "build:css": "bun run scripts/build-css.ts",
     "build:site": "cosmos-export",
     "build:standalone": "STANDALONE=1 vite build",

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "cosmos",
     "build": "bun run build:lib",
-    "build:lib": "bun run build:css && bun run build:cli && bun run build:standalone",
+    "build:lib": "bun run build:standalone && bun run build:css && bun run build:cli",
     "build:css": "bun run scripts/build-css.ts",
     "build:site": "cosmos-export",
     "build:cli": "vite build",

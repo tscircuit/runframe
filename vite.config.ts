@@ -35,9 +35,10 @@ if (process.env.STANDALONE) {
     lib: {
       entry: resolve(__dirname, "src/main.tsx"),
       name: "standalone",
-      fileName: "standalone",
+      fileName: (format) => `standalone.min.js`,
       formats: ["umd"],
     },
+    minify: true,
   }
 }
 

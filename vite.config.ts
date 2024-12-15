@@ -28,6 +28,19 @@ if (!process.env.VERCEL) {
   plugins.push(apiServerPlugin())
 }
 
+let build: any = undefined
+
+if (process.env.STANDALONE) {
+  build = {
+    lib: {
+      entry: resolve(__dirname, "src/main.tsx"),
+      name: "standalone",
+      fileName: "standalone",
+      formats: ["umd"],
+    },
+  }
+}
+
 export default defineConfig({
   plugins,
   resolve: {
@@ -40,4 +53,5 @@ export default defineConfig({
   },
   root: ".",
   publicDir: "public",
+  build,
 })

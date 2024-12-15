@@ -38,6 +38,8 @@
     "cli/**/*.ts",
     "cli/**/*.tsx",
     "scripts/**/*.ts",
-    "scripts/**/*.tsx"
+    "scripts/**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
   ]
 }

@@ -53,7 +53,7 @@
     "@tscircuit/file-server": "^0.0.6",
     "@tscircuit/pcb-viewer": "^1.10.22",
     "@tscircuit/schematic-viewer": "2.0.3",
-    "circuit-to-svg": "^0.0.92",
+    "circuit-to-svg": "^0.0.93",
     "comlink": "^4.4.2",
     "cssnano": "^7.0.6",
     "lucide-react": "^0.468.0",

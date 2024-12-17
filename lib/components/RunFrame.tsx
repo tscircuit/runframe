@@ -39,30 +39,62 @@ interface Props {
 
 export const RunFrame = (props: Props) => {
   const [circuitJson, setCircuitJson] = useState<any>(null)
+  const [error, setError] = useState<{
+    phase?: string
+    componentDisplayName?: string
+    error?: string
+    stack?: string
+  } | null>(null)
 
   useEffect(() => {
+    let worker: Awaited<ReturnType<typeof createCircuitWebWorker>>
+
     async function runWorker() {
-      const worker = await createCircuitWebWorker({
-        webWorkerUrl: evalWebWorkerBlobUrl,
-        verbose: true,
-      })
-      const $finished = worker.executeWithFsMap({
-        entrypoint: props.entrypoint,
-        fsMap: props.fsMap,
-      })
-      console.log("waiting for execution to finish...")
-      await $finished
-      console.log("waiting for initial circuit json...")
-      setCircuitJson(await worker.getCircuitJson())
-      console.log("got initial circuit json")
-      await $finished.catch((e) => {
+      try {
+        worker = await createCircuitWebWorker({
+          webWorkerUrl: evalWebWorkerBlobUrl,
+          verbose: true,
+        })
+
+        // Set up error listener
+        worker.on("eval_error", (errorData) => {
+          setError(errorData)
+          // Call the onError prop if provided
+          if (props.onError) {
+            props.onError(new Error(`${errorData.error} in ${errorData.componentDisplayName} during ${errorData.phase}`))
+          }
+        })
+
+        const $finished = worker.executeWithFsMap({
+          entrypoint: props.entrypoint,
+          fsMap: props.fsMap,
+        })
+
+        console.log("waiting for execution to finish...")
+        await $finished
+        console.log("waiting for initial circuit json...")
+        
+        const json = await worker.getCircuitJson()
+        setCircuitJson(json)
+        props.onCircuitJsonChange?.(json)
+        
+        console.log("got initial circuit json")
+        
+        await worker.renderUntilSettled()
+        const finalJson = await worker.getCircuitJson()
+        setCircuitJson(finalJson)
+        props.onCircuitJsonChange?.(finalJson)
+        props.onRenderingFinished?.({ circuitJson: finalJson })
+
+      } catch (e: any) {
         console.error(e)
-      })
-      setCircuitJson(await worker.getCircuitJson())
+        setError({ error: e.message, stack: e.stack })
+        props.onError?.(e)
+      }
     }
     runWorker()
   }, [props.fsMap])
 
   console.log({ circuitJson })
-  return <CircuitJsonPreview circuitJson={circuitJson} />
+  return <CircuitJsonPreview circuitJson={circuitJson} errorMessage={error?.error} />
 }

@@ -49,7 +49,7 @@
     "@radix-ui/react-icons": "^1.3.2",
     "@radix-ui/react-tabs": "^1.1.1",
     "@tscircuit/3d-viewer": "^0.0.63",
-    "@tscircuit/eval-webworker": "^0.0.26",
+    "@tscircuit/eval-webworker": "^0.0.27",
     "@tscircuit/file-server": "^0.0.6",
     "@tscircuit/pcb-viewer": "^1.10.22",
     "@tscircuit/schematic-viewer": "2.0.5",

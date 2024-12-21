@@ -39,6 +39,12 @@ interface Props {
 
 export const RunFrame = (props: Props) => {
   const [circuitJson, setCircuitJson] = useState<any>(null)
+  const [error, setError] = useState<{
+    phase?: string
+    componentDisplayName?: string
+    error?: string
+    stack?: string
+  } | null>(null)
 
   useEffect(() => {
     async function runWorker() {
@@ -46,23 +52,29 @@ export const RunFrame = (props: Props) => {
         webWorkerUrl: evalWebWorkerBlobUrl,
         verbose: true,
       })
-      const $finished = worker.executeWithFsMap({
-        entrypoint: props.entrypoint,
-        fsMap: props.fsMap,
-      })
+      const $finished = worker
+        .executeWithFsMap({
+          entrypoint: props.entrypoint,
+          fsMap: props.fsMap,
+        })
+        .catch((e) => {
+          // removing the prefix "Eval compiled js error for "./main.tsx":"
+          const message = e.message.split(":")[1]
+          setError({ error: message, stack: e.stack })
+          console.error(e)
+        })
       console.log("waiting for execution to finish...")
       await $finished
       console.log("waiting for initial circuit json...")
       setCircuitJson(await worker.getCircuitJson())
       console.log("got initial circuit json")
-      await $finished.catch((e) => {
-        console.error(e)
-      })
       setCircuitJson(await worker.getCircuitJson())
     }
     runWorker()
   }, [props.fsMap])
 
   console.log({ circuitJson })
-  return <CircuitJsonPreview circuitJson={circuitJson} />
+  return (
+    <CircuitJsonPreview circuitJson={circuitJson} errorMessage={error?.error} />
+  )
 }

@@ -61,15 +61,13 @@ export const RunFrame = (props: Props) => {
           // removing the prefix "Eval compiled js error for "./main.tsx":"
           const message = e.message.split(":")[1]
           setError({ error: message, stack: e.stack })
+          console.error(e)
         })
       console.log("waiting for execution to finish...")
       await $finished
       console.log("waiting for initial circuit json...")
       setCircuitJson(await worker.getCircuitJson())
       console.log("got initial circuit json")
-      await $finished.catch((e) => {
-        console.error(e)
-      })
       setCircuitJson(await worker.getCircuitJson())
     }
     runWorker()

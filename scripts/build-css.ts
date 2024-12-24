@@ -7,7 +7,7 @@ import tailwindConfig from "../tailwind.config"
 
 async function buildCss() {
   // Read your base CSS file with @tailwind directives
-  const css = "@tailwind base; @tailwind components; @tailwind utilities;"
+  const css = "@tailwind components; @tailwind utilities;"
 
   const result = await postcss([
     tailwindcss(tailwindConfig),

@@ -47,13 +47,15 @@ export interface PreviewContentProps {
   showJsonTab?: boolean
   showImportAndFormatButtons?: boolean
   headerClassName?: string
+  /**
+   * An optional left-side header, you can put a save button, a run button, or
+   * a title here.
+   */
   leftHeaderContent?: React.ReactNode
   isRunningCode?: boolean
   isStreaming?: boolean
   onToggleFullScreen?: () => void
   isFullScreen?: boolean
-  onCodeChange?: (code: string) => void
-  onDtsChange?: (dts: string) => void
   manualEditsFileContent?: string
   hasCodeChangedSinceLastRun?: boolean
   onManualEditsFileContentChange?: (newmanualEditsFileContent: string) => void
@@ -79,8 +81,6 @@ export const CircuitJsonPreview = ({
   isFullScreen,
   isRunningCode,
   hasCodeChangedSinceLastRun,
-  onCodeChange,
-  onDtsChange,
   manualEditsFileContent,
   onManualEditsFileContentChange,
 }: PreviewContentProps) => {

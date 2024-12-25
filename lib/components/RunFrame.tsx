@@ -17,6 +17,12 @@ interface Props {
   entrypoint: string
 
   /**
+   * An optional left-side header, you can put a save button, a run button, or
+   * a title here.
+   */
+  leftHeaderContent?: React.ReactNode
+
+  /**
    * Called when the circuit JSON changes
    */
   onCircuitJsonChange?: (circuitJson: any) => void
@@ -75,6 +81,10 @@ export const RunFrame = (props: Props) => {
 
   console.log({ circuitJson })
   return (
-    <CircuitJsonPreview circuitJson={circuitJson} errorMessage={error?.error} />
+    <CircuitJsonPreview
+      leftHeaderContent={props.leftHeaderContent}
+      circuitJson={circuitJson}
+      errorMessage={error?.error}
+    />
   )
 }

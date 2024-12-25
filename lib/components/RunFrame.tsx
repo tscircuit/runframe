@@ -1,9 +1,13 @@
 import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
 import { CircuitJsonPreview } from "./CircuitJsonPreview"
 import { useEffect, useState } from "react"
+import Debug from "debug"
+
+const debug = Debug("run-frame")
 
 // @ts-ignore
 import evalWebWorkerBlobUrl from "@tscircuit/eval-webworker/blob-url"
+import type { ManualEditEvent } from "@tscircuit/props"
 
 interface Props {
   /**
@@ -41,6 +45,11 @@ interface Props {
    * Called when an error occurs
    */
   onError?: (error: Error) => void
+
+  /**
+   * If true, turns on debug logging
+   */
+  debug?: boolean
 }
 
 export const RunFrame = (props: Props) => {
@@ -51,6 +60,10 @@ export const RunFrame = (props: Props) => {
     error?: string
     stack?: string
   } | null>(null)
+  const [editEvents, setEditEvents] = useState<ManualEditEvent[]>([])
+  useEffect(() => {
+    if (props.debug) Debug.enable("run-frame")
+  }, [props.debug])
 
   useEffect(() => {
     async function runWorker() {
@@ -69,21 +82,22 @@ export const RunFrame = (props: Props) => {
           setError({ error: message, stack: e.stack })
           console.error(e)
         })
-      console.log("waiting for execution to finish...")
+      debug("waiting for execution to finish...")
       await $finished
-      console.log("waiting for initial circuit json...")
+      debug("waiting for initial circuit json...")
       setCircuitJson(await worker.getCircuitJson())
-      console.log("got initial circuit json")
+      debug("got initial circuit json")
       setCircuitJson(await worker.getCircuitJson())
     }
     runWorker()
   }, [props.fsMap])
 
-  console.log({ circuitJson })
   return (
     <CircuitJsonPreview
       leftHeaderContent={props.leftHeaderContent}
       circuitJson={circuitJson}
+      editEvents={editEvents}
+      onEditEvent={(ee) => setEditEvents([...editEvents, ee])}
       errorMessage={error?.error}
     />
   )

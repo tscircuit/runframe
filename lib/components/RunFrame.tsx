@@ -47,6 +47,16 @@ interface Props {
   onError?: (error: Error) => void
 
   /**
+   * Called when an edit event occurs
+   */
+  onEditEvent?: (editEvent: ManualEditEvent) => void
+
+  /**
+   * Any edit events that have occurred and should be applied
+   */
+  editEvents?: ManualEditEvent[]
+
+  /**
    * If true, turns on debug logging
    */
   debug?: boolean
@@ -60,7 +70,6 @@ export const RunFrame = (props: Props) => {
     error?: string
     stack?: string
   } | null>(null)
-  const [editEvents, setEditEvents] = useState<ManualEditEvent[]>([])
   useEffect(() => {
     if (props.debug) Debug.enable("run-frame")
   }, [props.debug])
@@ -96,8 +105,6 @@ export const RunFrame = (props: Props) => {
     <CircuitJsonPreview
       leftHeaderContent={props.leftHeaderContent}
       circuitJson={circuitJson}
-      editEvents={editEvents}
-      onEditEvent={(ee) => setEditEvents([...editEvents, ee])}
       errorMessage={error?.error}
     />
   )

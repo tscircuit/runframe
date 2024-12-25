@@ -1,7 +1,8 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { RunFrame } from "../RunFrame"
 import { useRunFrameStore, selectCurrentFileMap } from "./store"
 import type { RunFrameWithApiProps } from "./types"
+import type { ManualEditEvent } from "@tscircuit/props"
 
 const guessEntrypoint = (files: string[]) =>
   files.find((file) => file.includes("entrypoint.")) ??
@@ -12,6 +13,7 @@ const guessEntrypoint = (files: string[]) =>
 export const RunFrameWithApi = ({ apiBaseUrl }: RunFrameWithApiProps) => {
   const { startPolling, stopPolling } = useRunFrameStore()
   const fsMap = useRunFrameStore(selectCurrentFileMap)
+  const [editEvents, setEditEvents] = useState<ManualEditEvent[]>([])
 
   // Initialize API base URL
   useEffect(() => {
@@ -38,6 +40,10 @@ export const RunFrameWithApi = ({ apiBaseUrl }: RunFrameWithApiProps) => {
       entrypoint={entrypoint}
       onError={(error) => {
         console.error("RunFrame error:", error)
+      }}
+      editEvents={editEvents}
+      onEditEvent={(ee) => {
+        setEditEvents([...editEvents, ee])
       }}
     />
   )

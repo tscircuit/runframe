@@ -81,7 +81,6 @@ export const CircuitJsonPreview = ({
   isFullScreen,
   isRunningCode,
   hasCodeChangedSinceLastRun,
-  header,
   manualEditsFileContent,
   onManualEditsFileContentChange,
 }: PreviewContentProps) => {

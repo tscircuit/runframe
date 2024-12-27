@@ -96,11 +96,15 @@ export const RunFrame = (props: Props) => {
   const fsMap =
     props.fsMap instanceof Map
       ? props.fsMap
-      : new Map(Object.entries(props.fsMap))
+      : Object.entries(props.fsMap ?? {}).reduce(
+          (m, [k, v]) => m.set(k, v),
+          new Map(),
+        )
   const lastFsMapRef = useRef<Map<string, string> | null>(null)
 
   useEffect(() => {
-    if (lastFsMapRef.current) {
+    if (!fsMap) return
+    if (lastFsMapRef.current && circuitJson) {
       const changes = getChangesBetweenFsMaps(lastFsMapRef.current, fsMap)
 
       if (Object.keys(changes).length > 0) {
@@ -123,10 +127,13 @@ export const RunFrame = (props: Props) => {
       globalThis.runFrameWorker = worker
       props.onRenderStarted?.()
 
+      const fsMapObj =
+        fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap
+
       const $finished = worker
         .executeWithFsMap({
           entrypoint: props.entrypoint,
-          fsMap,
+          fsMap: fsMapObj,
         })
         .catch((e: any) => {
           // removing the prefix "Eval compiled js error for "./main.tsx":"

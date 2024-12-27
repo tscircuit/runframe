@@ -27,7 +27,8 @@
       "recommended": true,
       "suspicious": {
         "noExplicitAny": "off",
-        "noArrayIndexKey": "off"
+        "noArrayIndexKey": "off",
+        "noConsoleLog": "error"
       },
       "complexity": {
         "noForEach": "info"

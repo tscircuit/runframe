@@ -32,6 +32,7 @@ import {
 import { Button } from "./ui/button"
 import { PcbViewerWithContainerHeight } from "./PcbViewerWithContainerHeight"
 import { useStyles } from "lib/hooks/use-styles"
+import type { ManualEditEvent } from "@tscircuit/props"
 
 export interface PreviewContentProps {
   code?: string
@@ -56,9 +57,21 @@ export interface PreviewContentProps {
   isStreaming?: boolean
   onToggleFullScreen?: () => void
   isFullScreen?: boolean
-  manualEditsFileContent?: string
+  // manualEditsFileContent?: string
   hasCodeChangedSinceLastRun?: boolean
-  onManualEditsFileContentChange?: (newmanualEditsFileContent: string) => void
+  // onManualEditsFileContentChange?: (newmanualEditsFileContent: string) => void
+
+  defaultActiveTab?:
+    | "code"
+    | "pcb"
+    | "schematic"
+    | "cad"
+    | "bom"
+    | "circuitjson"
+    | "error"
+
+  onEditEvent?: (editEvent: ManualEditEvent) => void
+  editEvents?: ManualEditEvent[]
 }
 
 export const CircuitJsonPreview = ({
@@ -81,11 +94,12 @@ export const CircuitJsonPreview = ({
   isFullScreen,
   isRunningCode,
   hasCodeChangedSinceLastRun,
-  manualEditsFileContent,
-  onManualEditsFileContentChange,
+  onEditEvent,
+  editEvents,
+  defaultActiveTab,
 }: PreviewContentProps) => {
   useStyles()
-  const [activeTab, setActiveTab] = useState(showCodeTab ? "code" : "pcb")
+  const [activeTab, setActiveTab] = useState(defaultActiveTab ?? "pcb")
 
   useEffect(() => {
     if (errorMessage) {
@@ -104,7 +118,7 @@ export const CircuitJsonPreview = ({
       <div className="md:sticky md:top-2">
         <Tabs
           value={activeTab}
-          onValueChange={setActiveTab}
+          onValueChange={setActiveTab as any}
           className="flex-grow flex flex-col p-2"
         >
           <div className={cn("flex items-center gap-2", headerClassName)}>
@@ -276,6 +290,10 @@ export const CircuitJsonPreview = ({
                     containerStyle={{
                       height: "100%",
                     }}
+                    editingEnabled
+                    onEditEvent={(ee) => onEditEvent?.(ee)}
+                    editEvents={editEvents}
+                    debugGrid
                   />
                 ) : (
                   <PreviewEmptyState onRunClicked={onRunClicked} />

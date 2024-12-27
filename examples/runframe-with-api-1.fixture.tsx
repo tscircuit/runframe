@@ -10,13 +10,25 @@ export default () => {
         body: JSON.stringify({
           file_path: "main.tsx",
           text_content: `
+import manualEdits from "./manual-edits.json"
+
+console.log("inside render manualEdits", manualEdits)
+
 circuit.add(
-<board width="10mm" height="10mm">
+<board width="10mm" height="10mm" manualEdits={manualEdits}>
   <resistor name="R1" resistance="1k" footprint="0402" />
   <capacitor name="C1" capacitance="1uF" footprint="0603" pcbX={4} />
   <trace from=".R1 .pin1" to=".C1 .pin1" />
 </board>
 )`,
+        }),
+      })
+      fetch("/api/files/upsert", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          file_path: "manual-edits.json",
+          text_content: JSON.stringify({}),
         }),
       })
     }, 500)
@@ -37,5 +49,5 @@ circuit.add(
     )
   }
 
-  return <RunFrameWithApi />
+  return <RunFrameWithApi debug />
 }

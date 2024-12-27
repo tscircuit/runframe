@@ -140,7 +140,7 @@ export const useRunFrameStore = create<RunFrameState>()(
         if (!state.circuitJson) return
 
         const manualEditsJson = state.fsMap.get("manual-edits.json")
-        const manualEdits = manualEditsJson ? JSON.parse(manualEditsJson) : []
+        const manualEdits = manualEditsJson ? JSON.parse(manualEditsJson) : {}
 
         // TODO apply manual edit events to manual edits file
         const updatedManualEditsFileContent = applyEditEventsToManualEditsFile({

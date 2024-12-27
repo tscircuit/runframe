@@ -1,9 +1,9 @@
 import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
 import { CircuitJsonPreview } from "./CircuitJsonPreview"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Debug from "debug"
 
-const debug = Debug("run-frame")
+const debug = Debug("run-frame:RunFrame")
 
 declare global {
   var runFrameWorker: any
@@ -13,12 +13,13 @@ declare global {
 import evalWebWorkerBlobUrl from "@tscircuit/eval-webworker/blob-url"
 import type { ManualEditEvent } from "@tscircuit/props"
 import { useRunFrameStore } from "./RunFrameWithApi/store"
+import { getChangesBetweenFsMaps } from "../utils/getChangesBetweenFsMaps"
 
 interface Props {
   /**
    * Map of filenames to file contents that will be available in the worker
    */
-  fsMap: Map<string, string> | { [filename: string]: string }
+  fsMap: Map<string, string>
 
   /**
    * The entry point file that will be executed first
@@ -92,7 +93,22 @@ export const RunFrame = (props: Props) => {
     if (props.debug) Debug.enable("run-frame*")
   }, [props.debug])
 
+  const lastFsMapRef = useRef<Map<string, string> | null>(null)
+
   useEffect(() => {
+    if (lastFsMapRef.current) {
+      const changes = getChangesBetweenFsMaps(lastFsMapRef.current, props.fsMap)
+
+      if (Object.keys(changes).length > 0) {
+        debug("render triggered by changes:", changes)
+      } else {
+        debug("render triggered without changes to fsMap, skipping")
+        return
+      }
+    }
+
+    lastFsMapRef.current = props.fsMap
+
     async function runWorker() {
       const worker =
         globalThis.runFrameWorker ??
@@ -122,6 +138,7 @@ export const RunFrame = (props: Props) => {
 
       debug("waiting for initial circuit json...")
       let circuitJson = await worker.getCircuitJson()
+      debug("got initial circuit json")
       setCircuitJson(circuitJson)
       props.onCircuitJsonChange?.(circuitJson)
       props.onInitialRender?.({ circuitJson })

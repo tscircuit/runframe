@@ -31,6 +31,7 @@
     "@types/react-dom": "18",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "circuit-json": "^0.0.122",
     "class-variance-authority": "^0.7.1",
     "debug": "^4.4.0",
     "playwright": "^1.49.1",

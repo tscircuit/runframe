@@ -5,15 +5,20 @@ import Debug from "debug"
 
 const debug = Debug("run-frame")
 
+declare global {
+  var runFrameWorker: any
+}
+
 // @ts-ignore
 import evalWebWorkerBlobUrl from "@tscircuit/eval-webworker/blob-url"
 import type { ManualEditEvent } from "@tscircuit/props"
+import { useRunFrameStore } from "./RunFrameWithApi/store"
 
 interface Props {
   /**
    * Map of filenames to file contents that will be available in the worker
    */
-  fsMap: { [filename: string]: string }
+  fsMap: Map<string, string> | { [filename: string]: string }
 
   /**
    * The entry point file that will be executed first
@@ -34,7 +39,17 @@ interface Props {
   /**
    * Called when rendering is finished
    */
-  onRenderingFinished?: (params: { circuitJson: any }) => void
+  onRenderFinished?: (params: { circuitJson: any }) => void
+
+  /**
+   * Called when the initial render is finished (fast)
+   */
+  onInitialRender?: (params: { circuitJson: any }) => void
+
+  /**
+   * Called when rendering is started
+   */
+  onRenderStarted?: () => void
 
   /**
    * Called for each render event
@@ -63,7 +78,10 @@ interface Props {
 }
 
 export const RunFrame = (props: Props) => {
-  const [circuitJson, setCircuitJson] = useState<any>(null)
+  const [circuitJson, setCircuitJson] = useRunFrameStore((s) => [
+    s.circuitJson,
+    s.setCircuitJson,
+  ])
   const [error, setError] = useState<{
     phase?: string
     componentDisplayName?: string
@@ -71,38 +89,58 @@ export const RunFrame = (props: Props) => {
     stack?: string
   } | null>(null)
   useEffect(() => {
-    if (props.debug) Debug.enable("run-frame")
+    if (props.debug) Debug.enable("run-frame*")
   }, [props.debug])
 
   useEffect(() => {
     async function runWorker() {
-      const worker = await createCircuitWebWorker({
-        webWorkerUrl: evalWebWorkerBlobUrl,
-        verbose: true,
-      })
+      const worker =
+        globalThis.runFrameWorker ??
+        (await createCircuitWebWorker({
+          webWorkerUrl: evalWebWorkerBlobUrl,
+          verbose: true,
+        }))
+      globalThis.runFrameWorker = worker
+      props.onRenderStarted?.()
+
+      const fsMapObj =
+        props.fsMap instanceof Map
+          ? Object.fromEntries(props.fsMap.entries())
+          : props.fsMap
+
       const $finished = worker
         .executeWithFsMap({
           entrypoint: props.entrypoint,
-          fsMap: props.fsMap,
+          fsMap: fsMapObj,
         })
-        .catch((e) => {
+        .catch((e: any) => {
           // removing the prefix "Eval compiled js error for "./main.tsx":"
           const message = e.message.split(":")[1]
           setError({ error: message, stack: e.stack })
           console.error(e)
         })
+
+      debug("waiting for initial circuit json...")
+      let circuitJson = await worker.getCircuitJson()
+      setCircuitJson(circuitJson)
+      props.onCircuitJsonChange?.(circuitJson)
+      props.onInitialRender?.({ circuitJson })
+
       debug("waiting for execution to finish...")
       await $finished
-      debug("waiting for initial circuit json...")
-      setCircuitJson(await worker.getCircuitJson())
-      debug("got initial circuit json")
-      setCircuitJson(await worker.getCircuitJson())
+
+      debug("getting final circuit json")
+      circuitJson = await worker.getCircuitJson()
+      props.onCircuitJsonChange?.(circuitJson)
+      setCircuitJson(circuitJson)
+      props.onRenderFinished?.({ circuitJson })
     }
     runWorker()
   }, [props.fsMap])
 
   return (
     <CircuitJsonPreview
+      defaultActiveTab="schematic"
       leftHeaderContent={props.leftHeaderContent}
       circuitJson={circuitJson}
       errorMessage={error?.error}

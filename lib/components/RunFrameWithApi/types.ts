@@ -1,3 +1,5 @@
+import type { ManualEditEvent } from "@tscircuit/props"
+import type { CircuitJson } from "circuit-json"
 // Types
 export type FilePath = string
 export type FileContent = string
@@ -21,12 +23,18 @@ export interface RunFrameState {
   lastEventTime: string | null
   isPolling: boolean
   error: Error | null
+  circuitJson: CircuitJson | null
+  lastManualEditsChangeSentAt: number
 
   // Actions
   upsertFile: (path: FilePath, content: FileContent) => Promise<void>
   getFile: (path: FilePath) => Promise<void>
   startPolling: () => void
   stopPolling: () => void
+  setCircuitJson: (circuitJson: CircuitJson) => void
+  applyEditEventsAndUpdateManualEditsJson: (
+    editEvents: ManualEditEvent[],
+  ) => Promise<void>
 }
 
 export interface RunFrameWithApiProps {
@@ -34,6 +42,7 @@ export interface RunFrameWithApiProps {
    * Base URL for the API endpoints
    */
   apiBaseUrl?: string
+  debug?: boolean
 }
 
 declare global {

@@ -8,6 +8,12 @@ import type {
   RunFrameState,
 } from "./types"
 import { API_BASE } from "./api-base"
+import type { ManualEditEvent } from "@tscircuit/props"
+import { applyEditEventsToManualEditsFile } from "@tscircuit/core"
+import type { CircuitJson } from "circuit-json"
+import Debug from "lib/utils/debug"
+
+const debug = Debug.extend("store")
 
 async function upsertFileApi(
   path: FilePath,
@@ -47,6 +53,8 @@ export const useRunFrameStore = create<RunFrameState>()(
       lastEventTime: null,
       isPolling: false,
       error: null,
+      circuitJson: null,
+      lastManualEditsChangeSentAt: 0,
 
       upsertFile: async (path, content) => {
         try {
@@ -70,6 +78,11 @@ export const useRunFrameStore = create<RunFrameState>()(
         }
       },
 
+      setCircuitJson: (circuitJson: CircuitJson) => {
+        if (circuitJson === get().circuitJson) return
+        set({ circuitJson })
+      },
+
       startPolling: () => {
         const poll = async () => {
           const state = get()
@@ -87,6 +100,13 @@ export const useRunFrameStore = create<RunFrameState>()(
               for (const event of events) {
                 if (event.event_type === "FILE_UPDATED") {
                   const file = await getFileApi(event.file_path)
+                  // Don't update the manual edits file if we're the ones who changed it
+                  if (
+                    event.file_path === "manual_edits.json" &&
+                    Date.now() - state.lastManualEditsChangeSentAt < 1000
+                  ) {
+                    continue
+                  }
                   updates.set(file.file_path, file.text_content)
                 }
               }
@@ -110,6 +130,33 @@ export const useRunFrameStore = create<RunFrameState>()(
 
       stopPolling: () => {
         set({ isPolling: false })
+      },
+
+      applyEditEventsAndUpdateManualEditsJson: async (
+        editEvents: ManualEditEvent[],
+      ) => {
+        debug("applyEditEventsAndUpdateManualEditsJson", { editEvents })
+        const state = get()
+        if (!state.circuitJson) return
+
+        const manualEditsJson = state.fsMap.get("manual-edits.json")
+        const manualEdits = manualEditsJson ? JSON.parse(manualEditsJson) : []
+
+        // TODO apply manual edit events to manual edits file
+        const updatedManualEditsFileContent = applyEditEventsToManualEditsFile({
+          circuitJson: state.circuitJson as any,
+          editEvents,
+          manualEditsFile: manualEdits,
+        })
+        debug("updatedManualEditsFileContent", updatedManualEditsFileContent)
+
+        set((state) => ({
+          lastManualEditsChangeSentAt: Date.now(),
+          fsMap: new Map(state.fsMap).set(
+            "manual-edits.json",
+            JSON.stringify(updatedManualEditsFileContent),
+          ),
+        }))
       },
     }),
     { name: "run-frame-store" },

@@ -7,8 +7,7 @@ import type {
   FileEvent,
   RunFrameState,
 } from "./types"
-
-const API_BASE = window.API_BASE_URL ?? "/api"
+import { API_BASE } from "./api-base"
 
 async function upsertFileApi(
   path: FilePath,

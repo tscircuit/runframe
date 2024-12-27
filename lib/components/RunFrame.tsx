@@ -106,6 +106,8 @@ export const RunFrame = (props: Props) => {
       leftHeaderContent={props.leftHeaderContent}
       circuitJson={circuitJson}
       errorMessage={error?.error}
+      onEditEvent={props.onEditEvent}
+      editEvents={props.editEvents}
     />
   )
 }

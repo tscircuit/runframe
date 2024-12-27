@@ -3,6 +3,7 @@ import { RunFrame } from "../RunFrame"
 import { useRunFrameStore, selectCurrentFileMap } from "./store"
 import type { RunFrameWithApiProps } from "./types"
 import type { ManualEditEvent } from "@tscircuit/props"
+import { API_BASE } from "./api-base"
 
 const guessEntrypoint = (files: string[]) =>
   files.find((file) => file.includes("entrypoint.")) ??
@@ -44,6 +45,14 @@ export const RunFrameWithApi = ({ apiBaseUrl }: RunFrameWithApiProps) => {
       editEvents={editEvents}
       onEditEvent={(ee) => {
         setEditEvents([...editEvents, ee])
+        fetch(`${API_BASE}/events/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            event_type: "USER_CREATED_MANUAL_EDIT",
+            ...ee,
+          }),
+        })
       }}
     />
   )

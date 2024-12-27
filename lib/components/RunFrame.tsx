@@ -19,7 +19,7 @@ interface Props {
   /**
    * Map of filenames to file contents that will be available in the worker
    */
-  fsMap: Map<string, string>
+  fsMap: Map<string, string> | Record<string, string>
 
   /**
    * The entry point file that will be executed first
@@ -93,11 +93,15 @@ export const RunFrame = (props: Props) => {
     if (props.debug) Debug.enable("run-frame*")
   }, [props.debug])
 
+  const fsMap =
+    props.fsMap instanceof Map
+      ? props.fsMap
+      : new Map(Object.entries(props.fsMap))
   const lastFsMapRef = useRef<Map<string, string> | null>(null)
 
   useEffect(() => {
     if (lastFsMapRef.current) {
-      const changes = getChangesBetweenFsMaps(lastFsMapRef.current, props.fsMap)
+      const changes = getChangesBetweenFsMaps(lastFsMapRef.current, fsMap)
 
       if (Object.keys(changes).length > 0) {
         debug("render triggered by changes:", changes)
@@ -107,7 +111,7 @@ export const RunFrame = (props: Props) => {
       }
     }
 
-    lastFsMapRef.current = props.fsMap
+    lastFsMapRef.current = fsMap
 
     async function runWorker() {
       const worker =
@@ -119,15 +123,10 @@ export const RunFrame = (props: Props) => {
       globalThis.runFrameWorker = worker
       props.onRenderStarted?.()
 
-      const fsMapObj =
-        props.fsMap instanceof Map
-          ? Object.fromEntries(props.fsMap.entries())
-          : props.fsMap
-
       const $finished = worker
         .executeWithFsMap({
           entrypoint: props.entrypoint,
-          fsMap: fsMapObj,
+          fsMap,
         })
         .catch((e: any) => {
           // removing the prefix "Eval compiled js error for "./main.tsx":"

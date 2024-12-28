@@ -4,8 +4,9 @@ import type {
   FilePath,
   FileContent,
   File,
-  FileEvent,
+  FileUpdatedEvent,
   RunFrameState,
+  RunFrameEvent,
 } from "./types"
 import { API_BASE } from "./api-base"
 import type { ManualEditEvent } from "@tscircuit/props"
@@ -36,7 +37,7 @@ async function getFileApi(path: FilePath): Promise<File> {
   return data.file
 }
 
-async function getEvents(since: string | null): Promise<FileEvent[]> {
+async function getEvents(since: string | null): Promise<FileUpdatedEvent[]> {
   const url = since
     ? `${API_BASE}/events/list?since=${encodeURIComponent(since)}`
     : `${API_BASE}/events/list`
@@ -55,6 +56,7 @@ export const useRunFrameStore = create<RunFrameState>()(
       error: null,
       circuitJson: null,
       lastManualEditsChangeSentAt: 0,
+      recentEvents: [],
 
       upsertFile: async (path, content) => {
         try {
@@ -92,6 +94,11 @@ export const useRunFrameStore = create<RunFrameState>()(
             const events = await getEvents(state.lastEventTime)
 
             if (events.length > 0) {
+              set((state) => ({
+                recentEvents: [...state.recentEvents, ...events].slice(0, 100),
+                // TODO sort
+                // .sort((a, b) => b.created_at.localeCompare(a.created_at)),
+              }))
               // Update lastEventTime to most recent event
               const newLastEventTime = events[events.length - 1].created_at
 
@@ -130,6 +137,18 @@ export const useRunFrameStore = create<RunFrameState>()(
 
       stopPolling: () => {
         set({ isPolling: false })
+      },
+
+      pushEvent: async (
+        event: Omit<RunFrameEvent, "event_id" | "created_at">,
+      ) => {
+        await fetch(`${window.API_BASE_URL ?? ""}/api/events/create`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(event),
+        })
       },
 
       applyEditEventsAndUpdateManualEditsJson: async (

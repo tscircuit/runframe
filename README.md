@@ -120,3 +120,15 @@ sequenceDiagram
 
     Note over BrowserRunframe: If there are unapplied editEvents, repeat
 ```
+
+### `<RunFrameWithApi />` and `<RunFrameForCli />` Event Bus
+
+The event bus for the RunFrame is accessible from the `@tscircuit/file-server`
+`/events/list` endpoint. RunFrame creates the following events:
+
+| Event Name              | Description                                             |
+| ----------------------- | ------------------------------------------------------- |
+| FILE_UPDATED            | A file was updated                                      |
+| REQUEST_TO_SAVE_SNIPPET | Browser request to save the current circuit to snippets |
+| FAILED_TO_SAVE_SNIPPET  | Failed to save the current snippet to Registry          |
+| SNIPPET_SAVED           | Snippet was saved to Registry                           |

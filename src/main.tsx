@@ -1,4 +1,4 @@
-import { RunFrameWithApi } from "lib/components/RunFrameWithApi"
+import { RunFrameWithApi } from "lib/components/RunFrameWithApi/RunFrameWithApi"
 import React from "react"
 import { createRoot } from "react-dom/client"
 

@@ -1,4 +1,5 @@
-import { RunFrameWithApi } from "lib/components/RunFrameWithApi"
+import { RunFrameForCli } from "lib/components/RunFrameForCli/RunFrameForCli"
+import { RunFrameWithApi } from "lib/components/RunFrameWithApi/RunFrameWithApi"
 import { useState, useEffect } from "react"
 
 export default () => {
@@ -49,5 +50,5 @@ circuit.add(
     )
   }
 
-  return <RunFrameWithApi debug />
+  return <RunFrameForCli debug />
 }

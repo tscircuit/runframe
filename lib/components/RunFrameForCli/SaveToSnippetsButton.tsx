@@ -62,8 +62,14 @@ export const SaveToSnippetsButton = () => {
             event_type: "REQUEST_TO_SAVE_SNIPPET",
           } as RequestToSaveSnippetEvent)
         }}
+        disabled={isSaving}
+        className={`px-3 text-sm py-1.5 rounded-md ${
+          isSaving
+            ? "cursor-not-allowed"
+            : "bg-white border border-gray-300 font-medium text-gray-900 shadow-sm"
+        }`}
       >
-        Save to Snippets
+        {isSaving ? "Saving..." : "Sync to Snippets"}
       </button>
       <SelectSnippetDialog
         snippetNames={availableSnippets ?? []}

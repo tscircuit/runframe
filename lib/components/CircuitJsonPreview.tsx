@@ -160,19 +160,6 @@ export const CircuitJsonPreview = ({
                 )}
                 Schematic
               </TabsTrigger>
-              <TabsTrigger value="assembly" className="whitespace-nowrap">
-                {circuitJson && (
-                  <span
-                    className={cn(
-                      "inline-flex items-center justify-center w-2 h-2 mr-1 text-xs font-bold text-white rounded-full",
-                      !hasCodeChangedSinceLastRun
-                        ? "bg-blue-500"
-                        : "bg-gray-500",
-                    )}
-                  />
-                )}
-                Assembly
-              </TabsTrigger>
               <TabsTrigger value="cad">
                 {circuitJson && (
                   <span
@@ -196,6 +183,15 @@ export const CircuitJsonPreview = ({
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="*:text-xs">
+                  <DropdownMenuItem onSelect={() => setActiveTab("assembly")}>
+                    <CheckIcon
+                      className={cn(
+                        "w-3 h-3 mr-2",
+                        activeTab !== "assembly" && "invisible",
+                      )}
+                    />
+                    Assembly
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={() => setActiveTab("error")}
                     className="flex"

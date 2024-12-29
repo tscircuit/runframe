@@ -13,6 +13,7 @@ import { ErrorFallback } from "./ErrorFallback"
 import { ErrorBoundary } from "react-error-boundary"
 import { ErrorTabContent } from "./ErrorTabContent"
 import { SchematicViewer } from "@tscircuit/schematic-viewer"
+import { AssemblyViewer } from "@tscircuit/assembly-viewer"
 import PreviewEmptyState from "./PreviewEmptyState"
 import { CircuitJsonTableViewer } from "./CircuitJsonTableViewer/CircuitJsonTableViewer"
 import { BomTable } from "./BomTable"
@@ -62,13 +63,14 @@ export interface PreviewContentProps {
   // onManualEditsFileContentChange?: (newmanualEditsFileContent: string) => void
 
   defaultActiveTab?:
-    | "code"
-    | "pcb"
-    | "schematic"
-    | "cad"
-    | "bom"
-    | "circuitjson"
-    | "error"
+  | "code"
+  | "pcb"
+  | "schematic"
+  | "assembly"
+  | "cad"
+  | "bom"
+  | "circuitjson"
+  | "error"
 
   onEditEvent?: (editEvent: ManualEditEvent) => void
   editEvents?: ManualEditEvent[]
@@ -76,7 +78,7 @@ export interface PreviewContentProps {
 
 export const CircuitJsonPreview = ({
   code,
-  onRunClicked = () => {},
+  onRunClicked = () => { },
   tsxRunTriggerCount,
   errorMessage,
   circuitJsonKey = "",
@@ -157,6 +159,19 @@ export const CircuitJsonPreview = ({
                   />
                 )}
                 Schematic
+              </TabsTrigger>
+              <TabsTrigger value="assembly" className="whitespace-nowrap">
+                {circuitJson && (
+                  <span
+                    className={cn(
+                      "inline-flex items-center justify-center w-2 h-2 mr-1 text-xs font-bold text-white rounded-full",
+                      !hasCodeChangedSinceLastRun
+                        ? "bg-blue-500"
+                        : "bg-gray-500",
+                    )}
+                  />
+                )}
+                Assembly
               </TabsTrigger>
               <TabsTrigger value="cad">
                 {circuitJson && (
@@ -255,19 +270,19 @@ export const CircuitJsonPreview = ({
                         ? "min-h-[calc(100vh-240px)]"
                         : "min-h-[620px]",
                     )}
-                    // onEditEventsChanged={(editEvents) => {
-                    //   if (editEvents.some((editEvent) => editEvent.in_progress))
-                    //     return
-                    //   // Update state with new edit events
-                    //   const newManualEditsFileContent = applyPcbEditEvents({
-                    //     editEvents,
-                    //     circuitJson,
-                    //     manualEditsFileContent,
-                    //   })
-                    //   onManualEditsFileContentChange?.(
-                    //     JSON.stringify(newManualEditsFileContent, null, 2),
-                    //   )
-                    // }}
+                  // onEditEventsChanged={(editEvents) => {
+                  //   if (editEvents.some((editEvent) => editEvent.in_progress))
+                  //     return
+                  //   // Update state with new edit events
+                  //   const newManualEditsFileContent = applyPcbEditEvents({
+                  //     editEvents,
+                  //     circuitJson,
+                  //     manualEditsFileContent,
+                  //   })
+                  //   onManualEditsFileContentChange?.(
+                  //     JSON.stringify(newManualEditsFileContent, null, 2),
+                  //   )
+                  // }}
                   />
                 ) : (
                   <PreviewEmptyState onRunClicked={onRunClicked} />
@@ -276,6 +291,29 @@ export const CircuitJsonPreview = ({
             </div>
           </TabsContent>
 
+          <TabsContent value="assembly">
+            <div
+              className={cn(
+                "overflow-auto",
+                isFullScreen ? "h-[calc(100vh-96px)]" : "h-[620px]",
+              )}
+            >
+              <ErrorBoundary fallback={<div>Error loading Assembly</div>}>
+                {circuitJson ? (
+                  <AssemblyViewer
+                    circuitJson={circuitJson}
+                    containerStyle={{
+                      height: "100%",
+                    }}
+                    editingEnabled
+                    debugGrid
+                  />
+                ) : (
+                  <PreviewEmptyState onRunClicked={onRunClicked} />
+                )}
+              </ErrorBoundary>
+            </div>
+          </TabsContent>
           <TabsContent value="schematic">
             <div
               className={cn(

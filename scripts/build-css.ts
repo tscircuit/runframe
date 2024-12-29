@@ -7,10 +7,18 @@ import tailwindConfig from "../tailwind.config"
 
 async function buildCss() {
   // Read your base CSS file with @tailwind directives
-  const css = "@tailwind components; @tailwind utilities;"
+  const css = "@tailwind utilities;"
 
   const result = await postcss([
-    tailwindcss(tailwindConfig),
+    tailwindcss({
+      ...tailwindConfig,
+      content: [],
+      corePlugins: {
+        preflight: false,
+        // Only enable animation related plugins
+        animation: true,
+      },
+    }),
     autoprefixer,
     cssnano,
   ]).process(css, {

@@ -63,14 +63,14 @@ export interface PreviewContentProps {
   // onManualEditsFileContentChange?: (newmanualEditsFileContent: string) => void
 
   defaultActiveTab?:
-  | "code"
-  | "pcb"
-  | "schematic"
-  | "assembly"
-  | "cad"
-  | "bom"
-  | "circuitjson"
-  | "error"
+    | "code"
+    | "pcb"
+    | "schematic"
+    | "assembly"
+    | "cad"
+    | "bom"
+    | "circuitjson"
+    | "error"
 
   onEditEvent?: (editEvent: ManualEditEvent) => void
   editEvents?: ManualEditEvent[]
@@ -78,7 +78,7 @@ export interface PreviewContentProps {
 
 export const CircuitJsonPreview = ({
   code,
-  onRunClicked = () => { },
+  onRunClicked = () => {},
   tsxRunTriggerCount,
   errorMessage,
   circuitJsonKey = "",
@@ -270,19 +270,19 @@ export const CircuitJsonPreview = ({
                         ? "min-h-[calc(100vh-240px)]"
                         : "min-h-[620px]",
                     )}
-                  // onEditEventsChanged={(editEvents) => {
-                  //   if (editEvents.some((editEvent) => editEvent.in_progress))
-                  //     return
-                  //   // Update state with new edit events
-                  //   const newManualEditsFileContent = applyPcbEditEvents({
-                  //     editEvents,
-                  //     circuitJson,
-                  //     manualEditsFileContent,
-                  //   })
-                  //   onManualEditsFileContentChange?.(
-                  //     JSON.stringify(newManualEditsFileContent, null, 2),
-                  //   )
-                  // }}
+                    // onEditEventsChanged={(editEvents) => {
+                    //   if (editEvents.some((editEvent) => editEvent.in_progress))
+                    //     return
+                    //   // Update state with new edit events
+                    //   const newManualEditsFileContent = applyPcbEditEvents({
+                    //     editEvents,
+                    //     circuitJson,
+                    //     manualEditsFileContent,
+                    //   })
+                    //   onManualEditsFileContentChange?.(
+                    //     JSON.stringify(newManualEditsFileContent, null, 2),
+                    //   )
+                    // }}
                   />
                 ) : (
                   <PreviewEmptyState onRunClicked={onRunClicked} />

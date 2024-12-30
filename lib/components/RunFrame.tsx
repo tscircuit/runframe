@@ -101,6 +101,7 @@ export const RunFrame = (props: Props) => {
           new Map(),
         )
   const lastFsMapRef = useRef<Map<string, string> | null>(null)
+  const lastEntrypointRef = useRef<string | null>(null)
 
   useEffect(() => {
     if (!fsMap) return
@@ -109,6 +110,8 @@ export const RunFrame = (props: Props) => {
 
       if (Object.keys(changes).length > 0) {
         debug("render triggered by changes:", changes)
+      } else if (lastEntrypointRef.current !== props.entrypoint) {
+        debug("render triggered by entrypoint change")
       } else {
         debug("render triggered without changes to fsMap, skipping")
         return
@@ -116,6 +119,7 @@ export const RunFrame = (props: Props) => {
     }
 
     lastFsMapRef.current = fsMap
+    lastEntrypointRef.current = props.entrypoint
 
     async function runWorker() {
       const worker =

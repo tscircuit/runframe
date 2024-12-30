@@ -58,7 +58,7 @@
     "@tscircuit/file-server": "^0.0.12",
     "@tscircuit/assembly-viewer": "^0.0.1",
     "@tscircuit/pcb-viewer": "^1.10.22",
-    "@tscircuit/props": "^0.0.123",
+    "@tscircuit/props": "^0.0.124",
     "@tscircuit/schematic-viewer": "2.0.9",
     "circuit-to-svg": "^0.0.99",
     "comlink": "^4.4.2",

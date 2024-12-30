@@ -92,9 +92,6 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
         markRenderComplete()
       }}
       entrypoint={entrypoint}
-      onError={(error) => {
-        console.error("RunFrame error:", error)
-      }}
       editEvents={editEventsForRender}
       onEditEvent={(ee) => {
         pushEditEvent(ee)

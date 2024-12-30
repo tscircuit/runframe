@@ -76,7 +76,7 @@ export interface PreviewContentProps {
 
 export const CircuitJsonPreview = ({
   code,
-  onRunClicked = () => {},
+  onRunClicked = undefined,
   tsxRunTriggerCount,
   errorMessage,
   circuitJsonKey = "",

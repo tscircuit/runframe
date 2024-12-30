@@ -11,12 +11,53 @@ export interface File {
   text_content: FileContent
 }
 
-export interface FileEvent {
+export interface FileUpdatedEvent {
   event_id: string
   event_type: "FILE_UPDATED"
   file_path: FilePath
   created_at: string
 }
+
+export interface RequestToSaveSnippetEvent {
+  event_id: string
+  event_type: "REQUEST_TO_SAVE_SNIPPET"
+  snippet_name?: string
+  created_at: string
+}
+
+export interface FailedToSaveSnippetEvent {
+  event_id: string
+  event_type: "FAILED_TO_SAVE_SNIPPET"
+  error_code: "SNIPPET_UNSET" | "SERVER_ERROR"
+  message?: string
+
+  /**
+   * When error_code is "SNIPPET_UNSET", this is the list of available snippets
+   * to prompt the user with
+   */
+  available_snippet_names?: string[]
+  created_at: string
+}
+
+export interface SnippetSavedEvent {
+  event_id: string
+  event_type: "SNIPPET_SAVED"
+  created_at: string
+}
+
+export type RunFrameEvent =
+  | FileUpdatedEvent
+  | RequestToSaveSnippetEvent
+  | FailedToSaveSnippetEvent
+  | SnippetSavedEvent
+
+type MappedOmit<T, K extends keyof T> = {
+  [P in keyof T as P extends K ? never : P]: T[P]
+}
+export type RunFrameEventInput = MappedOmit<
+  RunFrameEvent,
+  "event_id" | "created_at"
+>
 
 export interface RunFrameState {
   fsMap: Map<FilePath, FileContent>
@@ -25,6 +66,7 @@ export interface RunFrameState {
   error: Error | null
   circuitJson: CircuitJson | null
   lastManualEditsChangeSentAt: number
+  recentEvents: RunFrameEvent[]
 
   // Actions
   upsertFile: (path: FilePath, content: FileContent) => Promise<void>
@@ -35,14 +77,7 @@ export interface RunFrameState {
   applyEditEventsAndUpdateManualEditsJson: (
     editEvents: ManualEditEvent[],
   ) => Promise<void>
-}
-
-export interface RunFrameWithApiProps {
-  /**
-   * Base URL for the API endpoints
-   */
-  apiBaseUrl?: string
-  debug?: boolean
+  pushEvent: (event: RunFrameEventInput) => Promise<void>
 }
 
 declare global {

@@ -6,5 +6,5 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
     "./lib/**/*.{js,ts,jsx,tsx}",
   ],
-  plugiddns: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate")],
 }

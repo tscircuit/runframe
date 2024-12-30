@@ -1,4 +1,4 @@
-import { RunFrameWithApi } from "lib/components/RunFrameWithApi"
+import { RunFrameWithApi } from "lib/components/RunFrameWithApi/RunFrameWithApi"
 import { useState, useEffect } from "react"
 
 export default () => {

@@ -59,6 +59,7 @@ The CircuitJsonPreview component provides:
 
 - PCB view with interactive component placement
 - Schematic view
+- Assembly view
 - 3D view
 - Bill of Materials (BOM) table
 - Circuit JSON viewer

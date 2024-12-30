@@ -13,6 +13,7 @@ import { ErrorFallback } from "./ErrorFallback"
 import { ErrorBoundary } from "react-error-boundary"
 import { ErrorTabContent } from "./ErrorTabContent"
 import { SchematicViewer } from "@tscircuit/schematic-viewer"
+import { AssemblyViewer } from "@tscircuit/assembly-viewer"
 import PreviewEmptyState from "./PreviewEmptyState"
 import { CircuitJsonTableViewer } from "./CircuitJsonTableViewer/CircuitJsonTableViewer"
 import { BomTable } from "./BomTable"
@@ -65,6 +66,7 @@ export interface PreviewContentProps {
     | "code"
     | "pcb"
     | "schematic"
+    | "assembly"
     | "cad"
     | "bom"
     | "circuitjson"
@@ -181,6 +183,15 @@ export const CircuitJsonPreview = ({
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="*:text-xs">
+                  <DropdownMenuItem onSelect={() => setActiveTab("assembly")}>
+                    <CheckIcon
+                      className={cn(
+                        "w-3 h-3 mr-2",
+                        activeTab !== "assembly" && "invisible",
+                      )}
+                    />
+                    Assembly
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={() => setActiveTab("error")}
                     className="flex"
@@ -276,6 +287,29 @@ export const CircuitJsonPreview = ({
             </div>
           </TabsContent>
 
+          <TabsContent value="assembly">
+            <div
+              className={cn(
+                "overflow-auto",
+                isFullScreen ? "h-[calc(100vh-96px)]" : "h-[620px]",
+              )}
+            >
+              <ErrorBoundary fallback={<div>Error loading Assembly</div>}>
+                {circuitJson ? (
+                  <AssemblyViewer
+                    circuitJson={circuitJson}
+                    containerStyle={{
+                      height: "100%",
+                    }}
+                    editingEnabled
+                    debugGrid
+                  />
+                ) : (
+                  <PreviewEmptyState onRunClicked={onRunClicked} />
+                )}
+              </ErrorBoundary>
+            </div>
+          </TabsContent>
           <TabsContent value="schematic">
             <div
               className={cn(

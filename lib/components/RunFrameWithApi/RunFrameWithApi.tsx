@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { RunFrame } from "../RunFrame"
 import { useRunFrameStore, selectCurrentFileMap } from "./store"
-import type { RunFrameWithApiProps } from "./types"
 import type { ManualEditEvent } from "@tscircuit/props"
 import { API_BASE } from "./api-base"
 import { useEditEventController } from "lib/hooks/use-edit-event-controller"
@@ -15,8 +14,17 @@ const guessEntrypoint = (files: string[]) =>
   files.find((file) => file.includes("main.")) ??
   files.find((file) => file.endsWith(".tsx"))
 
+export interface RunFrameWithApiProps {
+  /**
+   * Base URL for the API endpoints
+   */
+  apiBaseUrl?: string
+  debug?: boolean
+  leftHeaderContent?: React.ReactNode
+}
+
 export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
-  const { apiBaseUrl } = props
+  const { apiBaseUrl, leftHeaderContent } = props
   useEffect(() => {
     if (props.debug) Debug.enable("run-frame*")
   }, [props.debug])
@@ -40,7 +48,6 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       window.API_BASE_URL = apiBaseUrl
     }
   }, [apiBaseUrl])
-  debug("editEventsForRender", editEventsForRender)
 
   // Start/stop polling
   useEffect(() => {
@@ -63,6 +70,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   return (
     <RunFrame
       fsMap={fsMap}
+      leftHeaderContent={leftHeaderContent}
       onInitialRender={() => {
         debug("onInitialRender / markRenderStarted")
         markRenderStarted()

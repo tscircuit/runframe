@@ -64,6 +64,10 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   const entrypoint =
     guessEntrypoint(Array.from(fsMap.keys())) ?? "entrypoint.tsx"
 
+  useEffect(() => {
+    debug(`entrypoint set to ${entrypoint}`)
+  }, [entrypoint])
+
   if (!fsMap.get(entrypoint)) {
     return (
       <div>

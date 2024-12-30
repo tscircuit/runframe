@@ -123,7 +123,8 @@ export const RunFrame = (props: Props) => {
 
     async function runWorker() {
       debug("running render worker")
-      const worker =
+      setError(null)
+      const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
         globalThis.runFrameWorker ??
         (await createCircuitWebWorker({
           webWorkerUrl: evalWebWorkerBlobUrl,
@@ -135,22 +136,37 @@ export const RunFrame = (props: Props) => {
       const fsMapObj =
         fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap
 
-      const $finished = worker
+      if (!fsMapObj[props.entrypoint]) {
+        setError({
+          error: `Entrypoint not found (entrypoint: "${props.entrypoint}", fsMapKeys: ${Object.keys(fsMapObj).join(", ")})`,
+          stack: "",
+        })
+        return
+      }
+
+      const evalResult = await worker
         .executeWithFsMap({
           entrypoint: props.entrypoint,
           fsMap: fsMapObj,
         })
+        .then(() => ({ success: true }))
         .catch((e: any) => {
           // removing the prefix "Eval compiled js error for "./main.tsx":"
           const message = e.message.split(":")[1]
+          props.onError?.(e)
           setError({ error: message, stack: e.stack })
           console.error(e)
+          return { success: false }
         })
+      if (!evalResult.success) return
+
+      const $renderResult = worker.renderUntilSettled()
 
       debug("waiting for initial circuit json...")
       let circuitJson = await worker.getCircuitJson().catch((e: any) => {
         debug("error getting initial circuit json", e)
         props.onError?.(e)
+        setError({ error: e.message, stack: e.stack })
         return null
       })
       if (!circuitJson) return
@@ -159,8 +175,7 @@ export const RunFrame = (props: Props) => {
       props.onCircuitJsonChange?.(circuitJson)
       props.onInitialRender?.({ circuitJson })
 
-      debug("waiting for execution to finish...")
-      await $finished
+      await $renderResult
 
       debug("getting final circuit json")
       circuitJson = await worker.getCircuitJson()

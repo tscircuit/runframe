@@ -123,7 +123,7 @@ export const RunFrame = (props: Props) => {
 
     async function runWorker() {
       debug("running render worker")
-      // setError(null)
+      setError(null)
       const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
         globalThis.runFrameWorker ??
         (await createCircuitWebWorker({

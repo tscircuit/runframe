@@ -46,6 +46,22 @@ async function getEvents(since: string | null): Promise<FileUpdatedEvent[]> {
   return data.event_list
 }
 
+async function getInitialFilesApi(): Promise<Map<FilePath, FileContent>> {
+  const response = await fetch(`${API_BASE}/files/list`)
+  const { file_list } = (await response.json()) as {
+    file_list: Array<{ file_id: string; file_path: string }>
+  }
+
+  const fileMap = new Map<FilePath, FileContent>()
+
+  for (const file of file_list) {
+    const fullFile = await getFileApi(file.file_path)
+    fileMap.set(file.file_path, fullFile.text_content)
+  }
+
+  return fileMap
+}
+
 // Create store
 export const useRunFrameStore = create<RunFrameState>()(
   devtools(
@@ -57,6 +73,11 @@ export const useRunFrameStore = create<RunFrameState>()(
       circuitJson: null,
       lastManualEditsChangeSentAt: 0,
       recentEvents: [],
+
+      loadInitialFiles: async () => {
+        const fsMap = await getInitialFilesApi()
+        set({ fsMap })
+      },
 
       upsertFile: async (path, content) => {
         try {

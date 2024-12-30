@@ -29,11 +29,17 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     if (props.debug) Debug.enable("run-frame*")
   }, [props.debug])
 
-  const { startPolling, stopPolling } = useRunFrameStore((s) => ({
-    startPolling: s.startPolling,
-    stopPolling: s.stopPolling,
-  }))
+  const { startPolling, stopPolling, loadInitialFiles } = useRunFrameStore(
+    (s) => ({
+      startPolling: s.startPolling,
+      stopPolling: s.stopPolling,
+      loadInitialFiles: s.loadInitialFiles,
+    }),
+  )
   const fsMap = useRunFrameStore((s) => s.fsMap)
+  useEffect(() => {
+    loadInitialFiles()
+  }, [])
 
   const {
     editEventsForRender,

@@ -78,6 +78,7 @@ export interface RunFrameState {
     editEvents: ManualEditEvent[],
   ) => Promise<void>
   pushEvent: (event: RunFrameEventInput) => Promise<void>
+  loadInitialFiles: () => Promise<void>
 }
 
 declare global {

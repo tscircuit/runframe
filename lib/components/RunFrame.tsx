@@ -122,6 +122,7 @@ export const RunFrame = (props: Props) => {
     lastEntrypointRef.current = props.entrypoint
 
     async function runWorker() {
+      debug("running render worker")
       const worker =
         globalThis.runFrameWorker ??
         (await createCircuitWebWorker({
@@ -147,7 +148,12 @@ export const RunFrame = (props: Props) => {
         })
 
       debug("waiting for initial circuit json...")
-      let circuitJson = await worker.getCircuitJson()
+      let circuitJson = await worker.getCircuitJson().catch((e: any) => {
+        debug("error getting initial circuit json", e)
+        props.onError?.(e)
+        return null
+      })
+      if (!circuitJson) return
       debug("got initial circuit json")
       setCircuitJson(circuitJson)
       props.onCircuitJsonChange?.(circuitJson)
@@ -163,7 +169,7 @@ export const RunFrame = (props: Props) => {
       props.onRenderFinished?.({ circuitJson })
     }
     runWorker()
-  }, [props.fsMap])
+  }, [props.fsMap, props.entrypoint])
 
   return (
     <CircuitJsonPreview

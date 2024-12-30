@@ -76,6 +76,7 @@ export const useRunFrameStore = create<RunFrameState>()(
 
       loadInitialFiles: async () => {
         const fsMap = await getInitialFilesApi()
+        debug("loaded initial files", { fsMap })
         set({ fsMap })
       },
 
@@ -207,7 +208,3 @@ export const useRunFrameStore = create<RunFrameState>()(
     { name: "run-frame-store" },
   ),
 )
-
-// Export selector for current file map
-export const selectCurrentFileMap = (state: RunFrameState) =>
-  Object.fromEntries(state.fsMap.entries())

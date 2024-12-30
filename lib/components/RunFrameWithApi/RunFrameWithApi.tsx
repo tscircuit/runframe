@@ -48,7 +48,6 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       window.API_BASE_URL = apiBaseUrl
     }
   }, [apiBaseUrl])
-  debug("editEventsForRender", editEventsForRender)
 
   // Start/stop polling
   useEffect(() => {

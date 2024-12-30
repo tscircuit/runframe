@@ -51,7 +51,7 @@ export const useRunFrameStore = create<RunFrameState>()(
   devtools(
     (set, get) => ({
       fsMap: new Map(),
-      lastEventTime: null,
+      lastEventTime: new Date().toISOString(),
       isPolling: false,
       error: null,
       circuitJson: null,
@@ -176,6 +176,11 @@ export const useRunFrameStore = create<RunFrameState>()(
             JSON.stringify(updatedManualEditsFileContent),
           ),
         }))
+
+        await upsertFileApi(
+          "manual-edits.json",
+          JSON.stringify(updatedManualEditsFileContent, null, 2),
+        )
       },
     }),
     { name: "run-frame-store" },

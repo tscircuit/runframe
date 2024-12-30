@@ -2,13 +2,51 @@ import { RunFrameForCli } from "lib/components/RunFrameForCli/RunFrameForCli"
 import { RunFrameWithApi } from "lib/components/RunFrameWithApi/RunFrameWithApi"
 import { useRunFrameStore } from "lib/components/RunFrameWithApi/store"
 import { useState, useEffect } from "react"
+import { DebugEventsTable } from "./utils/DebugEventsTable"
+import { useEventHandler } from "lib/components/RunFrameForCli/useEventHandler"
 
 export default () => {
   const recentEvents = useRunFrameStore((state) => state.recentEvents)
   const pushEvent = useRunFrameStore((state) => state.pushEvent)
 
+  useEventHandler(async (event) => {
+    if (event.event_type === "REQUEST_TO_SAVE_SNIPPET") {
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      if (!event.snippet_name) {
+        pushEvent({
+          event_type: "FAILED_TO_SAVE_SNIPPET",
+          error_code: "SNIPPET_UNSET",
+          available_snippet_names: [
+            "my-snippet-1",
+            "my-snippet-2",
+            "led-driver-board",
+            "555-timer",
+            "my-snippet-3",
+            "my-snippet-4",
+            "epaper-display",
+            "voltage-regulator",
+            "led-matrix-9x9",
+            "led-matrix-16x16",
+            "led-matrix-24x24",
+            "led-matrix-32x32",
+            "led-matrix-40x40",
+          ],
+        })
+      } else {
+        pushEvent({
+          event_type: "SNIPPET_SAVED",
+        })
+      }
+    }
+  })
+
   useEffect(() => {
     setTimeout(async () => {
+      fetch("/api/events/reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      })
       fetch("/api/files/upsert", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -57,38 +95,7 @@ circuit.add(
   return (
     <>
       <RunFrameForCli debug />
-      <div className="p-4">
-        <table className="w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-300 p-2">Event Type</th>
-              <th className="border border-gray-300 p-2">Created At</th>
-              <th className="border border-gray-300 p-2">Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recentEvents
-              .sort(
-                (a, b) =>
-                  new Date(b.created_at).valueOf() -
-                  new Date(a.created_at).valueOf(),
-              )
-              .map(({ event_type, event_id, created_at, ...rest }) => (
-                <tr key={event_id}>
-                  <td className="border border-gray-300 p-2">{event_type}</td>
-                  <td className="border border-gray-300 p-2">
-                    {new Date(created_at).toLocaleString()}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {JSON.stringify(rest)
-                      .slice(1, -1)
-                      .replace(/"([^"]+)":/g, "$1:")}
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
+      <DebugEventsTable />
     </>
   )
 }

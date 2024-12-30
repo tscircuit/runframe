@@ -51,6 +51,14 @@ export type RunFrameEvent =
   | FailedToSaveSnippetEvent
   | SnippetSavedEvent
 
+type MappedOmit<T, K extends keyof T> = {
+  [P in keyof T as P extends K ? never : P]: T[P]
+}
+export type RunFrameEventInput = MappedOmit<
+  RunFrameEvent,
+  "event_id" | "created_at"
+>
+
 export interface RunFrameState {
   fsMap: Map<FilePath, FileContent>
   lastEventTime: string | null
@@ -69,9 +77,7 @@ export interface RunFrameState {
   applyEditEventsAndUpdateManualEditsJson: (
     editEvents: ManualEditEvent[],
   ) => Promise<void>
-  pushEvent: (
-    event: Omit<RunFrameEvent, "event_id" | "created_at">,
-  ) => Promise<void>
+  pushEvent: (event: RunFrameEventInput) => Promise<void>
 }
 
 declare global {

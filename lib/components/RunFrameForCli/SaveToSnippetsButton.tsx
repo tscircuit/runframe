@@ -1,10 +1,14 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRunFrameStore } from "../RunFrameWithApi/store"
 import type { RequestToSaveSnippetEvent } from "../RunFrameWithApi/types"
 import { SelectSnippetDialog } from "./SelectSnippetDialog"
+import { useEventHandler } from "./useEventHandler"
+import { AlertCircle, CheckCircle2 } from "lucide-react"
 
 export const SaveToSnippetsButton = () => {
   const [snippetName, setSnippetName] = useState<string | null>(null)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [hasNeverBeenSaved, setHasNeverBeenSaved] = useState(true)
   const pushEvent = useRunFrameStore((state) => state.pushEvent)
   const recentEvents = useRunFrameStore((state) => state.recentEvents)
   const [isSaving, setIsSaving] = useState(false)
@@ -16,6 +20,20 @@ export const SaveToSnippetsButton = () => {
   )
   const [isSelectSnippetDialogOpen, setIsSelectSnippetDialogOpen] =
     useState(false)
+
+  const firstRenderTime = useMemo(() => Date.now(), [])
+  useEventHandler((event) => {
+    if (new Date(event.created_at).valueOf() < firstRenderTime + 500) return
+    if (event.event_type === "FILE_UPDATED") {
+      setHasUnsavedChanges(true)
+      return
+    }
+    if (event.event_type === "SNIPPET_SAVED") {
+      setHasUnsavedChanges(false)
+      setHasNeverBeenSaved(false)
+      return
+    }
+  })
 
   useEffect(() => {
     if (!isSaving) return
@@ -60,16 +78,28 @@ export const SaveToSnippetsButton = () => {
           setRequestToSaveSentAt(Date.now())
           await pushEvent({
             event_type: "REQUEST_TO_SAVE_SNIPPET",
+            snippet_name: snippetName,
           } as RequestToSaveSnippetEvent)
         }}
         disabled={isSaving}
-        className={`px-3 text-sm py-1.5 rounded-md ${
+        className={`px-3 flex items-center text-sm py-1.5 rounded-md ${
           isSaving
             ? "cursor-not-allowed"
             : "bg-white border border-gray-300 font-medium text-gray-900 shadow-sm"
         }`}
       >
-        {isSaving ? "Saving..." : "Sync to Snippets"}
+        {isSaving ? "Saving..." : "Save to Snippets"}
+        {isSaving || hasNeverBeenSaved ? null : (
+          <span className="ml-1.5 flex items-center">
+            {hasUnsavedChanges ? (
+              <div className="text-xs bg-orange-400 text-white p-0.5 px-1.5 rounded">
+                unsaved changes
+              </div>
+            ) : (
+              <CheckCircle2 className="w-4 h-4 text-green-500" />
+            )}
+          </span>
+        )}
       </button>
       <SelectSnippetDialog
         snippetNames={availableSnippets ?? []}

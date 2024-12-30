@@ -87,7 +87,7 @@ export const SelectSnippetDialog = ({
           >
             {selectedName === searchInput
               ? `Create "${selectedName}"`
-              : "Select"}
+              : `Save to ${selectedName}`}
           </button>
         </div>
       </div>

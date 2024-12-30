@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { RunFrame } from "../RunFrame"
-import { useRunFrameStore, selectCurrentFileMap } from "./store"
+import { useRunFrameStore } from "./store"
 import type { ManualEditEvent } from "@tscircuit/props"
 import { API_BASE } from "./api-base"
 import { useEditEventController } from "lib/hooks/use-edit-event-controller"

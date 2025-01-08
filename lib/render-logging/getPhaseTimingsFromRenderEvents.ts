@@ -1,13 +1,5 @@
-type RenderEvent = {
-  type:
-    | `renderable:renderLifecycle:${string}:start`
-    | `renderable:renderLifecycle:${string}:end`
-  /**
-   * Corresponds to the element that was rendered
-   */
-  renderId: string
-  createdAt: number
-}
+import type { RenderEvent } from "./RenderLog"
+
 /**
  * Given a list of render events, return a map of how much time was spent in each
  * render phase.

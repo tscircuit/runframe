@@ -3,6 +3,11 @@ import { CircuitJsonPreview, type TabId } from "./CircuitJsonPreview"
 import { useEffect, useRef, useState } from "react"
 import Debug from "debug"
 
+// TODO waiting for core PR: https://github.com/tscircuit/core/pull/489
+// import { orderedRenderPhases } from "@tscircuit/core"
+
+const numRenderPhases = 26
+
 const debug = Debug("run-frame:RunFrame")
 
 declare global {
@@ -155,14 +160,36 @@ export const RunFrame = (props: Props) => {
         return
       }
 
-      if (activeTab === "render_log") {
-        worker.on("renderable:renderLifecycle:anyEvent", (event: any) => {
+      const renderIds = new Set<string>()
+      worker.on("renderable:renderLifecycle:anyEvent", (event: any) => {
+        renderLog.lastRenderEvent = event
+        renderLog.eventsProcessed = (renderLog.eventsProcessed ?? 0) + 1
+        if (!renderIds.has(event.renderId)) {
+          renderIds.add(event.renderId)
+        }
+        const estTotalRenderEvents = renderIds.size * numRenderPhases * 2
+        const hasProcessedEnoughToEstimateProgress =
+          renderLog.eventsProcessed > renderIds.size * 2
+
+        // This estimated progress goes over 100% because of repeated render
+        // events, so we use a exponential decay to make it appear [0, 100%]
+        const estProgressLinear =
+          renderLog.eventsProcessed / estTotalRenderEvents
+
+        const estProgress = 1 - Math.exp(-estProgressLinear * 3)
+
+        renderLog.progress = hasProcessedEnoughToEstimateProgress
+          ? estProgress
+          : 0
+
+        if (activeTab === "render_log") {
           renderLog.renderEvents = renderLog.renderEvents ?? []
           event.createdAt = Date.now()
           renderLog.renderEvents.push(event)
-          setRenderLog(renderLog)
-        })
-      }
+        }
+
+        setRenderLog({ ...renderLog })
+      })
 
       const evalResult = await worker
         .executeWithFsMap({
@@ -207,8 +234,10 @@ export const RunFrame = (props: Props) => {
         renderLog.phaseTimings = getPhaseTimingsFromRenderEvents(
           renderLog.renderEvents ?? [],
         )
-        setRenderLog(renderLog)
       }
+      renderLog.progress = 1
+
+      setRenderLog({ ...renderLog })
     }
     runWorker()
   }, [props.fsMap, props.entrypoint])

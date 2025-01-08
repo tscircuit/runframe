@@ -22,6 +22,8 @@ import {
   EllipsisIcon,
   EllipsisVerticalIcon,
   FullscreenIcon,
+  LoaderCircleIcon,
+  LoaderIcon,
   MinimizeIcon,
 } from "lucide-react"
 import {
@@ -153,6 +155,25 @@ export const CircuitJsonPreview = ({
               isRunningCode={isRunningCode}
             /> */}
             {!leftHeaderContent && <div className="flex-grow" />}
+            {renderLog && renderLog.progress !== 1 && (
+              <div className="flex items-center gap-2">
+                {renderLog.lastRenderEvent && (
+                  <div className="text-xs text-gray-500">
+                    {
+                      renderLog.lastRenderEvent?.type
+                        .split("renderable:renderLifecycle:")[1]
+                        .split(":")[0]
+                    }
+                  </div>
+                )}
+                <div className="w-4 h-4 bg-blue-500 opacity-50 rounded-full text-white">
+                  <LoaderCircleIcon className="w-4 h-4 animate-spin" />
+                </div>
+                <div className="text-xs font-bold text-gray-700 tabular-nums">
+                  {((renderLog.progress ?? 0) * 100).toFixed(1)}%
+                </div>
+              </div>
+            )}
             <TabsList>
               {showCodeTab && <TabsTrigger value="code">Code</TabsTrigger>}
               <TabsTrigger value="pcb" className="whitespace-nowrap">

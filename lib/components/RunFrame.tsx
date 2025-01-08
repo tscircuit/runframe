@@ -1,5 +1,5 @@
 import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
-import { CircuitJsonPreview } from "./CircuitJsonPreview"
+import { CircuitJsonPreview, type TabId } from "./CircuitJsonPreview"
 import { useEffect, useRef, useState } from "react"
 import Debug from "debug"
 
@@ -14,6 +14,8 @@ import evalWebWorkerBlobUrl from "@tscircuit/eval-webworker/blob-url"
 import type { ManualEditEvent } from "@tscircuit/props"
 import { useRunFrameStore } from "./RunFrameWithApi/store"
 import { getChangesBetweenFsMaps } from "../utils/getChangesBetweenFsMaps"
+import type { RenderLog } from "lib/render-logging/RenderLog"
+import { getPhaseTimingsFromRenderEvents } from "lib/render-logging/getPhaseTimingsFromRenderEvents"
 
 interface Props {
   /**
@@ -76,6 +78,10 @@ interface Props {
    * If true, turns on debug logging
    */
   debug?: boolean
+
+  defaultActiveTab?: Parameters<
+    typeof CircuitJsonPreview
+  >[0]["defaultActiveTab"]
 }
 
 export const RunFrame = (props: Props) => {
@@ -89,6 +95,10 @@ export const RunFrame = (props: Props) => {
     error?: string
     stack?: string
   } | null>(null)
+  const [renderLog, setRenderLog] = useState<RenderLog | null>(null)
+  const [activeTab, setActiveTab] = useState<TabId>(
+    props.defaultActiveTab ?? "pcb",
+  )
   useEffect(() => {
     if (props.debug) Debug.enable("run-frame*")
   }, [props.debug])
@@ -124,6 +134,7 @@ export const RunFrame = (props: Props) => {
     async function runWorker() {
       debug("running render worker")
       setError(null)
+      const renderLog: RenderLog = {}
       const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
         globalThis.runFrameWorker ??
         (await createCircuitWebWorker({
@@ -142,6 +153,15 @@ export const RunFrame = (props: Props) => {
           stack: "",
         })
         return
+      }
+
+      if (activeTab === "render_log") {
+        worker.on("renderable:renderLifecycle:anyEvent", (event: any) => {
+          renderLog.renderEvents = renderLog.renderEvents ?? []
+          event.createdAt = Date.now()
+          renderLog.renderEvents.push(event)
+          setRenderLog(renderLog)
+        })
       }
 
       const evalResult = await worker
@@ -182,15 +202,24 @@ export const RunFrame = (props: Props) => {
       props.onCircuitJsonChange?.(circuitJson)
       setCircuitJson(circuitJson)
       props.onRenderFinished?.({ circuitJson })
+
+      if (activeTab === "render_log") {
+        renderLog.phaseTimings = getPhaseTimingsFromRenderEvents(
+          renderLog.renderEvents ?? [],
+        )
+        setRenderLog(renderLog)
+      }
     }
     runWorker()
   }, [props.fsMap, props.entrypoint])
 
   return (
     <CircuitJsonPreview
-      defaultActiveTab="schematic"
+      defaultActiveTab={props.defaultActiveTab}
       leftHeaderContent={props.leftHeaderContent}
+      onActiveTabChange={setActiveTab}
       circuitJson={circuitJson}
+      renderLog={renderLog}
       errorMessage={error?.error}
       onEditEvent={props.onEditEvent}
       editEvents={props.editEvents}

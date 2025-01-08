@@ -8,7 +8,7 @@ import { cn } from "lib/utils"
 import { applyPcbEditEvents } from "lib/utils/pcbManualEditEventHandler"
 import { CadViewer } from "@tscircuit/3d-viewer"
 import { PCBViewer } from "@tscircuit/pcb-viewer"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { ErrorFallback } from "./ErrorFallback"
 import { ErrorBoundary } from "react-error-boundary"
 import { ErrorTabContent } from "./ErrorTabContent"
@@ -34,6 +34,19 @@ import { Button } from "./ui/button"
 import { PcbViewerWithContainerHeight } from "./PcbViewerWithContainerHeight"
 import { useStyles } from "lib/hooks/use-styles"
 import type { ManualEditEvent } from "@tscircuit/props"
+import type { RenderLog } from "lib/render-logging/RenderLog"
+import { RenderLogViewer } from "./RenderLogViewer"
+
+export type TabId =
+  | "code"
+  | "pcb"
+  | "schematic"
+  | "assembly"
+  | "cad"
+  | "bom"
+  | "circuitjson"
+  | "error"
+  | "render_log"
 
 export interface PreviewContentProps {
   code?: string
@@ -45,6 +58,7 @@ export interface PreviewContentProps {
   circuitJsonKey?: string
   className?: string
   showCodeTab?: boolean
+  showRenderLogTab?: boolean
   codeTabContent?: React.ReactNode
   showJsonTab?: boolean
   showImportAndFormatButtons?: boolean
@@ -62,18 +76,14 @@ export interface PreviewContentProps {
   hasCodeChangedSinceLastRun?: boolean
   // onManualEditsFileContentChange?: (newmanualEditsFileContent: string) => void
 
-  defaultActiveTab?:
-    | "code"
-    | "pcb"
-    | "schematic"
-    | "assembly"
-    | "cad"
-    | "bom"
-    | "circuitjson"
-    | "error"
+  defaultActiveTab?: TabId
+
+  renderLog?: RenderLog | null
 
   onEditEvent?: (editEvent: ManualEditEvent) => void
   editEvents?: ManualEditEvent[]
+
+  onActiveTabChange?: (tab: TabId) => any
 }
 
 export const CircuitJsonPreview = ({
@@ -86,6 +96,9 @@ export const CircuitJsonPreview = ({
   showCodeTab = false,
   codeTabContent,
   showJsonTab = true,
+  showRenderLogTab = true,
+  onActiveTabChange,
+  renderLog,
   showImportAndFormatButtons = true,
   className,
   headerClassName,
@@ -101,7 +114,15 @@ export const CircuitJsonPreview = ({
   defaultActiveTab,
 }: PreviewContentProps) => {
   useStyles()
-  const [activeTab, setActiveTab] = useState(defaultActiveTab ?? "pcb")
+
+  const [activeTab, setActiveTabState] = useState(defaultActiveTab ?? "pcb")
+  const setActiveTab = useCallback(
+    (tab: TabId) => {
+      setActiveTabState(tab)
+      onActiveTabChange?.(tab)
+    },
+    [onActiveTabChange],
+  )
 
   useEffect(() => {
     if (errorMessage) {
@@ -229,6 +250,15 @@ export const CircuitJsonPreview = ({
                     />
                     JSON
                   </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setActiveTab("render_log")}>
+                    <CheckIcon
+                      className={cn(
+                        "w-3 h-3 mr-2",
+                        activeTab !== "render_log" && "invisible",
+                      )}
+                    />
+                    Render Log
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </TabsList>
@@ -247,7 +277,6 @@ export const CircuitJsonPreview = ({
               <div className="h-full">{codeTabContent}</div>
             </TabsContent>
           )}
-
           <TabsContent value="pcb">
             <div
               className={cn(
@@ -369,7 +398,6 @@ export const CircuitJsonPreview = ({
               </ErrorBoundary>
             </div>
           </TabsContent>
-
           <TabsContent value="circuitjson">
             <div
               className={cn(
@@ -393,6 +421,11 @@ export const CircuitJsonPreview = ({
               <PreviewEmptyState onRunClicked={onRunClicked} />
             )}
           </TabsContent>
+          {showRenderLogTab && (
+            <TabsContent value="render_log">
+              <RenderLogViewer renderLog={renderLog} />
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </div>

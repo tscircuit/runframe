@@ -54,7 +54,7 @@
     "@radix-ui/react-tabs": "^1.1.1",
     "@tscircuit/3d-viewer": "^0.0.90",
     "@tscircuit/assembly-viewer": "^0.0.1",
-    "@tscircuit/core": "^0.0.261",
+    "@tscircuit/core": "^0.0.262",
     "@tscircuit/eval-webworker": "^0.0.61",
     "@tscircuit/file-server": "^0.0.13",
     "@tscircuit/pcb-viewer": "^1.10.22",

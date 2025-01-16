@@ -1,8 +1,13 @@
 import type { RenderLog } from "lib/render-logging/RenderLog"
+import { orderedRenderPhases, type RenderPhase } from "@tscircuit/core"
+import { useState } from "react"
 
 export const RenderLogViewer = ({
   renderLog,
 }: { renderLog?: RenderLog | null }) => {
+  const [sortOption, setSortOption] = useState<"longest" | "chronological">(
+    "chronological",
+  )
   if (!renderLog)
     return (
       <div className="p-4 bg-gray-100 rounded-md">
@@ -11,13 +16,36 @@ export const RenderLogViewer = ({
       </div>
     )
 
-  const orderedPhaseTimings = Object.entries(
-    renderLog?.phaseTimings ?? {},
-  ).sort((a, b) => b[1] - a[1])
+  const orderedPhaseTimings = Object.entries(renderLog?.phaseTimings ?? {})
+
+  if (sortOption === "chronological") {
+    orderedPhaseTimings.sort(
+      (a, b) =>
+        orderedRenderPhases.indexOf(a[0] as RenderPhase) -
+        orderedRenderPhases.indexOf(b[0] as RenderPhase),
+    )
+  } else {
+    orderedPhaseTimings.sort((a, b) => b[1] - a[1])
+  }
 
   return (
     <div>
-      <div>Render Logs</div>
+      <div className="flex justify-between items-center">
+        <div>Render Logs</div>
+        <div className="mb-4 pr-2 flex text-xs items-center">
+          <div className="mr-2">Sort by:</div>
+          <select
+            value={sortOption}
+            onChange={(e) =>
+              setSortOption(e.target.value as "longest" | "chronological")
+            }
+            className="px-2 py-1 border rounded text-xs"
+          >
+            <option value="chronological">Phase Order</option>
+            <option value="longest">Duration</option>
+          </select>
+        </div>
+      </div>
       <table className="w-full text-xs">
         <thead>
           <tr>

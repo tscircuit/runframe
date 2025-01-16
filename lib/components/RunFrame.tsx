@@ -161,6 +161,8 @@ export const RunFrame = (props: Props) => {
       }
 
       const renderIds = new Set<string>()
+      const startRenderTime = Date.now()
+      let lastRenderLogSet = Date.now()
       worker.on("renderable:renderLifecycle:anyEvent", (event: any) => {
         renderLog.lastRenderEvent = event
         renderLog.eventsProcessed = (renderLog.eventsProcessed ?? 0) + 1
@@ -186,9 +188,15 @@ export const RunFrame = (props: Props) => {
           renderLog.renderEvents = renderLog.renderEvents ?? []
           event.createdAt = Date.now()
           renderLog.renderEvents.push(event)
-        }
+          if (Date.now() - lastRenderLogSet > 500) {
+            renderLog.phaseTimings = getPhaseTimingsFromRenderEvents(
+              renderLog.renderEvents ?? [],
+            )
+            lastRenderLogSet = Date.now()
+          }
 
-        setRenderLog({ ...renderLog })
+          setRenderLog({ ...renderLog })
+        }
       })
 
       const evalResult = await worker

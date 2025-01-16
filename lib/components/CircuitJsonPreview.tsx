@@ -37,7 +37,7 @@ import { PcbViewerWithContainerHeight } from "./PcbViewerWithContainerHeight"
 import { useStyles } from "lib/hooks/use-styles"
 import type { ManualEditEvent } from "@tscircuit/props"
 import type { RenderLog } from "lib/render-logging/RenderLog"
-import { RenderLogViewer } from "./RenderLogViewer"
+import { RenderLogViewer } from "./RenderLogViewer/RenderLogViewer"
 
 export type TabId =
   | "code"

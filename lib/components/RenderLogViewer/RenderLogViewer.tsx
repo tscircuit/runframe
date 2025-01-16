@@ -1,6 +1,7 @@
 import type { RenderLog } from "lib/render-logging/RenderLog"
 import { orderedRenderPhases, type RenderPhase } from "@tscircuit/core"
 import { useState } from "react"
+import RenderTimingsBar from "./RenderTimingsBar"
 
 export const RenderLogViewer = ({
   renderLog,
@@ -46,9 +47,11 @@ export const RenderLogViewer = ({
           </select>
         </div>
       </div>
+      <RenderTimingsBar phaseTimings={renderLog.phaseTimings} />
       <table className="w-full text-xs">
         <thead>
           <tr>
+            <th className="text-left p-2">Phase Order</th>
             <th className="text-left p-2">Phase</th>
             <th className="text-left p-2">Duration (ms)</th>
           </tr>
@@ -56,6 +59,9 @@ export const RenderLogViewer = ({
         <tbody>
           {orderedPhaseTimings.map(([phase, duration]) => (
             <tr key={phase}>
+              <td className="p-2">
+                {orderedRenderPhases.indexOf(phase as RenderPhase)}
+              </td>
               <td className="p-2">{phase}</td>
               <td className="p-2">{duration}</td>
             </tr>

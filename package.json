@@ -60,7 +60,7 @@
     "@tscircuit/pcb-viewer": "^1.10.22",
     "@tscircuit/props": "^0.0.129",
     "@tscircuit/schematic-viewer": "2.0.9",
-    "circuit-to-svg": "^0.0.100",
+    "circuit-to-svg": "^0.0.101",
     "comlink": "^4.4.2",
     "cssnano": "^7.0.6",
     "lucide-react": "^0.468.0",

@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   prefix: "rf-",
-  darkMode: ["class", "class"],
+  darkMode: ["class"],
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",

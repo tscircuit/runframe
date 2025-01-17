@@ -1,3 +1,4 @@
+import { orderedRenderPhases } from "@tscircuit/core"
 import type { RenderEvent } from "./RenderLog"
 
 /**
@@ -12,6 +13,10 @@ export const getPhaseTimingsFromRenderEvents = (
 ): Record<string, number> => {
   const phaseTimings: Record<string, number> = {}
   if (!renderEvents) return phaseTimings
+
+  for (const renderPhase of orderedRenderPhases) {
+    phaseTimings[renderPhase] = 0
+  }
 
   // Create a map to store start events by phase and renderId
   const startEvents = new Map<string, RenderEvent>()

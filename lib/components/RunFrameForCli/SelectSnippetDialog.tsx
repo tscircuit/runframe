@@ -35,18 +35,18 @@ export const SelectSnippetDialog = ({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
-      <div className="bg-white rounded-lg p-6 w-96">
-        <h2 className="text-lg font-semibold mb-4">Select Snippet</h2>
+    <div className="rf-fixed rf-inset-0 rf-bg-black rf-bg-opacity-50 rf-flex rf-items-center rf-justify-center rf-z-[100]">
+      <div className="rf-bg-white rf-rounded-lg rf-p-6 rf-w-96">
+        <h2 className="rf-text-lg rf-font-semibold rf-mb-4">Select Snippet</h2>
         <input
           type="text"
-          className="w-full px-4 py-2 border rounded mb-4"
+          className="rf-w-full rf-px-4 rf-py-2 rf-border rf-rounded rf-mb-4"
           placeholder="Search snippets or new snippet name..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-        <div className="h-60 overflow-y-auto">
+        <div className="rf-h-60 rf-overflow-y-auto">
           {filteredSnippets.map((name) => (
             <button
               type="button"
@@ -71,17 +71,17 @@ export const SelectSnippetDialog = ({
             </button>
           )}
         </div>
-        <div className="mt-4 flex justify-end gap-2">
+        <div className="rf-mt-4 rf-flex rf-justify-end rf-gap-2">
           <button
             type="button"
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+            className="rf-px-4 rf-py-2 rf-text-gray-600 rf-hover:text-gray-800"
             onClick={onCancel}
           >
             Cancel
           </button>
           <button
             type="button"
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+            className="rf-px-4 rf-py-2 rf-bg-blue-500 rf-text-white rf-rounded rf-hover:bg-blue-600 rf-disabled:opacity-50"
             onClick={() => selectedName && onSelect(selectedName)}
             disabled={!selectedName}
           >

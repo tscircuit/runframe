@@ -90,13 +90,13 @@ export const SaveToSnippetsButton = () => {
       >
         {isSaving ? "Saving..." : "Save to Snippets"}
         {isSaving || hasNeverBeenSaved ? null : (
-          <span className="ml-1.5 flex items-center">
+          <span className="rf-ml-1.5 rf-flex rf-items-center">
             {hasUnsavedChanges ? (
-              <div className="text-xs bg-orange-400 text-white p-0.5 px-1.5 rounded">
+              <div className="rf-text-xs rf-bg-orange-400 rf-text-white rf-p-0.5 rf-px-1.5 rf-rounded">
                 unsaved changes
               </div>
             ) : (
-              <CheckCircle2 className="w-4 h-4 text-green-500" />
+              <CheckCircle2 className="rf-w-4 rf-h-4 rf-text-green-500" />
             )}
           </span>
         )}

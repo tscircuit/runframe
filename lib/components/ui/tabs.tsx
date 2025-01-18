@@ -14,7 +14,7 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "rf-inline-flex rf-h-9 rf-items-center rf-justify-center rf-rounded-lg rf-bg-neutral-100 rf-p-1 rf-text-neutral-500 dark:rf-bg-neutral-800 dark:rf-text-neutral-400",
+      "rf-inline-flex rf-h-9 rf-items-center rf-justify-center rf-rounded-lg rf-bg-zinc-100 rf-p-1 rf-text-zinc-500 dark:rf-bg-zinc-800 dark:rf-text-zinc-400",
       className,
     )}
     {...props}
@@ -29,7 +29,7 @@ const TabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "rf-inline-flex rf-items-center rf-justify-center rf-whitespace-nowrap rf-rounded-md rf-px-3 rf-py-1 rf-text-sm rf-font-medium rf-ring-offset-white rf-transition-all focus-visible:rf-outline-none focus-visible:rf-ring-2 focus-visible:rf-ring-neutral-950 focus-visible:rf-ring-offset-2 disabled:rf-pointer-events-none disabled:rf-opacity-50 data-[state=active]:rf-bg-white data-[state=active]:rf-text-neutral-950 data-[state=active]:rf-shadow dark:rf-ring-offset-neutral-950 dark:focus-visible:rf-ring-neutral-300 dark:data-[state=active]:rf-bg-neutral-950 dark:data-[state=active]:rf-text-neutral-50",
+      "rf-inline-flex rf-items-center rf-justify-center rf-whitespace-nowrap rf-rounded-md rf-px-3 rf-py-1 rf-text-sm rf-font-medium rf-ring-offset-white rf-transition-all focus-visible:rf-outline-none focus-visible:rf-ring-2 focus-visible:rf-ring-zinc-950 focus-visible:rf-ring-offset-2 disabled:rf-pointer-events-none disabled:rf-opacity-50 data-[state=active]:rf-bg-white data-[state=active]:rf-text-zinc-950 data-[state=active]:rf-shadow dark:rf-ring-offset-zinc-950 dark:focus-visible:rf-ring-zinc-300 dark:data-[state=active]:rf-bg-zinc-950 dark:data-[state=active]:rf-text-zinc-50",
       className,
     )}
     {...props}
@@ -44,7 +44,7 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "rf-mt-2 rf-ring-offset-white focus-visible:rf-outline-none focus-visible:rf-ring-2 focus-visible:rf-ring-neutral-950 focus-visible:rf-ring-offset-2 dark:rf-ring-offset-neutral-950 dark:focus-visible:rf-ring-neutral-300",
+      "rf-mt-2 rf-ring-offset-white focus-visible:rf-outline-none focus-visible:rf-ring-2 focus-visible:rf-ring-zinc-950 focus-visible:rf-ring-offset-2 dark:rf-ring-offset-zinc-950 dark:focus-visible:rf-ring-zinc-300",
       className,
     )}
     {...props}

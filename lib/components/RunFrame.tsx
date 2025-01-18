@@ -1,7 +1,8 @@
 import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
 import { CircuitJsonPreview, type TabId } from "./CircuitJsonPreview"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useReducer, useRef, useState } from "react"
 import Debug from "debug"
+import { Loader2, Play } from "lucide-react"
 
 // TODO waiting for core PR: https://github.com/tscircuit/core/pull/489
 // import { orderedRenderPhases } from "@tscircuit/core"
@@ -32,6 +33,11 @@ interface Props {
    * The entry point file that will be executed first
    */
   entrypoint: string
+
+  /**
+   * Whether to show a run button that controls when code executes
+   */
+  showRunButton?: boolean
 
   /**
    * An optional left-side header, you can put a save button, a run button, or
@@ -100,6 +106,12 @@ export const RunFrame = (props: Props) => {
     error?: string
     stack?: string
   } | null>(null)
+  const [runCountTrigger, incRunCountTrigger] = useReducer(
+    (acc: number, s: number) => acc + 1,
+    0,
+  )
+  const lastRunCountTriggerRef = useRef(0)
+  const [isRunning, setIsRunning] = useState(false)
   const [renderLog, setRenderLog] = useState<RenderLog | null>(null)
   const [activeTab, setActiveTab] = useState<TabId>(
     props.defaultActiveTab ?? "pcb",
@@ -120,21 +132,31 @@ export const RunFrame = (props: Props) => {
 
   useEffect(() => {
     if (!fsMap) return
+    const wasTriggeredByRunButton =
+      props.showRunButton && runCountTrigger !== lastRunCountTriggerRef.current
     if (lastFsMapRef.current && circuitJson) {
       const changes = getChangesBetweenFsMaps(lastFsMapRef.current, fsMap)
 
       if (Object.keys(changes).length > 0) {
-        debug("render triggered by changes:", changes)
+        debug("code changes detected")
       } else if (lastEntrypointRef.current !== props.entrypoint) {
         debug("render triggered by entrypoint change")
-      } else {
+      } else if (!wasTriggeredByRunButton) {
         debug("render triggered without changes to fsMap, skipping")
         return
       }
     }
 
+    if (
+      props.showRunButton &&
+      runCountTrigger === lastRunCountTriggerRef.current
+    ) {
+      return
+    }
+
     lastFsMapRef.current = fsMap
     lastEntrypointRef.current = props.entrypoint
+    setIsRunning(true)
 
     async function runWorker() {
       debug("running render worker")
@@ -222,6 +244,7 @@ export const RunFrame = (props: Props) => {
         debug("error getting initial circuit json", e)
         props.onError?.(e)
         setError({ error: e.message, stack: e.stack })
+        setIsRunning(false)
         return null
       })
       if (!circuitJson) return
@@ -246,14 +269,36 @@ export const RunFrame = (props: Props) => {
       renderLog.progress = 1
 
       setRenderLog({ ...renderLog })
+      setIsRunning(false)
     }
     runWorker()
-  }, [props.fsMap, props.entrypoint])
+  }, [props.fsMap, props.entrypoint, runCountTrigger])
 
   return (
     <CircuitJsonPreview
       defaultActiveTab={props.defaultActiveTab}
-      leftHeaderContent={props.leftHeaderContent}
+      leftHeaderContent={
+        <>
+          {props.showRunButton && (
+            <button
+              type="button"
+              onClick={() => {
+                incRunCountTrigger(1)
+              }}
+              className="rf-flex rf-items-center rf-gap-2 rf-px-4 rf-py-2 rf-bg-blue-600 rf-text-white rf-rounded-md rf-mr-2 disabled:rf-opacity-50"
+              disabled={isRunning}
+            >
+              Run{" "}
+              {isRunning ? (
+                <Loader2 className="rf-w-3 rf-h-3 rf-animate-spin" />
+              ) : (
+                <Play className="rf-w-3 rf-h-3" />
+              )}
+            </button>
+          )}
+          {props.leftHeaderContent}
+        </>
+      }
       onActiveTabChange={setActiveTab}
       circuitJson={circuitJson}
       renderLog={renderLog}

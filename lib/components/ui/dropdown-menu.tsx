@@ -25,7 +25,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      "rf-flex rf-cursor-default rf-gap-2 rf-select-none rf-items-center rf-rounded-sm rf-px-2 rf-py-1.5 rf-text-sm rf-outline-none focus:rf-bg-neutral-100 data-[state=open]:rf-bg-neutral-100 [&_svg]:rf-pointer-events-none [&_svg]:rf-size-4 [&_svg]:rf-shrink-0 dark:focus:rf-bg-neutral-800 dark:data-[state=open]:rf-bg-neutral-800",
+      "rf-flex rf-cursor-default rf-gap-2 rf-select-none rf-items-center rf-rounded-sm rf-px-2 rf-py-1.5 rf-text-sm rf-outline-none focus:rf-bg-zinc-100 data-[state=open]:rf-bg-zinc-100 [&_svg]:rf-pointer-events-none [&_svg]:rf-size-4 [&_svg]:rf-shrink-0 dark:focus:rf-bg-zinc-800 dark:data-[state=open]:rf-bg-zinc-800",
       inset && "rf-pl-8",
       className,
     )}
@@ -45,7 +45,7 @@ const DropdownMenuSubContent = React.forwardRef<
   <DropdownMenuPrimitive.SubContent
     ref={ref}
     className={cn(
-      "rf-z-50 rf-min-w-[8rem] rf-overflow-hidden rf-rounded-md rf-border rf-border-neutral-200 rf-bg-white rf-p-1 rf-text-neutral-950 rf-shadow-lg data-[state=open]:rf-animate-in data-[state=closed]:rf-animate-out data-[state=closed]:rf-fade-out-0 data-[state=open]:rf-fade-in-0 data-[state=closed]:rf-zoom-out-95 data-[state=open]:rf-zoom-in-95 data-[side=bottom]:rf-slide-in-from-top-2 data-[side=left]:rf-slide-in-from-right-2 data-[side=right]:rf-slide-in-from-left-2 data-[side=top]:rf-slide-in-from-bottom-2 dark:rf-border-neutral-800 dark:rf-bg-neutral-950 dark:rf-text-neutral-50",
+      "rf-z-50 rf-min-w-[8rem] rf-overflow-hidden rf-rounded-md rf-border rf-border-zinc-200 rf-bg-white rf-p-1 rf-text-zinc-950 rf-shadow-lg data-[state=open]:rf-animate-in data-[state=closed]:rf-animate-out data-[state=closed]:rf-fade-out-0 data-[state=open]:rf-fade-in-0 data-[state=closed]:rf-zoom-out-95 data-[state=open]:rf-zoom-in-95 data-[side=bottom]:rf-slide-in-from-top-2 data-[side=left]:rf-slide-in-from-right-2 data-[side=right]:rf-slide-in-from-left-2 data-[side=top]:rf-slide-in-from-bottom-2 dark:rf-border-zinc-800 dark:rf-bg-zinc-950 dark:rf-text-zinc-50",
       className,
     )}
     {...props}
@@ -63,7 +63,7 @@ const DropdownMenuContent = React.forwardRef<
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        "rf-z-50 rf-min-w-[8rem] rf-overflow-hidden rf-rounded-md rf-border rf-border-neutral-200 rf-bg-white rf-p-1 rf-text-neutral-950 rf-shadow-md dark:rf-border-neutral-800 dark:rf-bg-neutral-950 dark:rf-text-neutral-50",
+        "rf-z-50 rf-min-w-[8rem] rf-overflow-hidden rf-rounded-md rf-border rf-border-zinc-200 rf-bg-white rf-p-1 rf-text-zinc-950 rf-shadow-md dark:rf-border-zinc-800 dark:rf-bg-zinc-950 dark:rf-text-zinc-50",
         "data-[state=open]:rf-animate-in data-[state=closed]:rf-animate-out data-[state=closed]:rf-fade-out-0 data-[state=open]:rf-fade-in-0 data-[state=closed]:rf-zoom-out-95 data-[state=open]:rf-zoom-in-95 data-[side=bottom]:rf-slide-in-from-top-2 data-[side=left]:rf-slide-in-from-right-2 data-[side=right]:rf-slide-in-from-left-2 data-[side=top]:rf-slide-in-from-bottom-2",
         className,
       )}
@@ -82,7 +82,7 @@ const DropdownMenuItem = React.forwardRef<
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
-      "rf-relative rf-flex rf-cursor-default rf-select-none rf-items-center rf-gap-2 rf-rounded-sm rf-px-2 rf-py-1.5 rf-text-sm rf-outline-none rf-transition-colors focus:rf-bg-neutral-100 focus:rf-text-neutral-900 data-[disabled]:rf-pointer-events-none data-[disabled]:rf-opacity-50 [&>svg]:rf-size-4 [&>svg]:rf-shrink-0 dark:focus:rf-bg-neutral-800 dark:focus:rf-text-neutral-50",
+      "rf-relative rf-flex rf-cursor-default rf-select-none rf-items-center rf-gap-2 rf-rounded-sm rf-px-2 rf-py-1.5 rf-text-sm rf-outline-none rf-transition-colors focus:rf-bg-zinc-100 focus:rf-text-zinc-900 data-[disabled]:rf-pointer-events-none data-[disabled]:rf-opacity-50 [&>svg]:rf-size-4 [&>svg]:rf-shrink-0 dark:focus:rf-bg-zinc-800 dark:focus:rf-text-zinc-50",
       inset && "rf-pl-8",
       className,
     )}
@@ -98,7 +98,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
     className={cn(
-      "rf-relative rf-flex rf-cursor-default rf-select-none rf-items-center rf-rounded-sm rf-py-1.5 rf-pl-8 rf-pr-2 rf-text-sm rf-outline-none rf-transition-colors focus:rf-bg-neutral-100 focus:rf-text-neutral-900 data-[disabled]:rf-pointer-events-none data-[disabled]:rf-opacity-50 dark:focus:rf-bg-neutral-800 dark:focus:rf-text-neutral-50",
+      "rf-relative rf-flex rf-cursor-default rf-select-none rf-items-center rf-rounded-sm rf-py-1.5 rf-pl-8 rf-pr-2 rf-text-sm rf-outline-none rf-transition-colors focus:rf-bg-zinc-100 focus:rf-text-zinc-900 data-[disabled]:rf-pointer-events-none data-[disabled]:rf-opacity-50 dark:focus:rf-bg-zinc-800 dark:focus:rf-text-zinc-50",
       className,
     )}
     checked={checked}
@@ -122,7 +122,7 @@ const DropdownMenuRadioItem = React.forwardRef<
   <DropdownMenuPrimitive.RadioItem
     ref={ref}
     className={cn(
-      "rf-relative rf-flex rf-cursor-default rf-select-none rf-items-center rf-rounded-sm rf-py-1.5 rf-pl-8 rf-pr-2 rf-text-sm rf-outline-none rf-transition-colors focus:rf-bg-neutral-100 focus:rf-text-neutral-900 data-[disabled]:rf-pointer-events-none data-[disabled]:rf-opacity-50 dark:focus:rf-bg-neutral-800 dark:focus:rf-text-neutral-50",
+      "rf-relative rf-flex rf-cursor-default rf-select-none rf-items-center rf-rounded-sm rf-py-1.5 rf-pl-8 rf-pr-2 rf-text-sm rf-outline-none rf-transition-colors focus:rf-bg-zinc-100 focus:rf-text-zinc-900 data-[disabled]:rf-pointer-events-none data-[disabled]:rf-opacity-50 dark:focus:rf-bg-zinc-800 dark:focus:rf-text-zinc-50",
       className,
     )}
     {...props}
@@ -162,7 +162,7 @@ const DropdownMenuSeparator = React.forwardRef<
   <DropdownMenuPrimitive.Separator
     ref={ref}
     className={cn(
-      "rf--mx-1 rf-my-1 rf-h-px rf-bg-neutral-100 dark:rf-bg-neutral-800",
+      "rf--mx-1 rf-my-1 rf-h-px rf-bg-zinc-100 dark:rf-bg-zinc-800",
       className,
     )}
     {...props}

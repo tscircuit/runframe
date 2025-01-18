@@ -6,7 +6,7 @@
   "tailwind": {
     "config": "tailwind.config.js",
     "css": "index.css",
-    "baseColor": "neutral",
+    "baseColor": "zinc",
     "cssVariables": false,
     "prefix": "rf-"
   },

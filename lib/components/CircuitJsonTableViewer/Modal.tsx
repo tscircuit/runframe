@@ -22,10 +22,10 @@ const Modal: React.FC<ModalProps> = ({ open, children, title, onClose }) => {
           e.stopPropagation()
         }}
       >
-        <h2 className="rf-mt-0 rf-text-xl">{title}</h2>
+        <h2 className="rf-mt-0 rf-text-md rf-pb-4">{title}</h2>
         <button
           type="button"
-          className="rf-absolute rf-top-4 rf-right-4 rf-text-2xl rf-font-bold"
+          className="rf-absolute rf-top-2 rf-right-4 rf-text-2xl rf-font-bold"
           onClick={onClose}
         >
           &times;

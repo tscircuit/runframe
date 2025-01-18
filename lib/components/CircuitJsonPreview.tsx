@@ -430,7 +430,7 @@ export const CircuitJsonPreview = ({
               </ErrorBoundary>
             </div>
           </TabsContent>
-          <TabsContent value="circuitjson">
+          <TabsContent value="circuit_json">
             <div
               className={cn(
                 "rf-overflow-auto",

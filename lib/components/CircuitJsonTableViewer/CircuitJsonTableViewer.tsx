@@ -272,7 +272,7 @@ export const CircuitJsonTableViewer: React.FC<{ elements: Element[] }> = ({
     })
 
   return (
-    <div className="rf-font-mono rf-text-xs">
+    <div className="rf-font-mono rf-text-xs rf-bg-white">
       <div className="rf-overflow-x-auto">
         <table className="rf-table-auto rf-w-full rf-text-left">
           <thead>

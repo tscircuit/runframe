@@ -12,10 +12,11 @@
     "dist"
   ],
   "scripts": {
-    "start": "cosmos",
+    "start": "bun run build:css && concurrently 'bun run cosmos' 'bun run build:css:watch'",
     "build": "bun run build:css && bun run build:standalone && bun run build:lib",
     "build:lib": "tsup-node lib/preview.ts lib/runner.ts --platform browser --format esm --dts",
     "build:css": "bun run scripts/build-css.ts",
+    "build:css:watch": "chokidar 'lib/components/**/*.tsx' -c 'bun run build:css'",
     "build:site": "cosmos-export",
     "build:standalone": "STANDALONE=1 vite build",
     "analyze": "source-map-explorer 'dist/standalone.min.js'",
@@ -31,8 +32,10 @@
     "@types/react-dom": "18",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "chokidar-cli": "^3.0.0",
     "circuit-json": "^0.0.122",
     "class-variance-authority": "^0.7.1",
+    "concurrently": "^9.1.2",
     "debug": "^4.4.0",
     "playwright": "^1.49.1",
     "postcss": "^8.4.49",

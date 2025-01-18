@@ -5,7 +5,6 @@ import {
   TabsTrigger,
 } from "lib/components/ui/tabs"
 import { cn } from "lib/utils"
-import { applyPcbEditEvents } from "lib/utils/pcbManualEditEventHandler"
 import { CadViewer } from "@tscircuit/3d-viewer"
 import { PCBViewer } from "@tscircuit/pcb-viewer"
 import { useCallback, useEffect, useState } from "react"
@@ -48,8 +47,16 @@ export type TabId =
   | "cad"
   | "bom"
   | "circuit_json"
-  | "error"
+  | "errors"
   | "render_log"
+
+const dropdownMenuItems = [
+  "assembly",
+  "bom",
+  "circuit_json",
+  "errors",
+  "render_log",
+]
 
 export interface PreviewContentProps {
   code?: string
@@ -129,7 +136,7 @@ export const CircuitJsonPreview = ({
 
   useEffect(() => {
     if (errorMessage) {
-      setActiveTab("error")
+      setActiveTab("errors")
     }
   }, [errorMessage])
 
@@ -233,61 +240,27 @@ export const CircuitJsonPreview = ({
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="rf-*:text-xs">
-                  <DropdownMenuItem onSelect={() => setActiveTab("assembly")}>
-                    <CheckIcon
-                      className={cn(
-                        "rf-w-3 rf-h-3 rf-mr-2",
-                        activeTab !== "assembly" && "rf-invisible",
+                  {dropdownMenuItems.map((item) => (
+                    <DropdownMenuItem
+                      key={item}
+                      onSelect={() => setActiveTab(item as TabId)}
+                    >
+                      <CheckIcon
+                        className={cn(
+                          "rf-w-3 rf-h-3 rf-mr-2",
+                          activeTab !== item && "rf-invisible",
+                        )}
+                      />
+                      <div className="rf-pr-2">
+                        {capitalizeFirstLetters(item)}
+                      </div>
+                      {item === "errors" && errorMessage && (
+                        <span className="rf-inline-flex rf-items-center rf-justify-center rf-w-3 rf-h-3 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full">
+                          1
+                        </span>
                       )}
-                    />
-                    Assembly
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={() => setActiveTab("error")}
-                    className="rf-flex"
-                  >
-                    <CheckIcon
-                      className={cn(
-                        "rf-w-3 rf-h-3 rf-mr-2",
-                        activeTab !== "error" && "rf-invisible",
-                      )}
-                    />
-                    <div className="rf-flex-grow">Errors</div>
-                    {errorMessage && (
-                      <span className="rf-inline-flex rf-items-center rf-justify-center rf-w-3 rf-h-3 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full">
-                        1
-                      </span>
-                    )}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => setActiveTab("bom")}>
-                    <CheckIcon
-                      className={cn(
-                        "rf-w-3 rf-h-3 rf-mr-2",
-                        activeTab !== "bom" && "rf-invisible",
-                      )}
-                    />
-                    Bill of Materials
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={() => setActiveTab("circuit_json")}
-                  >
-                    <CheckIcon
-                      className={cn(
-                        "rf-w-3 rf-h-3 rf-mr-2",
-                        activeTab !== "circuit_json" && "rf-invisible",
-                      )}
-                    />
-                    JSON
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => setActiveTab("render_log")}>
-                    <CheckIcon
-                      className={cn(
-                        "rf-w-3 rf-h-3 rf-mr-2",
-                        activeTab !== "render_log" && "rf-invisible",
-                      )}
-                    />
-                    Render Log
-                  </DropdownMenuItem>
+                    </DropdownMenuItem>
+                  ))}
                 </DropdownMenuContent>
               </DropdownMenu>
             </TabsList>
@@ -446,7 +419,7 @@ export const CircuitJsonPreview = ({
               </ErrorBoundary>
             </div>
           </TabsContent>
-          <TabsContent value="error">
+          <TabsContent value="errors">
             {circuitJson || errorMessage ? (
               <ErrorTabContent code={code} errorMessage={errorMessage} />
             ) : (

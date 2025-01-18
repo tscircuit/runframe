@@ -11,7 +11,7 @@ export const ClickableText: React.FC<ClickableTextProps> = ({
 }) => {
   return (
     <span
-      className="cursor-pointer underline text-blue-300 mx-2"
+      className="rf-cursor-pointer rf-underline rf-text-blue-600 rf-mx-2"
       onClick={onClick}
     >
       {text}

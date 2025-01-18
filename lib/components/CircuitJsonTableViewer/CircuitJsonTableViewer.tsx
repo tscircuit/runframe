@@ -117,7 +117,7 @@ export const CircuitJsonTableViewer: React.FC<{ elements: Element[] }> = ({
       key: "primary_id",
       name: "primary_id",
       renderCell: (row: ProcessedElement) => (
-        <div className="flex items-center">
+        <div className="rf-flex rf-items-center">
           <ClickableText
             text={row.primary_id}
             onClick={() =>
@@ -128,7 +128,7 @@ export const CircuitJsonTableViewer: React.FC<{ elements: Element[] }> = ({
               })
             }
           />
-          <span className="flex-grow" />
+          <span className="rf-flex-grow" />
           <ClickableText
             text="(JSON)"
             onClick={() =>
@@ -151,7 +151,7 @@ export const CircuitJsonTableViewer: React.FC<{ elements: Element[] }> = ({
               : () => (
                   <div>
                     Focus:{" "}
-                    <span className="underline">{filters.focused_id}</span>
+                    <span className="rf-underline">{filters.focused_id}</span>
                     <ClickableText
                       text="(unfocus)"
                       onClick={() => setFilter({ focused_id: undefined })}
@@ -173,7 +173,7 @@ export const CircuitJsonTableViewer: React.FC<{ elements: Element[] }> = ({
               onChange={(e) =>
                 setFilter({ component_type_filter: e.target.value })
               }
-              className="border rounded p-1 w-full"
+              className="rf-border rf-rounded rf-p-1 rf-w-full"
             >
               <option key="any" value="any">
                 any
@@ -221,7 +221,7 @@ export const CircuitJsonTableViewer: React.FC<{ elements: Element[] }> = ({
       key: "other_ids",
       name: "other_ids",
       renderCell: (row: ProcessedElement) => (
-        <div className="space-x-2">
+        <div className="rf-space-x-2">
           {Object.entries(row.other_ids).map(([other_id, v]) => (
             <ClickableText
               key={v}
@@ -272,13 +272,13 @@ export const CircuitJsonTableViewer: React.FC<{ elements: Element[] }> = ({
     })
 
   return (
-    <div className="font-mono text-xs">
-      <div className="overflow-x-auto">
-        <table className="table-auto w-full text-left">
+    <div className="rf-font-mono rf-text-xs rf-bg-white">
+      <div className="rf-overflow-x-auto">
+        <table className="rf-table-auto rf-w-full rf-text-left">
           <thead>
             <tr>
               {columns.map((col) => (
-                <th key={col.key} className="px-4 py-2 border-b">
+                <th key={col.key} className="rf-px-4 rf-py-2 rf-border-b">
                   {col.renderHeaderCell ? col.renderHeaderCell(col) : col.name}
                 </th>
               ))}
@@ -286,9 +286,9 @@ export const CircuitJsonTableViewer: React.FC<{ elements: Element[] }> = ({
           </thead>
           <tbody>
             {elements4.map((row, rowIndex) => (
-              <tr key={rowIndex} className="hover:bg-gray-100">
+              <tr key={rowIndex} className="rf-hover:bg-gray-100">
                 {columns.map((col) => (
-                  <td key={col.key} className="px-4 py-2 border-b">
+                  <td key={col.key} className="rf-px-4 rf-py-2 rf-border-b">
                     {col.renderCell
                       ? col.renderCell(row)
                       : (row as any)[col.key]}
@@ -304,8 +304,8 @@ export const CircuitJsonTableViewer: React.FC<{ elements: Element[] }> = ({
         onClose={() => setModal({ open: false })}
         title={modal.open ? modal.title : ""}
       >
-        <div className="bg-gray-800 p-3 text-white rounded">
-          <pre className="whitespace-pre-wrap">
+        <div className="rf-bg-gray-800 rf-p-3 rf-text-white rf-rounded">
+          <pre className="rf-whitespace-pre-wrap">
             {modal.open ? JSON.stringify(modal.element, null, 2) : ""}
           </pre>
         </div>

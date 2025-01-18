@@ -2,12 +2,15 @@ import { Button } from "lib/components/ui/button"
 import { PlayIcon } from "lucide-react"
 
 const PreviewEmptyState = ({ onRunClicked }: { onRunClicked?: () => void }) => (
-  <div className="flex items-center gap-3 bg-gray-100 text-center justify-center py-10">
+  <div className="rf-flex rf-items-center rf-gap-3 rf-bg-gray-100 rf-text-center rf-justify-center rf-py-10">
     No circuit json loaded
     {onRunClicked && (
-      <Button className="bg-blue-600 hover:bg-blue-500" onClick={onRunClicked}>
+      <Button
+        className="rf-bg-blue-600 rf-hover:bg-blue-500"
+        onClick={onRunClicked}
+      >
         Run Code
-        <PlayIcon className="w-3 h-3 ml-2" />
+        <PlayIcon className="rf-w-3 rf-h-3 rf-ml-2" />
       </Button>
     )}
   </div>

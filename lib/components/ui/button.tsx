@@ -1,30 +1,31 @@
 import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 disabled:pointer-events-none disabled:opacity-50 dark:focus-visible:ring-slate-300",
+  "rf-inline-flex rf-items-center rf-justify-center rf-gap-2 rf-whitespace-nowrap rf-rounded-md rf-text-sm rf-font-medium rf-transition-colors focus-visible:rf-outline-none focus-visible:rf-ring-1 focus-visible:rf-ring-neutral-950 disabled:rf-pointer-events-none disabled:rf-opacity-50 [&_svg]:rf-pointer-events-none [&_svg]:rf-size-4 [&_svg]:rf-shrink-0 dark:focus-visible:rf-ring-neutral-300",
   {
     variants: {
       variant: {
         default:
-          "bg-slate-900 text-slate-50 shadow hover:bg-slate-900/90 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90",
+          "rf-bg-neutral-900 rf-text-neutral-50 rf-shadow hover:rf-bg-neutral-900/90 dark:rf-bg-neutral-50 dark:rf-text-neutral-900 dark:hover:rf-bg-neutral-50/90",
         destructive:
-          "bg-red-500 text-slate-50 shadow-sm hover:bg-red-500/90 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-900/90",
+          "rf-bg-red-500 rf-text-neutral-50 rf-shadow-sm hover:rf-bg-red-500/90 dark:rf-bg-red-900 dark:rf-text-neutral-50 dark:hover:rf-bg-red-900/90",
         outline:
-          "border border-slate-200 bg-white shadow-sm hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50",
+          "rf-border rf-border-neutral-200 rf-bg-white rf-shadow-sm hover:rf-bg-neutral-100 hover:rf-text-neutral-900 dark:rf-border-neutral-800 dark:rf-bg-neutral-950 dark:hover:rf-bg-neutral-800 dark:hover:rf-text-neutral-50",
         secondary:
-          "bg-slate-100 text-slate-900 shadow-sm hover:bg-slate-100/80 dark:bg-slate-800 dark:text-slate-50 dark:hover:bg-slate-800/80",
+          "rf-bg-neutral-100 rf-text-neutral-900 rf-shadow-sm hover:rf-bg-neutral-100/80 dark:rf-bg-neutral-800 dark:rf-text-neutral-50 dark:hover:rf-bg-neutral-800/80",
         ghost:
-          "hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-50",
-        link: "text-slate-900 underline-offset-4 hover:underline dark:text-slate-50",
+          "hover:rf-bg-neutral-100 hover:rf-text-neutral-900 dark:hover:rf-bg-neutral-800 dark:hover:rf-text-neutral-50",
+        link: "rf-text-neutral-900 rf-underline-offset-4 hover:rf-underline dark:rf-text-neutral-50",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
-        icon: "h-9 w-9",
+        default: "rf-h-9 rf-px-4 rf-py-2",
+        sm: "rf-h-8 rf-rounded-md rf-px-3 rf-text-xs",
+        lg: "rf-h-10 rf-rounded-md rf-px-8",
+        icon: "rf-h-9 rf-w-9",
       },
     },
     defaultVariants: {
@@ -42,7 +43,7 @@ export interface ButtonProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = "button"
+    const Comp = asChild ? Slot : "button"
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}

@@ -8,13 +8,13 @@ interface HeaderCellProps {
 
 export const HeaderCell: React.FC<HeaderCellProps> = (p) => {
   return (
-    <div className="leading-5">
-      <div className="py-2 font-bold">{p.column.name}</div>
+    <div className="rf-leading-5">
+      <div className="rf-py-2 rf-font-bold">{p.column.name}</div>
       <div>
         {p.field?.() ?? (
           <input
             type="text"
-            className="border rounded p-1 w-full"
+            className="rf-border rf-rounded rf-p-1 rf-w-full"
             onChange={(e) => {
               p.onTextChange?.(e.target.value)
             }}

@@ -9,7 +9,7 @@ export const linkify = (supplier: string, partNumber: string) => {
   if (supplier === "jlcpcb") {
     return (
       <a
-        className="underline text-blue-500"
+        className="rf-underline rf-text-blue-500"
         target="_blank"
         rel="noreferrer"
         href={`https://jlcpcb.com/partdetail/${partNumber}`}
@@ -36,13 +36,13 @@ export const BomTable: React.FC<BomTableProps> = ({ circuitJson }) => {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left text-sm">
+    <div className="rf-overflow-x-auto">
+      <table className="rf-w-full rf-text-left rf-text-sm">
         <thead>
-          <tr className="border-b">
-            <th className="p-2">Name</th>
+          <tr className="rf-border-b">
+            <th className="rf-p-2">Name</th>
             {Array.from(supplierColumns).map((supplier) => (
-              <th key={supplier} className="p-2 capitalize">
+              <th key={supplier} className="rf-p-2 rf-capitalize">
                 {supplier}
               </th>
             ))}
@@ -50,10 +50,10 @@ export const BomTable: React.FC<BomTableProps> = ({ circuitJson }) => {
         </thead>
         <tbody>
           {sourceComponents.map((comp) => (
-            <tr key={comp.source_component_id} className="border-b">
-              <td className="p-2">{comp.name}</td>
+            <tr key={comp.source_component_id} className="rf-border-b">
+              <td className="rf-p-2">{comp.name}</td>
               {Array.from(supplierColumns).map((supplier) => (
-                <td key={supplier} className="p-2">
+                <td key={supplier} className="rf-p-2">
                   {linkify(
                     supplier,
                     comp.supplier_part_numbers?.[supplier]?.[0] || "",

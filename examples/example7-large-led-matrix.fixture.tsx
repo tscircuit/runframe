@@ -15,6 +15,6 @@ circuit.add(
     }}
     defaultActiveTab="render_log"
     entrypoint="main.tsx"
-    // showRenderLogTab
+    showRunButton
   />
 )

@@ -21,6 +21,7 @@ import {
   EllipsisIcon,
   EllipsisVerticalIcon,
   FullscreenIcon,
+  Loader2,
   LoaderCircleIcon,
   LoaderIcon,
   MinimizeIcon,
@@ -99,7 +100,6 @@ export interface PreviewContentProps {
 export const CircuitJsonPreview = ({
   code,
   onRunClicked = undefined,
-  tsxRunTriggerCount,
   errorMessage,
   circuitJsonKey = "",
   circuitJson,
@@ -159,11 +159,9 @@ export const CircuitJsonPreview = ({
           >
             {leftHeaderContent}
             {leftHeaderContent && <div className="rf-flex-grow" />}
-            {/* <RunButton
-              onClick={() => triggerRunTsx()}
-              disabled={!hasCodeChangedSinceLastRun && tsxRunTriggerCount !== 0}
-              isRunningCode={isRunningCode}
-            /> */}
+            {!leftHeaderContent && isRunningCode && (
+              <Loader2 className="rf-w-4 rf-h-4 rf-animate-spin" />
+            )}
             {!leftHeaderContent && <div className="rf-flex-grow" />}
             {renderLog && renderLog.progress !== 1 && (
               <div className="rf-flex rf-items-center rf-gap-2">

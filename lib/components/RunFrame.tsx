@@ -302,6 +302,7 @@ export const RunFrame = (props: Props) => {
       onActiveTabChange={setActiveTab}
       circuitJson={circuitJson}
       renderLog={renderLog}
+      isRunningCode={isRunning}
       errorMessage={error?.error}
       onEditEvent={props.onEditEvent}
       editEvents={props.editEvents}

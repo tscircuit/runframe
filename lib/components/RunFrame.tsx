@@ -1,6 +1,6 @@
 import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
 import { CircuitJsonPreview, type TabId } from "./CircuitJsonPreview"
-import { useEffect, useReducer, useRef, useState } from "react"
+import { useEffect, useMemo, useReducer, useRef, useState } from "react"
 import Debug from "debug"
 import { Loader2, Play } from "lucide-react"
 
@@ -156,6 +156,7 @@ export const RunFrame = (props: Props) => {
 
     lastFsMapRef.current = fsMap
     lastEntrypointRef.current = props.entrypoint
+    lastRunCountTriggerRef.current = runCountTrigger
     setIsRunning(true)
 
     async function runWorker() {
@@ -274,6 +275,10 @@ export const RunFrame = (props: Props) => {
     runWorker()
   }, [props.fsMap, props.entrypoint, runCountTrigger])
 
+  const circuitJsonKey = useMemo(() => {
+    return `cj-${Math.random().toString(36).substring(2, 15)}`
+  }, [circuitJson])
+
   return (
     <CircuitJsonPreview
       defaultActiveTab={props.defaultActiveTab}
@@ -301,6 +306,7 @@ export const RunFrame = (props: Props) => {
       }
       onActiveTabChange={setActiveTab}
       circuitJson={circuitJson}
+      circuitJsonKey={circuitJsonKey}
       renderLog={renderLog}
       isRunningCode={isRunning}
       errorMessage={error?.error}

@@ -40,7 +40,10 @@ export const PcbViewerWithContainerHeight = ({
   }, [])
 
   return (
-    <div ref={containerRef} className={containerClassName || "w-full h-full"}>
+    <div
+      ref={containerRef}
+      className={containerClassName || "rf-w-full rf-h-full"}
+    >
       <PCBViewer {...props} height={computedHeight} />
     </div>
   )

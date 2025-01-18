@@ -4,18 +4,18 @@ export const ErrorFallback = ({ error }: { error: Error }) => {
   return (
     <div
       data-testid="error-container"
-      className="error-container mt-4 bg-red-50 rounded-md border border-red-200"
+      className="rf-error-container rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200"
     >
-      <div className="p-4">
-        <h2 className="text-lg font-semibold text-red-800 mb-3">
+      <div className="rf-p-4">
+        <h2 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-3">
           Error Loading 3D Viewer
         </h2>
-        <p className="text-xs font-mono whitespace-pre-wrap text-red-700">
+        <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-700">
           {error.message}
         </p>
         <details
           style={{ whiteSpace: "pre-wrap" }}
-          className="text-xs font-mono text-red-600 mt-2"
+          className="rf-text-xs rf-font-mono rf-text-red-600 rf-mt-2"
         >
           {error.stack}
         </details>

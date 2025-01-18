@@ -17,8 +17,8 @@ export const RenderTimingsBar = ({
   )
 
   return (
-    <div className="space-y-2 w-full px-4">
-      <div className="relative h-8 flex rounded-sm">
+    <div className="rf-space-y-2 rf-w-full rf-px-4">
+      <div className="rf-relative rf-h-8 rf-flex rf-rounded-sm">
         {orderedRenderPhases.map((phase, index) => {
           const time = phaseTimings[phase] || 0
           const width = (time / totalTime) * 100
@@ -26,20 +26,20 @@ export const RenderTimingsBar = ({
           return (
             <div
               key={phase}
-              className="group relative overflow-visible"
+              className="rf-group rf-relative rf-overflow-visible"
               style={{
                 width: `${width}%`,
                 backgroundColor: getPhaseColor(index),
               }}
             >
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs whitespace-nowrap rounded bg-gray-900 text-white pointer-events-none">
+              <div className="rf-opacity-0 rf-group-hover:opacity-100 rf-transition-opacity rf-absolute rf-bottom-full rf-left-1/2 rf-transform rf--translate-x-1/2 rf-mb-2 rf-px-2 rf-py-1 rf-text-xs rf-whitespace-nowrap rf-rounded rf-bg-gray-900 rf-text-white rf-pointer-events-none">
                 {phase}: {time}ms
               </div>
             </div>
           )
         })}
       </div>
-      <div className="text-xs text-gray-500">
+      <div className="rf-text-xs rf-text-gray-500">
         Total: {totalTime.toFixed(2)}ms
       </div>
     </div>

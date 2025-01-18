@@ -12,19 +12,20 @@ const Modal: React.FC<ModalProps> = ({ open, children, title, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+      className="rf-fixed rf-inset-0 rf-bg-black rf-bg-opacity-50 rf-flex rf-justify-center rf-items-center rf-z-50"
       onClick={onClose}
     >
       <div
-        className="bg-white p-5 rounded-lg relative w-11/12 max-w-2xl"
+        className="rf-bg-white rf-p-5 rf-rounded-lg rf-relative rf-w-11/12 rf-max-w-2xl"
         onClick={(e) => {
           e.preventDefault()
           e.stopPropagation()
         }}
       >
-        <h2 className="mt-0 text-xl">{title}</h2>
+        <h2 className="rf-mt-0 rf-text-xl">{title}</h2>
         <button
-          className="absolute top-4 right-4 text-2xl font-bold"
+          type="button"
+          className="rf-absolute rf-top-4 rf-right-4 rf-text-2xl rf-font-bold"
           onClick={onClose}
         >
           &times;

@@ -38,6 +38,7 @@ import { useStyles } from "lib/hooks/use-styles"
 import type { ManualEditEvent } from "@tscircuit/props"
 import type { RenderLog } from "lib/render-logging/RenderLog"
 import { RenderLogViewer } from "./RenderLogViewer/RenderLogViewer"
+import { capitalizeFirstLetters } from "lib/utils"
 
 export type TabId =
   | "code"
@@ -46,7 +47,7 @@ export type TabId =
   | "assembly"
   | "cad"
   | "bom"
-  | "circuitjson"
+  | "circuit_json"
   | "error"
   | "render_log"
 
@@ -140,25 +141,27 @@ export const CircuitJsonPreview = ({
 
   return (
     <div className={cn("flex flex-col relative", className)}>
-      <div className="md:sticky md:top-2">
+      <div className="rf-md:sticky rf-md:top-2">
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab as any}
-          className="flex-grow flex flex-col p-2"
+          className="rf-flex-grow rf-flex rf-flex-col rf-p-2"
         >
-          <div className={cn("flex items-center gap-2", headerClassName)}>
+          <div
+            className={cn("rf-flex rf-items-center rf-gap-2", headerClassName)}
+          >
             {leftHeaderContent}
-            {leftHeaderContent && <div className="flex-grow" />}
+            {leftHeaderContent && <div className="rf-flex-grow" />}
             {/* <RunButton
               onClick={() => triggerRunTsx()}
               disabled={!hasCodeChangedSinceLastRun && tsxRunTriggerCount !== 0}
               isRunningCode={isRunningCode}
             /> */}
-            {!leftHeaderContent && <div className="flex-grow" />}
+            {!leftHeaderContent && <div className="rf-flex-grow" />}
             {renderLog && renderLog.progress !== 1 && (
-              <div className="flex items-center gap-2">
+              <div className="rf-flex rf-items-center rf-gap-2">
                 {renderLog.lastRenderEvent && (
-                  <div className="text-xs text-gray-500">
+                  <div className="rf-text-xs rf-text-gray-500">
                     {
                       renderLog.lastRenderEvent?.type
                         .split("renderable:renderLifecycle:")[1]
@@ -166,37 +169,37 @@ export const CircuitJsonPreview = ({
                     }
                   </div>
                 )}
-                <div className="w-4 h-4 bg-blue-500 opacity-50 rounded-full text-white">
-                  <LoaderCircleIcon className="w-4 h-4 animate-spin" />
+                <div className="rf-w-4 rf-h-4 rf-bg-blue-500 rf-opacity-50 rf-rounded-full rf-text-white">
+                  <LoaderCircleIcon className="rf-w-4 rf-h-4 rf-animate-spin" />
                 </div>
-                <div className="text-xs font-bold text-gray-700 tabular-nums">
+                <div className="rf-text-xs rf-font-bold rf-text-gray-700 rf-tabular-nums">
                   {((renderLog.progress ?? 0) * 100).toFixed(1)}%
                 </div>
               </div>
             )}
             <TabsList>
               {showCodeTab && <TabsTrigger value="code">Code</TabsTrigger>}
-              <TabsTrigger value="pcb" className="whitespace-nowrap">
+              <TabsTrigger value="pcb" className="rf-whitespace-nowrap">
                 {circuitJson && (
                   <span
                     className={cn(
-                      "inline-flex items-center justify-center w-2 h-2 mr-1 text-xs font-bold text-white rounded-full",
+                      "rf-inline-flex rf-items-center rf-justify-center rf-w-2 rf-h-2 rf-mr-1 rf-text-xs rf-font-bold rf-text-white rf-rounded-full",
                       !hasCodeChangedSinceLastRun
-                        ? "bg-blue-500"
-                        : "bg-gray-500",
+                        ? "rf-bg-blue-500"
+                        : "rf-bg-gray-500",
                     )}
                   />
                 )}
                 PCB
               </TabsTrigger>
-              <TabsTrigger value="schematic" className="whitespace-nowrap">
+              <TabsTrigger value="schematic" className="rf-whitespace-nowrap">
                 {circuitJson && (
                   <span
                     className={cn(
-                      "inline-flex items-center justify-center w-2 h-2 mr-1 text-xs font-bold text-white rounded-full",
+                      "rf-inline-flex rf-items-center rf-justify-center rf-w-2 rf-h-2 rf-mr-1 rf-text-xs rf-font-bold rf-text-white rf-rounded-full",
                       !hasCodeChangedSinceLastRun
-                        ? "bg-blue-500"
-                        : "bg-gray-500",
+                        ? "rf-bg-blue-500"
+                        : "rf-bg-gray-500",
                     )}
                   />
                 )}
@@ -208,45 +211,50 @@ export const CircuitJsonPreview = ({
                     className={cn(
                       "inline-flex items-center justify-center w-2 h-2 mr-1 text-xs font-bold text-white rounded-full",
                       !hasCodeChangedSinceLastRun
-                        ? "bg-blue-500"
-                        : "bg-gray-500",
+                        ? "rf-bg-blue-500"
+                        : "rf-bg-gray-500",
                     )}
                   />
                 )}
                 3D
               </TabsTrigger>
+              {!["pcb", "cad", "schematic"].includes(activeTab) && (
+                <TabsTrigger value={activeTab}>
+                  {capitalizeFirstLetters(activeTab)}
+                </TabsTrigger>
+              )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <div className="whitespace-nowrap p-2 mr-1 cursor-pointer relative">
-                    <EllipsisIcon className="w-4 h-4" />
+                  <div className="rf-whitespace-nowrap rf-p-2 rf-mr-1 rf-cursor-pointer rf-relative">
+                    <EllipsisIcon className="rf-w-4 rf-h-4" />
                     {errorMessage && (
-                      <span className="inline-flex absolute top-[6px] right-[4px] items-center justify-center w-1 h-1 ml-2 text-[8px] font-bold text-white bg-red-500 rounded-full" />
+                      <span className="rf-inline-flex rf-absolute rf-top-[6px] rf-right-[4px] rf-items-center rf-justify-center rf-w-1 rf-h-1 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full" />
                     )}
                   </div>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="*:text-xs">
+                <DropdownMenuContent className="rf-*:text-xs">
                   <DropdownMenuItem onSelect={() => setActiveTab("assembly")}>
                     <CheckIcon
                       className={cn(
-                        "w-3 h-3 mr-2",
-                        activeTab !== "assembly" && "invisible",
+                        "rf-w-3 rf-h-3 rf-mr-2",
+                        activeTab !== "assembly" && "rf-invisible",
                       )}
                     />
                     Assembly
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={() => setActiveTab("error")}
-                    className="flex"
+                    className="rf-flex"
                   >
                     <CheckIcon
                       className={cn(
-                        "w-3 h-3 mr-2",
-                        activeTab !== "error" && "invisible",
+                        "rf-w-3 rf-h-3 rf-mr-2",
+                        activeTab !== "error" && "rf-invisible",
                       )}
                     />
-                    <div className="flex-grow">Errors</div>
+                    <div className="rf-flex-grow">Errors</div>
                     {errorMessage && (
-                      <span className="inline-flex items-center justify-center w-3 h-3 ml-2 text-[8px] font-bold text-white bg-red-500 rounded-full">
+                      <span className="rf-inline-flex rf-items-center rf-justify-center rf-w-3 rf-h-3 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full">
                         1
                       </span>
                     )}
@@ -254,19 +262,19 @@ export const CircuitJsonPreview = ({
                   <DropdownMenuItem onSelect={() => setActiveTab("bom")}>
                     <CheckIcon
                       className={cn(
-                        "w-3 h-3 mr-2",
-                        activeTab !== "bom" && "invisible",
+                        "rf-w-3 rf-h-3 rf-mr-2",
+                        activeTab !== "bom" && "rf-invisible",
                       )}
                     />
                     Bill of Materials
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onSelect={() => setActiveTab("circuitjson")}
+                    onSelect={() => setActiveTab("circuit_json")}
                   >
                     <CheckIcon
                       className={cn(
-                        "w-3 h-3 mr-2",
-                        activeTab !== "circuitjson" && "invisible",
+                        "rf-w-3 rf-h-3 rf-mr-2",
+                        activeTab !== "circuit_json" && "rf-invisible",
                       )}
                     />
                     JSON
@@ -274,8 +282,8 @@ export const CircuitJsonPreview = ({
                   <DropdownMenuItem onSelect={() => setActiveTab("render_log")}>
                     <CheckIcon
                       className={cn(
-                        "w-3 h-3 mr-2",
-                        activeTab !== "render_log" && "invisible",
+                        "rf-w-3 rf-h-3 rf-mr-2",
+                        activeTab !== "render_log" && "rf-invisible",
                       )}
                     />
                     Render Log
@@ -294,15 +302,18 @@ export const CircuitJsonPreview = ({
             )}
           </div>
           {showCodeTab && (
-            <TabsContent value="code" className="flex-grow overflow-hidden">
-              <div className="h-full">{codeTabContent}</div>
+            <TabsContent
+              value="code"
+              className="rf-flex-grow rf-overflow-hidden"
+            >
+              <div className="rf-h-full">{codeTabContent}</div>
             </TabsContent>
           )}
           <TabsContent value="pcb">
             <div
               className={cn(
-                "overflow-hidden",
-                isFullScreen ? "h-[calc(100vh-96px)]" : "h-[620px]",
+                "rf-overflow-hidden",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
               )}
             >
               <ErrorBoundary fallback={<div>Error loading PCB viewer</div>}>
@@ -311,10 +322,10 @@ export const CircuitJsonPreview = ({
                     key={circuitJsonKey}
                     soup={circuitJson}
                     containerClassName={cn(
-                      "h-full w-full",
+                      "rf-h-full rf-w-full",
                       isFullScreen
-                        ? "min-h-[calc(100vh-240px)]"
-                        : "min-h-[620px]",
+                        ? "rf-min-h-[calc(100vh-240px)]"
+                        : "rf-min-h-[620px]",
                     )}
                     // onEditEventsChanged={(editEvents) => {
                     //   if (editEvents.some((editEvent) => editEvent.in_progress))
@@ -340,8 +351,8 @@ export const CircuitJsonPreview = ({
           <TabsContent value="assembly">
             <div
               className={cn(
-                "overflow-auto",
-                isFullScreen ? "h-[calc(100vh-96px)]" : "h-[620px]",
+                "rf-overflow-auto",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
               )}
             >
               <ErrorBoundary fallback={<div>Error loading Assembly</div>}>
@@ -363,8 +374,8 @@ export const CircuitJsonPreview = ({
           <TabsContent value="schematic">
             <div
               className={cn(
-                "overflow-auto",
-                isFullScreen ? "h-[calc(100vh-96px)]" : "h-[620px]",
+                "rf-overflow-auto",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
               )}
             >
               <ErrorBoundary fallback={<div>Error loading Schematic</div>}>
@@ -389,8 +400,8 @@ export const CircuitJsonPreview = ({
           <TabsContent value="cad">
             <div
               className={cn(
-                "overflow-auto",
-                isFullScreen ? "h-[calc(100vh-96px)]" : "h-[620px]",
+                "rf-overflow-auto",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
               )}
             >
               <ErrorBoundary FallbackComponent={ErrorFallback}>
@@ -406,8 +417,8 @@ export const CircuitJsonPreview = ({
           <TabsContent value="bom">
             <div
               className={cn(
-                "overflow-auto",
-                isFullScreen ? "h-[calc(100vh-96px)]" : "h-[620px]",
+                "rf-overflow-auto",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
               )}
             >
               <ErrorBoundary fallback={<div>Error loading BOM</div>}>
@@ -422,8 +433,8 @@ export const CircuitJsonPreview = ({
           <TabsContent value="circuitjson">
             <div
               className={cn(
-                "overflow-auto",
-                isFullScreen ? "h-[calc(100vh-96px)]" : "h-[620px]",
+                "rf-overflow-auto",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
               )}
             >
               <ErrorBoundary fallback={<div>Error loading JSON viewer</div>}>

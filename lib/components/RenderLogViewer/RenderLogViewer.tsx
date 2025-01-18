@@ -11,7 +11,7 @@ export const RenderLogViewer = ({
   )
   if (!renderLog)
     return (
-      <div className="p-4 bg-gray-100 rounded-md">
+      <div className="rf-p-4 rf-bg-gray-100 rf-rounded-md">
         No render log, make sure this tab is open when you render (TODO add a
         rerender button here)
       </div>
@@ -31,16 +31,16 @@ export const RenderLogViewer = ({
 
   return (
     <div>
-      <div className="flex justify-between items-center">
+      <div className="rf-flex rf-justify-between rf-items-center">
         <div>Render Logs</div>
-        <div className="mb-4 pr-2 flex text-xs items-center">
-          <div className="mr-2">Sort by:</div>
+        <div className="rf-mb-4 rf-pr-2 rf-flex rf-text-xs rf-items-center">
+          <div className="rf-mr-2">Sort by:</div>
           <select
             value={sortOption}
             onChange={(e) =>
               setSortOption(e.target.value as "longest" | "chronological")
             }
-            className="px-2 py-1 border rounded text-xs"
+            className="rf-px-2 rf-py-1 rf-border rf-rounded rf-text-xs"
           >
             <option value="chronological">Phase Order</option>
             <option value="longest">Duration</option>
@@ -48,22 +48,22 @@ export const RenderLogViewer = ({
         </div>
       </div>
       <RenderTimingsBar phaseTimings={renderLog.phaseTimings} />
-      <table className="w-full text-xs">
+      <table className="rf-w-full rf-text-xs">
         <thead>
           <tr>
-            <th className="text-left p-2">Phase Order</th>
-            <th className="text-left p-2">Phase</th>
-            <th className="text-left p-2">Duration (ms)</th>
+            <th className="rf-text-left rf-p-2">Phase Order</th>
+            <th className="rf-text-left rf-p-2">Phase</th>
+            <th className="rf-text-left rf-p-2">Duration (ms)</th>
           </tr>
         </thead>
         <tbody>
           {orderedPhaseTimings.map(([phase, duration]) => (
             <tr key={phase}>
-              <td className="p-2">
+              <td className="rf-p-2">
                 {orderedRenderPhases.indexOf(phase as RenderPhase)}
               </td>
-              <td className="p-2">{phase}</td>
-              <td className="p-2">{duration}</td>
+              <td className="rf-p-2">{phase}</td>
+              <td className="rf-p-2">{duration}</td>
             </tr>
           ))}
         </tbody>

@@ -3,7 +3,7 @@
 import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
 
-import { cn } from "lib/utils"
+import { cn } from "lib/lib/utils"
 
 const Tabs = TabsPrimitive.Root
 
@@ -14,7 +14,7 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "rf-inline-flex rf-h-9 rf-items-center rf-justify-center rf-rounded-lg rf-bg-slate-100 rf-p-1 rf-text-slate-500 dark:rf-bg-slate-800 dark:rf-text-slate-400",
+      "rf-inline-flex rf-h-10 rf-items-center rf-justify-center rf-rounded-md rf-bg-muted rf-p-1 rf-text-muted-foreground",
       className,
     )}
     {...props}
@@ -29,7 +29,7 @@ const TabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "rf-inline-flex rf-items-center rf-justify-center rf-whitespace-nowrap rf-rounded-md rf-px-3 rf-py-1.5 rf-text-sm rf-font-medium rf-ring-offset-white rf-transition-all focus-visible:rf-outline-none focus-visible:rf-ring-2 focus-visible:rf-ring-slate-950 focus-visible:rf-ring-offset-2 disabled:rf-pointer-events-none disabled:rf-opacity-50 data-[state=active]:rf-bg-white data-[state=active]:rf-text-slate-950 data-[state=active]:rf-shadow-sm dark:rf-ring-offset-slate-950 dark:focus-visible:rf-ring-slate-300 dark:data-[state=active]:rf-bg-slate-950 dark:data-[state=active]:rf-text-slate-50",
+      "rf-inline-flex rf-items-center rf-justify-center rf-whitespace-nowrap rf-rounded-sm rf-px-3 rf-py-1.5 rf-text-sm rf-font-medium rf-ring-offset-background rf-transition-all focus-visible:rf-outline-none focus-visible:rf-ring-2 focus-visible:rf-ring-ring focus-visible:rf-ring-offset-2 disabled:rf-pointer-events-none disabled:rf-opacity-50 data-[state=active]:rf-bg-background data-[state=active]:rf-text-foreground data-[state=active]:rf-shadow-sm",
       className,
     )}
     {...props}
@@ -44,7 +44,7 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "rf-mt-2 rf-ring-offset-white focus-visible:rf-outline-none focus-visible:rf-ring-2 focus-visible:rf-ring-slate-950 focus-visible:rf-ring-offset-2 dark:rf-ring-offset-slate-950 dark:focus-visible:rf-ring-slate-300",
+      "rf-mt-2 rf-ring-offset-background focus-visible:rf-outline-none focus-visible:rf-ring-2 focus-visible:rf-ring-ring focus-visible:rf-ring-offset-2",
       className,
     )}
     {...props}

@@ -7,19 +7,19 @@ import tailwindConfig from "../tailwind.config"
 
 async function buildCss() {
   // Read your base CSS file with @tailwind directives
-  const css = "@tailwind components; @tailwind utilities;"
+  const css = "@tailwind base; @tailwind components; @tailwind utilities;"
 
   const result = await postcss([
     tailwindcss(tailwindConfig),
-    autoprefixer,
-    cssnano,
+    // autoprefixer,
+    // cssnano,
   ]).process(css, {
     from: undefined,
   })
 
   fs.writeFileSync(
     "./lib/hooks/styles.generated.ts",
-    `export default \`${result.css.replace(/\\/g, "\\\\")}\``,
+    `export default ${JSON.stringify(result.css)}`,
   )
 }
 

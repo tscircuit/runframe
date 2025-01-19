@@ -65,10 +65,11 @@ The CircuitJsonPreview component provides:
 - Circuit JSON viewer
 - Error display
 
-> Note: You should have tailwind installed in the parent project, this library
-> works without installing tailwind but without the "css reset" things will look
-> a bit off (e.g. you might see serif fonts), create an issue if that's
-> cumbersome because we removed it to save 5kb
+### Providing the Blob URL (to avoid loading webworker from CDN)
+
+```tsx
+import evalWebWorkerBlobUrl from "@tscircuit/eval-webworker/blob-url"
+```
 
 ## Development
 

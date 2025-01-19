@@ -1,7 +1,7 @@
 import type { RenderLog } from "lib/render-logging/RenderLog"
 import { orderedRenderPhases, type RenderPhase } from "@tscircuit/core"
 import { useState } from "react"
-import RenderTimingsBar from "./RenderTimingsBar"
+import RenderTimingsBar, { getPhaseColor } from "./RenderTimingsBar"
 
 export const RenderLogViewer = ({
   renderLog,
@@ -29,8 +29,13 @@ export const RenderLogViewer = ({
     orderedPhaseTimings.sort((a, b) => b[1] - a[1])
   }
 
+  const totalTime = orderedPhaseTimings.reduce(
+    (sum, [_, time]) => sum + time,
+    0,
+  )
+
   return (
-    <div>
+    <div className="rf-bg-white">
       <div className="rf-flex rf-justify-between rf-items-center">
         <div>Render Logs</div>
         <div className="rf-mb-4 rf-pr-2 rf-flex rf-text-xs rf-items-center">
@@ -63,7 +68,25 @@ export const RenderLogViewer = ({
                 {orderedRenderPhases.indexOf(phase as RenderPhase)}
               </td>
               <td className="rf-p-2">{phase}</td>
-              <td className="rf-p-2">{duration}</td>
+              <td className="rf-p-2">
+                <div className="rf-w-8">
+                  <div
+                    className="rf-h-2 rf-rounded-sm"
+                    style={{
+                      backgroundColor: getPhaseColor(phase),
+                      width: `${(duration / totalTime) * 100}%`,
+                    }}
+                  />
+                </div>
+              </td>
+              <td className="rf-p-2">
+                <div className="rf-flex w-full">
+                  <span className="rf-flex-grow">{duration}ms</span>
+                  <span className="rf-text-gray-500 rf-pr-2">
+                    {((duration / totalTime) * 100).toFixed(1)}%
+                  </span>
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>

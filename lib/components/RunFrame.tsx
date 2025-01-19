@@ -15,8 +15,6 @@ declare global {
   var runFrameWorker: any
 }
 
-// @ts-ignore
-import evalWebWorkerBlobUrl from "@tscircuit/eval-webworker/blob-url"
 import type { ManualEditEvent } from "@tscircuit/props"
 import { useRunFrameStore } from "./RunFrameWithApi/store"
 import { getChangesBetweenFsMaps } from "../utils/getChangesBetweenFsMaps"
@@ -93,6 +91,8 @@ interface Props {
   defaultActiveTab?: Parameters<
     typeof CircuitJsonPreview
   >[0]["defaultActiveTab"]
+
+  evalWebWorkerBlobUrl?: string
 }
 
 export const RunFrame = (props: Props) => {
@@ -166,7 +166,7 @@ export const RunFrame = (props: Props) => {
       const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
         globalThis.runFrameWorker ??
         (await createCircuitWebWorker({
-          webWorkerUrl: evalWebWorkerBlobUrl,
+          webWorkerUrl: props.evalWebWorkerBlobUrl,
           verbose: true,
         }))
       globalThis.runFrameWorker = worker

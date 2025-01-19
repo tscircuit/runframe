@@ -162,7 +162,7 @@ export const RunFrame = (props: Props) => {
     async function runWorker() {
       debug("running render worker")
       setError(null)
-      const renderLog: RenderLog = {}
+      const renderLog: RenderLog = { progress: 0 }
       const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
         globalThis.runFrameWorker ??
         (await createCircuitWebWorker({
@@ -205,7 +205,10 @@ export const RunFrame = (props: Props) => {
 
         renderLog.progress = hasProcessedEnoughToEstimateProgress
           ? estProgress
-          : 0
+          : // Until we have enough events to estimate progress, we use the 0-5%
+            // range and assume that there are ~500 renderIds, this will usually
+            // be an underestimate.
+            (1 - Math.exp(-(renderLog.eventsProcessed ?? 0) / 1000)) * 0.05
 
         if (activeTab === "render_log") {
           renderLog.renderEvents = renderLog.renderEvents ?? []
@@ -217,9 +220,8 @@ export const RunFrame = (props: Props) => {
             )
             lastRenderLogSet = Date.now()
           }
-
-          setRenderLog({ ...renderLog })
         }
+        setRenderLog({ ...renderLog })
       })
 
       const evalResult = await worker

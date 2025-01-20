@@ -297,7 +297,18 @@ export const RunFrame = (props: Props) => {
             >
               Run{" "}
               {isRunning ? (
-                <Loader2 className="rf-w-3 rf-h-3 rf-animate-spin" />
+                <>
+                  <Loader2 className="rf-w-3 rf-h-3 rf-animate-spin" />
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setIsRunning(false)
+                    }}
+                    className="rf-ml-2 rf-text-red-500 rf-font-bold hover:rf-text-red-700"
+                  >
+                    ✕
+                  </button>
+                </>
               ) : (
                 <Play className="rf-w-3 rf-h-3" />
               )}

@@ -285,8 +285,8 @@ export const RunFrame = (props: Props) => {
     <CircuitJsonPreview
       defaultActiveTab={props.defaultActiveTab}
       leftHeaderContent={
-        <>              
-        {props.showRunButton && (
+        <>
+          {props.showRunButton && (
             <div className="rf-flex rf-items-center rf-gap-2">
               <button
                 type="button"

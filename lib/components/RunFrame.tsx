@@ -285,34 +285,36 @@ export const RunFrame = (props: Props) => {
     <CircuitJsonPreview
       defaultActiveTab={props.defaultActiveTab}
       leftHeaderContent={
-        <>
-          {props.showRunButton && (
-            <button
-              type="button"
-              onClick={() => {
-                incRunCountTrigger(1)
-              }}
-              className="rf-flex rf-items-center rf-gap-2 rf-px-4 rf-py-2 rf-bg-blue-600 rf-text-white rf-rounded-md rf-mr-2 disabled:rf-opacity-50"
-              disabled={isRunning}
-            >
-              Run{" "}
-              {isRunning ? (
-                <>
+        <>              
+        {props.showRunButton && (
+            <div className="rf-flex rf-items-center rf-gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  incRunCountTrigger(1)
+                }}
+                className="rf-flex rf-items-center rf-gap-2 rf-px-4 rf-py-2 rf-bg-blue-600 rf-text-white rf-rounded-md disabled:rf-opacity-50"
+                disabled={isRunning}
+              >
+                Run{" "}
+                {isRunning ? (
                   <Loader2 className="rf-w-3 rf-h-3 rf-animate-spin" />
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setIsRunning(false)
-                    }}
-                    className="rf-ml-2 rf-text-red-500 rf-font-bold hover:rf-text-red-700"
-                  >
-                    ✕
-                  </button>
-                </>
-              ) : (
-                <Play className="rf-w-3 rf-h-3" />
+                ) : (
+                  <Play className="rf-w-3 rf-h-3" />
+                )}
+              </button>
+              {isRunning && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setIsRunning(false)
+                  }}
+                  className="rf-px-3 rf-py-2 rf-bg-red-500 rf-text-white rf-rounded-md hover:rf-bg-red-600 rf-font-medium rf-flex rf-items-center rf-gap-1"
+                >
+                  Stop <span className="rf-font-bold">×</span>
+                </button>
               )}
-            </button>
+            </div>
           )}
           {props.leftHeaderContent}
         </>

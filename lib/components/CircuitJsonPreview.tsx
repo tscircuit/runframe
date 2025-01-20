@@ -154,8 +154,12 @@ export const CircuitJsonPreview = ({
           onValueChange={setActiveTab as any}
           className="rf-flex-grow rf-flex rf-flex-col rf-p-2"
         >
+          {" "}
           <div
-            className={cn("rf-flex rf-items-center rf-gap-2", headerClassName)}
+            className={cn(
+              "rf-flex rf-items-center rf-gap-2 rf-sticky rf-top-2 rf-z-50 rf-bg-white/90 rf-p-2 rf-rounded-lg rf-shadow-sm",
+              headerClassName,
+            )}
           >
             {leftHeaderContent}
             {leftHeaderContent && <div className="rf-flex-grow" />}
@@ -318,7 +322,6 @@ export const CircuitJsonPreview = ({
               </ErrorBoundary>
             </div>
           </TabsContent>
-
           <TabsContent value="assembly">
             <div
               className={cn(
@@ -367,7 +370,6 @@ export const CircuitJsonPreview = ({
               </ErrorBoundary>
             </div>
           </TabsContent>
-
           <TabsContent value="cad">
             <div
               className={cn(
@@ -384,7 +386,6 @@ export const CircuitJsonPreview = ({
               </ErrorBoundary>
             </div>
           </TabsContent>
-
           <TabsContent value="bom">
             <div
               className={cn(

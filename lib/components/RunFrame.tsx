@@ -2,7 +2,7 @@ import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
 import { CircuitJsonPreview, type TabId } from "./CircuitJsonPreview"
 import { useEffect, useMemo, useReducer, useRef, useState } from "react"
 import Debug from "debug"
-import { Loader2, Play } from "lucide-react"
+import { Loader2, Play, Maximize2, Minimize2 } from "lucide-react"
 
 // TODO waiting for core PR: https://github.com/tscircuit/core/pull/489
 // import { orderedRenderPhases } from "@tscircuit/core"
@@ -36,6 +36,11 @@ interface Props {
    * Whether to show a run button that controls when code executes
    */
   showRunButton?: boolean
+
+  /**
+   * Whether to show the fullscreen toggle button
+   */
+  showToggleFullScreen?: boolean
 
   /**
    * An optional left-side header, you can put a save button, a run button, or
@@ -112,6 +117,7 @@ export const RunFrame = (props: Props) => {
   )
   const lastRunCountTriggerRef = useRef(0)
   const [isRunning, setIsRunning] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
   const [renderLog, setRenderLog] = useState<RenderLog | null>(null)
   const [activeTab, setActiveTab] = useState<TabId>(
     props.defaultActiveTab ?? "pcb",
@@ -281,9 +287,21 @@ export const RunFrame = (props: Props) => {
     return `cj-${Math.random().toString(36).substring(2, 15)}`
   }, [circuitJson])
 
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen()
+      setIsFullscreen(true)
+    } else {
+      document.exitFullscreen()
+      setIsFullscreen(false)
+    }
+  }
+
   return (
     <CircuitJsonPreview
       defaultActiveTab={props.defaultActiveTab}
+      onToggleFullScreen={toggleFullscreen}
+      isFullScreen={isFullscreen}
       leftHeaderContent={
         <>
           {props.showRunButton && (
@@ -302,6 +320,29 @@ export const RunFrame = (props: Props) => {
                 <Play className="rf-w-3 rf-h-3" />
               )}
             </button>
+          )}
+          {props.showToggleFullScreen && (
+            <div className="rf-flex rf-items-center rf-gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen()
+                    setIsFullscreen(true)
+                  } else {
+                    document.exitFullscreen()
+                    setIsFullscreen(false)
+                  }
+                }}
+                className="rf-flex rf-items-center rf-gap-2 rf-px-2 rf-py-2 rf-text-zinc-900 rf-rounded-md rf-bg-white hover:rf-bg-zinc-100"
+              >
+                {isFullscreen ? (
+                  <Minimize2 className="rf-w-4 rf-h-4" />
+                ) : (
+                  <Maximize2 className="rf-w-4 rf-h-4" />
+                )}
+              </button>
+            </div>
           )}
           {props.leftHeaderContent}
         </>

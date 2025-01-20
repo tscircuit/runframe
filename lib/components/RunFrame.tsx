@@ -2,7 +2,8 @@ import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
 import { CircuitJsonPreview, type TabId } from "./CircuitJsonPreview"
 import { useEffect, useMemo, useReducer, useRef, useState } from "react"
 import Debug from "debug"
-import { Loader2, Play } from "lucide-react"
+import { Loader2, Play, X } from "lucide-react"
+import { Button } from "./ui/button"
 
 // TODO waiting for core PR: https://github.com/tscircuit/core/pull/489
 // import { orderedRenderPhases } from "@tscircuit/core"
@@ -288,12 +289,12 @@ export const RunFrame = (props: Props) => {
         <>
           {props.showRunButton && (
             <div className="rf-flex rf-items-center rf-gap-2">
-              <button
-                type="button"
+              <Button
                 onClick={() => {
                   incRunCountTrigger(1)
                 }}
-                className="rf-flex rf-items-center rf-gap-2 rf-px-4 rf-py-2 rf-bg-blue-600 rf-text-white rf-rounded-md disabled:rf-opacity-50"
+                variant="primary"
+                className="rf-flex rf-items-center rf-gap-2"
                 disabled={isRunning}
               >
                 Run{" "}
@@ -302,17 +303,19 @@ export const RunFrame = (props: Props) => {
                 ) : (
                   <Play className="rf-w-3 rf-h-3" />
                 )}
-              </button>
+              </Button>
               {isRunning && (
-                <button
+                <Button
                   onClick={(e) => {
                     e.stopPropagation()
                     setIsRunning(false)
                   }}
-                  className="rf-px-3 rf-py-2 rf-bg-red-500 rf-text-white rf-rounded-md hover:rf-bg-red-600 rf-font-medium rf-flex rf-items-center rf-gap-1"
+                  variant="ghost"
+                  size="icon"
+                  className="rf-text-red-500 hover:rf-text-red-600"
                 >
-                  Stop <span className="rf-font-bold">×</span>
-                </button>
+                  <X className="rf-h-4 rf-w-4" />
+                </Button>
               )}
             </div>
           )}

@@ -2,7 +2,7 @@ import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
 import { CircuitJsonPreview, type TabId } from "./CircuitJsonPreview"
 import { useEffect, useMemo, useReducer, useRef, useState } from "react"
 import Debug from "debug"
-import { Loader2, Play, X } from "lucide-react"
+import { Loader2, Play, Square } from "lucide-react"
 import { Button } from "./ui/button"
 
 // TODO waiting for core PR: https://github.com/tscircuit/core/pull/489
@@ -288,8 +288,9 @@ export const RunFrame = (props: Props) => {
       leftHeaderContent={
         <>
           {props.showRunButton && (
-            <div className="rf-flex rf-items-center rf-gap-2">
+            <div className="rf-flex rf-items-center rf-gap-0.5">
               <Button
+                type="button"
                 onClick={() => {
                   incRunCountTrigger(1)
                 }}
@@ -299,9 +300,9 @@ export const RunFrame = (props: Props) => {
               >
                 Run{" "}
                 {isRunning ? (
-                  <Loader2 className="rf-w-3 rf-h-3 rf-animate-spin" />
+                  <Loader2 className="rf-w-2 rf-h-2 rf-animate-spin" />
                 ) : (
-                  <Play className="rf-w-3 rf-h-3" />
+                  <Play className="rf-w-2 rf-h-2" />
                 )}
               </Button>
               {isRunning && (
@@ -312,9 +313,9 @@ export const RunFrame = (props: Props) => {
                   }}
                   variant="ghost"
                   size="icon"
-                  className="rf-text-red-500 hover:rf-text-red-600"
+                  className="rf-text-red-500 hover:rf-text-red-600 -ml-2"
                 >
-                  <X className="rf-h-4 rf-w-4" />
+                  <Square className="rf-h-4 rf-w-4" />
                 </Button>
               )}
             </div>

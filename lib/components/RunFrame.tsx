@@ -314,7 +314,7 @@ export const RunFrame = (props: Props) => {
                   size="icon"
                   className="rf-text-red-500 hover:rf-text-red-600 -ml-4"
                 >
-                  <Square className="rf-h-4 rf-w-4" />
+                  <Square className="rf-h-2 rf-w-2" fill="currentColor" />
                 </Button>
               )}
             </div>

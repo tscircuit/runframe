@@ -288,23 +288,22 @@ export const RunFrame = (props: Props) => {
       leftHeaderContent={
         <>
           {props.showRunButton && (
-            <div className="rf-flex rf-items-center rf-gap-0.5">
-              <Button
+            <div className="rf-flex rf-items-center rf-gap-0">
+              <button
                 type="button"
                 onClick={() => {
                   incRunCountTrigger(1)
                 }}
-                variant="primary"
-                className="rf-flex rf-items-center rf-gap-2"
+                className="rf-flex rf-items-center rf-gap-2 rf-px-4 rf-py-2 rf-bg-blue-600 rf-text-white rf-rounded-md disabled:rf-opacity-50"
                 disabled={isRunning}
               >
                 Run{" "}
                 {isRunning ? (
-                  <Loader2 className="rf-w-2 rf-h-2 rf-animate-spin" />
+                  <Loader2 className="rf-w-3 rf-h-3 rf-animate-spin" />
                 ) : (
-                  <Play className="rf-w-2 rf-h-2" />
+                  <Play className="rf-w-3 rf-h-3" />
                 )}
-              </Button>
+              </button>
               {isRunning && (
                 <Button
                   onClick={(e) => {
@@ -313,7 +312,7 @@ export const RunFrame = (props: Props) => {
                   }}
                   variant="ghost"
                   size="icon"
-                  className="rf-text-red-500 hover:rf-text-red-600 -ml-2"
+                  className="rf-text-red-500 hover:rf-text-red-600 -ml-4"
                 >
                   <Square className="rf-h-4 rf-w-4" />
                 </Button>

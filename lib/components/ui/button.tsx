@@ -11,8 +11,6 @@ const buttonVariants = cva(
       variant: {
         default:
           "rf-bg-zinc-900 rf-text-zinc-50 rf-shadow hover:rf-bg-zinc-900/90 dark:rf-bg-zinc-50 dark:rf-text-zinc-900 dark:hover:rf-bg-zinc-50/90",
-        primary:
-          "rf-bg-blue-600 rf-text-white rf-shadow hover:rf-bg-blue-700 dark:rf-bg-blue-600 dark:rf-text-white dark:hover:rf-bg-blue-700",
         destructive:
           "rf-bg-red-500 rf-text-zinc-50 rf-shadow-sm hover:rf-bg-red-500/90 dark:rf-bg-red-900 dark:rf-text-zinc-50 dark:hover:rf-bg-red-900/90",
         outline:

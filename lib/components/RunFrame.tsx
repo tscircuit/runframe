@@ -309,6 +309,11 @@ export const RunFrame = (props: Props) => {
                   onClick={(e) => {
                     e.stopPropagation()
                     setIsRunning(false)
+                    // Kill the worker using the provided kill function
+                    if (globalThis.runFrameWorker) {
+                      globalThis.runFrameWorker.kill()
+                      globalThis.runFrameWorker = null
+                    }
                   }}
                   variant="ghost"
                   size="icon"

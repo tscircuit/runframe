@@ -294,7 +294,7 @@ export const RunFrame = (props: Props) => {
                 onClick={() => {
                   incRunCountTrigger(1)
                 }}
-                className="rf-flex rf-items-center rf-gap-2 rf-px-4 rf-py-2 rf-bg-blue-600 rf-text-white rf-rounded-md disabled:rf-opacity-50"
+                className="rf-flex rf-items-center rf-gap-2 rf-px-4 rf-py-2 rf-bg-blue-600 hover:rf-bg-blue-700 rf-text-white rf-rounded-md disabled:rf-opacity-50 transition-colors duration-200"
                 disabled={isRunning}
               >
                 Run{" "}
@@ -317,9 +317,9 @@ export const RunFrame = (props: Props) => {
                   }}
                   variant="ghost"
                   size="icon"
-                  className="rf-text-red-500 hover:rf-text-red-600 -ml-4"
+                  className="rf-text-zinc-400/70 hover:rf-text-zinc-300 hover:rf-bg-zinc-100/10 -ml-4 transition-all duration-200"
                 >
-                  <Square className="rf-h-2 rf-w-2" fill="currentColor" />
+                  <Square className="!rf-h-2.5 !rf-w-2.5" fill="currentColor" />
                 </Button>
               )}
             </div>

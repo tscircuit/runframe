@@ -317,9 +317,9 @@ export const RunFrame = (props: Props) => {
                   }}
                   variant="ghost"
                   size="icon"
-                  className="rf-absolute -rf-right-8 rf-top-1/2 -rf-translate-y-1/2 rf-text-red-300/70 hover:rf-text-red-400 hover:rf-bg-zinc-100/10 transition-all duration-200"
+                  className="rf-text-red-300 hover:rf-text-red-400 hover:!rf-bg-transparent -ml-4 [&>svg]:rf-text-red-300 [&>svg]:hover:rf-text-red-400"
                 >
-                  <Square className="!rf-h-2.5 !rf-w-2.5" fill="currentColor" />
+                  <Square className="!rf-h-2.5 !rf-w-2.5" fill="currentColor" stroke="currentColor" />
                 </Button>
               )}
             </div>

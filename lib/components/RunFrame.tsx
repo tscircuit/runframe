@@ -288,7 +288,7 @@ export const RunFrame = (props: Props) => {
       leftHeaderContent={
         <>
           {props.showRunButton && (
-            <div className="rf-flex rf-items-center rf-gap-0">
+            <div className="rf-relative rf-inline-flex">
               <button
                 type="button"
                 onClick={() => {
@@ -317,7 +317,7 @@ export const RunFrame = (props: Props) => {
                   }}
                   variant="ghost"
                   size="icon"
-                  className="rf-text-zinc-400/70 hover:rf-text-zinc-300 hover:rf-bg-zinc-100/10 -ml-4 transition-all duration-200"
+                  className="rf-absolute -rf-right-8 rf-top-1/2 -rf-translate-y-1/2 rf-text-red-300/70 hover:rf-text-red-400 hover:rf-bg-zinc-100/10 transition-all duration-200"
                 >
                   <Square className="!rf-h-2.5 !rf-w-2.5" fill="currentColor" />
                 </Button>

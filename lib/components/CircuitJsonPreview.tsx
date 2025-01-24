@@ -157,7 +157,7 @@ export const CircuitJsonPreview = ({
           {" "}
           <div
             className={cn(
-              "rf-flex rf-items-center rf-gap-2 rf-sticky rf-top-2 rf-z-50 rf-bg-white/90 rf-p-2 rf-rounded-lg rf-shadow-sm",
+              "rf-flex rf-items-center rf-gap-2 rf-bg-white/90 rf-p-2 rf-rounded-lg rf-shadow-sm",
               headerClassName,
             )}
           >

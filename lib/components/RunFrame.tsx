@@ -2,7 +2,7 @@ import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
 import { CircuitJsonPreview, type TabId } from "./CircuitJsonPreview"
 import { useEffect, useMemo, useReducer, useRef, useState } from "react"
 import Debug from "debug"
-import { Loader2, Play, Square, Maximize2, Minimize2 } from "lucide-react"
+import { Loader2, Play, Square} from "lucide-react"
 import { Button } from "./ui/button"
 
 // TODO waiting for core PR: https://github.com/tscircuit/core/pull/489
@@ -346,29 +346,6 @@ export const RunFrame = (props: Props) => {
                   </Button>
                 </div>
               )}
-            </div>
-          )}
-          {props.showToggleFullScreen && (
-            <div className="rf-flex rf-items-center rf-gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen()
-                    setIsFullscreen(true)
-                  } else {
-                    document.exitFullscreen()
-                    setIsFullscreen(false)
-                  }
-                }}
-                className="rf-flex rf-items-center rf-gap-2 rf-px-2 rf-py-2 rf-text-zinc-900 rf-rounded-md rf-bg-white hover:rf-bg-zinc-100"
-              >
-                {isFullscreen ? (
-                  <Minimize2 className="rf-w-4 rf-h-4" />
-                ) : (
-                  <Maximize2 className="rf-w-4 rf-h-4" />
-                )}
-              </button>
             </div>
           )}
           {props.leftHeaderContent}

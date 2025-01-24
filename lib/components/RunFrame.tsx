@@ -2,7 +2,8 @@ import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
 import { CircuitJsonPreview, type TabId } from "./CircuitJsonPreview"
 import { useEffect, useMemo, useReducer, useRef, useState } from "react"
 import Debug from "debug"
-import { Loader2, Play, Maximize2, Minimize2 } from "lucide-react"
+import { Loader2, Play, Square, Maximize2, Minimize2 } from "lucide-react"
+import { Button } from "./ui/button"
 
 // TODO waiting for core PR: https://github.com/tscircuit/core/pull/489
 // import { orderedRenderPhases } from "@tscircuit/core"
@@ -305,21 +306,47 @@ export const RunFrame = (props: Props) => {
       leftHeaderContent={
         <>
           {props.showRunButton && (
-            <button
-              type="button"
-              onClick={() => {
-                incRunCountTrigger(1)
-              }}
-              className="rf-flex rf-items-center rf-gap-2 rf-px-4 rf-py-2 rf-bg-blue-600 rf-text-white rf-rounded-md rf-mr-2 disabled:rf-opacity-50"
-              disabled={isRunning}
-            >
-              Run{" "}
-              {isRunning ? (
-                <Loader2 className="rf-w-3 rf-h-3 rf-animate-spin" />
-              ) : (
-                <Play className="rf-w-3 rf-h-3" />
+            <div className="rf-relative rf-inline-flex">
+              <button
+                type="button"
+                onClick={() => {
+                  incRunCountTrigger(1)
+                }}
+                className="rf-flex rf-items-center rf-gap-2 rf-px-4 rf-py-2 rf-bg-blue-600 hover:rf-bg-blue-700 rf-text-white rf-rounded-md disabled:rf-opacity-50 transition-colors duration-200"
+                disabled={isRunning}
+              >
+                Run{" "}
+                {isRunning ? (
+                  <Loader2 className="rf-w-3 rf-h-3 rf-animate-spin" />
+                ) : (
+                  <Play className="rf-w-3 rf-h-3" />
+                )}
+              </button>
+              {isRunning && (
+                <div className="rf-flex rf-items-center">
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setIsRunning(false)
+                      // Kill the worker using the provided kill function
+                      if (globalThis.runFrameWorker) {
+                        globalThis.runFrameWorker.kill()
+                        globalThis.runFrameWorker = null
+                      }
+                    }}
+                    variant="ghost"
+                    size="icon"
+                    className="rf-text-red-300 hover:rf-text-red-400 hover:!rf-bg-transparent -ml-4 [&>svg]:rf-text-red-300 [&>svg]:hover:rf-text-red-400 rf-flex rf-items-center rf-justify-center"
+                  >
+                    <Square
+                      className="!rf-h-2.5 !rf-w-2.5"
+                      fill="currentColor"
+                      stroke="currentColor"
+                    />
+                  </Button>
+                </div>
               )}
-            </button>
+            </div>
           )}
           {props.showToggleFullScreen && (
             <div className="rf-flex rf-items-center rf-gap-2">

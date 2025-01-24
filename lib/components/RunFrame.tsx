@@ -305,26 +305,28 @@ export const RunFrame = (props: Props) => {
                 )}
               </button>
               {isRunning && (
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setIsRunning(false)
-                    // Kill the worker using the provided kill function
-                    if (globalThis.runFrameWorker) {
-                      globalThis.runFrameWorker.kill()
-                      globalThis.runFrameWorker = null
-                    }
-                  }}
-                  variant="ghost"
-                  size="icon"
-                  className="rf-text-red-300 hover:rf-text-red-400 hover:!rf-bg-transparent -ml-4 [&>svg]:rf-text-red-300 [&>svg]:hover:rf-text-red-400"
-                >
-                  <Square
-                    className="!rf-h-2.5 !rf-w-2.5"
-                    fill="currentColor"
-                    stroke="currentColor"
-                  />
-                </Button>
+                <div className="rf-flex rf-items-center">
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setIsRunning(false)
+                      // Kill the worker using the provided kill function
+                      if (globalThis.runFrameWorker) {
+                        globalThis.runFrameWorker.kill()
+                        globalThis.runFrameWorker = null
+                      }
+                    }}
+                    variant="ghost"
+                    size="icon"
+                    className="rf-text-red-300 hover:rf-text-red-400 hover:!rf-bg-transparent -ml-4 [&>svg]:rf-text-red-300 [&>svg]:hover:rf-text-red-400 rf-flex rf-items-center rf-justify-center"
+                  >
+                    <Square
+                      className="!rf-h-2.5 !rf-w-2.5"
+                      fill="currentColor"
+                      stroke="currentColor"
+                    />
+                  </Button>
+                </div>
               )}
             </div>
           )}

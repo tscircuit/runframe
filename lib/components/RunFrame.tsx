@@ -2,7 +2,7 @@ import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
 import { CircuitJsonPreview, type TabId } from "./CircuitJsonPreview"
 import { useEffect, useMemo, useReducer, useRef, useState } from "react"
 import Debug from "debug"
-import { Loader2, Play, Square} from "lucide-react"
+import { Loader2, Play, Square } from "lucide-react"
 import { Button } from "./ui/button"
 
 // TODO waiting for core PR: https://github.com/tscircuit/core/pull/489

@@ -1,5 +1,5 @@
-import { RunFrameWithApi } from "../RunFrameWithApi/RunFrameWithApi"
-import { SaveToSnippetsButton } from "./SaveToSnippetsButton"
+import { RunFrameWithApi } from "../RunFrameWithApi/RunFrameWithApi";
+import { SaveToSnippetsButton } from "./SaveToSnippetsButton";
 
 export const RunFrameForCli = (props: { debug?: boolean }) => {
   return (
@@ -13,5 +13,5 @@ export const RunFrameForCli = (props: { debug?: boolean }) => {
         }
       />
     </div>
-  )
-}
+  );
+};

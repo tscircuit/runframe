@@ -284,7 +284,7 @@ export const CircuitJsonPreview = ({
             <div
               className={cn(
                 "rf-overflow-hidden",
-                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[840px]",
               )}
             >
               <ErrorBoundary fallback={<div>Error loading PCB viewer</div>}>
@@ -296,7 +296,7 @@ export const CircuitJsonPreview = ({
                       "rf-h-full rf-w-full",
                       isFullScreen
                         ? "rf-min-h-[calc(100vh-240px)]"
-                        : "rf-min-h-[620px]",
+                        : "rf-min-h-[840px]",
                     )}
                     // onEditEventsChanged={(editEvents) => {
                     //   if (editEvents.some((editEvent) => editEvent.in_progress))
@@ -323,7 +323,7 @@ export const CircuitJsonPreview = ({
             <div
               className={cn(
                 "rf-overflow-auto",
-                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[840px]",
               )}
             >
               <ErrorBoundary fallback={<div>Error loading Assembly</div>}>
@@ -346,7 +346,7 @@ export const CircuitJsonPreview = ({
             <div
               className={cn(
                 "rf-overflow-auto",
-                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[840px]",
               )}
             >
               <ErrorBoundary fallback={<div>Error loading Schematic</div>}>
@@ -372,7 +372,7 @@ export const CircuitJsonPreview = ({
             <div
               className={cn(
                 "rf-overflow-auto",
-                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[840px]",
               )}
             >
               <ErrorBoundary FallbackComponent={ErrorFallback}>
@@ -389,7 +389,7 @@ export const CircuitJsonPreview = ({
             <div
               className={cn(
                 "rf-overflow-auto",
-                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[840px]",
               )}
             >
               <ErrorBoundary fallback={<div>Error loading BOM</div>}>
@@ -405,7 +405,7 @@ export const CircuitJsonPreview = ({
             <div
               className={cn(
                 "rf-overflow-auto",
-                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[840px]",
               )}
             >
               <ErrorBoundary fallback={<div>Error loading JSON viewer</div>}>

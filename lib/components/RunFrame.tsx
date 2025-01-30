@@ -233,13 +233,15 @@ export const RunFrame = (props: Props) => {
         .then(() => ({ success: true }))
         .catch((e: any) => {
           // removing the prefix "Eval compiled js error for "./main.tsx":"
-          const message = e.message.split(":")[1]
+          const message: string = e.message.includes(":")
+            ? e.message.replace(/[^:]+:/, "")
+            : e.message
           props.onError?.(e)
           setError({ error: message, stack: e.stack })
           console.error(e)
           return { success: false }
         })
-      if (!evalResult.success) return
+      if (!evalResult.success) return setIsRunning(false)
 
       const $renderResult = worker.renderUntilSettled()
 

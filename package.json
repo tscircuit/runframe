@@ -59,7 +59,7 @@
     "@tscircuit/3d-viewer": "^0.0.115",
     "@tscircuit/assembly-viewer": "^0.0.1",
     "@tscircuit/eval-webworker": "^0.0.83",
-    "@tscircuit/core": "^0.0.297",
+    "@tscircuit/core": "^0.0.298",
     "@tscircuit/file-server": "^0.0.13",
     "@tscircuit/pcb-viewer": "^1.11.29",
     "@tscircuit/props": "^0.0.138",

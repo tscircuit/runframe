@@ -307,7 +307,7 @@ export const RunFrame = (props: Props) => {
                 )}
               </button>
               {isRunning && (
-                <div className="rf-flex rf-items-center">
+                <div className="rf-flex rf-items-center rf-ml-1">
                   <Button
                     onClick={(e) => {
                       e.stopPropagation()
@@ -320,7 +320,7 @@ export const RunFrame = (props: Props) => {
                     }}
                     variant="ghost"
                     size="icon"
-                    className="rf-text-red-300 hover:rf-text-red-400 hover:!rf-bg-transparent -ml-4 [&>svg]:rf-text-red-300 [&>svg]:hover:rf-text-red-400 rf-flex rf-items-center rf-justify-center"
+                    className="rf-text-red-300 hover:rf-text-red-400 hover:!rf-bg-transparent [&>svg]:rf-text-red-300 [&>svg]:hover:rf-text-red-400 rf-flex rf-items-center rf-justify-center"
                   >
                     <Square
                       className="!rf-h-2.5 !rf-w-2.5"

@@ -380,7 +380,10 @@ export const CircuitJsonPreview = ({
             >
               <ErrorBoundary FallbackComponent={ErrorFallback}>
                 {circuitJson ? (
-                  <CadViewer soup={circuitJson as any} autoRotateDisabled={autoRotate3dViewerDisabled} />
+                  <CadViewer
+                    soup={circuitJson as any}
+                    autoRotateDisabled={autoRotate3dViewerDisabled}
+                  />
                 ) : (
                   <PreviewEmptyState onRunClicked={onRunClicked} />
                 )}

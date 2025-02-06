@@ -95,6 +95,8 @@ export interface PreviewContentProps {
   editEvents?: ManualEditEvent[]
 
   onActiveTabChange?: (tab: TabId) => any
+
+  autoRotate3dViewerDisabled?: boolean
 }
 
 export const CircuitJsonPreview = ({
@@ -122,6 +124,7 @@ export const CircuitJsonPreview = ({
   onEditEvent,
   editEvents,
   defaultActiveTab,
+  autoRotate3dViewerDisabled,
 }: PreviewContentProps) => {
   useStyles()
 
@@ -377,7 +380,10 @@ export const CircuitJsonPreview = ({
             >
               <ErrorBoundary FallbackComponent={ErrorFallback}>
                 {circuitJson ? (
-                  <CadViewer soup={circuitJson as any} />
+                  <CadViewer
+                    soup={circuitJson as any}
+                    autoRotateDisabled={autoRotate3dViewerDisabled}
+                  />
                 ) : (
                   <PreviewEmptyState onRunClicked={onRunClicked} />
                 )}

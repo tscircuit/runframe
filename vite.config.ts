@@ -50,6 +50,21 @@ if (process.env.STANDALONE) {
     minify: true,
     // reportCompressedSize: true,
   }
+
+  if (process.env.STANDALONE === "preview") {
+    build = {
+      lib: {
+        entry: resolve(
+          __dirname,
+          "lib/components/CircuitJsonPreviewStandalone/standalone-preview.tsx",
+        ),
+        name: "standalone-preview",
+        fileName: (format) => `standalone-preview.min.js`,
+        formats: ["umd"],
+      },
+      minify: true,
+    }
+  }
 }
 
 export default defineConfig({

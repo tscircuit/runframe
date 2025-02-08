@@ -79,6 +79,11 @@ export interface PreviewContentProps {
    * a title here.
    */
   leftHeaderContent?: React.ReactNode
+  /**
+   * Default header content, shown on the right side of the header with the PCB,
+   * schematic, and CAD tabs.
+   */
+  showRightHeaderContent?: boolean
   isRunningCode?: boolean
   isStreaming?: boolean
   onToggleFullScreen?: () => void
@@ -105,6 +110,7 @@ export const CircuitJsonPreview = ({
   errorMessage,
   circuitJsonKey = "",
   circuitJson,
+  showRightHeaderContent = true,
   showCodeTab = false,
   codeTabContent,
   showJsonTab = true,
@@ -185,86 +191,88 @@ export const CircuitJsonPreview = ({
                 </div>
               </div>
             )}
-            <TabsList>
-              {showCodeTab && <TabsTrigger value="code">Code</TabsTrigger>}
-              <TabsTrigger value="pcb" className="rf-whitespace-nowrap">
-                {circuitJson && (
-                  <span
-                    className={cn(
-                      "rf-inline-flex rf-items-center rf-justify-center rf-w-2 rf-h-2 rf-mr-1 rf-text-xs rf-font-bold rf-text-white rf-rounded-full",
-                      !hasCodeChangedSinceLastRun
-                        ? "rf-bg-blue-500"
-                        : "rf-bg-gray-500",
-                    )}
-                  />
-                )}
-                PCB
-              </TabsTrigger>
-              <TabsTrigger value="schematic" className="rf-whitespace-nowrap">
-                {circuitJson && (
-                  <span
-                    className={cn(
-                      "rf-inline-flex rf-items-center rf-justify-center rf-w-2 rf-h-2 rf-mr-1 rf-text-xs rf-font-bold rf-text-white rf-rounded-full",
-                      !hasCodeChangedSinceLastRun
-                        ? "rf-bg-blue-500"
-                        : "rf-bg-gray-500",
-                    )}
-                  />
-                )}
-                Schematic
-              </TabsTrigger>
-              <TabsTrigger value="cad">
-                {circuitJson && (
-                  <span
-                    className={cn(
-                      "inline-flex items-center justify-center w-2 h-2 mr-1 text-xs font-bold text-white rounded-full",
-                      !hasCodeChangedSinceLastRun
-                        ? "rf-bg-blue-500"
-                        : "rf-bg-gray-500",
-                    )}
-                  />
-                )}
-                3D
-              </TabsTrigger>
-              {!["pcb", "cad", "schematic"].includes(activeTab) && (
-                <TabsTrigger value={activeTab}>
-                  {capitalizeFirstLetters(activeTab)}
-                </TabsTrigger>
-              )}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <div className="rf-whitespace-nowrap rf-p-2 rf-mr-1 rf-cursor-pointer rf-relative">
-                    <EllipsisIcon className="rf-w-4 rf-h-4" />
-                    {errorMessage && (
-                      <span className="rf-inline-flex rf-absolute rf-top-[6px] rf-right-[4px] rf-items-center rf-justify-center rf-w-1 rf-h-1 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full" />
-                    )}
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="rf-*:text-xs">
-                  {dropdownMenuItems.map((item) => (
-                    <DropdownMenuItem
-                      key={item}
-                      onSelect={() => setActiveTab(item as TabId)}
-                    >
-                      <CheckIcon
-                        className={cn(
-                          "rf-w-3 rf-h-3 rf-mr-2",
-                          activeTab !== item && "rf-invisible",
-                        )}
-                      />
-                      <div className="rf-pr-2">
-                        {capitalizeFirstLetters(item)}
-                      </div>
-                      {item === "errors" && errorMessage && (
-                        <span className="rf-inline-flex rf-items-center rf-justify-center rf-w-3 rf-h-3 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full">
-                          1
-                        </span>
+            {showRightHeaderContent && (
+              <TabsList>
+                {showCodeTab && <TabsTrigger value="code">Code</TabsTrigger>}
+                <TabsTrigger value="pcb" className="rf-whitespace-nowrap">
+                  {circuitJson && (
+                    <span
+                      className={cn(
+                        "rf-inline-flex rf-items-center rf-justify-center rf-w-2 rf-h-2 rf-mr-1 rf-text-xs rf-font-bold rf-text-white rf-rounded-full",
+                        !hasCodeChangedSinceLastRun
+                          ? "rf-bg-blue-500"
+                          : "rf-bg-gray-500",
                       )}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </TabsList>
+                    />
+                  )}
+                  PCB
+                </TabsTrigger>
+                <TabsTrigger value="schematic" className="rf-whitespace-nowrap">
+                  {circuitJson && (
+                    <span
+                      className={cn(
+                        "rf-inline-flex rf-items-center rf-justify-center rf-w-2 rf-h-2 rf-mr-1 rf-text-xs rf-font-bold rf-text-white rf-rounded-full",
+                        !hasCodeChangedSinceLastRun
+                          ? "rf-bg-blue-500"
+                          : "rf-bg-gray-500",
+                      )}
+                    />
+                  )}
+                  Schematic
+                </TabsTrigger>
+                <TabsTrigger value="cad">
+                  {circuitJson && (
+                    <span
+                      className={cn(
+                        "inline-flex items-center justify-center w-2 h-2 mr-1 text-xs font-bold text-white rounded-full",
+                        !hasCodeChangedSinceLastRun
+                          ? "rf-bg-blue-500"
+                          : "rf-bg-gray-500",
+                      )}
+                    />
+                  )}
+                  3D
+                </TabsTrigger>
+                {!["pcb", "cad", "schematic"].includes(activeTab) && (
+                  <TabsTrigger value={activeTab}>
+                    {capitalizeFirstLetters(activeTab)}
+                  </TabsTrigger>
+                )}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <div className="rf-whitespace-nowrap rf-p-2 rf-mr-1 rf-cursor-pointer rf-relative">
+                      <EllipsisIcon className="rf-w-4 rf-h-4" />
+                      {errorMessage && (
+                        <span className="rf-inline-flex rf-absolute rf-top-[6px] rf-right-[4px] rf-items-center rf-justify-center rf-w-1 rf-h-1 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full" />
+                      )}
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="rf-*:text-xs">
+                    {dropdownMenuItems.map((item) => (
+                      <DropdownMenuItem
+                        key={item}
+                        onSelect={() => setActiveTab(item as TabId)}
+                      >
+                        <CheckIcon
+                          className={cn(
+                            "rf-w-3 rf-h-3 rf-mr-2",
+                            activeTab !== item && "rf-invisible",
+                          )}
+                        />
+                        <div className="rf-pr-2">
+                          {capitalizeFirstLetters(item)}
+                        </div>
+                        {item === "errors" && errorMessage && (
+                          <span className="rf-inline-flex rf-items-center rf-justify-center rf-w-3 rf-h-3 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full">
+                            1
+                          </span>
+                        )}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TabsList>
+            )}
             {onToggleFullScreen && (
               <Button onClick={onToggleFullScreen} variant="ghost">
                 {isFullScreen ? (

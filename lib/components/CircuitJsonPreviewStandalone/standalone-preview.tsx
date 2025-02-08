@@ -7,6 +7,7 @@ declare global {
     CIRCUIT_JSON_PREVIEW_PROPS?: {
       autoRotate3dViewerDisabled?: boolean
       defaultActiveTab?: TabId
+      showRightHeaderContent?: boolean
     }
   }
 }
@@ -17,6 +18,7 @@ root.render(
   <CircuitJsonPreview
     defaultActiveTab={"cad"}
     autoRotate3dViewerDisabled={true}
+    showRightHeaderContent={false}
     circuitJson={window.CIRCUIT_JSON || {}}
     {...(window.CIRCUIT_JSON_PREVIEW_PROPS || {})}
   />,

@@ -68,7 +68,7 @@ The CircuitJsonPreview component provides:
 ### Providing the Blob URL (to avoid loading webworker from CDN)
 
 ```tsx
-import evalWebWorkerBlobUrl from "@tscircuit/eval-webworker/blob-url"
+import evalWebWorkerBlobUrl from "@tscircuit/eval/blob-url"
 ```
 
 ## Development

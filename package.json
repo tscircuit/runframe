@@ -2,7 +2,7 @@
   "name": "@tscircuit/runframe",
   "main": "dist/preview.js",
   "type": "module",
-  "version": "0.0.149",
+  "version": "0.0.150",
   "exports": {
     ".": "./dist/preview.js",
     "./preview": "./dist/preview.js",
@@ -60,8 +60,8 @@
     "@radix-ui/react-tabs": "^1.1.2",
     "@tscircuit/3d-viewer": "^0.0.129",
     "@tscircuit/assembly-viewer": "^0.0.1",
-    "@tscircuit/core": "^0.0.301",
     "@tscircuit/eval-webworker": "^0.0.83",
+    "@tscircuit/core": "^0.0.302",
     "@tscircuit/file-server": "^0.0.13",
     "@tscircuit/pcb-viewer": "^1.11.29",
     "@tscircuit/props": "^0.0.139",

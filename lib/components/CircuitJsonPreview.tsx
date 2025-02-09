@@ -164,7 +164,6 @@ export const CircuitJsonPreview = ({
           isFullScreen && "rf-fixed rf-top-0 rf-left-0 rf-w-full rf-bg-white",
         )}
       >
-        {" "}
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab as any}

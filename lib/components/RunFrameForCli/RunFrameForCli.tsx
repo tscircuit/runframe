@@ -3,13 +3,15 @@ import { SaveToSnippetsButton } from "./SaveToSnippetsButton"
 
 export const RunFrameForCli = (props: { debug?: boolean }) => {
   return (
-    <RunFrameWithApi
-      debug={props.debug}
-      leftHeaderContent={
-        <div>
-          <SaveToSnippetsButton />
-        </div>
-      }
-    />
+    <div className="rf-w-full rf-h-full">
+      <RunFrameWithApi
+        debug={props.debug}
+        leftHeaderContent={
+          <div>
+            <SaveToSnippetsButton />
+          </div>
+        }
+      />
+    </div>
   )
 }

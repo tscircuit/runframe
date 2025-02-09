@@ -70,7 +70,7 @@
     "clsx": "^2.1.1",
     "comlink": "^4.4.2",
     "cssnano": "^7.0.6",
-    "jscad-fiber": "^0.0.76",
+    "jscad-fiber": "^0.0.77",
     "lucide-react": "^0.473.0",
     "react-cosmos-plugin-vite": "^6.2.0",
     "schematic-symbols": "^0.0.111",

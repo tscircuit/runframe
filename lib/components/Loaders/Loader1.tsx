@@ -1,16 +1,16 @@
-"use client";
-import { useEffect, useState } from "react";
+"use client"
+import { useEffect, useState } from "react"
 
 interface CircuitLoaderProps {
-  size?: number;
-  color?: string;
-  message?: string;
+  size?: number
+  color?: string
+  message?: string
 }
 
 export default function CircuitLoader({
   size = 200,
   color = "text-cyan-400",
-  message = "Loading..."
+  message = "Loading...",
 }: CircuitLoaderProps) {
   return (
     <div className="flex flex-col items-center justify-center h-screen w-screen bg-black space-y-4">
@@ -38,18 +38,18 @@ export default function CircuitLoader({
             strokeDasharray="12 6"
             className="animate-dash-reverse"
           />
-          <circle 
-            cx="30" 
-            cy="100" 
-            r="4" 
-            fill="currentColor" 
+          <circle
+            cx="30"
+            cy="100"
+            r="4"
+            fill="currentColor"
             className="animate-pulse"
           />
-          <circle 
-            cx="170" 
-            cy="100" 
-            r="4" 
-            fill="currentColor" 
+          <circle
+            cx="170"
+            cy="100"
+            r="4"
+            fill="currentColor"
             className="animate-pulse"
           />
         </svg>
@@ -66,7 +66,7 @@ export default function CircuitLoader({
       </div>
 
       {/* Animation Styles */}
-      <style >{`
+      <style>{`
         @keyframes dash {
           to { stroke-dashoffset: -100; }
         }
@@ -87,5 +87,5 @@ export default function CircuitLoader({
         }
       `}</style>
     </div>
-  );
+  )
 }

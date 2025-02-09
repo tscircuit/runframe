@@ -86,8 +86,6 @@ export interface PreviewContentProps {
   showRightHeaderContent?: boolean
   isRunningCode?: boolean
   isStreaming?: boolean
-  onToggleFullScreen?: () => void
-  isFullScreen?: boolean
   // manualEditsFileContent?: string
   hasCodeChangedSinceLastRun?: boolean
   // onManualEditsFileContentChange?: (newmanualEditsFileContent: string) => void
@@ -123,8 +121,6 @@ export const CircuitJsonPreview = ({
   leftHeaderContent,
   readOnly,
   isStreaming,
-  onToggleFullScreen,
-  isFullScreen,
   isRunningCode,
   hasCodeChangedSinceLastRun,
   onEditEvent,
@@ -135,6 +131,7 @@ export const CircuitJsonPreview = ({
   useStyles()
 
   const [activeTab, setActiveTabState] = useState(defaultActiveTab ?? "pcb")
+  const [isFullScreen, setIsFullScreen] = useState(false)
   const setActiveTab = useCallback(
     (tab: TabId) => {
       setActiveTabState(tab)
@@ -142,6 +139,10 @@ export const CircuitJsonPreview = ({
     },
     [onActiveTabChange],
   )
+
+  const showToggleFullScreen = () => {
+    setIsFullScreen(!isFullScreen)
+  }
 
   useEffect(() => {
     if (errorMessage) {
@@ -157,7 +158,12 @@ export const CircuitJsonPreview = ({
 
   return (
     <div className={cn("flex flex-col relative", className)}>
-      <div className="rf-md:sticky rf-md:top-2">
+      <div
+        className={cn(
+          "rf-md:sticky rf-md:top-2",
+          isFullScreen && "rf-fixed rf-top-0 rf-left-0 rf-w-full rf-bg-white",
+        )}
+      >
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab as any}
@@ -273,8 +279,8 @@ export const CircuitJsonPreview = ({
                 </DropdownMenu>
               </TabsList>
             )}
-            {onToggleFullScreen && (
-              <Button onClick={onToggleFullScreen} variant="ghost">
+            {showToggleFullScreen && (
+              <Button onClick={showToggleFullScreen} variant="ghost">
                 {isFullScreen ? (
                   <MinimizeIcon size={16} />
                 ) : (

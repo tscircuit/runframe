@@ -2,7 +2,7 @@
   "name": "@tscircuit/runframe",
   "main": "dist/preview.js",
   "type": "module",
-  "version": "0.0.150",
+  "version": "0.0.151",
   "exports": {
     ".": "./dist/preview.js",
     "./preview": "./dist/preview.js",
@@ -64,7 +64,7 @@
     "@tscircuit/core": "^0.0.302",
     "@tscircuit/file-server": "^0.0.13",
     "@tscircuit/pcb-viewer": "^1.11.29",
-    "@tscircuit/props": "^0.0.139",
+    "@tscircuit/props": "^0.0.142",
     "@tscircuit/schematic-viewer": "2.0.9",
     "circuit-to-svg": "^0.0.101",
     "clsx": "^2.1.1",

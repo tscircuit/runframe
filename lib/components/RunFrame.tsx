@@ -319,7 +319,7 @@ export const RunFrame = (props: Props) => {
                   }}
                   variant="ghost"
                   size="icon"
-                  className="rf-ml-2 rf-text-red-300 hover:rf-text-red-400"
+                  className="rf-ml-2 rf-text-red-300 hover:rf-text-red-400 rf-flex rf-items-center"
                 >
                   <Square
                     className="rf-h-2.5 rf-w-2.5"

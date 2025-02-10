@@ -1,4 +1,4 @@
-import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
+import { createCircuitWebWorker } from "@tscircuit/eval"
 import { CircuitJsonPreview, type TabId } from "./CircuitJsonPreview"
 import { useEffect, useMemo, useReducer, useRef, useState } from "react"
 import Debug from "debug"

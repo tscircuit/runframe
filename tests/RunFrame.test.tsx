@@ -1,6 +1,6 @@
 import { test, expect } from "bun:test"
-import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
-import evalWebWorkerBlobUrl from "@tscircuit/eval-webworker/blob-url"
+import { createCircuitWebWorker } from "@tscircuit/eval"
+import evalWebWorkerBlobUrl from "@tscircuit/eval/blob-url"
 
 test("RunFrame should handle circuit evaluation", async () => {
   const worker = await createCircuitWebWorker({

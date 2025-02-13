@@ -100,6 +100,8 @@ export interface PreviewContentProps {
   onActiveTabChange?: (tab: TabId) => any
 
   autoRotate3dViewerDisabled?: boolean
+
+  showSchematicDebugGrid?: boolean
 }
 
 export const CircuitJsonPreview = ({
@@ -127,6 +129,7 @@ export const CircuitJsonPreview = ({
   editEvents,
   defaultActiveTab,
   autoRotate3dViewerDisabled,
+  showSchematicDebugGrid = false,
 }: PreviewContentProps) => {
   useStyles()
 
@@ -376,7 +379,7 @@ export const CircuitJsonPreview = ({
                     editingEnabled
                     onEditEvent={(ee) => onEditEvent?.(ee)}
                     editEvents={editEvents}
-                    debugGrid
+                    debugGrid={showSchematicDebugGrid}
                   />
                 ) : (
                   <PreviewEmptyState onRunClicked={onRunClicked} />

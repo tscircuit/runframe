@@ -1,9 +1,8 @@
-import { defineConfig, type Plugin } from "vite"
+import winterspecBundle from "@tscircuit/file-server/dist/bundle"
 import react from "@vitejs/plugin-react"
 import { resolve } from "node:path"
-import winterspecBundle from "@tscircuit/file-server/dist/bundle"
+import { type Plugin, defineConfig } from "vite"
 import { getNodeHandler } from "winterspec/adapters/node"
-import { visualizer } from "rollup-plugin-visualizer"
 
 const fakeHandler = getNodeHandler(winterspecBundle as any, {})
 
@@ -31,15 +30,7 @@ if (!process.env.VERCEL && !process.env.STANDALONE) {
 
 let build: any = undefined
 
-if (process.env.STANDALONE) {
-  // plugins.push(
-  //   visualizer({
-  //     filename: "stats.html",
-  //     open: true, // Will open the stats.html file after build
-  //     gzipSize: true,
-  //     brotliSize: true,
-  //   }),
-  // )
+if (process.env.STANDALONE === "1") {
   build = {
     lib: {
       entry: resolve(__dirname, "src/main.tsx"),
@@ -48,22 +39,20 @@ if (process.env.STANDALONE) {
       formats: ["umd"],
     },
     minify: true,
-    // reportCompressedSize: true,
   }
-
-  if (process.env.STANDALONE === "preview") {
-    build = {
-      lib: {
-        entry: resolve(
-          __dirname,
-          "lib/components/CircuitJsonPreviewStandalone/standalone-preview.tsx",
-        ),
-        name: "standalone-preview",
-        fileName: (format) => `standalone-preview.min.js`,
-        formats: ["umd"],
-      },
-      minify: true,
-    }
+}
+if (process.env.STANDALONE === "preview") {
+  build = {
+    lib: {
+      entry: resolve(
+        __dirname,
+        "lib/components/CircuitJsonPreviewStandalone/standalone-preview.tsx",
+      ),
+      name: "standalone-preview",
+      fileName: (format) => `standalone-preview.min.js`,
+      formats: ["umd"],
+    },
+    minify: true,
   }
 }
 

@@ -7,6 +7,7 @@
     ".": "./dist/preview.js",
     "./preview": "./dist/preview.js",
     "./runner": "./dist/runner.js",
+    "./standalone": "./dist/standalone.min.js",
     "./standalone-preview": "./dist/standalone-preview.min.js"
   },
   "files": [
@@ -20,7 +21,7 @@
     "build:css:watch": "chokidar 'lib/components/**/*.tsx' -c 'bun run build:css'",
     "build:site": "cosmos-export",
     "build:standalone": "STANDALONE=1 vite build",
-    "build:standalone-preview": "STANDALONE=preview vite build",
+    "build:standalone-preview": "STANDALONE=preview vite build --emptyOutDir false",
     "analyze": "source-map-explorer 'dist/standalone.min.js'",
     "format:check": "biome format .",
     "format": "biome format --write .",

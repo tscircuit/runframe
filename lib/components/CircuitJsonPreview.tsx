@@ -178,38 +178,38 @@ export const CircuitJsonPreview = ({
             {leftHeaderContent}
             {leftHeaderContent && <div className="rf-flex-grow" />}
             {!leftHeaderContent && (
-  <div className="rf-flex rf-items-center rf-justify-center rf-w-6 rf-h-6">
-    {isRunningCode && (
-      <Loader2 className="rf-w-4 rf-h-4 rf-animate-spin rf-absolute" />
-    )}
-  </div>
-)}
-
-
-            {!leftHeaderContent && <div className="rf-flex-grow" />}
+            <div className="rf-flex rf-items-center rf-justify-center rf-w-6 rf-h-6">
+                {isRunningCode && (
+                    <Loader2 className="rf-w-4 rf-h-4 rf-animate-spin rf-absolute" />
+                )}
+            </div>
+        )}
+             {!leftHeaderContent && <div className="rf-flex-grow" />}
             {renderLog && renderLog.progress !== 1 && (
-  <div
-    className={cn(
-      "rf-flex rf-items-center rf-gap-2",
-      window.innerWidth > 768 ? "rf-flex" : "rf-hidden"
-    )}
-  >
-    {renderLog.lastRenderEvent && (
-      <div className="rf-text-xs rf-text-gray-500">
-        {renderLog.lastRenderEvent?.type
-          .split("renderable:renderLifecycle:")[1]
-          .split(":")[0]}
-      </div>
-    )}
-    <div className="rf-relative rf-w-4 rf-h-4">
-      <div className="rf-absolute rf-w-4 rf-h-4 rf-bg-blue-500 rf-opacity-50 rf-rounded-full rf-text-white" />
-      <LoaderCircleIcon className="rf-w-4 rf-h-4 rf-animate-spin rf-absolute rf-top-0 rf-left-0 rf-z-20" />
-    </div>
-    <div className="rf-text-xs rf-font-bold rf-text-gray-700 rf-tabular-nums">
-      {((renderLog.progress ?? 0) * 100).toFixed(1)}%
-    </div>
-  </div>
-)}
+            <div
+                className={cn(
+                    "rf-flex rf-items-center rf-gap-2",
+                    window.innerWidth > 768 ? "rf-flex" : "rf-hidden"
+                )}
+            >
+                {renderLog.lastRenderEvent && (
+                    <div className="rf-text-xs rf-text-gray-500">
+                        {
+                            renderLog.lastRenderEvent?.type
+                                .split("renderable:renderLifecycle:")[1]
+                                .split(":")[0]
+                            }
+                        </div>
+                    )}
+                    <div className="rf-relative rf-w-4 rf-h-4">
+                        <div className="rf-absolute rf-w-4 rf-h-4 rf-bg-blue-500 rf-opacity-50 rf-rounded-full rf-text-white" />
+                        <LoaderCircleIcon className="rf-w-4 rf-h-4 rf-animate-spin rf-absolute rf-top-0 rf-left-0 rf-z-20" />
+                    </div>
+                    <div className="rf-text-xs rf-font-bold rf-text-gray-700 rf-tabular-nums">
+                        {((renderLog.progress ?? 0) * 100).toFixed(1)}%
+                    </div>
+                </div>
+            )}
 
             {showRightHeaderContent && (
               <TabsList>

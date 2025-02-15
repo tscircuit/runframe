@@ -11,6 +11,17 @@ import {
   DropdownMenuItem,
 } from "../ui/dropdown-menu"
 
+const availableExports = [
+  "json",
+  "svg",
+  "dsn",
+  "glb",
+  "csv",
+  "text",
+  "kicad_mod",
+  "kicad project",
+]
+
 export const RunframeCliLeftHeader = () => {
   const [snippetName, setSnippetName] = useState<string | null>(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
@@ -28,6 +39,7 @@ export const RunframeCliLeftHeader = () => {
     null,
   )
   const [isError, setIsError] = useState(false)
+  const [isExporting, setisExporting] = useState(false)
 
   const pushEvent = useRunFrameStore((state) => state.pushEvent)
   const recentEvents = useRunFrameStore((state) => state.recentEvents)
@@ -46,6 +58,16 @@ export const RunframeCliLeftHeader = () => {
       setNotificationMessage("Snippet saved successfully.")
       setIsError(false)
       return
+    }
+    if (event.event_type === "REQUEST_EXPORT") {
+      setisExporting(true)
+      setNotificationMessage("Export requested...")
+      setIsError(false)
+    }
+    if (event.event_type === "EXPORT_CREATED") {
+      setNotificationMessage(`Export created: ${event.exportFilePath}`)
+      setIsError(false)
+      setisExporting(false)
     }
   })
 
@@ -108,8 +130,35 @@ export const RunframeCliLeftHeader = () => {
         <DropdownMenuItem onSelect={triggerSaveSnippet} disabled={isSaving}>
           {isSaving ? "Saving..." : "Push"}
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => {}}>Export</DropdownMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <DropdownMenuItem className="rf-hover:block" disabled={isExporting}>
+              {isExporting ? "Exporting..." : "Export"}
+            </DropdownMenuItem>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            {availableExports.map((ext, i) => (
+              <DropdownMenuItem
+                key={i}
+                onSelect={() => {
+                  if (!isExporting) {
+                    pushEvent({
+                      event_type: "REQUEST_EXPORT",
+                      exportType: ext,
+                    })
+                    setNotificationMessage(`Export requested: ${ext}`)
+                    setIsError(false)
+                  }
+                }}
+                disabled={isExporting}
+              >
+                {ext}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </DropdownMenuContent>
+
       <div className="!rf-h-full rf-w-fit rf-grid rf-place-items-center rf-my-auto">
         <div className="rf-flex rf-gap-4">
           {hasUnsavedChanges ||

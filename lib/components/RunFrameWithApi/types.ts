@@ -45,11 +45,27 @@ export interface SnippetSavedEvent {
   created_at: string
 }
 
+export interface SnippetExportCreatedEvent {
+  event_id: string
+  event_type: "EXPORT_CREATED"
+  created_at: string
+  exportFilePath: string
+}
+
+export interface RequestToExportSnippetEvent {
+  event_id: string
+  event_type: "REQUEST_EXPORT"
+  exportType: string
+  created_at: string
+}
+
 export type RunFrameEvent =
   | FileUpdatedEvent
   | RequestToSaveSnippetEvent
   | FailedToSaveSnippetEvent
   | SnippetSavedEvent
+  | SnippetExportCreatedEvent
+  | RequestToExportSnippetEvent
 
 type MappedOmit<T, K extends keyof T> = {
   [P in keyof T as P extends K ? never : P]: T[P]

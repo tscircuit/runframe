@@ -22,10 +22,81 @@
         margin: 0;
         padding: 0;
       }
+
+      /* Loader Styles */
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+
+      .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1em;
+      }
+
+      .loading {
+        background-color: lightgrey;
+        height: 2px;
+        overflow: hidden;
+        position: relative;
+        width: 12em;
+        border-radius: 2px;
+      }
+
+      .loading-bar {
+        animation: side2side 2s ease-in-out infinite;
+        background-color: dodgerblue;
+        height: 100%;
+        position: absolute;
+        width: 45%;
+      }
+
+      @keyframes side2side {
+        0%, 100% {
+          transform: translateX(-50%);
+        }
+        50% {
+          transform: translateX(150%);
+        }
+      }
     </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="loader" class="loading-overlay">
+      <div class="loading-container">
+        <div class="loading">
+          <div class="loading-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="root" style="visibility: hidden;"></div>
+    
+    <script>
+      window.onload = function() {
+        const loader = document.getElementById("loader");
+        const root = document.getElementById("root");
+
+        // Hide the loader and show the root when the page has fully loaded
+        loader.style.transition = "opacity 0.3s ease";
+        loader.style.opacity = "0"; // Fade out the loader
+        setTimeout(function() {
+          loader.style.display = "none"; // Hide loader completely
+          loader.remove()
+          root.style.visibility = "visible"; // Show the root content
+        }, 300); // Match the opacity transition duration
+      };
+    </script>
     <script type="module" src="/lib/entrypoints/iframe.tsx"></script>
   </body>
 </html>

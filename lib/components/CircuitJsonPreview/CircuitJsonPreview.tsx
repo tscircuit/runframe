@@ -77,6 +77,7 @@ export const CircuitJsonPreview = ({
   defaultActiveTab,
   autoRotate3dViewerDisabled,
   showSchematicDebugGrid = false,
+  showToggleFullScreen = true,
 }: PreviewContentProps) => {
   useStyles()
 
@@ -90,7 +91,7 @@ export const CircuitJsonPreview = ({
     [onActiveTabChange],
   )
 
-  const showToggleFullScreen = () => {
+  const toggleFullScreen = () => {
     setIsFullScreen(!isFullScreen)
   }
 
@@ -101,8 +102,12 @@ export const CircuitJsonPreview = ({
   }, [errorMessage])
 
   useEffect(() => {
-    if (activeTab === "code" && circuitJson && !errorMessage) {
-      setActiveTab("pcb")
+    if (
+      (activeTab === "code" || activeTab === "errors") &&
+      circuitJson &&
+      !errorMessage
+    ) {
+      setActiveTab(defaultActiveTab ?? "pcb")
     }
   }, [circuitJson])
 
@@ -233,7 +238,7 @@ export const CircuitJsonPreview = ({
               </TabsList>
             )}
             {showToggleFullScreen && (
-              <Button onClick={showToggleFullScreen} variant="ghost">
+              <Button onClick={toggleFullScreen} variant="ghost">
                 {isFullScreen ? (
                   <MinimizeIcon size={16} />
                 ) : (

@@ -25,6 +25,7 @@ export interface PreviewContentProps {
   showRenderLogTab?: boolean
   codeTabContent?: React.ReactNode
   showJsonTab?: boolean
+  showToggleFullScreen?: boolean
   showImportAndFormatButtons?: boolean
   headerClassName?: string
   /**

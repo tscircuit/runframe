@@ -47,7 +47,7 @@ export const ErrorTabContent = ({
             alert("Error copied to clipboard!")
           }}
         >
-          <ClipboardIcon className="rf-w-4 rf-h-4 rf-mr-2" />
+          <ClipboardIcon className="rf-w-4 rf-h-4" />
           Copy Error
         </Button>
         <Button
@@ -79,7 +79,7 @@ export const ErrorTabContent = ({
             // )
           }}
         >
-          <GitHubLogoIcon className="rf-w-4 rf-h-4 rf-mr-2" />
+          <GitHubLogoIcon className="rf-w-4 rf-h-4" />
           Report Issue
         </Button>
       </div>

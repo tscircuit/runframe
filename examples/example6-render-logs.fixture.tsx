@@ -1,4 +1,4 @@
-import { RunFrame } from "lib/components/RunFrame"
+import { RunFrame } from "lib/components/RunFrame/RunFrame"
 import React from "react"
 
 export default () => (

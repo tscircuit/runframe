@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { RunFrame } from "../RunFrame"
+import { RunFrame } from "../RunFrame/RunFrame"
 import { useRunFrameStore } from "./store"
 import type { ManualEditEvent } from "@tscircuit/props"
 import { API_BASE } from "./api-base"

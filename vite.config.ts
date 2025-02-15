@@ -51,13 +51,6 @@ if (process.env.STANDALONE === "iframe") {
       formats: ["umd"],
     },
     minify: true,
-    rollupOptions: {
-      output: {
-        globals: {
-          process: "process",
-        },
-      },
-    },
   }
 }
 

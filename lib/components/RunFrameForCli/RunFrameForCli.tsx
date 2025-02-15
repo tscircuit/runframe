@@ -6,7 +6,7 @@ export const RunFrameForCli = (props: { debug?: boolean }) => {
     <RunFrameWithApi
       debug={props.debug}
       leftHeaderContent={
-        <div>
+        <div className="rf-flex">
           <RunframeCliLeftHeader />
         </div>
       }

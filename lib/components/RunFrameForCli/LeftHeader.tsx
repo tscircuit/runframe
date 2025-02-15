@@ -9,6 +9,10 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuPortal,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "../ui/dropdown-menu"
 
 const availableExports = [
@@ -131,33 +135,33 @@ export const RunframeCliLeftHeader = () => {
         <DropdownMenuItem onSelect={triggerSaveSnippet} disabled={isSaving}>
           {isSaving ? "Saving..." : "Push"}
         </DropdownMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <DropdownMenuItem className="rf-hover:block" disabled={isExporting}>
-              {isExporting ? "Exporting..." : "Export"}
-            </DropdownMenuItem>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            {availableExports.map((ext, i) => (
-              <DropdownMenuItem
-                key={i}
-                onSelect={() => {
-                  if (!isExporting) {
-                    pushEvent({
-                      event_type: "REQUEST_EXPORT",
-                      exportType: ext,
-                    })
-                    setNotificationMessage(`Export requested: ${ext}`)
-                    setIsError(false)
-                  }
-                }}
-                disabled={isExporting}
-              >
-                {ext}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger disabled={isExporting}>
+            {isExporting ? "Exporting..." : "Export"}
+          </DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent>
+              {availableExports.map((ext, i) => (
+                <DropdownMenuItem
+                  key={i}
+                  onSelect={() => {
+                    if (!isExporting) {
+                      pushEvent({
+                        event_type: "REQUEST_EXPORT",
+                        exportType: ext,
+                      })
+                      setNotificationMessage(`Export requested: ${ext}`)
+                      setIsError(false)
+                    }
+                  }}
+                  disabled={isExporting}
+                >
+                  {ext}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
       </DropdownMenuContent>
 
       <div className="!rf-h-full rf-w-fit rf-grid rf-place-items-center rf-my-auto">
@@ -170,7 +174,7 @@ export const RunframeCliLeftHeader = () => {
             ))}
           {notificationMessage && (
             <div
-              className={`rf-text-xs rf-mt-1 rf-flex rf-max-w-lg rf-break-words rf-text-center rf-h-full ${
+              className={`rf-text-xs rf-mt-1 rf-flex rf-max-w-xl rf-break-words rf-text-center rf-h-full ${
                 isError ? "rf-text-red-500" : "rf-text-green-500"
               }`}
             >

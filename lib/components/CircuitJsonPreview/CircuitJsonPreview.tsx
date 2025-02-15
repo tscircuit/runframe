@@ -107,7 +107,7 @@ export const CircuitJsonPreview = ({
   }, [circuitJson])
 
   return (
-    <div 
+    <div
       className={cn("flex flex-col relative rf-overflow-x-hidden", className)}
     >
       <div

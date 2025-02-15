@@ -13,11 +13,13 @@ function IframeApp() {
     }),
     {} as RunFrameProps,
   )
+  const [propsReceived, setPropsReceived] = useState(false)
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data && "runframe_props" in event.data) {
         setPropsFromParent(event.data.runframe_props)
+        setPropsReceived(true)
       }
     }
 
@@ -29,20 +31,29 @@ function IframeApp() {
 
   return (
     <div style={{ width: "100%", height: "100vh" }}>
-      <RunFrame
-        debug={window.location.search.includes("debug")}
-        {...propsFromParent}
-        onError={(error) => {
-          const msg: RunFrameIframeEvent = {
-            type: "runframe_event",
-            runframe_event: {
-              type: "error",
-              error_message: error.message ?? error.toString(),
-            },
-          }
-          window.parent?.postMessage(msg, "*")
-        }}
-      />
+      {!propsReceived && (
+        <div>
+          <div className="rf-gray-500">Waiting for code...</div>
+        </div>
+      )}
+      {propsReceived && (
+        <RunFrame
+          debug={window.location.search.includes("debug")}
+          showToggleFullScreen={false}
+          defaultActiveTab="cad"
+          {...propsFromParent}
+          onError={(error) => {
+            const msg: RunFrameIframeEvent = {
+              type: "runframe_event",
+              runframe_event: {
+                type: "error",
+                error_message: error.message ?? error.toString(),
+              },
+            }
+            window.parent?.postMessage(msg, "*")
+          }}
+        />
+      )}
     </div>
   )
 }

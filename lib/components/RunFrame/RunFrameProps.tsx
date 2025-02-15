@@ -18,6 +18,11 @@ export interface RunFrameProps {
   showRunButton?: boolean
 
   /**
+   * Whether to show a full screen button
+   */
+  showToggleFullScreen?: boolean
+
+  /**
    * An optional left-side header, you can put a save button, a run button, or
    * a title here.
    */

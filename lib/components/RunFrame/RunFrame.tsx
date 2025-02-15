@@ -220,6 +220,7 @@ export const RunFrame = (props: RunFrameProps) => {
   return (
     <CircuitJsonPreview
       defaultActiveTab={props.defaultActiveTab}
+      showToggleFullScreen={props.showToggleFullScreen}
       leftHeaderContent={
         <>
           {props.showRunButton && (

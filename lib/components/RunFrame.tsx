@@ -178,7 +178,7 @@ export const RunFrame = (props: Props) => {
 
       if (!fsMapObj[props.entrypoint]) {
         setError({
-          error: `Entrypoint not found (entrypoint: "${props.entrypoint}", fsMapKeys: ${Object.keys(fsMapObj).join(", ")})`,
+          error: `No code found at entry point "${props.entrypoint}". Make sure you've provided the correct entry file.`,
           stack: "",
         })
         setIsRunning(false)

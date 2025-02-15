@@ -77,7 +77,7 @@ test("RunFrame should handle empty fsMap", async () => {
   }
 
   expect(error).toBeDefined()
-  expect(error?.message).toContain('main.tsx" not found')
+  expect(error?.message).toContain("No code found at entry point")
 })
 
 test("RunFrame should handle missing entrypoint", async () => {
@@ -100,5 +100,5 @@ test("RunFrame should handle missing entrypoint", async () => {
   }
 
   expect(error).toBeDefined()
-  expect(error?.message).toContain('main.tsx" not found')
+  expect(error?.message).toContain("No code found at entry point")
 })

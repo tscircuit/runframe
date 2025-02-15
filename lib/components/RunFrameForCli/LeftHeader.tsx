@@ -89,8 +89,9 @@ export const RunframeCliLeftHeader = () => {
       setRequestToSaveSentAt(null)
       setNotificationMessage(
         saveFailedEvent.message ??
-          "Failed to save snippet. See terminal for error.",
+          "Failed to save snippet. See console for error.",
       )
+      console.error(saveFailedEvent.message)
       setIsError(true)
       if (
         saveFailedEvent.error_code === "SNIPPET_UNSET" &&
@@ -169,7 +170,7 @@ export const RunframeCliLeftHeader = () => {
             ))}
           {notificationMessage && (
             <div
-              className={`rf-text-xs rf-mt-1 rf-flex rf-text-center rf-h-full ${
+              className={`rf-text-xs rf-mt-1 rf-flex rf-max-w-lg rf-break-words rf-text-center rf-h-full ${
                 isError ? "rf-text-red-500" : "rf-text-green-500"
               }`}
             >

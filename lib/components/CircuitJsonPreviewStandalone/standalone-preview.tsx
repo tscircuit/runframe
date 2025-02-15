@@ -1,5 +1,8 @@
 import { createRoot } from "react-dom/client"
-import { CircuitJsonPreview, type TabId } from "../CircuitJsonPreview"
+import {
+  CircuitJsonPreview,
+  type TabId,
+} from "../CircuitJsonPreview/CircuitJsonPreview"
 
 declare global {
   interface Window {

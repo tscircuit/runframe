@@ -1,4 +1,4 @@
-import { CircuitJsonPreview } from "lib/components/CircuitJsonPreview"
+import { CircuitJsonPreview } from "lib/components/CircuitJsonPreview/CircuitJsonPreview"
 import { renderToCircuitJson } from "lib/dev/render-to-circuit-json"
 
 export default () => (

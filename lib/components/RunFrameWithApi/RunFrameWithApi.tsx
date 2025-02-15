@@ -8,7 +8,7 @@ import Debug from "debug"
 
 const debug = Debug("run-frame:RunFrameWithApi")
 
-const guessEntrypoint = (files: string[]) =>
+export const guessEntrypoint = (files: string[]) =>
   files.find((file) => file.includes("entrypoint.")) ??
   files.find((file) => file.includes("index.")) ??
   files.find((file) => file.includes("main.")) ??

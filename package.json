@@ -15,11 +15,11 @@
   ],
   "scripts": {
     "start": "bun run build:css && concurrently 'bun run cosmos' 'bun run build:css:watch'",
-    "build": "bun run build:css && bun run build:standalone && bun run build:standalone-preview && bun run build:lib && bun run build:standalone-iframe",
+    "build": "bun run build:css && bun run build:standalone && bun run build:standalone-preview && bun run build:lib",
     "build:lib": "tsup-node lib/preview.ts lib/runner.ts --platform browser --format esm --dts",
     "build:css": "bun run scripts/build-css.ts",
     "build:css:watch": "chokidar 'lib/components/**/*.tsx' -c 'bun run build:css'",
-    "build:site": "cosmos-export",
+    "build:site": "cosmos-export && bun run build:standalone-iframe && cp ./dist/standalone-iframe.html ./cosmos-export && cp ./dist/standalone-iframe.min.js ./cosmos-export",
     "build:standalone": "STANDALONE=1 vite build",
     "build:standalone-iframe": "STANDALONE=iframe vite build && mv ./dist/lib/entrypoints/standalone-iframe.html ./dist/standalone-iframe.html",
     "build:standalone-preview": "STANDALONE=preview vite build --emptyOutDir false",

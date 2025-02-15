@@ -24,6 +24,7 @@ import { getChangesBetweenFsMaps } from "../../utils/getChangesBetweenFsMaps"
 import type { RenderLog } from "lib/render-logging/RenderLog"
 import { getPhaseTimingsFromRenderEvents } from "lib/render-logging/getPhaseTimingsFromRenderEvents"
 import type { RunFrameProps } from "./RunFrameProps"
+import { useMutex } from "./useMutex"
 
 export type { RunFrameProps }
 
@@ -43,6 +44,7 @@ export const RunFrame = (props: RunFrameProps) => {
     0,
   )
   const lastRunCountTriggerRef = useRef(0)
+  const runMutex = useMutex()
   const [isRunning, setIsRunning] = useState(false)
   const [renderLog, setRenderLog] = useState<RenderLog | null>(null)
   const [activeTab, setActiveTab] = useState<TabId>(
@@ -91,7 +93,7 @@ export const RunFrame = (props: RunFrameProps) => {
     lastRunCountTriggerRef.current = runCountTrigger
     setIsRunning(true)
 
-    async function runWorker() {
+    const runWorker = async () => {
       debug("running render worker")
       setError(null)
       const renderLog: RenderLog = { progress: 0 }
@@ -208,7 +210,7 @@ export const RunFrame = (props: RunFrameProps) => {
       setRenderLog({ ...renderLog })
       setIsRunning(false)
     }
-    runWorker()
+    runMutex.runWithMutex(runWorker)
   }, [props.fsMap, props.entrypoint, runCountTrigger])
 
   const circuitJsonKey = useMemo(() => {

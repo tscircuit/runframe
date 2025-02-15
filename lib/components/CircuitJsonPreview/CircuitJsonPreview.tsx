@@ -117,10 +117,13 @@ export const CircuitJsonPreview = ({
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab as any}
-          className="rf-flex-grow rf-flex rf-flex-col rf-p-2"
+          className="rf-flex-grow rf-flex rf-flex-col"
         >
           <div
-            className={cn("rf-flex rf-items-center rf-gap-2", headerClassName)}
+            className={cn(
+              "rf-flex rf-items-center rf-gap-2 rf-p-2 rf-pb-0",
+              headerClassName,
+            )}
           >
             {leftHeaderContent}
             {leftHeaderContent && <div className="rf-flex-grow" />}

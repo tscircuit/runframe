@@ -1,1 +1,1 @@
-export * from "./components/CircuitJsonPreview"
+export * from "./components/CircuitJsonPreview/CircuitJsonPreview"

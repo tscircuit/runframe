@@ -8,14 +8,14 @@ import { cn } from "lib/utils"
 import { CadViewer } from "@tscircuit/3d-viewer"
 import { PCBViewer } from "@tscircuit/pcb-viewer"
 import { useCallback, useEffect, useState } from "react"
-import { ErrorFallback } from "./ErrorFallback"
+import { ErrorFallback } from "../ErrorFallback"
 import { ErrorBoundary } from "react-error-boundary"
-import { ErrorTabContent } from "./ErrorTabContent"
+import { ErrorTabContent } from "../ErrorTabContent"
 import { SchematicViewer } from "@tscircuit/schematic-viewer"
 import { AssemblyViewer } from "@tscircuit/assembly-viewer"
-import PreviewEmptyState from "./PreviewEmptyState"
-import { CircuitJsonTableViewer } from "./CircuitJsonTableViewer/CircuitJsonTableViewer"
-import { BomTable } from "./BomTable"
+import PreviewEmptyState from "../PreviewEmptyState"
+import { CircuitJsonTableViewer } from "../CircuitJsonTableViewer/CircuitJsonTableViewer"
+import { BomTable } from "../BomTable"
 import {
   CheckIcon,
   EllipsisIcon,
@@ -31,25 +31,15 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu"
-import { Button } from "./ui/button"
-import { PcbViewerWithContainerHeight } from "./PcbViewerWithContainerHeight"
+} from "../ui/dropdown-menu"
+import { Button } from "../ui/button"
+import { PcbViewerWithContainerHeight } from "../PcbViewerWithContainerHeight"
 import { useStyles } from "lib/hooks/use-styles"
 import type { ManualEditEvent } from "@tscircuit/props"
 import type { RenderLog } from "lib/render-logging/RenderLog"
-import { RenderLogViewer } from "./RenderLogViewer/RenderLogViewer"
+import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { capitalizeFirstLetters } from "lib/utils"
-
-export type TabId =
-  | "code"
-  | "pcb"
-  | "schematic"
-  | "assembly"
-  | "cad"
-  | "bom"
-  | "circuit_json"
-  | "errors"
-  | "render_log"
+import type { PreviewContentProps, TabId } from "./PreviewContentProps"
 
 const dropdownMenuItems = [
   "assembly",
@@ -59,50 +49,7 @@ const dropdownMenuItems = [
   "render_log",
 ]
 
-export interface PreviewContentProps {
-  code?: string
-  readOnly?: boolean
-  onRunClicked?: () => void
-  tsxRunTriggerCount?: number
-  errorMessage?: string | null
-  circuitJson: any
-  circuitJsonKey?: string
-  className?: string
-  showCodeTab?: boolean
-  showRenderLogTab?: boolean
-  codeTabContent?: React.ReactNode
-  showJsonTab?: boolean
-  showImportAndFormatButtons?: boolean
-  headerClassName?: string
-  /**
-   * An optional left-side header, you can put a save button, a run button, or
-   * a title here.
-   */
-  leftHeaderContent?: React.ReactNode
-  /**
-   * Default header content, shown on the right side of the header with the PCB,
-   * schematic, and CAD tabs.
-   */
-  showRightHeaderContent?: boolean
-  isRunningCode?: boolean
-  isStreaming?: boolean
-  // manualEditsFileContent?: string
-  hasCodeChangedSinceLastRun?: boolean
-  // onManualEditsFileContentChange?: (newmanualEditsFileContent: string) => void
-
-  defaultActiveTab?: TabId
-
-  renderLog?: RenderLog | null
-
-  onEditEvent?: (editEvent: ManualEditEvent) => void
-  editEvents?: ManualEditEvent[]
-
-  onActiveTabChange?: (tab: TabId) => any
-
-  autoRotate3dViewerDisabled?: boolean
-
-  showSchematicDebugGrid?: boolean
-}
+export type { PreviewContentProps, TabId }
 
 export const CircuitJsonPreview = ({
   code,

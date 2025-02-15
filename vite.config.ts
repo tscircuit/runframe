@@ -45,9 +45,9 @@ if (process.env.STANDALONE === "1") {
 if (process.env.STANDALONE === "iframe") {
   build = {
     lib: {
-      entry: resolve(__dirname, "lib/entrypoints/standalone-iframe.html"),
-      name: "standalone-iframe",
-      fileName: (format) => `standalone-iframe.min.js`,
+      entry: resolve(__dirname, "lib/entrypoints/iframe.html"),
+      name: "iframe",
+      fileName: (format) => `iframe.min.js`,
       formats: ["umd"],
     },
     minify: true,

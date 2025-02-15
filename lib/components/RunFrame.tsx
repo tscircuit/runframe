@@ -135,6 +135,18 @@ export const RunFrame = (props: Props) => {
     if (!fsMap) return
     const wasTriggeredByRunButton =
       props.showRunButton && runCountTrigger !== lastRunCountTriggerRef.current
+
+    // Check if no code is provided
+    if (fsMap.size === 0) {
+      setError({
+        error:
+          "No code provided to run. Please provide code in the fsMap prop.",
+        stack: "",
+      })
+      setIsRunning(false)
+      return
+    }
+
     if (lastFsMapRef.current && circuitJson) {
       const changes = getChangesBetweenFsMaps(lastFsMapRef.current, fsMap)
 
@@ -144,6 +156,7 @@ export const RunFrame = (props: Props) => {
         debug("render triggered by entrypoint change")
       } else if (!wasTriggeredByRunButton) {
         debug("render triggered without changes to fsMap, skipping")
+        setIsRunning(false)
         return
       }
     }
@@ -181,6 +194,7 @@ export const RunFrame = (props: Props) => {
           error: `Entrypoint not found (entrypoint: "${props.entrypoint}", fsMapKeys: ${Object.keys(fsMapObj).join(", ")})`,
           stack: "",
         })
+        setIsRunning(false)
         return
       }
 
@@ -238,10 +252,16 @@ export const RunFrame = (props: Props) => {
             : e.message
           props.onError?.(e)
           setError({ error: message, stack: e.stack })
-          console.error(e)
+          if (globalThis.runFrameWorker) {
+            globalThis.runFrameWorker.kill()
+            globalThis.runFrameWorker = null
+          }
           return { success: false }
         })
-      if (!evalResult.success) return setIsRunning(false)
+      if (!evalResult.success) {
+        setIsRunning(false)
+        return
+      }
 
       const $renderResult = worker.renderUntilSettled()
 
@@ -250,6 +270,10 @@ export const RunFrame = (props: Props) => {
         debug("error getting initial circuit json", e)
         props.onError?.(e)
         setError({ error: e.message, stack: e.stack })
+        if (globalThis.runFrameWorker) {
+          globalThis.runFrameWorker.kill()
+          globalThis.runFrameWorker = null
+        }
         setIsRunning(false)
         return null
       })

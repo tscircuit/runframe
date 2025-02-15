@@ -71,6 +71,79 @@ The CircuitJsonPreview component provides:
 import evalWebWorkerBlobUrl from "@tscircuit/eval/blob-url"
 ```
 
+### Standalone Iframe
+
+RunFrame can be embedded in an iframe, allowing you to evaluate tscircuit code from a parent application.
+
+First, create an HTML file that will host your RunFrame iframe:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RunFrame Host</title>
+  </head>
+  <body>
+    <iframe
+      id="runframe"
+      src="https://runframe.tscircuit.com/iframe.html"
+      style="width: 100%; height: 600px; border: none;"
+    ></iframe>
+
+    <script>
+      const iframe = document.getElementById("runframe")
+
+      // Example: Send circuit code to the iframe
+      function updateCircuit() {
+        iframe.contentWindow.postMessage(
+          {
+            vfs: {
+              "main.tsx": `
+                        circuit.add(
+                            <resistor resistance="1k" />
+                        )
+                    `,
+            },
+            entrypoint: "main.tsx",
+          },
+          "*"
+        )
+      }
+
+      // Listen for messages from the iframe
+      window.addEventListener("message", (event) => {
+        if (event.data.type === "CIRCUIT_RENDERED") {
+          console.log("Circuit rendering complete:", event.data.circuitJson)
+        }
+      })
+    </script>
+  </body>
+</html>
+```
+
+#### Communication Protocol
+
+Messages sent to the iframe should follow this format:
+
+```typescript
+interface IframeMessage {
+  vfs?: Record<string, string> // Virtual filesystem map
+  entrypoint?: string // Entry point file name
+}
+```
+
+Example message:
+
+```javascript
+{
+    vfs: {
+        "main.tsx": "circuit.add(<resistor resistance=\"1k\" />)",
+        "components.tsx": "export const CustomComponent = () => ..."
+    },
+    entrypoint: "main.tsx"
+}
+```
+
 ## Development
 
 ### File-Server Interaction with Edit Events

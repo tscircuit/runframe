@@ -1,13 +1,13 @@
 import { RunFrameWithApi } from "../RunFrameWithApi/RunFrameWithApi"
-import { SaveToSnippetsButton } from "./SaveToSnippetsButton"
+import { RunframeCliLeftHeader } from "./LeftHeader"
 
 export const RunFrameForCli = (props: { debug?: boolean }) => {
   return (
     <RunFrameWithApi
       debug={props.debug}
       leftHeaderContent={
-        <div>
-          <SaveToSnippetsButton />
+        <div className="rf-flex">
+          <RunframeCliLeftHeader />
         </div>
       }
     />

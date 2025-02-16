@@ -127,11 +127,11 @@ export const RunframeCliLeftHeader = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="rf-whitespace-nowrap rf-p-2 rf-mx-1 rf-cursor-pointer rf-relative rf-text-sm">
+        <div className="rf-whitespace-nowrap rf-p-2 rf-mx-1 rf-cursor-pointer rf-relative">
           File
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="rf-*:text-xs">
+      <DropdownMenuContent className="rf-*:rf-text-xs">
         <DropdownMenuItem onSelect={triggerSaveSnippet} disabled={isSaving}>
           {isSaving ? "Saving..." : "Push"}
         </DropdownMenuItem>
@@ -144,6 +144,7 @@ export const RunframeCliLeftHeader = () => {
               {availableExports.map((ext, i) => (
                 <DropdownMenuItem
                   key={i}
+                  className="rf-text-xs"
                   onSelect={() => {
                     if (!isExporting) {
                       pushEvent({

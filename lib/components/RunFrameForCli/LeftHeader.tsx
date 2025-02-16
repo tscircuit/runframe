@@ -127,7 +127,7 @@ export const RunframeCliLeftHeader = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="rf-whitespace-nowrap rf-p-2 rf-mx-1 rf-cursor-pointer rf-relative">
+        <div className="rf-whitespace-nowrap rf-p-2 rf-mx-1 rf-cursor-pointer rf-relative rf-text-sm">
           File
         </div>
       </DropdownMenuTrigger>

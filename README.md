@@ -73,9 +73,7 @@ import evalWebWorkerBlobUrl from "@tscircuit/eval/blob-url"
 
 ### Standalone Iframe
 
-RunFrame can be embedded in an iframe, allowing you to evaluate tscircuit code from a parent application.
-
-First, create an HTML file that will host your RunFrame iframe:
+RunFrame can be embedded in an iframe, allowing you to evaluate tscircuit code from a parent application. There are two main ways to integrate RunFrame: using the React component or creating a standalone iframe implementation.
 
 ```html
 <!DOCTYPE html>
@@ -93,27 +91,22 @@ First, create an HTML file that will host your RunFrame iframe:
     <script>
       const iframe = document.getElementById("runframe")
 
-      // Example: Send circuit code to the iframe
-      function updateCircuit() {
-        iframe.contentWindow.postMessage(
-          {
-            vfs: {
-              "main.tsx": `
-                        circuit.add(
-                            <resistor resistance="1k" />
-                        )
-                    `,
-            },
-            entrypoint: "main.tsx",
-          },
-          "*"
-        )
-      }
-
-      // Listen for messages from the iframe
+      // Listen for ready message from iframe
       window.addEventListener("message", (event) => {
-        if (event.data.type === "CIRCUIT_RENDERED") {
-          console.log("Circuit rendering complete:", event.data.circuitJson)
+        if (event.data?.runframe_type === "runframe_ready_to_receive") {
+          // Send circuit configuration
+          iframe.contentWindow.postMessage(
+            {
+              runframe_type: "runframe_props_changed",
+              runframe_props: {
+                fsMap: {
+                  "main.tsx": `circuit.add(<resistor resistance="1k" />)`,
+                },
+                entrypoint: "main.tsx",
+              },
+            },
+            "*"
+          )
         }
       })
     </script>
@@ -121,27 +114,17 @@ First, create an HTML file that will host your RunFrame iframe:
 </html>
 ```
 
-#### Communication Protocol
+#### Listening for events from the iframe
 
-Messages sent to the iframe should follow this format:
-
-```typescript
-interface IframeMessage {
-  vfs?: Record<string, string> // Virtual filesystem map
-  entrypoint?: string // Entry point file name
-}
-```
-
-Example message:
-
-```javascript
-{
-    vfs: {
-        "main.tsx": "circuit.add(<resistor resistance=\"1k\" />)",
-        "components.tsx": "export const CustomComponent = () => ..."
-    },
-    entrypoint: "main.tsx"
-}
+```tsx
+window.addEventListener("message", (event) => {
+  if (event.data?.runframe_type === "runframe_event") {
+    const { type } = event.data.runframe_event
+    if (type === "error") {
+      console.error(event.data.runframe_event.error_message)
+    }
+  }
+})
 ```
 
 ## Development

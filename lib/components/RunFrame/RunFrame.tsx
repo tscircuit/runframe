@@ -65,16 +65,6 @@ export const RunFrame = (props: RunFrameProps) => {
   const lastEntrypointRef = useRef<string | null>(null)
 
   useEffect(() => {
-    if (!fsMap) {
-      setError({
-        error:
-          "No files provided. Please provide at least one file with code to execute.",
-        stack: "",
-      })
-      setIsRunning(false)
-      return
-    }
-
     // Convert fsMap to object for consistent handling
     const fsMapObj =
       fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap
@@ -135,7 +125,7 @@ export const RunFrame = (props: RunFrameProps) => {
 
       if (!fsMapObj[props.entrypoint]) {
         setError({
-          error: `No code found at entry point "${props.entrypoint}". Available files: ${Object.keys(fsMapObj).join(", ")}`,
+          error: `Entrypoint not found (entrypoint: "${props.entrypoint}". Available files: ${Object.keys(fsMapObj).join(", ")}`,
           stack: "",
         })
         setIsRunning(false)

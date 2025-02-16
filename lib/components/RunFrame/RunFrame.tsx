@@ -69,8 +69,8 @@ export const RunFrame = (props: RunFrameProps) => {
     const fsMapObj =
       fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap
 
-    // Check for empty fsMap first
-    if (!fsMapObj || Object.keys(fsMapObj).length === 0) {
+    // Check if entrypoint exists and has no content
+    if (!fsMapObj[props.entrypoint]?.trim()) {
       setError({
         error:
           "No files provided. Please provide at least one file with code to execute.",
@@ -125,7 +125,7 @@ export const RunFrame = (props: RunFrameProps) => {
 
       if (!fsMapObj[props.entrypoint]) {
         setError({
-          error: `Entrypoint not found (entrypoint: "${props.entrypoint}". Available files: ${Object.keys(fsMapObj).join(", ")}`,
+          error: `Entrypoint not found (entrypoint: "${props.entrypoint}", fsMapKeys: ${Object.keys(fsMapObj).join(", ")}`,
           stack: "",
         })
         setIsRunning(false)

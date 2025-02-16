@@ -131,12 +131,12 @@ export const RunframeCliLeftHeader = () => {
           File
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="rf-*:rf-text-xs">
+      <DropdownMenuContent className="rf-text-sm">
         <DropdownMenuItem onSelect={triggerSaveSnippet} disabled={isSaving}>
           {isSaving ? "Saving..." : "Push"}
         </DropdownMenuItem>
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger disabled={isExporting}>
+          <DropdownMenuSubTrigger className="rf-text-sm" disabled={isExporting}>
             {isExporting ? "Exporting..." : "Export"}
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>

@@ -77,7 +77,33 @@ test("RunFrame should handle empty fsMap", async () => {
   }
 
   expect(error).toBeDefined()
-  expect(error?.message).toContain("No code found at entry point")
+  expect(error?.message).toBe(
+    "No files provided. Please provide at least one file with code to execute.",
+  )
+})
+
+test("RunFrame should handle missing entrypoint parameter", async () => {
+  const worker = await createCircuitWebWorker({
+    webWorkerUrl: evalWebWorkerBlobUrl,
+    verbose: true,
+  })
+
+  let error: Error | null = null
+  try {
+    await worker.executeWithFsMap({
+      fsMap: { "main.tsx": "some code" },
+      // @ts-ignore intentionally passing undefined to test error handling
+      entrypoint: undefined,
+    })
+    await worker.renderUntilSettled()
+  } catch (e) {
+    error = e as Error
+  }
+
+  expect(error).toBeDefined()
+  expect(error?.message).toBe(
+    "No code found at entry point. Please specify an entrypoint file.",
+  )
 })
 
 test("RunFrame should handle missing entrypoint", async () => {
@@ -100,5 +126,7 @@ test("RunFrame should handle missing entrypoint", async () => {
   }
 
   expect(error).toBeDefined()
-  expect(error?.message).toContain("No code found at entry point")
+  expect(error?.message).toBe(
+    `No code found at entry point "main.tsx". Available files: other.tsx`,
+  )
 })

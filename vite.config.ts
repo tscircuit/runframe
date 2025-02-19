@@ -34,7 +34,10 @@ if (process.env.STANDALONE === "1") {
   build = {
     // metafile: "./metafile.json",
     lib: {
-      entry: resolve(__dirname, "src/main.tsx"),
+      entry: resolve(
+        __dirname,
+        "lib/components/RunFrameWithApi/standalone.tsx",
+      ),
       name: "standalone",
       fileName: (format) => `standalone.min.js`,
       formats: ["umd"],

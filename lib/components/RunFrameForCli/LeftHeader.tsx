@@ -36,7 +36,7 @@ const availableExports: Array<{ extension: string; name: string }> = [
   { extension: "csv", name: "CSV (Comma-Separated Values)" },
   { extension: "text", name: "Plain Text" },
   { extension: "kicad_mod", name: "KiCad Module" },
-  { extension: "kicad project", name: "KiCad Project" },
+  { extension: "kicad_project", name: "KiCad Project" },
   { extension: "gbr", name: "Gerbers" },
 ]
 
@@ -80,7 +80,7 @@ export const RunframeCliLeftHeader = () => {
     }
     if (event.event_type === "REQUEST_EXPORT") {
       setisExporting(true)
-      setNotificationMessage("Export requested...")
+      setNotificationMessage("Export processing...")
       setIsError(false)
     }
     if (event.event_type === "EXPORT_CREATED") {

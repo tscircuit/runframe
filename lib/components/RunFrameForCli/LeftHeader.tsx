@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from "react"
 import { useRunFrameStore } from "../RunFrameWithApi/store"
-import type { RequestToSaveSnippetEvent } from "../RunFrameWithApi/types"
+import type {
+  FailedToSaveSnippetEvent,
+  RequestToSaveSnippetEvent,
+} from "../RunFrameWithApi/types"
 import { SelectSnippetDialog } from "./SelectSnippetDialog"
 import { useEventHandler } from "./useEventHandler"
-import { AlertCircle, CheckCircle } from "lucide-react"
+import { CheckCircle } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -14,16 +17,27 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
 } from "../ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+} from "../ui/alert-dialog"
 
-const availableExports = [
-  "json",
-  "svg",
-  "dsn",
-  "glb",
-  "csv",
-  "text",
-  "kicad_mod",
-  "kicad project",
+const availableExports: Array<{ extension: string; name: string }> = [
+  { extension: "json", name: "JSON" },
+  { extension: "svg", name: "SVG" },
+  { extension: "dsn", name: "Specctra DSN" },
+  { extension: "glb", name: "GLB (Binary GLTF)" },
+  { extension: "csv", name: "CSV (Comma-Separated Values)" },
+  { extension: "text", name: "Plain Text" },
+  { extension: "kicad_mod", name: "KiCad Module" },
+  { extension: "kicad_project", name: "KiCad Project" },
+  { extension: "gbr", name: "Gerbers" },
 ]
 
 export const RunframeCliLeftHeader = () => {
@@ -42,6 +56,7 @@ export const RunframeCliLeftHeader = () => {
   const [notificationMessage, setNotificationMessage] = useState<string | null>(
     null,
   )
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isError, setIsError] = useState(false)
   const [isExporting, setisExporting] = useState(false)
 
@@ -65,7 +80,7 @@ export const RunframeCliLeftHeader = () => {
     }
     if (event.event_type === "REQUEST_EXPORT") {
       setisExporting(true)
-      setNotificationMessage("Export requested...")
+      setNotificationMessage("Export processing...")
       setIsError(false)
     }
     if (event.event_type === "EXPORT_CREATED") {
@@ -83,7 +98,7 @@ export const RunframeCliLeftHeader = () => {
 
     const saveFailedEvent = eventsSinceRequestToSave.find(
       (event) => event.event_type === "FAILED_TO_SAVE_SNIPPET",
-    )
+    ) as FailedToSaveSnippetEvent
     const saveSuccessEvent = eventsSinceRequestToSave.find(
       (event) => event.event_type === "SNIPPET_SAVED",
     )
@@ -91,7 +106,7 @@ export const RunframeCliLeftHeader = () => {
     if (saveFailedEvent) {
       setIsSaving(false)
       setRequestToSaveSentAt(null)
-      setNotificationMessage(
+      setErrorMessage(
         saveFailedEvent.message ??
           "Failed to save snippet. See console for error.",
       )
@@ -127,37 +142,40 @@ export const RunframeCliLeftHeader = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="rf-whitespace-nowrap rf-p-2 rf-mx-1 rf-cursor-pointer rf-relative">
+        <div className="rf-whitespace-nowrap rf-text-xs font-medium rf-p-2 rf-mx-1 rf-cursor-pointer rf-relative">
           File
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="rf-text-sm">
-        <DropdownMenuItem onSelect={triggerSaveSnippet} disabled={isSaving}>
+      <DropdownMenuContent>
+        <DropdownMenuItem
+          className="rf-text-xs"
+          onSelect={triggerSaveSnippet}
+          disabled={isSaving}
+        >
           {isSaving ? "Saving..." : "Push"}
         </DropdownMenuItem>
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger className="rf-text-sm" disabled={isExporting}>
+          <DropdownMenuSubTrigger className="rf-text-xs" disabled={isExporting}>
             {isExporting ? "Exporting..." : "Export"}
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent>
-              {availableExports.map((ext, i) => (
+              {availableExports.map((exp, i) => (
                 <DropdownMenuItem
                   key={i}
-                  className="rf-text-xs"
                   onSelect={() => {
                     if (!isExporting) {
                       pushEvent({
                         event_type: "REQUEST_EXPORT",
-                        exportType: ext,
+                        exportType: exp.extension,
                       })
-                      setNotificationMessage(`Export requested: ${ext}`)
+                      setNotificationMessage(`Export requested for ${exp.name}`)
                       setIsError(false)
                     }
                   }}
                   disabled={isExporting}
                 >
-                  {ext}
+                  <span className="rf-text-xs">{exp.name}</span>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuSubContent>
@@ -169,28 +187,40 @@ export const RunframeCliLeftHeader = () => {
         <div className="rf-flex rf-gap-4">
           {hasUnsavedChanges ||
             (hasNeverBeenSaved && (
-              <div className="rf-text-xs rf-h-fit rf-bg-orange-400 rf-text-white rf-p-0.5 rf-px-1.5 rf-rounded">
-                Unsaved changes
-              </div>
+              <button
+                disabled={isSaving}
+                onClick={triggerSaveSnippet}
+                className="transition ease-in-out hover:scale-105 pointer-cursor rf-text-xs rf-h-fit disabled:rf-bg-blue-600/60 rf-bg-blue-600/70 rf-text-white rf-p-0.5 rf-px-1.5 rf-rounded"
+              >
+                {isSaving ? "Syncing..." : "Not Synced"}
+              </button>
             ))}
           {notificationMessage && (
             <div
-              className={`rf-text-xs rf-mt-1 rf-flex rf-max-w-xl rf-break-words rf-text-center rf-h-full ${
-                isError ? "rf-text-red-500" : "rf-text-green-500"
-              }`}
+              className={`rf-text-xs rf-font-medium rf-mt-1 rf-flex rf-max-w-xl rf-text-blue-500 rf-break-words rf-text-center rf-h-full`}
             >
               <div className="rf-flex rf-items-center">
-                {isError ? (
-                  <AlertCircle className="rf-w-4 rf-h-4 rf-inline rf-mr-1" />
-                ) : (
-                  <CheckCircle className="rf-w-4 rf-h-4 rf-inline rf-mr-1" />
-                )}
+                <CheckCircle className="rf-w-4 rf-h-4 rf-inline rf-mr-1" />
                 {notificationMessage}
               </div>
             </div>
           )}
         </div>
       </div>
+
+      <AlertDialog open={isError} onOpenChange={setIsError}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Error Saving Snippet</AlertDialogTitle>
+            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsError(false)}>
+              Dismiss
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <SelectSnippetDialog
         snippetNames={availableSnippets ?? []}

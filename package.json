@@ -52,7 +52,8 @@
     "source-map-explorer": "^2.5.3",
     "tailwindcss": "^3.4.17",
     "tsup": "^8.3.5",
-    "vite": "^6.0.3"
+    "vite": "^6.0.3",
+    "react-cosmos-plugin-vite": "^6.2.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
@@ -76,7 +77,6 @@
     "cssnano": "^7.0.6",
     "jscad-fiber": "^0.0.77",
     "lucide-react": "^0.473.0",
-    "react-cosmos-plugin-vite": "^6.2.0",
     "schematic-symbols": "^0.0.111",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7"

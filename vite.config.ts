@@ -32,6 +32,7 @@ let build: any = undefined
 
 if (process.env.STANDALONE === "1") {
   build = {
+    // metafile: "./metafile.json",
     lib: {
       entry: resolve(__dirname, "src/main.tsx"),
       name: "standalone",

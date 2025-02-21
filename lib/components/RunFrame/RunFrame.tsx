@@ -65,7 +65,42 @@ export const RunFrame = (props: RunFrameProps) => {
   const lastEntrypointRef = useRef<string | null>(null)
 
   useEffect(() => {
-    if (!fsMap) return
+    // Convert fsMap to object for consistent handling
+    const fsMapObj =
+      fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap
+
+    // Check if no files are provided
+    if (!fsMapObj || Object.keys(fsMapObj).length === 0) {
+      setError({
+        error:
+          "No files provided. Please provide at least one file with code to execute.",
+        stack: "",
+      })
+      setIsRunning(false)
+      return
+    }
+
+    // Check if no entrypoint is provided
+    if (!props.entrypoint) {
+      setError({
+        error: "No entrypoint provided. Please specify an entrypoint file.",
+        stack: "",
+      })
+      setIsRunning(false)
+      return
+    }
+
+    // Check if entrypoint exists and has no content
+    if (!fsMapObj[props.entrypoint]?.trim()) {
+      setError({
+        error:
+          "No files provided. Please provide at least one file with code to execute.",
+        stack: "",
+      })
+      setIsRunning(false)
+      return
+    }
+
     const wasTriggeredByRunButton =
       props.showRunButton && runCountTrigger !== lastRunCountTriggerRef.current
     if (lastFsMapRef.current && circuitJson) {
@@ -114,6 +149,7 @@ export const RunFrame = (props: RunFrameProps) => {
           error: `Entrypoint not found (entrypoint: "${props.entrypoint}", fsMapKeys: ${Object.keys(fsMapObj).join(", ")})`,
           stack: "",
         })
+        setIsRunning(false)
         return
       }
 
@@ -174,7 +210,10 @@ export const RunFrame = (props: RunFrameProps) => {
           console.error(e)
           return { success: false }
         })
-      if (!evalResult.success) return setIsRunning(false)
+      if (!evalResult.success) {
+        setIsRunning(false)
+        return
+      }
 
       const $renderResult = worker.renderUntilSettled()
 

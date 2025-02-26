@@ -68,7 +68,7 @@
     "@tscircuit/3d-viewer": "^0.0.156",
     "@tscircuit/assembly-viewer": "^0.0.1",
     "@tscircuit/pcb-viewer": "^1.11.46",
-    "@tscircuit/eval": "^0.0.102",
+    "@tscircuit/eval": "^0.0.107",
     "@tscircuit/core": "^0.0.331",
     "@tscircuit/file-server": "^0.0.13",
     "@tscircuit/props": "^0.0.154",

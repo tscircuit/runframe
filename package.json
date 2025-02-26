@@ -73,7 +73,7 @@
     "@tscircuit/file-server": "^0.0.13",
     "@tscircuit/props": "^0.0.156",
     "@tscircuit/schematic-viewer": "2.0.9",
-    "circuit-to-svg": "^0.0.102",
+    "circuit-to-svg": "^0.0.107",
     "clsx": "^2.1.1",
     "comlink": "^4.4.2",
     "cssnano": "^7.0.6",

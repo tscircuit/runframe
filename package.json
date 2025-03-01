@@ -65,7 +65,7 @@
     "@radix-ui/react-icons": "^1.3.2",
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-tabs": "^1.1.2",
-    "@tscircuit/3d-viewer": "^0.0.157",
+    "@tscircuit/3d-viewer": "^0.0.160",
     "@tscircuit/assembly-viewer": "^0.0.1",
     "@tscircuit/pcb-viewer": "^1.11.46",
     "@tscircuit/eval": "^0.0.107",

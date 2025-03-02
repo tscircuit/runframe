@@ -39,6 +39,7 @@ export const RunFrame = (props: RunFrameProps) => {
     error?: string
     stack?: string
   } | null>(null)
+  const [autoroutingGraphics, setAutoroutingGraphics] = useState<any>(null)
   const [runCountTrigger, incRunCountTrigger] = useReducer(
     (acc: number, s: number) => acc + 1,
     0,
@@ -135,7 +136,8 @@ export const RunFrame = (props: RunFrameProps) => {
       const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
         globalThis.runFrameWorker ??
         (await createCircuitWebWorker({
-          webWorkerUrl: props.evalWebWorkerBlobUrl,
+          evalVersion: props.evalVersion ?? "latest",
+          webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
           verbose: true,
         }))
       globalThis.runFrameWorker = worker
@@ -194,13 +196,20 @@ export const RunFrame = (props: RunFrameProps) => {
         setRenderLog({ ...renderLog })
       })
 
+      worker.on("autorouting:progress", (event: any) => {
+        setAutoroutingGraphics(event.debugGraphics)
+      })
+
       const evalResult = await worker
         .executeWithFsMap({
           entrypoint: props.entrypoint,
           fsMap: fsMapObj,
         })
-        .then(() => ({ success: true }))
+        .then(() => {
+          return { success: true }
+        })
         .catch((e: any) => {
+          console.log("error", e)
           // removing the prefix "Eval compiled js error for "./main.tsx":"
           const message: string = e.message.includes(":")
             ? e.message.replace(/[^:]+:/, "")
@@ -260,6 +269,7 @@ export const RunFrame = (props: RunFrameProps) => {
     <CircuitJsonPreview
       defaultActiveTab={props.defaultActiveTab}
       showToggleFullScreen={props.showToggleFullScreen}
+      autoroutingGraphics={autoroutingGraphics}
       leftHeaderContent={
         <>
           {props.showRunButton && (

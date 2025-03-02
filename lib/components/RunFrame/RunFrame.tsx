@@ -136,6 +136,7 @@ export const RunFrame = (props: RunFrameProps) => {
       const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
         globalThis.runFrameWorker ??
         (await createCircuitWebWorker({
+          evalVersion: props.evalVersion ?? "latest",
           webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
           verbose: true,
         }))

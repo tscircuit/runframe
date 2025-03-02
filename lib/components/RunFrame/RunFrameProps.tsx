@@ -76,4 +76,6 @@ export interface RunFrameProps {
   defaultActiveTab?: TabId
 
   evalWebWorkerBlobUrl?: string
+
+  evalVersion?: string
 }

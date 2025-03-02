@@ -7,7 +7,6 @@ import { useEffect, useMemo, useReducer, useRef, useState } from "react"
 import Debug from "debug"
 import { Loader2, Play, Square } from "lucide-react"
 import { Button } from "../ui/button"
-import blobUrl from "@tscircuit/eval/blob-url"
 
 // TODO waiting for core PR: https://github.com/tscircuit/core/pull/489
 // import { orderedRenderPhases } from "@tscircuit/core"
@@ -137,8 +136,7 @@ export const RunFrame = (props: RunFrameProps) => {
       const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
         globalThis.runFrameWorker ??
         (await createCircuitWebWorker({
-          webWorkerBlobUrl: blobUrl,
-          // webWorkerUrl:  props.evalWebWorkerBlobUrl,
+          webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
           verbose: true,
         }))
       globalThis.runFrameWorker = worker

@@ -57,6 +57,7 @@ export const CircuitJsonPreview = ({
   errorMessage,
   circuitJsonKey = "",
   circuitJson,
+  autoroutingGraphics,
   showRightHeaderContent = true,
   showCodeTab = false,
   codeTabContent,
@@ -268,7 +269,8 @@ export const CircuitJsonPreview = ({
                 {circuitJson ? (
                   <PcbViewerWithContainerHeight
                     key={circuitJsonKey}
-                    soup={circuitJson}
+                    circuitJson={circuitJson}
+                    debugGraphics={autoroutingGraphics}
                     containerClassName={cn(
                       "rf-h-full rf-w-full",
                       isFullScreen

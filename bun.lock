@@ -12,7 +12,7 @@
         "@tscircuit/3d-viewer": "^0.0.161",
         "@tscircuit/assembly-viewer": "^0.0.1",
         "@tscircuit/core": "^0.0.340",
-        "@tscircuit/eval": "^0.0.113",
+        "@tscircuit/eval": "^0.0.115",
         "@tscircuit/file-server": "^0.0.13",
         "@tscircuit/pcb-viewer": "^1.11.61",
         "@tscircuit/props": "^0.0.160",
@@ -378,7 +378,7 @@
 
     "@tscircuit/core": ["@tscircuit/core@0.0.340", "", { "dependencies": { "@lume/kiwi": "^0.4.3", "@tscircuit/capacity-autorouter": "^0.0.13", "@tscircuit/infgrid-ijump-astar": "^0.0.33", "@tscircuit/math-utils": "^0.0.9", "@tscircuit/props": "^0.0.159", "@tscircuit/schematic-autolayout": "^0.0.6", "@tscircuit/soup-util": "^0.0.41", "circuit-json": "^0.0.151", "circuit-json-to-connectivity-map": "^0.0.17", "format-si-unit": "^0.0.3", "nanoid": "^5.0.7", "performance-now": "^2.1.0", "react-reconciler": "^0.31.0", "react-reconciler-18": "npm:react-reconciler@0.29.2", "schematic-symbols": "^0.0.121", "transformation-matrix": "^2.16.1", "zod": "^3.23.8" }, "peerDependencies": { "@tscircuit/footprinter": "*", "typescript": "^5.0.0" } }, "sha512-9FLK4Lj3VoOXCSaEuYOJpYHSsvD5/0hNEnW8to/2n9BiR/3Zxgrkv+2LJ1Ijg7JeaiMWq8gn4vKS7YdU8S78Wg=="],
 
-    "@tscircuit/eval": ["@tscircuit/eval@0.0.113", "", { "peerDependencies": { "@tscircuit/core": "*", "circuit-json": "*", "jscad-fiber": "*", "typescript": "^5.0.0" } }, "sha512-F5ka8oc/lkPtLr5IzKlJEJ+I+ftrtUFm0V1nZ80PUUnTdtE6a0uLTL28gV//4lHXh3KRiJboeWcWHN+995ailw=="],
+    "@tscircuit/eval": ["@tscircuit/eval@0.0.115", "", { "peerDependencies": { "@tscircuit/core": "*", "circuit-json": "*", "jscad-fiber": "*", "typescript": "^5.0.0" } }, "sha512-LmqWbgXPAj3lOCUAvquA1LSf9PLLtK0GjRxVF/C0rJyhKwQF/U+bSxbuR/IifzN/3elimtdpTGDOwq0O7gCX8Q=="],
 
     "@tscircuit/file-server": ["@tscircuit/file-server@0.0.13", "", { "dependencies": { "winterspec": "^0.0.86", "zod": "^3.23.8", "zustand": "^4.5.5", "zustand-hoist": "^2.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "bin": { "file-server": "dist/cli.js" } }, "sha512-VPcz6ev/erhSV7yAC0D1XJqSrmfCbqj3bwnFl5u0NnZ97cxicEcOKpVJVSUTa1V4IHO2pwq9A/YwXV16L3lNtg=="],
 

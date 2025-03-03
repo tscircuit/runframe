@@ -241,11 +241,6 @@ export const CircuitJsonPreview = ({
                         )}
                       </DropdownMenuItem>
                     ))}
-<<<<<<< HEAD
-                    {/* <DropdownMenuItem>
-                      <Button variant="ghost"></Button>
-                    </DropdownMenuItem> */}
-=======
                     <DropdownMenuItem
                       disabled
                       className="rf-opacity-60 rf-cursor-default rf-select-none"
@@ -260,7 +255,6 @@ export const CircuitJsonPreview = ({
                           .join(".")}
                       </div>
                     </DropdownMenuItem>
->>>>>>> origin/main
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TabsList>

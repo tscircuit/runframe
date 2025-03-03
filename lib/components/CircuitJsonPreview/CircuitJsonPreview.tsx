@@ -17,6 +17,8 @@ import PreviewEmptyState from "../PreviewEmptyState"
 import { CircuitJsonTableViewer } from "../CircuitJsonTableViewer/CircuitJsonTableViewer"
 import { BomTable } from "../BomTable"
 import {
+  BoxIcon,
+  Square,
   CheckIcon,
   EllipsisIcon,
   EllipsisVerticalIcon,
@@ -25,6 +27,8 @@ import {
   LoaderCircleIcon,
   LoaderIcon,
   MinimizeIcon,
+  PlusIcon,
+  Circle,
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -221,12 +225,12 @@ export const CircuitJsonPreview = ({
                         key={item}
                         onSelect={() => setActiveTab(item as TabId)}
                       >
-                        <CheckIcon
-                          className={cn(
-                            "rf-w-3 rf-h-3 rf-mr-2",
-                            activeTab !== item && "rf-invisible",
-                          )}
-                        />
+                        {activeTab !== item && (
+                          <Circle className="rf-w-3 rf-h-3 rf-opacity-30" />
+                        )}
+                        {activeTab === item && (
+                          <CheckIcon className="rf-w-3 rf-h-3" />
+                        )}
                         <div className="rf-pr-2">
                           {capitalizeFirstLetters(item)}
                         </div>

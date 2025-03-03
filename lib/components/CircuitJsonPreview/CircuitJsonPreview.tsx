@@ -40,6 +40,7 @@ import type { RenderLog } from "lib/render-logging/RenderLog"
 import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { capitalizeFirstLetters } from "lib/utils"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
+import { version } from "../../../package.json"
 
 const dropdownMenuItems = [
   "assembly",
@@ -236,6 +237,20 @@ export const CircuitJsonPreview = ({
                         )}
                       </DropdownMenuItem>
                     ))}
+                    <DropdownMenuItem
+                      disabled
+                      className="rf-opacity-60 rf-cursor-default rf-select-none"
+                    >
+                      <div className="rf-pr-2 rf-text-xs rf-text-gray-500">
+                        @tscircuit/runframe@
+                        {version
+                          .split(".")
+                          .map((part, i) =>
+                            i === 2 ? parseInt(part) + 1 : part,
+                          )
+                          .join(".")}
+                      </div>
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TabsList>

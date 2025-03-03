@@ -241,9 +241,14 @@ export const CircuitJsonPreview = ({
                       disabled
                       className="rf-opacity-60 rf-cursor-default rf-select-none"
                     >
-                      <CheckIcon className="rf-w-3 rf-h-3 rf-mr-2 rf-invisible" />
                       <div className="rf-pr-2 rf-text-xs rf-text-gray-500">
-                        @tscircuit/runframe@{version}
+                        @tscircuit/runframe@
+                        {version
+                          .split(".")
+                          .map((part, i) =>
+                            i === 2 ? parseInt(part) + 1 : part,
+                          )
+                          .join(".")}
                       </div>
                     </DropdownMenuItem>
                   </DropdownMenuContent>

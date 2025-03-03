@@ -265,7 +265,20 @@ export const CircuitJsonPreview = ({
                 isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
               )}
             >
-              <ErrorBoundary fallback={<div>Error loading PCB viewer</div>}>
+              <ErrorBoundary
+                fallbackRender={({ error }: { error: Error }) => (
+                  <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200">
+                    <div className="rf-p-4">
+                      <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-3">
+                        Error loading PCB viewer
+                      </h3>
+                      <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600 rf-mt-2">
+                        {error?.message || "An unknown error occurred"}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              >
                 {circuitJson ? (
                   <PcbViewerWithContainerHeight
                     key={circuitJsonKey}
@@ -330,7 +343,20 @@ export const CircuitJsonPreview = ({
                 isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
               )}
             >
-              <ErrorBoundary fallback={<div>Error loading Schematic</div>}>
+              <ErrorBoundary
+                fallbackRender={({ error }: { error: Error }) => (
+                  <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200">
+                    <div className="rf-p-4">
+                      <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-3">
+                        Error loading Schematic
+                      </h3>
+                      <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600 rf-mt-2">
+                        {error?.message || "An unknown error occurred"}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              >
                 {circuitJson ? (
                   <SchematicViewer
                     circuitJson={circuitJson}
@@ -376,7 +402,20 @@ export const CircuitJsonPreview = ({
                 isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
               )}
             >
-              <ErrorBoundary fallback={<div>Error loading BOM</div>}>
+              <ErrorBoundary
+                fallbackRender={({ error }: { error: Error }) => (
+                  <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200">
+                    <div className="rf-p-4">
+                      <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-3">
+                        Error loading Bill of Materials
+                      </h3>
+                      <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600 rf-mt-2">
+                        {error?.message || "An unknown error occurred"}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              >
                 {circuitJson ? (
                   <BomTable circuitJson={circuitJson} />
                 ) : (

@@ -78,4 +78,9 @@ export interface RunFrameProps {
   evalWebWorkerBlobUrl?: string
 
   evalVersion?: string
+
+  onReportAutoroutingLog?: (
+    name: string,
+    data: { simpleRouteJson: any },
+  ) => void
 }

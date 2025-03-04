@@ -67,6 +67,7 @@
     "@radix-ui/react-tabs": "^1.1.2",
     "@tscircuit/3d-viewer": "^0.0.163",
     "@tscircuit/assembly-viewer": "^0.0.1",
+    "@tscircuit/create-snippet-url": "^0.0.8",
     "@tscircuit/core": "^0.0.345",
     "@tscircuit/eval": "^0.0.115",
     "@tscircuit/file-server": "^0.0.13",

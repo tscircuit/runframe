@@ -135,10 +135,27 @@ export const RunFrame = (props: RunFrameProps) => {
       debug("running render worker")
       setError(null)
       const renderLog: RenderLog = { progress: 0 }
+
+      let evalVersion = props.evalVersion ?? "latest"
+      if (!globalThis.runFrameWorker && props.forceLatestEvalVersion) {
+        // Force latest version by fetching from jsdelivr
+        try {
+          const response = await fetch(
+            "https://data.jsdelivr.com/v1/package/npm/@tscircuit/eval",
+          )
+          if (response.ok) {
+            const data = await response.json()
+            if (data.tags?.latest) {
+              evalVersion = data.tags.latest
+            }
+          }
+        } catch (err) {}
+      }
+
       const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
         globalThis.runFrameWorker ??
         (await createCircuitWebWorker({
-          evalVersion: props.evalVersion ?? "latest",
+          evalVersion,
           webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
           verbose: true,
         }))

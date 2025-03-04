@@ -48,5 +48,6 @@ circuit.add(
     defaultActiveTab="pcb"
     entrypoint="main.tsx"
     showRunButton
+    forceLatestEvalVersion
   />
 )

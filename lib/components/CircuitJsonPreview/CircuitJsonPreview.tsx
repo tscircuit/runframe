@@ -10,7 +10,7 @@ import { PCBViewer } from "@tscircuit/pcb-viewer"
 import { useCallback, useEffect, useState } from "react"
 import { ErrorFallback } from "../ErrorFallback"
 import { ErrorBoundary } from "react-error-boundary"
-import { ErrorTabContent } from "../ErrorTabContent"
+import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
 import { SchematicViewer } from "@tscircuit/schematic-viewer"
 import { AssemblyViewer } from "@tscircuit/assembly-viewer"
 import PreviewEmptyState from "../PreviewEmptyState"
@@ -76,6 +76,8 @@ export const CircuitJsonPreview = ({
   leftHeaderContent,
   readOnly,
   isStreaming,
+  autoroutingLog,
+  onReportAutoroutingLog,
   isRunningCode,
   hasCodeChangedSinceLastRun,
   onEditEvent,
@@ -461,7 +463,12 @@ export const CircuitJsonPreview = ({
           </TabsContent>
           <TabsContent value="errors">
             {circuitJson || errorMessage ? (
-              <ErrorTabContent code={code} errorMessage={errorMessage} />
+              <ErrorTabContent
+                code={code}
+                errorMessage={errorMessage}
+                autoroutingLog={autoroutingLog}
+                onReportAutoroutingLog={onReportAutoroutingLog}
+              />
             ) : (
               <PreviewEmptyState onRunClicked={onRunClicked} />
             )}

@@ -42,6 +42,9 @@ circuit.add(
 `,
       "manual-edits.json": "{}",
     }}
+    onReportAutoroutingLog={(name, data) => {
+      window.alert("reporting...")
+    }}
     defaultActiveTab="pcb"
     entrypoint="main.tsx"
     showRunButton

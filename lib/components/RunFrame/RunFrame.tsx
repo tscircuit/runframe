@@ -25,6 +25,7 @@ import type { RenderLog } from "lib/render-logging/RenderLog"
 import { getPhaseTimingsFromRenderEvents } from "lib/render-logging/getPhaseTimingsFromRenderEvents"
 import type { RunFrameProps } from "./RunFrameProps"
 import { useMutex } from "./useMutex"
+import type { AutoroutingStartEvent } from "@tscircuit/core"
 
 export type { RunFrameProps }
 
@@ -48,6 +49,7 @@ export const RunFrame = (props: RunFrameProps) => {
   const runMutex = useMutex()
   const [isRunning, setIsRunning] = useState(false)
   const [renderLog, setRenderLog] = useState<RenderLog | null>(null)
+  const [autoroutingLog, setAutoroutingLog] = useState<Record<string, any>>({})
   const [activeTab, setActiveTab] = useState<TabId>(
     props.defaultActiveTab ?? "pcb",
   )
@@ -158,6 +160,14 @@ export const RunFrame = (props: RunFrameProps) => {
       const renderIds = new Set<string>()
       const startRenderTime = Date.now()
       let lastRenderLogSet = Date.now()
+      worker.on("autorouting:start", (event: AutoroutingStartEvent) => {
+        setAutoroutingLog({
+          ...autoroutingLog,
+          [event.componentDisplayName]: {
+            simpleRouteJson: event.simpleRouteJson,
+          },
+        })
+      })
       worker.on("renderable:renderLifecycle:anyEvent", (event: any) => {
         renderLog.lastRenderEvent = event
         renderLog.eventsProcessed = (renderLog.eventsProcessed ?? 0) + 1
@@ -270,6 +280,8 @@ export const RunFrame = (props: RunFrameProps) => {
       defaultActiveTab={props.defaultActiveTab}
       showToggleFullScreen={props.showToggleFullScreen}
       autoroutingGraphics={autoroutingGraphics}
+      autoroutingLog={autoroutingLog}
+      onReportAutoroutingLog={props.onReportAutoroutingLog}
       leftHeaderContent={
         <>
           {props.showRunButton && (

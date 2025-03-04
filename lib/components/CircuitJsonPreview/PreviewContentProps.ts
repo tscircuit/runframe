@@ -30,6 +30,10 @@ export interface PreviewContentProps {
   showImportAndFormatButtons?: boolean
   headerClassName?: string
   /**
+   * A record of component name to autorouting information
+   */
+  autoroutingLog?: Record<string, { simpleRouteJson: any }>
+  /**
    * An optional left-side header, you can put a save button, a run button, or
    * a title here.
    */
@@ -57,4 +61,9 @@ export interface PreviewContentProps {
   autoRotate3dViewerDisabled?: boolean
 
   showSchematicDebugGrid?: boolean
+
+  onReportAutoroutingLog?: (
+    name: string,
+    data: { simpleRouteJson: any },
+  ) => void
 }

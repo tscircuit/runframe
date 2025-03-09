@@ -87,7 +87,20 @@ circuit.add(
                   {time.toLocaleTimeString()}
                 </td>
                 <td style={{ border: "1px solid #ccc", padding: "8px" }}>
-                  {JSON.stringify(event)}
+                  <details>
+                    <summary style={{ cursor: "pointer", fontWeight: "bold" }}>
+                      {event.type || "Event Details"}
+                    </summary>
+                    <pre
+                      style={{
+                        whiteSpace: "pre-wrap",
+                        wordBreak: "break-all",
+                        margin: "8px 0",
+                      }}
+                    >
+                      {JSON.stringify(event, null, 2)}
+                    </pre>
+                  </details>
                 </td>
               </tr>
             ))}

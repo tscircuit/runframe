@@ -89,7 +89,7 @@ circuit.add(
                 <td style={{ border: "1px solid #ccc", padding: "8px" }}>
                   <details>
                     <summary style={{ cursor: "pointer", fontWeight: "bold" }}>
-                      {event.type || "Event Details"}
+                      {event.edit_event_type}
                     </summary>
                     <pre
                       style={{

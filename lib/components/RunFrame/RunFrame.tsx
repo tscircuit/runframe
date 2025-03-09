@@ -26,6 +26,7 @@ import { getPhaseTimingsFromRenderEvents } from "lib/render-logging/getPhaseTimi
 import type { RunFrameProps } from "./RunFrameProps"
 import { useMutex } from "./useMutex"
 import type { AutoroutingStartEvent } from "@tscircuit/core"
+import type { EditEvent } from "@tscircuit/pcb-viewer"
 
 export type { RunFrameProps }
 
@@ -292,6 +293,28 @@ export const RunFrame = (props: RunFrameProps) => {
     return `cj-${Math.random().toString(36).substring(2, 15)}`
   }, [circuitJson])
 
+  // Updated to debounce edit events so only the last event is emitted after dragging ends
+  const lastEditEventRef = useRef<any>(null)
+  const dragTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const handleEditEvent = (event: EditEvent) => {
+    if (event.in_progress) {
+      lastEditEventRef.current = event
+      if (dragTimeout.current) {
+        clearTimeout(dragTimeout.current)
+        dragTimeout.current = null
+      }
+    } else {
+      if (dragTimeout.current) {
+        clearTimeout(dragTimeout.current)
+      }
+      dragTimeout.current = setTimeout(() => {
+        props.onEditEvent?.(lastEditEventRef.current)
+        lastEditEventRef.current = null
+        dragTimeout.current = null
+      }, 100)
+    }
+  }
+
   return (
     <CircuitJsonPreview
       defaultActiveTab={props.defaultActiveTab}
@@ -353,7 +376,7 @@ export const RunFrame = (props: RunFrameProps) => {
       renderLog={renderLog}
       isRunningCode={isRunning}
       errorMessage={error?.error}
-      onEditEvent={props.onEditEvent}
+      onEditEvent={handleEditEvent}
       editEvents={props.editEvents}
     />
   )

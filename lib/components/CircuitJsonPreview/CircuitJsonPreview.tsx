@@ -313,6 +313,11 @@ export const CircuitJsonPreview = ({
                         ? "rf-min-h-[calc(100vh-240px)]"
                         : "rf-min-h-[620px]",
                     )}
+                    onEditEventsChanged={(editEvents) => {
+                      if (onEditEvent) {
+                        editEvents.forEach((e) => onEditEvent(e))
+                      }
+                    }}
                     // onEditEventsChanged={(editEvents) => {
                     //   if (editEvents.some((editEvent) => editEvent.in_progress))
                     //     return

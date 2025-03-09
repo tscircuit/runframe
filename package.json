@@ -46,6 +46,7 @@
     "postcss": "^8.4.49",
     "react": "18",
     "react-cosmos": "^6.2.1",
+    "react-cosmos-plugin-vite": "^6.2.0",
     "react-dom": "18",
     "rollup-plugin-visualizer": "^5.12.0",
     "serve": "^14.2.4",
@@ -53,7 +54,6 @@
     "tailwindcss": "^3.4.17",
     "tsup": "^8.3.5",
     "vite": "^6.0.3",
-    "react-cosmos-plugin-vite": "^6.2.0",
     "yargs": "^17.7.2"
   },
   "peerDependencies": {
@@ -71,7 +71,7 @@
     "@tscircuit/create-snippet-url": "^0.0.8",
     "@tscircuit/eval": "^0.0.120",
     "@tscircuit/file-server": "^0.0.13",
-    "@tscircuit/pcb-viewer": "^1.11.61",
+    "@tscircuit/pcb-viewer": "^1.11.67",
     "@tscircuit/props": "^0.0.161",
     "@tscircuit/schematic-viewer": "2.0.9",
     "circuit-to-svg": "^0.0.112",

@@ -352,6 +352,8 @@ export const RunFrame = (props: RunFrameProps) => {
                         globalThis.runFrameWorker.kill()
                         globalThis.runFrameWorker = null
                       }
+                      setRenderLog(null)
+                      setAutoroutingGraphics(null)
                     }}
                     variant="ghost"
                     size="icon"

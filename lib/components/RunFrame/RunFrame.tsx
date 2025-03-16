@@ -49,6 +49,17 @@ export const RunFrame = (props: RunFrameProps) => {
   const lastRunCountTriggerRef = useRef(0)
   const runMutex = useMutex()
   const [isRunning, setIsRunning] = useState(false)
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter" && !isRunning) {
+        incRunCountTrigger(1)
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [isRunning])
+
   const [renderLog, setRenderLog] = useState<RenderLog | null>(null)
   const [autoroutingLog, setAutoroutingLog] = useState<Record<string, any>>({})
   const [activeTab, setActiveTab] = useState<TabId>(

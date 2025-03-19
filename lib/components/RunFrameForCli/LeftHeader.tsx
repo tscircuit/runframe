@@ -210,13 +210,15 @@ export const RunframeCliLeftHeader = (props: {
                   </label>
                 </div>
               </DropdownMenuItem>
-              <DropdownMenuItem className="rf-flex rf-items-center rf-gap-2">
-                <div className="rf-flex rf-items-center rf-gap-2">
-                  <span className="rf-text-xs">
-                    @tscircuit/eval@{lastRunEvalVersion}
-                  </span>
-                </div>
-              </DropdownMenuItem>
+              {lastRunEvalVersion && (
+                <DropdownMenuItem className="rf-flex rf-items-center rf-gap-2">
+                  <div className="rf-flex rf-items-center rf-gap-2">
+                    <span className="rf-text-xs">
+                      @tscircuit/eval@{lastRunEvalVersion}
+                    </span>
+                  </div>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuSubContent>
           </DropdownMenuPortal>
         </DropdownMenuSub>

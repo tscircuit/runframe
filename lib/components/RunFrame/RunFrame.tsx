@@ -1,4 +1,4 @@
-import { createCircuitWebWorker } from "@tscircuit/eval"
+import { createCircuitWebWorker } from "@tscircuit/eval/worker"
 import {
   CircuitJsonPreview,
   type TabId,

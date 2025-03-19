@@ -86,11 +86,12 @@ export const CircuitJsonPreview = ({
   autoRotate3dViewerDisabled,
   showSchematicDebugGrid = false,
   showToggleFullScreen = true,
+  defaultFullScreen = false,
 }: PreviewContentProps) => {
   useStyles()
 
   const [activeTab, setActiveTabState] = useState(defaultActiveTab ?? "pcb")
-  const [isFullScreen, setIsFullScreen] = useState(false)
+  const [isFullScreen, setIsFullScreen] = useState(defaultFullScreen)
   const setActiveTab = useCallback(
     (tab: TabId) => {
       setActiveTabState(tab)

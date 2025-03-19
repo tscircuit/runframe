@@ -13,6 +13,7 @@ export type TabId =
   | "render_log"
 
 export interface PreviewContentProps {
+  defaultFullScreen?: boolean
   code?: string
   readOnly?: boolean
   onRunClicked?: () => void

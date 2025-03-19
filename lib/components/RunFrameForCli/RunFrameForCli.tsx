@@ -11,6 +11,7 @@ export const RunFrameForCli = (props: { debug?: boolean }) => {
     <RunFrameWithApi
       debug={props.debug}
       forceLatestEvalVersion={shouldLoadLatestEval}
+      defaultFullScreen={true}
       leftHeaderContent={
         <div className="rf-flex">
           <RunframeCliLeftHeader

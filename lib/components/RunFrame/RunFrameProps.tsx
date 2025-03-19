@@ -23,6 +23,11 @@ export interface RunFrameProps {
   showToggleFullScreen?: boolean
 
   /**
+   * Whether to start the preview in fullscreen mode by default
+   */
+  defaultFullScreen?: boolean
+
+  /**
    * An optional left-side header, you can put a save button, a run button, or
    * a title here.
    */

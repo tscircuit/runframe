@@ -19,6 +19,8 @@ export interface RunFrameWithApiProps {
    * Base URL for the API endpoints
    */
   apiBaseUrl?: string
+  evalVersion?: string
+  forceLatestEvalVersion?: boolean
   debug?: boolean
   leftHeaderContent?: React.ReactNode
 }
@@ -82,6 +84,8 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   return (
     <RunFrame
       fsMap={fsMap}
+      evalVersion={props.evalVersion}
+      forceLatestEvalVersion={props.forceLatestEvalVersion}
       leftHeaderContent={leftHeaderContent}
       onInitialRender={() => {
         debug("onInitialRender / markRenderStarted")

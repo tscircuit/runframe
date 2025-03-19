@@ -27,6 +27,7 @@ import type { RunFrameProps } from "./RunFrameProps"
 import { useMutex } from "./useMutex"
 import type { AutoroutingStartEvent } from "@tscircuit/core"
 import type { EditEvent } from "@tscircuit/pcb-viewer"
+import { useRunnerStore } from "./runner-store/use-runner-store"
 
 export type { RunFrameProps }
 
@@ -46,6 +47,7 @@ export const RunFrame = (props: RunFrameProps) => {
     (acc: number, s: number) => acc + 1,
     0,
   )
+  const setLastRunEvalVersion = useRunnerStore((s) => s.setLastRunEvalVersion)
   const lastRunCountTriggerRef = useRef(0)
   const runMutex = useMutex()
   const [isRunning, setIsRunning] = useState(false)
@@ -159,6 +161,7 @@ export const RunFrame = (props: RunFrameProps) => {
             const data = await response.json()
             if (data.tags?.latest) {
               evalVersion = data.tags.latest
+              setLastRunEvalVersion(evalVersion)
             }
           }
         } catch (err) {}
@@ -298,7 +301,7 @@ export const RunFrame = (props: RunFrameProps) => {
       setIsRunning(false)
     }
     runMutex.runWithMutex(runWorker)
-  }, [props.fsMap, props.entrypoint, runCountTrigger])
+  }, [props.fsMap, props.entrypoint, runCountTrigger, props.evalVersion])
 
   const circuitJsonKey = useMemo(() => {
     return `cj-${Math.random().toString(36).substring(2, 15)}`

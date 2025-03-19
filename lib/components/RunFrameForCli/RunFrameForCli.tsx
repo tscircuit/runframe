@@ -11,7 +11,8 @@ export const RunFrameForCli = (props: { debug?: boolean }) => {
     <RunFrameWithApi
       debug={props.debug}
       forceLatestEvalVersion={shouldLoadLatestEval}
-      defaultFullScreen={true}
+      defaultToFullScreen={true}
+      showToggleFullScreen={false} // Hide the fullscreen toggle button in CLI
       leftHeaderContent={
         <div className="rf-flex">
           <RunframeCliLeftHeader

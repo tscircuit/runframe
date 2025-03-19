@@ -392,7 +392,7 @@ export const RunFrame = (props: RunFrameProps) => {
       errorMessage={error?.error}
       onEditEvent={handleEditEvent}
       editEvents={props.editEvents}
-      defaultFullScreen={props.defaultFullScreen}
+      defaultToFullScreen={props.defaultToFullScreen}
     />
   )
 }

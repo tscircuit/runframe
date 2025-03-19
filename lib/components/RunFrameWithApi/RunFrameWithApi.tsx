@@ -23,6 +23,7 @@ export interface RunFrameWithApiProps {
   forceLatestEvalVersion?: boolean
   debug?: boolean
   leftHeaderContent?: React.ReactNode
+  defaultToFullScreen?: boolean
 }
 
 export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
@@ -87,6 +88,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       evalVersion={props.evalVersion}
       forceLatestEvalVersion={props.forceLatestEvalVersion}
       leftHeaderContent={leftHeaderContent}
+      defaultToFullScreen={props.defaultToFullScreen}
       onInitialRender={() => {
         debug("onInitialRender / markRenderStarted")
         markRenderStarted()

@@ -332,6 +332,7 @@ export const RunFrame = (props: RunFrameProps) => {
   return (
     <CircuitJsonPreview
       defaultActiveTab={props.defaultActiveTab}
+      defaultToFullScreen={props.defaultToFullScreen}
       showToggleFullScreen={props.showToggleFullScreen}
       autoroutingGraphics={autoroutingGraphics}
       autoroutingLog={autoroutingLog}

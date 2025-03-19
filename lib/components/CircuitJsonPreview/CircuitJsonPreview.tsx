@@ -86,11 +86,12 @@ export const CircuitJsonPreview = ({
   autoRotate3dViewerDisabled,
   showSchematicDebugGrid = false,
   showToggleFullScreen = true,
+  defaultToFullScreen = false,
 }: PreviewContentProps) => {
   useStyles()
 
   const [activeTab, setActiveTabState] = useState(defaultActiveTab ?? "pcb")
-  const [isFullScreen, setIsFullScreen] = useState(false)
+  const [isFullScreen, setIsFullScreen] = useState(defaultToFullScreen)
   const setActiveTab = useCallback(
     (tab: TabId) => {
       setActiveTabState(tab)
@@ -283,7 +284,7 @@ export const CircuitJsonPreview = ({
             <div
               className={cn(
                 "rf-overflow-hidden",
-                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
+                isFullScreen ? "rf-h-[calc(100vh-52px)]" : "rf-h-[620px]",
               )}
             >
               <ErrorBoundary

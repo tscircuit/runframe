@@ -29,6 +29,11 @@ export interface RunFrameProps {
   leftHeaderContent?: React.ReactNode
 
   /**
+   * Whether to show full screen by defualt
+   */
+  defaultToFullScreen?: boolean
+
+  /**
    * Called when the circuit JSON changes
    */
   onCircuitJsonChange?: (circuitJson: any) => void

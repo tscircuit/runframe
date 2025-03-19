@@ -29,6 +29,7 @@ export interface PreviewContentProps {
   showToggleFullScreen?: boolean
   showImportAndFormatButtons?: boolean
   headerClassName?: string
+  defaultToFullScreen?: boolean
   /**
    * A record of component name to autorouting information
    */

@@ -27,6 +27,8 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
 } from "../ui/alert-dialog"
+import { Checkbox } from "../ui/checkbox"
+import { useRunnerStore } from "../RunFrame/runner-store/use-runner-store"
 
 const availableExports: Array<{ extension: string; name: string }> = [
   { extension: "json", name: "JSON" },
@@ -40,7 +42,11 @@ const availableExports: Array<{ extension: string; name: string }> = [
   { extension: "gbr", name: "Gerbers" },
 ]
 
-export const RunframeCliLeftHeader = () => {
+export const RunframeCliLeftHeader = (props: {
+  shouldLoadLatestEval: boolean
+  onChangeShouldLoadLatestEval: (shouldLoadLatestEval: boolean) => void
+}) => {
+  const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
   const [snippetName, setSnippetName] = useState<string | null>(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [hasNeverBeenSaved, setHasNeverBeenSaved] = useState(true)
@@ -181,6 +187,39 @@ export const RunframeCliLeftHeader = () => {
             </DropdownMenuSubContent>
           </DropdownMenuPortal>
         </DropdownMenuSub>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger className="rf-text-xs">
+            Advanced
+          </DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent>
+              <DropdownMenuItem className="rf-flex rf-items-center rf-gap-2">
+                <div className="rf-flex rf-items-center rf-gap-2">
+                  <Checkbox
+                    id="load-latest-eval"
+                    checked={props.shouldLoadLatestEval}
+                    onCheckedChange={(checked) => {
+                      props.onChangeShouldLoadLatestEval(checked === true)
+                    }}
+                  />
+                  <label
+                    htmlFor="load-latest-eval"
+                    className="rf-text-xs rf-cursor-pointer"
+                  >
+                    Force Latest @tscircuit/eval
+                  </label>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="rf-flex rf-items-center rf-gap-2">
+                <div className="rf-flex rf-items-center rf-gap-2">
+                  <span className="rf-text-xs">
+                    @tscircuit/eval@{lastRunEvalVersion}
+                  </span>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
       </DropdownMenuContent>
 
       <div className="!rf-h-full rf-w-fit rf-grid rf-place-items-center rf-my-auto">
@@ -188,6 +227,7 @@ export const RunframeCliLeftHeader = () => {
           {hasUnsavedChanges ||
             (hasNeverBeenSaved && (
               <button
+                type="button"
                 disabled={isSaving}
                 onClick={triggerSaveSnippet}
                 className="transition ease-in-out hover:scale-105 pointer-cursor rf-text-xs rf-h-fit disabled:rf-bg-blue-600/60 rf-bg-blue-600/70 rf-text-white rf-p-0.5 rf-px-1.5 rf-rounded"

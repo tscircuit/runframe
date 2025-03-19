@@ -1,12 +1,14 @@
 # Created using @tscircuit/plop (npm install -g @tscircuit/plop)
 name: Publish to npm
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
     paths:
       - "lib/**"
       - "package.json"
+      - "bun.lock"
 
 jobs:
   publish:

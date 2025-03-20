@@ -219,6 +219,16 @@ export const RunframeCliLeftHeader = (props: {
                   </div>
                 </DropdownMenuItem>
               )}
+              <DropdownMenuItem
+                className="rf-flex rf-items-center rf-gap-2"
+                onClick={() => {
+                  window.open("/api/admin", "_blank")
+                }}
+              >
+                <div className="rf-flex rf-items-center rf-gap-2">
+                  <span className="rf-text-xs">CLI Admin Panel</span>
+                </div>
+              </DropdownMenuItem>
             </DropdownMenuSubContent>
           </DropdownMenuPortal>
         </DropdownMenuSub>

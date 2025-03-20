@@ -253,9 +253,7 @@ export const RunFrame = (props: RunFrameProps) => {
         .catch((e: any) => {
           console.log("error", e)
           // removing the prefix "Eval compiled js error for "./main.tsx":"
-          const message: string = e.message.includes(":")
-            ? e.message.replace(/[^:]+:/, "")
-            : e.message
+          const message: string = e.message.replace("Error: ", "")
           props.onError?.(e)
           setError({ error: message, stack: e.stack })
           console.error(e)

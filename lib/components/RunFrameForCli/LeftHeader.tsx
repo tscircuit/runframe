@@ -32,14 +32,15 @@ import { useRunnerStore } from "../RunFrame/runner-store/use-runner-store"
 
 const availableExports: Array<{ extension: string; name: string }> = [
   { extension: "json", name: "JSON" },
-  { extension: "svg", name: "SVG" },
-  { extension: "dsn", name: "Specctra DSN" },
-  { extension: "glb", name: "GLB (Binary GLTF)" },
+  { extension: "schematic-svg", name: "Schematic SVG" },
+  { extension: "pcb-svg", name: "PCB SVG" },
+  { extension: "specctra-dsn", name: "Specctra DSN" },
+  { extension: "gltf", name: "GLB (Binary GLTF)" },
   { extension: "csv", name: "CSV (Comma-Separated Values)" },
   { extension: "text", name: "Plain Text" },
   { extension: "kicad_mod", name: "KiCad Module" },
   { extension: "kicad_project", name: "KiCad Project" },
-  { extension: "gbr", name: "Gerbers" },
+  { extension: "gerbers", name: "Gerbers" },
 ]
 
 export const RunframeCliLeftHeader = (props: {
@@ -54,6 +55,9 @@ export const RunframeCliLeftHeader = (props: {
   const [requestToSaveSentAt, setRequestToSaveSentAt] = useState<number | null>(
     null,
   )
+  const [requestToExportSentAt, setRequestToExportSentAt] = useState<
+    number | null
+  >(null)
   const [availableSnippets, setAvailableSnippets] = useState<string[] | null>(
     null,
   )
@@ -88,11 +92,7 @@ export const RunframeCliLeftHeader = (props: {
       setisExporting(true)
       setNotificationMessage("Export processing...")
       setIsError(false)
-    }
-    if (event.event_type === "EXPORT_CREATED") {
-      setNotificationMessage(`Export created: ${event.exportFilePath}`)
-      setIsError(false)
-      setisExporting(false)
+      return
     }
   })
 
@@ -134,6 +134,38 @@ export const RunframeCliLeftHeader = (props: {
     }
   }, [recentEvents, isSaving])
 
+  useEffect(() => {
+    if (!isExporting || requestToExportSentAt === null) return
+    const eventsSinceRequestToExport = recentEvents.filter(
+      (event) => new Date(event.created_at).valueOf() > requestToExportSentAt,
+    )
+    const exportFailedEvent = eventsSinceRequestToExport.find(
+      (event) => event.event_type === "FAILED_TO_EXPORT",
+    )
+    const exportSuccessEvent = eventsSinceRequestToExport.find(
+      (event) => event.event_type === "EXPORT_CREATED",
+    )
+
+    if (exportFailedEvent) {
+      setisExporting(false)
+      setRequestToExportSentAt(null)
+      setErrorMessage(
+        exportFailedEvent.message ??
+          "Failed to export snippet. See console for error.",
+      )
+      console.error(exportFailedEvent.message)
+      setIsError(true)
+    }
+    if (exportSuccessEvent) {
+      setisExporting(false)
+      setRequestToExportSentAt(null)
+      setNotificationMessage(
+        `Exported succesfully at ${exportSuccessEvent.exportFilePath}`,
+      )
+      setIsError(false)
+    }
+  }, [recentEvents, isExporting])
+
   const triggerSaveSnippet = async () => {
     setIsSaving(true)
     setRequestToSaveSentAt(Date.now())
@@ -143,6 +175,18 @@ export const RunframeCliLeftHeader = (props: {
       event_type: "REQUEST_TO_SAVE_SNIPPET",
       snippet_name: snippetName,
     } as RequestToSaveSnippetEvent)
+  }
+
+  const triggerExportSnippet = async (exportType: string) => {
+    const exportReqTime = new Date().valueOf() - 2000
+    setisExporting(true)
+    setRequestToExportSentAt(exportReqTime)
+    setNotificationMessage(null)
+    setIsError(false)
+    pushEvent({
+      event_type: "REQUEST_EXPORT",
+      exportType: exportType,
+    })
   }
 
   return (
@@ -169,16 +213,7 @@ export const RunframeCliLeftHeader = (props: {
               {availableExports.map((exp, i) => (
                 <DropdownMenuItem
                   key={i}
-                  onSelect={() => {
-                    if (!isExporting) {
-                      pushEvent({
-                        event_type: "REQUEST_EXPORT",
-                        exportType: exp.extension,
-                      })
-                      setNotificationMessage(`Export requested for ${exp.name}`)
-                      setIsError(false)
-                    }
-                  }}
+                  onClick={() => triggerExportSnippet(exp.extension)}
                   disabled={isExporting}
                 >
                   <span className="rf-text-xs">{exp.name}</span>
@@ -263,7 +298,7 @@ export const RunframeCliLeftHeader = (props: {
       <AlertDialog open={isError} onOpenChange={setIsError}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Error Saving Snippet</AlertDialogTitle>
+            <AlertDialogTitle>Error</AlertDialogTitle>
             <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

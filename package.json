@@ -30,6 +30,7 @@
     "serve:cosmos": "serve cosmos-export"
   },
   "devDependencies": {
+    "@babel/standalone": "^7.26.10",
     "@biomejs/biome": "^1.9.4",
     "@types/bun": "latest",
     "@types/debug": "^4.1.12",
@@ -70,7 +71,7 @@
     "@tscircuit/assembly-viewer": "^0.0.1",
     "@tscircuit/core": "^0.0.354",
     "@tscircuit/create-snippet-url": "^0.0.8",
-    "@tscircuit/eval": "^0.0.131",
+    "@tscircuit/eval": "^0.0.135",
     "@tscircuit/file-server": "^0.0.13",
     "@tscircuit/pcb-viewer": "^1.11.67",
     "@tscircuit/props": "^0.0.163",

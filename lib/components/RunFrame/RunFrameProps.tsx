@@ -93,5 +93,5 @@ export interface RunFrameProps {
   /**
    * Optional callback when the fsMap is updated with new manual edits
    */
-  onFsMapUpdate?: (updatedFsMap: Record<string, string>) => void;
+  onFsMapUpdate?: (updatedFsMap: Record<string, string>) => void
 }

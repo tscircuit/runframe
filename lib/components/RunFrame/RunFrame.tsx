@@ -332,7 +332,12 @@ export const RunFrame = (props: RunFrameProps) => {
 
         // Update manual-edits.json with the new component position
         if (finalEvent?.edit_event_type === "edit_pcb_component_location") {
-          updateManualEditsJson(finalEvent, props, circuitJson as AnyCircuitElement[], lastFsMapRef)
+          updateManualEditsJson(
+            finalEvent,
+            props,
+            circuitJson as AnyCircuitElement[],
+            lastFsMapRef,
+          )
         }
 
         lastEditEventRef.current = null

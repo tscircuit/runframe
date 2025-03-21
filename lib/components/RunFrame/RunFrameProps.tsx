@@ -89,4 +89,9 @@ export interface RunFrameProps {
     name: string,
     data: { simpleRouteJson: any },
   ) => void
+
+  /**
+   * Optional callback when the fsMap is updated with new manual edits
+   */
+  onFsMapUpdate?: (updatedFsMap: Record<string, string>) => void;
 }

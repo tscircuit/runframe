@@ -1,11 +1,11 @@
 import { createCircuitWebWorker } from "@tscircuit/eval/worker"
+import Debug from "debug"
+import { Loader2, Play, Square } from "lucide-react"
+import { useEffect, useMemo, useReducer, useRef, useState } from "react"
 import {
   CircuitJsonPreview,
   type TabId,
 } from "../CircuitJsonPreview/CircuitJsonPreview"
-import { useEffect, useMemo, useReducer, useRef, useState } from "react"
-import Debug from "debug"
-import { Loader2, Play, Square } from "lucide-react"
 import { Button } from "../ui/button"
 
 // TODO waiting for core PR: https://github.com/tscircuit/core/pull/489
@@ -19,15 +19,17 @@ declare global {
   var runFrameWorker: any
 }
 
-import { useRunFrameStore } from "../RunFrameWithApi/store"
-import { getChangesBetweenFsMaps } from "../../utils/getChangesBetweenFsMaps"
-import type { RenderLog } from "lib/render-logging/RenderLog"
-import { getPhaseTimingsFromRenderEvents } from "lib/render-logging/getPhaseTimingsFromRenderEvents"
-import type { RunFrameProps } from "./RunFrameProps"
-import { useMutex } from "./useMutex"
 import type { AutoroutingStartEvent } from "@tscircuit/core"
 import type { EditEvent } from "@tscircuit/pcb-viewer"
+import type { AnyCircuitElement } from "circuit-json"
+import type { RenderLog } from "lib/render-logging/RenderLog"
+import { getPhaseTimingsFromRenderEvents } from "lib/render-logging/getPhaseTimingsFromRenderEvents"
+import { getChangesBetweenFsMaps } from "../../utils/getChangesBetweenFsMaps"
+import { useRunFrameStore } from "../RunFrameWithApi/store"
+import type { RunFrameProps } from "./RunFrameProps"
 import { useRunnerStore } from "./runner-store/use-runner-store"
+import { useMutex } from "./useMutex"
+import { updateManualEditsJson } from "lib/utils/update-manual-edits-json"
 
 export type { RunFrameProps }
 
@@ -245,13 +247,18 @@ export const RunFrame = (props: RunFrameProps) => {
       const evalResult = await worker
         .executeWithFsMap({
           entrypoint: props.entrypoint,
-          fsMap: fsMapObj,
+          fsMap: {
+            ...fsMapObj,
+            "manual-edits.json": JSON.stringify({
+              __esModule: true,
+              default: JSON.parse(fsMapObj["manual-edits.json"]),
+            }),
+          },
         })
         .then(() => {
           return { success: true }
         })
         .catch((e: any) => {
-          console.log("error", e)
           // removing the prefix "Eval compiled js error for "./main.tsx":"
           const message: string = e.message.replace("Error: ", "")
           props.onError?.(e)
@@ -320,7 +327,14 @@ export const RunFrame = (props: RunFrameProps) => {
         clearTimeout(dragTimeout.current)
       }
       dragTimeout.current = setTimeout(() => {
-        props.onEditEvent?.(lastEditEventRef.current)
+        const finalEvent = lastEditEventRef.current
+        props.onEditEvent?.(finalEvent)
+
+        // Update manual-edits.json with the new component position
+        if (finalEvent?.edit_event_type === "edit_pcb_component_location") {
+          updateManualEditsJson(finalEvent, props, circuitJson as AnyCircuitElement[], lastFsMapRef)
+        }
+
         lastEditEventRef.current = null
         dragTimeout.current = null
       }, 100)

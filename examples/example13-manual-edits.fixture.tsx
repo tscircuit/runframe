@@ -28,7 +28,7 @@ export default () => {
           "manual_trace_hints": []
         }`.trim(),
   )
-  const [fsMap, setFsMap] = useState({
+  const [fsMap, setFsMap] = useState<Record<string, string>>({
     "entrypoint.tsx": code,
     "manual-edits.json": manualEdits,
   })

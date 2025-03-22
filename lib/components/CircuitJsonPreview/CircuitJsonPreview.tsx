@@ -468,16 +468,23 @@ export const CircuitJsonPreview = ({
             </div>
           </TabsContent>
           <TabsContent value="errors">
-            {circuitJson || errorMessage ? (
-              <ErrorTabContent
-                code={code}
-                errorMessage={errorMessage}
-                autoroutingLog={autoroutingLog}
-                onReportAutoroutingLog={onReportAutoroutingLog}
-              />
-            ) : (
-              <PreviewEmptyState onRunClicked={onRunClicked} />
-            )}
+            <div
+              className={cn(
+                "rf-overflow-auto",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
+              )}
+            >
+              {circuitJson || errorMessage ? (
+                <ErrorTabContent
+                  code={code}
+                  errorMessage={errorMessage}
+                  autoroutingLog={autoroutingLog}
+                  onReportAutoroutingLog={onReportAutoroutingLog}
+                />
+              ) : (
+                <PreviewEmptyState onRunClicked={onRunClicked} />
+              )}
+            </div>
           </TabsContent>
           {showRenderLogTab && (
             <TabsContent value="render_log">

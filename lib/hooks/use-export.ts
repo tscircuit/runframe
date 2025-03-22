@@ -1,27 +1,30 @@
-import type { RunFrameEvent } from "lib/components/RunFrameWithApi/types"
-import { useEffect } from "react"
+import type {
+  RunFrameEvent,
+  RunFrameEventInput,
+} from "lib/components/RunFrameWithApi/types"
+import { useEffect, useState } from "react"
 
 interface UseExportHandlerProps {
-  isExporting: boolean
-  setIsExporting: (value: boolean) => void
   requestToExportSentAt: number | null
   setRequestToExportSentAt: (value: number | null) => void
   recentEvents: RunFrameEvent[]
   setNotificationMessage: (message: string | null) => void
   setErrorMessage: (message: string) => void
   setIsError: (value: boolean) => void
+  pushEvent: (event: RunFrameEventInput) => Promise<void>
 }
 
 export function useExportHandler({
-  isExporting,
-  setIsExporting,
   requestToExportSentAt,
   setRequestToExportSentAt,
   recentEvents,
   setNotificationMessage,
   setErrorMessage,
   setIsError,
+  pushEvent,
 }: UseExportHandlerProps) {
+  const [isExporting, setIsExporting] = useState(false)
+
   useEffect(() => {
     if (!isExporting || requestToExportSentAt === null) return
 
@@ -77,8 +80,6 @@ export function useExportHandler({
             `Exported successfully: ${exportSuccessEvent.fileName}`,
           )
         } catch (error) {
-          console.log("useExportHandler: error in try block")
-          console.error("Error decoding file for download:", error)
           setErrorMessage("Exported file could not be downloaded.")
           setIsError(true)
           setNotificationMessage(null)
@@ -88,4 +89,20 @@ export function useExportHandler({
       }
     }
   }, [recentEvents, isExporting, requestToExportSentAt])
+
+  return {
+    isExporting,
+    setIsExporting,
+    startExport: async (exportType: string) => {
+      setIsExporting(true)
+      await pushEvent({
+        event_type: "REQUEST_EXPORT",
+        exportType: exportType,
+      }).then(() => {
+        const exportReqTime = new Date().valueOf() - 5000
+        setRequestToExportSentAt(exportReqTime)
+        setIsError(false)
+      })
+    },
+  }
 }

@@ -57,9 +57,10 @@ export const RunframeCliLeftHeader = (props: {
   )
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isError, setIsError] = useState(false)
-  const [isExporting, setIsExporting] = useState(false)
 
-  const pushEvent = useRunFrameStore((state) => state.pushEvent)
+  const { pushEvent } = useRunFrameStore((state) => ({
+    pushEvent: state.pushEvent,
+  }))
   const recentEvents = useRunFrameStore((state) => state.recentEvents)
 
   const firstRenderTime = useMemo(() => Date.now(), [])
@@ -77,17 +78,6 @@ export const RunframeCliLeftHeader = (props: {
       setIsError(false)
       return
     }
-  })
-
-  useExportHandler({
-    isExporting,
-    setIsExporting,
-    requestToExportSentAt,
-    setRequestToExportSentAt,
-    recentEvents,
-    setNotificationMessage,
-    setErrorMessage,
-    setIsError,
   })
 
   useEffect(() => {
@@ -139,17 +129,15 @@ export const RunframeCliLeftHeader = (props: {
     } as RequestToSaveSnippetEvent)
   }
 
-  const triggerExportSnippet = async (exportType: string) => {
-    const exportReqTime = new Date().valueOf() - 5000
-    setIsExporting(true)
-    setNotificationMessage("Export processing...")
-    setRequestToExportSentAt(exportReqTime)
-    setIsError(false)
-    pushEvent({
-      event_type: "REQUEST_EXPORT",
-      exportType: exportType,
-    })
-  }
+  const { isExporting, startExport } = useExportHandler({
+    requestToExportSentAt,
+    setRequestToExportSentAt,
+    recentEvents,
+    setNotificationMessage,
+    setErrorMessage,
+    setIsError,
+    pushEvent,
+  })
 
   return (
     <DropdownMenu>
@@ -175,7 +163,7 @@ export const RunframeCliLeftHeader = (props: {
               {availableExports.map((exp, i) => (
                 <DropdownMenuItem
                   key={i}
-                  onClick={() => triggerExportSnippet(exp.extension)}
+                  onClick={() => startExport(exp.extension)}
                   disabled={isExporting}
                 >
                   <span className="rf-text-xs">{exp.name}</span>

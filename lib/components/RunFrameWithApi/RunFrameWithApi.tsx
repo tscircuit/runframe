@@ -116,6 +116,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             file_path: "manual-edits.json", // derive this from fsMap somehow
+            initiator: "runframe",
             content: applyManualEdits(fsMap["manual-edits.json"])
           })
         })

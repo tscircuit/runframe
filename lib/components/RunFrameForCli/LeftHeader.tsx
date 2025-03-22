@@ -29,6 +29,7 @@ import {
 } from "../ui/alert-dialog"
 import { Checkbox } from "../ui/checkbox"
 import { useRunnerStore } from "../RunFrame/runner-store/use-runner-store"
+import { useExportHandler } from "lib/hooks/use-export"
 
 const availableExports: Array<{ extension: string; name: string }> = [
   { extension: "json", name: "JSON" },
@@ -68,7 +69,7 @@ export const RunframeCliLeftHeader = (props: {
   )
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isError, setIsError] = useState(false)
-  const [isExporting, setisExporting] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
 
   const pushEvent = useRunFrameStore((state) => state.pushEvent)
   const recentEvents = useRunFrameStore((state) => state.recentEvents)
@@ -89,11 +90,22 @@ export const RunframeCliLeftHeader = (props: {
       return
     }
     if (event.event_type === "REQUEST_EXPORT") {
-      setisExporting(true)
+      setIsExporting(true)
       setNotificationMessage("Export processing...")
       setIsError(false)
       return
     }
+  })
+
+  useExportHandler({
+    isExporting,
+    setIsExporting,
+    requestToExportSentAt,
+    setRequestToExportSentAt,
+    recentEvents,
+    setNotificationMessage,
+    setErrorMessage,
+    setIsError,
   })
 
   useEffect(() => {
@@ -134,38 +146,6 @@ export const RunframeCliLeftHeader = (props: {
     }
   }, [recentEvents, isSaving])
 
-  useEffect(() => {
-    if (!isExporting || requestToExportSentAt === null) return
-    const eventsSinceRequestToExport = recentEvents.filter(
-      (event) => new Date(event.created_at).valueOf() > requestToExportSentAt,
-    )
-    const exportFailedEvent = eventsSinceRequestToExport.find(
-      (event) => event.event_type === "FAILED_TO_EXPORT",
-    )
-    const exportSuccessEvent = eventsSinceRequestToExport.find(
-      (event) => event.event_type === "EXPORT_CREATED",
-    )
-
-    if (exportFailedEvent) {
-      setisExporting(false)
-      setRequestToExportSentAt(null)
-      setErrorMessage(
-        exportFailedEvent.message ??
-          "Failed to export snippet. See console for error.",
-      )
-      console.error(exportFailedEvent.message)
-      setIsError(true)
-    }
-    if (exportSuccessEvent) {
-      setisExporting(false)
-      setRequestToExportSentAt(null)
-      setNotificationMessage(
-        `Exported succesfully at ${exportSuccessEvent.exportFilePath}`,
-      )
-      setIsError(false)
-    }
-  }, [recentEvents, isExporting])
-
   const triggerSaveSnippet = async () => {
     setIsSaving(true)
     setRequestToSaveSentAt(Date.now())
@@ -178,8 +158,8 @@ export const RunframeCliLeftHeader = (props: {
   }
 
   const triggerExportSnippet = async (exportType: string) => {
-    const exportReqTime = new Date().valueOf() - 2000
-    setisExporting(true)
+    const exportReqTime = new Date().valueOf() - 5000
+    setIsExporting(true)
     setRequestToExportSentAt(exportReqTime)
     setNotificationMessage(null)
     setIsError(false)

@@ -30,19 +30,7 @@ import {
 import { Checkbox } from "../ui/checkbox"
 import { useRunnerStore } from "../RunFrame/runner-store/use-runner-store"
 import { useExportHandler } from "lib/hooks/use-export"
-
-const availableExports: Array<{ extension: string; name: string }> = [
-  { extension: "json", name: "JSON" },
-  { extension: "schematic-svg", name: "Schematic SVG" },
-  { extension: "pcb-svg", name: "PCB SVG" },
-  { extension: "specctra-dsn", name: "Specctra DSN" },
-  { extension: "gltf", name: "GLB (Binary GLTF)" },
-  { extension: "csv", name: "CSV (Comma-Separated Values)" },
-  { extension: "text", name: "Plain Text" },
-  { extension: "kicad_mod", name: "KiCad Module" },
-  { extension: "kicad_project", name: "KiCad Project" },
-  { extension: "gerbers", name: "Gerbers" },
-]
+import { availableExports } from "lib/constants"
 
 export const RunframeCliLeftHeader = (props: {
   shouldLoadLatestEval: boolean
@@ -86,12 +74,6 @@ export const RunframeCliLeftHeader = (props: {
       setHasUnsavedChanges(false)
       setHasNeverBeenSaved(false)
       setNotificationMessage("Snippet saved successfully.")
-      setIsError(false)
-      return
-    }
-    if (event.event_type === "REQUEST_EXPORT") {
-      setIsExporting(true)
-      setNotificationMessage("Export processing...")
       setIsError(false)
       return
     }
@@ -160,8 +142,8 @@ export const RunframeCliLeftHeader = (props: {
   const triggerExportSnippet = async (exportType: string) => {
     const exportReqTime = new Date().valueOf() - 5000
     setIsExporting(true)
+    setNotificationMessage("Export processing...")
     setRequestToExportSentAt(exportReqTime)
-    setNotificationMessage(null)
     setIsError(false)
     pushEvent({
       event_type: "REQUEST_EXPORT",

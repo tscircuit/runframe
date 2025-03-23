@@ -21,7 +21,6 @@ export interface PreviewContentProps {
   errorMessage?: string | null
   autoroutingGraphics?: any
   circuitJson: any
-  circuitJsonKey?: string
   className?: string
   showCodeTab?: boolean
   showRenderLogTab?: boolean

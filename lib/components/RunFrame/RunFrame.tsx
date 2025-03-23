@@ -302,10 +302,6 @@ export const RunFrame = (props: RunFrameProps) => {
     runMutex.runWithMutex(runWorker)
   }, [props.fsMap, props.entrypoint, runCountTrigger, props.evalVersion])
 
-  const circuitJsonKey = useMemo(() => {
-    return `cj-${Math.random().toString(36).substring(2, 15)}`
-  }, [circuitJson])
-
   // Updated to debounce edit events so only the last event is emitted after dragging ends
   const lastEditEventRef = useRef<any>(null)
   const dragTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -385,7 +381,6 @@ export const RunFrame = (props: RunFrameProps) => {
       }
       onActiveTabChange={setActiveTab}
       circuitJson={circuitJson}
-      circuitJsonKey={circuitJsonKey}
       renderLog={renderLog}
       isRunningCode={isRunning}
       errorMessage={error?.error}

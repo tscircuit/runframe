@@ -138,6 +138,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
           body: JSON.stringify({
             file_path: manualEditsFilePath,
             text_content: JSON.stringify(updatedManualEdits),
+            initiator: "filesystem_change",
           }),
         })
       }}

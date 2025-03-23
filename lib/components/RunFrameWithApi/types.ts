@@ -56,9 +56,7 @@ export interface SnippetExportCreatedEvent {
   event_id: string
   event_type: "EXPORT_CREATED"
   created_at: string
-  fileName: string
-  mimeType: string
-  binaryData: string
+  outputFilePath: string
 }
 
 export interface RequestToExportSnippetEvent {

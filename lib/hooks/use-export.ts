@@ -56,36 +56,11 @@ export function useExportHandler({
       setIsExporting(false)
       setRequestToExportSentAt(null)
       setIsError(false)
-
-      if (
-        exportSuccessEvent.binaryData &&
-        exportSuccessEvent.fileName &&
-        exportSuccessEvent.mimeType
-      ) {
-        try {
-          const byteArray = Uint8Array.from(
-            atob(exportSuccessEvent.binaryData),
-            (char) => char.charCodeAt(0),
-          )
-          const blob = new Blob([byteArray], {
-            type: exportSuccessEvent.mimeType,
-          })
-          const link = document.createElement("a")
-          link.href = URL.createObjectURL(blob)
-          link.download = exportSuccessEvent.fileName
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-          setNotificationMessage(
-            `Exported successfully: ${exportSuccessEvent.fileName}`,
-          )
-        } catch (error) {
-          setErrorMessage("Exported file could not be downloaded.")
-          setIsError(true)
-          setNotificationMessage(null)
-        }
-      } else {
-        setNotificationMessage(`Export downloaded successfully!`)
+      if (exportSuccessEvent.outputFilePath) {
+        window.open(
+          `/api/download?file_path=${exportSuccessEvent.outputFilePath}`,
+          "_blank",
+        )
       }
     }
   }, [recentEvents, isExporting, requestToExportSentAt])

@@ -44,12 +44,12 @@ export function useExportHandler({
       setIsExporting(false)
       setRequestToExportSentAt(null)
       setNotificationMessage(null)
+      setIsError(true)
       setErrorMessage(
         exportFailedEvent.message ??
           "Failed to export snippet. See console for error.",
       )
       console.error(exportFailedEvent.message)
-      setIsError(true)
     }
 
     if (exportSuccessEvent) {
@@ -58,7 +58,7 @@ export function useExportHandler({
       setIsError(false)
       if (exportSuccessEvent.outputFilePath) {
         window.open(
-          `/api/download?file_path=${exportSuccessEvent.outputFilePath}`,
+          `/api/files/download?file_path=${encodeURIComponent(exportSuccessEvent.outputFilePath)}`,
           "_blank",
         )
       }

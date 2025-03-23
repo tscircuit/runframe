@@ -3,13 +3,12 @@ import type {
   RunFrameEventInput,
 } from "lib/components/RunFrameWithApi/types"
 import { useEffect, useState } from "react"
+import { toast } from "react-hot-toast"
 
 interface UseExportHandlerProps {
   requestToExportSentAt: number | null
   setRequestToExportSentAt: (value: number | null) => void
   recentEvents: RunFrameEvent[]
-  setNotificationMessage: (message: string | null) => void
-  setErrorMessage: (message: string) => void
   setIsError: (value: boolean) => void
   pushEvent: (event: RunFrameEventInput) => Promise<void>
 }
@@ -18,8 +17,6 @@ export function useExportHandler({
   requestToExportSentAt,
   setRequestToExportSentAt,
   recentEvents,
-  setNotificationMessage,
-  setErrorMessage,
   setIsError,
   pushEvent,
 }: UseExportHandlerProps) {
@@ -43,9 +40,7 @@ export function useExportHandler({
     if (exportFailedEvent) {
       setIsExporting(false)
       setRequestToExportSentAt(null)
-      setNotificationMessage(null)
-      setIsError(true)
-      setErrorMessage(
+      toast.error(
         exportFailedEvent.message ??
           "Failed to export snippet. See console for error.",
       )
@@ -57,6 +52,7 @@ export function useExportHandler({
       setRequestToExportSentAt(null)
       setIsError(false)
       if (exportSuccessEvent.outputFilePath) {
+        toast.success("Export download started...")
         window.open(
           `/api/files/download?file_path=${encodeURIComponent(exportSuccessEvent.outputFilePath)}`,
           "_blank",
@@ -69,6 +65,7 @@ export function useExportHandler({
     isExporting,
     setIsExporting,
     startExport: async (exportType: string) => {
+      toast.loading("Export processing...", { duration: 500 })
       setIsExporting(true)
       await pushEvent({
         event_type: "REQUEST_EXPORT",

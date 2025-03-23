@@ -133,8 +133,6 @@ export const RunframeCliLeftHeader = (props: {
     requestToExportSentAt,
     setRequestToExportSentAt,
     recentEvents,
-    setNotificationMessage,
-    setErrorMessage,
     setIsError,
     pushEvent,
   })

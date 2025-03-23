@@ -29,7 +29,6 @@ import {
   MinimizeIcon,
   PlusIcon,
   Circle,
-  FileIcon,
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -46,7 +45,6 @@ import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { capitalizeFirstLetters } from "lib/utils"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
 import { version } from "../../../package.json"
-import { ImportComponentDialog } from "../ImportComponentDialog"
 
 const dropdownMenuItems = [
   "assembly",
@@ -94,7 +92,6 @@ export const CircuitJsonPreview = ({
 
   const [activeTab, setActiveTabState] = useState(defaultActiveTab ?? "pcb")
   const [isFullScreen, setIsFullScreen] = useState(defaultToFullScreen)
-  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
   const setActiveTab = useCallback(
     (tab: TabId) => {
       setActiveTabState(tab)
@@ -146,33 +143,10 @@ export const CircuitJsonPreview = ({
           >
             {leftHeaderContent}
             {leftHeaderContent && <div className="rf-flex-grow" />}
-            {!leftHeaderContent && (
-              <>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="rf-h-8 rf-gap-1"
-                    >
-                      <FileIcon className="rf-h-4 rf-w-4" />
-                      File
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem
-                      onClick={() => setIsImportDialogOpen(true)}
-                    >
-                      Import
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <div className="rf-flex-grow" />
-              </>
-            )}
             {!leftHeaderContent && isRunningCode && (
               <Loader2 className="rf-w-4 rf-h-4 rf-animate-spin" />
             )}
+            {!leftHeaderContent && <div className="rf-flex-grow" />}
             {renderLog && renderLog.progress !== 1 && (
               <div className="rf-flex rf-items-center rf-gap-2">
                 {renderLog.lastRenderEvent && (
@@ -519,17 +493,6 @@ export const CircuitJsonPreview = ({
           )}
         </Tabs>
       </div>
-
-      {/* Import Component Dialog */}
-      <ImportComponentDialog
-        isOpen={isImportDialogOpen}
-        onClose={() => setIsImportDialogOpen(false)}
-        onImport={(component) => {
-          console.log("Component imported:", component)
-          // TODO  Here you would emit an event indicating a component import has been requested
-          setIsImportDialogOpen(false)
-        }}
-      />
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import type { ManualEditEvent } from "@tscircuit/props"
 import type { CircuitJson } from "circuit-json"
+import type { ComponentSearchResult } from "../ImportComponentDialog"
 // Types
 export type FilePath = string
 export type FileContent = string
@@ -44,6 +45,12 @@ export interface SnippetSavedEvent {
   event_type: "SNIPPET_SAVED"
   created_at: string
 }
+export interface ImportComponentEvent {
+  event_id: string
+  event_type: "IMPORT_COMPONENT"
+  created_at: string
+  component: ComponentSearchResult
+}
 
 export interface SnippetExportCreatedEvent {
   event_id: string
@@ -66,6 +73,7 @@ export type RunFrameEvent =
   | SnippetSavedEvent
   | SnippetExportCreatedEvent
   | RequestToExportSnippetEvent
+  | ImportComponentEvent
 
 type MappedOmit<T, K extends keyof T> = {
   [P in keyof T as P extends K ? never : P]: T[P]

@@ -20,7 +20,7 @@ import {
 } from "./tscircuit-registry-api"
 import { createSvgUrl as createPngUrl } from "@tscircuit/create-snippet-url"
 
-interface ComponentSearchResult {
+export interface ComponentSearchResult {
   id: string
   name: string
   description?: string

@@ -71,7 +71,7 @@
     "@tscircuit/assembly-viewer": "^0.0.1",
     "@tscircuit/core": "^0.0.357",
     "@tscircuit/create-snippet-url": "^0.0.8",
-    "@tscircuit/eval": "^0.0.137",
+    "@tscircuit/eval": "^0.0.138",
     "@tscircuit/file-server": "^0.0.13",
     "@tscircuit/pcb-viewer": "^1.11.67",
     "@tscircuit/props": "^0.0.163",

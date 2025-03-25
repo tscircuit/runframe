@@ -66,6 +66,16 @@ export interface RequestToExportSnippetEvent {
   created_at: string
 }
 
+// New notification event type
+export interface NotificationEvent {
+  event_id: string
+  event_type: "NOTIFICATION"
+  created_at: string
+  title: string
+  contentMd?: string
+  timeout?: number
+}
+
 export type RunFrameEvent =
   | FileUpdatedEvent
   | RequestToSaveSnippetEvent
@@ -74,6 +84,7 @@ export type RunFrameEvent =
   | SnippetExportCreatedEvent
   | RequestToExportSnippetEvent
   | ImportComponentEvent
+  | NotificationEvent
 
 type MappedOmit<T, K extends keyof T> = {
   [P in keyof T as P extends K ? never : P]: T[P]

@@ -76,6 +76,10 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   const entrypoint =
     guessEntrypoint(Array.from(fsMap.keys())) ?? "entrypoint.tsx"
 
+  const runFrameKey = `${entrypoint}-${Array.from(fsMap.entries())
+    .map(([k, v]) => `${k}:${v.length}`)
+    .join("|")}`
+
   useEffect(() => {
     debug(`entrypoint set to ${entrypoint}`, {
       fsKeys: Array.from(fsMap.keys()),
@@ -93,6 +97,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
 
   return (
     <RunFrame
+      key={runFrameKey}
       fsMap={fsMap}
       evalVersion={props.evalVersion}
       forceLatestEvalVersion={props.forceLatestEvalVersion}

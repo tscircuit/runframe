@@ -32,7 +32,7 @@
   "devDependencies": {
     "@babel/standalone": "^7.26.10",
     "@biomejs/biome": "^1.9.4",
-    "@tscircuit/fake-snippets": "^0.0.13",
+    "@tscircuit/fake-snippets": "^0.0.14",
     "@types/bun": "latest",
     "@types/debug": "^4.1.12",
     "@types/react": "18",
@@ -44,6 +44,7 @@
     "class-variance-authority": "^0.7.1",
     "concurrently": "^9.1.2",
     "debug": "^4.4.0",
+    "ky": "^1.7.5",
     "playwright": "^1.49.1",
     "postcss": "^8.4.49",
     "react": "18",

@@ -4,6 +4,7 @@ import { resolve } from "node:path"
 import { type Plugin, defineConfig } from "vite"
 import { getNodeHandler } from "winterspec/adapters/node"
 import fakeRegistryBundle from "@tscircuit/fake-snippets/dist/bundle"
+import ky from "ky"
 
 const fileServerHandler = getNodeHandler(winterspecBundle as any, {})
 const fakeRegistryHandler = getNodeHandler(fakeRegistryBundle as any, {})
@@ -25,11 +26,17 @@ function fileServerPlugin(): Plugin {
 }
 
 function fakeRegistryPlugin(): Plugin {
+  let initialized = false
   return {
     name: "fake-registry",
     async configureServer(server) {
+      const port = server.config.server.port
       server.middlewares.use(async (req, res, next) => {
         if (req.url?.startsWith("/registry/")) {
+          if (!initialized) {
+            initialized = true
+            await ky.post(`http://localhost:${port}/registry/_fake/seed`)
+          }
           req.url = `/api/${req.url.replace("/registry/", "")}`
           fakeRegistryHandler(req, res)
         } else {

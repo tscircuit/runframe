@@ -11,7 +11,7 @@ import {
   convertBomRowsToCsv,
 } from "circuit-json-to-bom-csv"
 import { convertCircuitJsonToPickAndPlaceCsv } from "circuit-json-to-pnp-csv"
-import { openForDownload } from "./open-for-download"
+import { openForDownload } from "../open-for-download"
 
 export const exportFabricationFiles = async ({
   circuitJson,

@@ -287,7 +287,7 @@ export const RunFrame = (props: RunFrameProps) => {
       props.onCircuitJsonChange?.(circuitJson)
       setCircuitJson(circuitJson)
       props.onRenderFinished?.({ circuitJson })
-      setAutoroutingGraphics(null)
+      setAutoroutingGraphics({})
 
       if (activeTab === "render_log") {
         renderLog.phaseTimings = getPhaseTimingsFromRenderEvents(

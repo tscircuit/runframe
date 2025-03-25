@@ -1,5 +1,6 @@
 import type { CircuitJson } from "circuit-json"
 import { exportFabricationFiles } from "./formats/export-fabrication-files"
+import { openForDownload } from "./open-for-download"
 
 export const availableExports = [
   { extension: "json", name: "Circuit JSON" },
@@ -25,5 +26,14 @@ export const exportAndDownload = async ({
 }) => {
   if (exportName === "Fabrication Files") {
     exportFabricationFiles({ circuitJson, projectName })
+    return
   }
+  if (exportName === "Circuit JSON") {
+    openForDownload(JSON.stringify(circuitJson, null, 2), {
+      fileName: `${projectName}.circuit.json`,
+      mimeType: "application/json",
+    })
+    return
+  }
+  throw new Error(`Unsupported export type: "${exportName}"`)
 }

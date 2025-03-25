@@ -1,4 +1,4 @@
-import { fetchEasyEDAComponent, convertRawEasyEdaToTs } from "easyeda"
+import { fetchEasyEDAComponent, convertRawEasyToTsx } from "easyeda/browser"
 import { API_BASE } from "lib/components/RunFrameWithApi/api-base"
 import ky from "ky"
 
@@ -20,7 +20,7 @@ export const importComponentFromJlcpcb = async (jlcpcbPartNumber: string) => {
     },
   })
 
-  const tsx = await convertRawEasyEdaToTs(component)
+  const tsx = await convertRawEasyToTsx(component)
 
   const fileName = tsx.match(/export const (\w+) = .*/)?.[1]
 

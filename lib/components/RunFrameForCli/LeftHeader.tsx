@@ -30,19 +30,14 @@ import {
 import { Checkbox } from "../ui/checkbox"
 import { useRunnerStore } from "../RunFrame/runner-store/use-runner-store"
 import { ImportComponentDialog } from "../ImportComponentDialog"
+import {
+  availableExports,
+  exportAndDownload,
+} from "lib/optional-features/exporting/export-and-download"
+import { toast } from "lib/utils/toast"
+import { Toaster } from "react-hot-toast"
+import { importComponentFromJlcpcb } from "lib/optional-features/importing/import-component-from-jlcpcb"
 import { useOrderDialog } from "../OrderDialog/useOrderDialog"
-
-const availableExports: Array<{ extension: string; name: string }> = [
-  { extension: "json", name: "JSON" },
-  { extension: "svg", name: "SVG" },
-  { extension: "dsn", name: "Specctra DSN" },
-  { extension: "glb", name: "GLB (Binary GLTF)" },
-  { extension: "csv", name: "CSV (Comma-Separated Values)" },
-  { extension: "text", name: "Plain Text" },
-  { extension: "kicad_mod", name: "KiCad Module" },
-  { extension: "kicad_project", name: "KiCad Project" },
-  { extension: "gbr", name: "Gerbers" },
-]
 
 export const RunframeCliLeftHeader = (props: {
   shouldLoadLatestEval: boolean
@@ -148,6 +143,8 @@ export const RunframeCliLeftHeader = (props: {
     } as RequestToSaveSnippetEvent)
   }
 
+  const circuitJson = useRunFrameStore((state) => state.circuitJson)
+
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
 
   return (
@@ -197,16 +194,15 @@ export const RunframeCliLeftHeader = (props: {
                   <DropdownMenuItem
                     key={i}
                     onSelect={() => {
-                      if (!isExporting) {
-                        pushEvent({
-                          event_type: "REQUEST_EXPORT",
-                          exportType: exp.extension,
-                        })
-                        setNotificationMessage(
-                          `Export requested for ${exp.name}`,
-                        )
-                        setIsError(false)
+                      if (!circuitJson) {
+                        toast.error("No Circuit JSON to export")
+                        return
                       }
+                      exportAndDownload({
+                        exportName: exp.name,
+                        circuitJson,
+                        projectName: snippetName ?? "Untitled",
+                      })
                     }}
                     disabled={isExporting}
                   >
@@ -263,32 +259,6 @@ export const RunframeCliLeftHeader = (props: {
           </DropdownMenuSub>
         </DropdownMenuContent>
 
-        <div className="!rf-h-full rf-w-fit rf-grid rf-place-items-center rf-my-auto">
-          <div className="rf-flex rf-gap-4">
-            {hasUnsavedChanges ||
-              (hasNeverBeenSaved && (
-                <button
-                  type="button"
-                  disabled={isSaving}
-                  onClick={triggerSaveSnippet}
-                  className="transition ease-in-out hover:scale-105 pointer-cursor rf-text-xs rf-h-fit disabled:rf-bg-blue-600/60 rf-bg-blue-600/70 rf-text-white rf-p-0.5 rf-px-1.5 rf-rounded"
-                >
-                  {isSaving ? "Syncing..." : "Not Synced"}
-                </button>
-              ))}
-            {notificationMessage && (
-              <div
-                className={`rf-text-xs rf-font-medium rf-mt-1 rf-flex rf-max-w-xl rf-text-blue-500 rf-break-words rf-text-center rf-h-full`}
-              >
-                <div className="rf-flex rf-items-center">
-                  <CheckCircle className="rf-w-4 rf-h-4 rf-inline rf-mr-1" />
-                  {notificationMessage}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
         <AlertDialog open={isError} onOpenChange={setIsError}>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -323,13 +293,35 @@ export const RunframeCliLeftHeader = (props: {
         isOpen={isImportDialogOpen}
         onClose={() => setIsImportDialogOpen(false)}
         onImport={async (component) => {
-          setIsImportDialogOpen(false)
-          await pushEvent({
-            event_type: "IMPORT_COMPONENT",
-            component: component,
-          })
+          toast.promise(
+            async () => {
+              if (component.source === "tscircuit.com") {
+                await pushEvent({
+                  event_type: "INSTALL_PACKAGE",
+                  full_package_name: `@tsci/${component.owner}.${component.name}`,
+                })
+
+                // TODO wait on event indicating the package was successfully installed
+                throw new Error("Not implemented")
+              } else if (component.source === "jlcpcb") {
+                const { filePath } = await importComponentFromJlcpcb(
+                  component.partNumber!,
+                )
+
+                return { filePath }
+              }
+            },
+            {
+              loading: `Importing component: "${component.name}"`,
+              success: (data: any) =>
+                data?.filePath
+                  ? `Imported to "${data.filePath}"`
+                  : "Import Successful",
+            },
+          )
         }}
       />
+      <Toaster position="top-center" reverseOrder={false} />
       <orderDialog.OrderDialog />
     </>
   )

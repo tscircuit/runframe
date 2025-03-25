@@ -24,7 +24,7 @@ export interface ComponentSearchResult {
   id: string
   name: string
   description?: string
-  source: "tscircuit" | "jlcpcb"
+  source: "tscircuit.com" | "jlcpcb"
   partNumber?: string
   // Additional JLC-specific properties
   package?: string
@@ -53,8 +53,8 @@ export const ImportComponentDialog = ({
   const [isLoading, setIsLoading] = useState(false)
   const [selectedComponent, setSelectedComponent] =
     useState<ComponentSearchResult | null>(null)
-  const [activeTab, setActiveTab] = useState<"tscircuit" | "jlcpcb">(
-    "tscircuit",
+  const [activeTab, setActiveTab] = useState<"tscircuit.com" | "jlcpcb">(
+    "tscircuit.com",
   )
   const [detailsOpen, setDetailsOpen] = useState(false)
   const [detailsComponent, setDetailsComponent] =
@@ -138,11 +138,11 @@ export const ImportComponentDialog = ({
         <Tabs
           value={activeTab}
           onValueChange={(value) =>
-            setActiveTab(value as "tscircuit" | "jlcpcb")
+            setActiveTab(value as "tscircuit.com" | "jlcpcb")
           }
         >
           <TabsList className="rf-grid rf-w-full rf-grid-cols-2">
-            <TabsTrigger value="tscircuit">tscircuit.com</TabsTrigger>
+            <TabsTrigger value="tscircuit.com">tscircuit.com</TabsTrigger>
             <TabsTrigger value="jlcpcb">JLCPCB Parts</TabsTrigger>
           </TabsList>
 
@@ -151,7 +151,7 @@ export const ImportComponentDialog = ({
               <Search className="rf-absolute rf-left-2 rf-top-2.5 rf-h-4 rf-w-4 rf-text-muted-foreground" />
               <Input
                 placeholder={
-                  activeTab === "tscircuit"
+                  activeTab === "tscircuit.com"
                     ? "Search components..."
                     : "Search JLCPCB parts (e.g. C14663)..."
                 }
@@ -189,7 +189,7 @@ export const ImportComponentDialog = ({
                       </div>
                     </div>
                     <div className="rf-flex rf-gap-2">
-                      {result.source === "tscircuit" && (
+                      {result.source === "tscircuit.com" && (
                         <Button
                           variant="outline"
                           size="sm"
@@ -282,7 +282,7 @@ export const ImportComponentDialog = ({
           )}
 
           {/* tscircuit-specific information */}
-          {detailsComponent?.source === "tscircuit" && (
+          {detailsComponent?.source === "tscircuit.com" && (
             <div className="rf-my-4 rf-border rf-rounded-md rf-p-4 !rf-max-w-[60vw] !rf-overflow-x-hidden">
               <div className="rf-text-sm rf-font-medium rf-mb-2">
                 tscircuit Details
@@ -313,7 +313,7 @@ export const ImportComponentDialog = ({
 
           <div className="rf-my-4 rf-border rf-rounded-md rf-p-4">
             <div className="rf-text-sm rf-font-medium rf-mb-2">Preview</div>
-            {detailsComponent?.source === "tscircuit" &&
+            {detailsComponent?.source === "tscircuit.com" &&
             detailsComponent.code ? (
               <div className="rf-flex rf-justify-center">
                 <div className="rf-border rf-rounded rf-p-4 rf-bg-zinc-50">

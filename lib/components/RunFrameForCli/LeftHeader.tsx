@@ -30,7 +30,6 @@ import {
 import { Checkbox } from "../ui/checkbox"
 import { useRunnerStore } from "../RunFrame/runner-store/use-runner-store"
 import { ImportComponentDialog } from "../ImportComponentDialog"
-<<<<<<< HEAD
 import {
   availableExports,
   exportAndDownload,
@@ -38,21 +37,7 @@ import {
 import { toast } from "lib/utils/toast"
 import { Toaster } from "react-hot-toast"
 import { importComponentFromJlcpcb } from "lib/optional-features/importing/import-component-from-jlcpcb"
-=======
 import { useOrderDialog } from "../OrderDialog/useOrderDialog"
-
-const availableExports: Array<{ extension: string; name: string }> = [
-  { extension: "json", name: "JSON" },
-  { extension: "svg", name: "SVG" },
-  { extension: "dsn", name: "Specctra DSN" },
-  { extension: "glb", name: "GLB (Binary GLTF)" },
-  { extension: "csv", name: "CSV (Comma-Separated Values)" },
-  { extension: "text", name: "Plain Text" },
-  { extension: "kicad_mod", name: "KiCad Module" },
-  { extension: "kicad_project", name: "KiCad Project" },
-  { extension: "gbr", name: "Gerbers" },
-]
->>>>>>> origin/main
 
 export const RunframeCliLeftHeader = (props: {
   shouldLoadLatestEval: boolean

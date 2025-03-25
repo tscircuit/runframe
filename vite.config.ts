@@ -3,17 +3,42 @@ import react from "@vitejs/plugin-react"
 import { resolve } from "node:path"
 import { type Plugin, defineConfig } from "vite"
 import { getNodeHandler } from "winterspec/adapters/node"
+import fakeRegistryBundle from "@tscircuit/fake-snippets/dist/bundle"
+import ky from "ky"
 
-const fakeHandler = getNodeHandler(winterspecBundle as any, {})
+const fileServerHandler = getNodeHandler(winterspecBundle as any, {})
+const fakeRegistryHandler = getNodeHandler(fakeRegistryBundle as any, {})
 
-function apiServerPlugin(): Plugin {
+function fileServerPlugin(): Plugin {
   return {
-    name: "api-server",
+    name: "file-server",
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         if (req.url?.startsWith("/api/")) {
           req.url = req.url.replace("/api/", "/")
-          fakeHandler(req, res)
+          fileServerHandler(req, res)
+        } else {
+          next()
+        }
+      })
+    },
+  }
+}
+
+function fakeRegistryPlugin(): Plugin {
+  let initialized = false
+  return {
+    name: "fake-registry",
+    async configureServer(server) {
+      const port = server.config.server.port
+      server.middlewares.use(async (req, res, next) => {
+        if (req.url?.startsWith("/registry/")) {
+          if (!initialized) {
+            initialized = true
+            await ky.post(`http://localhost:${port}/registry/_fake/seed`)
+          }
+          req.url = `/api/${req.url.replace("/registry/", "")}`
+          fakeRegistryHandler(req, res)
         } else {
           next()
         }
@@ -25,7 +50,8 @@ function apiServerPlugin(): Plugin {
 const plugins: any[] = [react()]
 
 if (!process.env.VERCEL && !process.env.STANDALONE) {
-  plugins.push(apiServerPlugin())
+  plugins.push(fileServerPlugin())
+  plugins.push(fakeRegistryPlugin())
 }
 
 let build: any = undefined

@@ -3,17 +3,18 @@ import react from "@vitejs/plugin-react"
 import { resolve } from "node:path"
 import { type Plugin, defineConfig } from "vite"
 import { getNodeHandler } from "winterspec/adapters/node"
+import {} from "@tscircuit/fake-snippets"
 
-const fakeHandler = getNodeHandler(winterspecBundle as any, {})
+const fileServerHandler = getNodeHandler(winterspecBundle as any, {})
 
-function apiServerPlugin(): Plugin {
+function fileServerPlugin(): Plugin {
   return {
-    name: "api-server",
+    name: "file-server",
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         if (req.url?.startsWith("/api/")) {
           req.url = req.url.replace("/api/", "/")
-          fakeHandler(req, res)
+          fileServerHandler(req, res)
         } else {
           next()
         }
@@ -25,7 +26,7 @@ function apiServerPlugin(): Plugin {
 const plugins: any[] = [react()]
 
 if (!process.env.VERCEL && !process.env.STANDALONE) {
-  plugins.push(apiServerPlugin())
+  plugins.push(fileServerPlugin())
 }
 
 let build: any = undefined

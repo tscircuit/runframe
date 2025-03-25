@@ -30,18 +30,10 @@ import {
 import { Checkbox } from "../ui/checkbox"
 import { useRunnerStore } from "../RunFrame/runner-store/use-runner-store"
 import { ImportComponentDialog } from "../ImportComponentDialog"
-
-const availableExports: Array<{ extension: string; name: string }> = [
-  { extension: "json", name: "JSON" },
-  { extension: "svg", name: "SVG" },
-  { extension: "dsn", name: "Specctra DSN" },
-  { extension: "glb", name: "GLB (Binary GLTF)" },
-  { extension: "csv", name: "CSV (Comma-Separated Values)" },
-  { extension: "text", name: "Plain Text" },
-  { extension: "kicad_mod", name: "KiCad Module" },
-  { extension: "kicad_project", name: "KiCad Project" },
-  { extension: "gbr", name: "Gerbers" },
-]
+import {
+  availableExports,
+  exportAndDownload,
+} from "lib/optional-features/exporting/export-and-download"
 
 export const RunframeCliLeftHeader = (props: {
   shouldLoadLatestEval: boolean
@@ -146,6 +138,8 @@ export const RunframeCliLeftHeader = (props: {
     } as RequestToSaveSnippetEvent)
   }
 
+  const circuitJson = useRunFrameStore((state) => state.circuitJson)
+
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
 
   return (
@@ -184,16 +178,11 @@ export const RunframeCliLeftHeader = (props: {
                   <DropdownMenuItem
                     key={i}
                     onSelect={() => {
-                      if (!isExporting) {
-                        pushEvent({
-                          event_type: "REQUEST_EXPORT",
-                          exportType: exp.extension,
-                        })
-                        setNotificationMessage(
-                          `Export requested for ${exp.name}`,
-                        )
-                        setIsError(false)
-                      }
+                      exportAndDownload({
+                        exportName: exp.name,
+                        circuitJson,
+                        projectName: snippetName ?? "Untitled",
+                      })
                     }}
                     disabled={isExporting}
                   >

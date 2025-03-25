@@ -80,8 +80,6 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     setNotifications([])
   }
 
-  // Removed localStorage storage as per requirement
-
   return (
     <NotificationContext.Provider
       value={{

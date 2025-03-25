@@ -300,18 +300,25 @@ export const RunframeCliLeftHeader = (props: {
                   event_type: "INSTALL_PACKAGE",
                   full_package_name: `@tsci/${component.owner}.${component.name}`,
                 })
+
+                // TODO wait on event indicating the package was successfully installed
+                throw new Error("Not implemented")
               } else if (component.source === "jlcpcb") {
-                await importComponentFromJlcpcb(component.partNumber!)
+                const { filePath } = await importComponentFromJlcpcb(
+                  component.partNumber!,
+                )
+
+                return { filePath }
               }
             },
             {
               loading: `Importing component: "${component.name}"`,
+              success: (data: any) =>
+                data?.filePath
+                  ? `Imported to "${data.filePath}"`
+                  : "Import Successful",
             },
           )
-          // await pushEvent({
-          //   event_type: "IMPORT_COMPONENT",
-          //   component: component,
-          // })
         }}
       />
       <Toaster position="top-center" reverseOrder={false} />

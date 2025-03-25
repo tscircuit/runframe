@@ -81,7 +81,7 @@
     "@tscircuit/core": "^0.0.358",
     "@tscircuit/create-snippet-url": "^0.0.8",
     "@tscircuit/eval": "^0.0.141",
-    "@tscircuit/file-server": "file:.yalc/@tscircuit/file-server",
+    "@tscircuit/file-server": "^0.0.17",
     "@tscircuit/pcb-viewer": "^1.11.83",
     "@tscircuit/props": "^0.0.164",
     "@tscircuit/schematic-viewer": "2.0.9",

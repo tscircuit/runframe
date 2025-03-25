@@ -3,9 +3,10 @@ import react from "@vitejs/plugin-react"
 import { resolve } from "node:path"
 import { type Plugin, defineConfig } from "vite"
 import { getNodeHandler } from "winterspec/adapters/node"
-import {} from "@tscircuit/fake-snippets"
+import fakeRegistryBundle from "@tscircuit/fake-snippets/dist/bundle"
 
 const fileServerHandler = getNodeHandler(winterspecBundle as any, {})
+const fakeRegistryHandler = getNodeHandler(fakeRegistryBundle as any, {})
 
 function fileServerPlugin(): Plugin {
   return {
@@ -23,10 +24,27 @@ function fileServerPlugin(): Plugin {
   }
 }
 
+function fakeRegistryPlugin(): Plugin {
+  return {
+    name: "fake-registry",
+    async configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        if (req.url?.startsWith("/registry/")) {
+          req.url = `/api/${req.url.replace("/registry/", "")}`
+          fakeRegistryHandler(req, res)
+        } else {
+          next()
+        }
+      })
+    },
+  }
+}
+
 const plugins: any[] = [react()]
 
 if (!process.env.VERCEL && !process.env.STANDALONE) {
   plugins.push(fileServerPlugin())
+  plugins.push(fakeRegistryPlugin())
 }
 
 let build: any = undefined

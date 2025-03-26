@@ -45,11 +45,11 @@ export interface SnippetSavedEvent {
   event_type: "SNIPPET_SAVED"
   created_at: string
 }
-export interface ImportComponentEvent {
+export interface InstallPackageEvent {
   event_id: string
-  event_type: "IMPORT_COMPONENT"
+  event_type: "INSTALL_PACKAGE"
   created_at: string
-  component: ComponentSearchResult
+  full_package_name: string
 }
 
 export interface SnippetExportCreatedEvent {
@@ -85,6 +85,7 @@ export type RunFrameEvent =
   | RequestToExportSnippetEvent
   | ImportComponentEvent
   | NotificationEvent
+  | InstallPackageEvent
 
 type MappedOmit<T, K extends keyof T> = {
   [P in keyof T as P extends K ? never : P]: T[P]

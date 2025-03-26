@@ -4,7 +4,7 @@ import { useRunFrameStore } from "./store"
 import { API_BASE } from "./api-base"
 import { useEditEventController } from "lib/hooks/use-edit-event-controller"
 import Debug from "debug"
-import { applyPcbEditEventsToManualEditsFile } from "@tscircuit/core"
+import { applyEditEventsToManualEditsFile } from "@tscircuit/core"
 
 const debug = Debug("run-frame:RunFrameWithApi")
 
@@ -30,6 +30,10 @@ export interface RunFrameWithApiProps {
   leftHeaderContent?: React.ReactNode
   defaultToFullScreen?: boolean
   showToggleFullScreen?: boolean
+  /**
+   * Whether to automatically re-render when components are moved. Defaults to true.
+   */
+  autoRenderOnComponentMove?: boolean
 }
 
 export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
@@ -99,6 +103,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       leftHeaderContent={leftHeaderContent}
       defaultToFullScreen={props.defaultToFullScreen}
       showToggleFullScreen={props.showToggleFullScreen}
+      autoRenderOnComponentMove={props.autoRenderOnComponentMove}
       onInitialRender={() => {
         debug("onInitialRender / markRenderStarted")
         markRenderStarted()
@@ -126,7 +131,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
 
         const manualEditsFile = fsMap.get(manualEditsFilePath)
 
-        const updatedManualEdits = applyPcbEditEventsToManualEditsFile({
+        const updatedManualEdits = applyEditEventsToManualEditsFile({
           circuitJson: circuitJson!,
           editEvents: [ee],
           manualEditsFile: JSON.parse(manualEditsFile ?? "{}"),

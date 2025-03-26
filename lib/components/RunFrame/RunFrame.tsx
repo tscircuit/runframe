@@ -320,6 +320,11 @@ export const RunFrame = (props: RunFrameProps) => {
         props.onEditEvent?.(lastEditEventRef.current)
         lastEditEventRef.current = null
         dragTimeout.current = null
+        
+        // Auto trigger a re-render when component movement is complete
+        if (!props.showRunButton || props.autoRenderOnComponentMove !== false) {
+          incRunCountTrigger(1)
+        }
       }, 100)
     }
   }

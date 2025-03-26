@@ -28,6 +28,11 @@ export interface RunFrameProps {
   defaultToFullScreen?: boolean
 
   /**
+   * Whether to automatically re-render when components are moved. Defaults to true.
+   */
+  autoRenderOnComponentMove?: boolean
+
+  /**
    * An optional left-side header, you can put a save button, a run button, or
    * a title here.
    */

@@ -64,7 +64,7 @@ export const mapTscircuitSnippetToSearchResult = (
     description:
       tscircuitSnippet.description ||
       `Component by ${tscircuitSnippet.owner_name}`,
-    source: "tscircuit" as const,
+    source: "tscircuit.com" as const,
     partNumber: tscircuitSnippet.name,
     previewUrl: tscircuitSnippet.preview_url,
     // Additional tscircuit-specific properties

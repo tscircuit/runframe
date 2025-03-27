@@ -333,6 +333,19 @@ export const CircuitJsonPreview = ({
                         editEvents.forEach((e) => onEditEvent(e))
                       }
                     }}
+                    // onEditEventsChanged={(editEvents) => {
+                    //   if (editEvents.some((editEvent) => editEvent.in_progress))
+                    //     return
+                    //   // Update state with new edit events
+                    //   const newManualEditsFileContent = applyPcbEditEvents({
+                    //     editEvents,
+                    //     circuitJson,
+                    //     manualEditsFileContent,
+                    //   })
+                    //   onManualEditsFileContentChange?.(
+                    //     JSON.stringify(newManualEditsFileContent, null, 2),
+                    //   )
+                    // }}
                   />
                 ) : (
                   <PreviewEmptyState onRunClicked={onRunClicked} />

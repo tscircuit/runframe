@@ -7,7 +7,7 @@ import {
 import { cn } from "lib/utils"
 import { CadViewer } from "@tscircuit/3d-viewer"
 import { PCBViewer } from "@tscircuit/pcb-viewer"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState, useRef, forwardRef } from "react"
 import { ErrorFallback } from "../ErrorFallback"
 import { ErrorBoundary } from "react-error-boundary"
 import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
@@ -91,12 +91,22 @@ export const CircuitJsonPreview = ({
 
   const [activeTab, setActiveTabState] = useState(defaultActiveTab ?? "pcb")
   const [isFullScreen, setIsFullScreen] = useState(defaultToFullScreen)
+  
+  // Generate a stable key for the PCB viewer to preserve its state across tab changes
+  const pcbViewerKey = useRef("pcb-viewer-" + Math.random().toString(36).substr(2, 9))
+  
+  const previousTabRef = useRef<TabId | null>(null)
+  
+  // Keep a ref to the PCB viewer DOM element to preserve its state
+  const pcbContainerRef = useRef<HTMLDivElement>(null)
+
   const setActiveTab = useCallback(
     (tab: TabId) => {
+      previousTabRef.current = activeTab
       setActiveTabState(tab)
       onActiveTabChange?.(tab)
     },
-    [onActiveTabChange],
+    [onActiveTabChange, activeTab],
   )
 
   const toggleFullScreen = () => {
@@ -279,11 +289,14 @@ export const CircuitJsonPreview = ({
               <div className="rf-h-full">{codeTabContent}</div>
             </TabsContent>
           )}
-          <TabsContent value="pcb">
+          <TabsContent value="pcb" forceMount>
             <div
+              ref={pcbContainerRef}
               className={cn(
                 "rf-overflow-hidden",
                 isFullScreen ? "rf-h-[calc(100vh-52px)]" : "rf-h-[620px]",
+                // Hide when not active
+                activeTab !== "pcb" && "rf-hidden"
               )}
             >
               <ErrorBoundary
@@ -302,6 +315,7 @@ export const CircuitJsonPreview = ({
               >
                 {circuitJson ? (
                   <PcbViewerWithContainerHeight
+                    key={pcbViewerKey.current}
                     disableAutoFocus
                     focusOnHover={false}
                     circuitJson={circuitJson}
@@ -317,19 +331,6 @@ export const CircuitJsonPreview = ({
                         editEvents.forEach((e) => onEditEvent(e))
                       }
                     }}
-                    // onEditEventsChanged={(editEvents) => {
-                    //   if (editEvents.some((editEvent) => editEvent.in_progress))
-                    //     return
-                    //   // Update state with new edit events
-                    //   const newManualEditsFileContent = applyPcbEditEvents({
-                    //     editEvents,
-                    //     circuitJson,
-                    //     manualEditsFileContent,
-                    //   })
-                    //   onManualEditsFileContentChange?.(
-                    //     JSON.stringify(newManualEditsFileContent, null, 2),
-                    //   )
-                    // }}
                   />
                 ) : (
                   <PreviewEmptyState onRunClicked={onRunClicked} />
@@ -361,11 +362,12 @@ export const CircuitJsonPreview = ({
               </ErrorBoundary>
             </div>
           </TabsContent>
-          <TabsContent value="schematic">
+          <TabsContent value="schematic" forceMount>
             <div
               className={cn(
                 "rf-overflow-auto",
                 isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
+                activeTab !== "schematic" && "rf-hidden"
               )}
             >
               <ErrorBoundary
@@ -400,11 +402,12 @@ export const CircuitJsonPreview = ({
             </div>
           </TabsContent>
 
-          <TabsContent value="cad">
+          <TabsContent value="cad" forceMount>
             <div
               className={cn(
                 "rf-overflow-auto",
                 isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
+                activeTab !== "cad" && "rf-hidden"
               )}
             >
               <ErrorBoundary FallbackComponent={ErrorFallback}>

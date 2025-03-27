@@ -91,12 +91,14 @@ export const CircuitJsonPreview = ({
 
   const [activeTab, setActiveTabState] = useState(defaultActiveTab ?? "pcb")
   const [isFullScreen, setIsFullScreen] = useState(defaultToFullScreen)
-  
+
   // Generate a stable key for the PCB viewer to preserve its state across tab changes
-  const pcbViewerKey = useRef("pcb-viewer-" + Math.random().toString(36).substr(2, 9))
-  
+  const pcbViewerKey = useRef(
+    "pcb-viewer-" + Math.random().toString(36).substr(2, 9),
+  )
+
   const previousTabRef = useRef<TabId | null>(null)
-  
+
   // Keep a ref to the PCB viewer DOM element to preserve its state
   const pcbContainerRef = useRef<HTMLDivElement>(null)
 
@@ -296,7 +298,7 @@ export const CircuitJsonPreview = ({
                 "rf-overflow-hidden",
                 isFullScreen ? "rf-h-[calc(100vh-52px)]" : "rf-h-[620px]",
                 // Hide when not active
-                activeTab !== "pcb" && "rf-hidden"
+                activeTab !== "pcb" && "rf-hidden",
               )}
             >
               <ErrorBoundary
@@ -367,7 +369,7 @@ export const CircuitJsonPreview = ({
               className={cn(
                 "rf-overflow-auto",
                 isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
-                activeTab !== "schematic" && "rf-hidden"
+                activeTab !== "schematic" && "rf-hidden",
               )}
             >
               <ErrorBoundary
@@ -407,7 +409,7 @@ export const CircuitJsonPreview = ({
               className={cn(
                 "rf-overflow-auto",
                 isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
-                activeTab !== "cad" && "rf-hidden"
+                activeTab !== "cad" && "rf-hidden",
               )}
             >
               <ErrorBoundary FallbackComponent={ErrorFallback}>

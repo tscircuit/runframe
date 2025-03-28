@@ -180,3 +180,5 @@ dist
 lib/hooks/styles.generated.ts
 .vercel
 cosmos-export
+yalc.lock
+.yalc

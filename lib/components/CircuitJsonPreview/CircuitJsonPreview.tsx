@@ -92,23 +92,12 @@ export const CircuitJsonPreview = ({
   const [activeTab, setActiveTabState] = useState(defaultActiveTab ?? "pcb")
   const [isFullScreen, setIsFullScreen] = useState(defaultToFullScreen)
 
-  // Generate a stable key for the PCB viewer to preserve its state across tab changes
-  const pcbViewerKey = useRef(
-    "pcb-viewer-" + Math.random().toString(36).substr(2, 9),
-  )
-
-  const previousTabRef = useRef<TabId | null>(null)
-
-  // Keep a ref to the PCB viewer DOM element to preserve its state
-  const pcbContainerRef = useRef<HTMLDivElement>(null)
-
   const setActiveTab = useCallback(
     (tab: TabId) => {
-      previousTabRef.current = activeTab
       setActiveTabState(tab)
       onActiveTabChange?.(tab)
     },
-    [onActiveTabChange, activeTab],
+    [onActiveTabChange],
   )
 
   const toggleFullScreen = () => {
@@ -293,7 +282,6 @@ export const CircuitJsonPreview = ({
           )}
           <TabsContent value="pcb" forceMount>
             <div
-              ref={pcbContainerRef}
               className={cn(
                 "rf-overflow-hidden",
                 isFullScreen ? "rf-h-[calc(100vh-52px)]" : "rf-h-[620px]",
@@ -317,7 +305,6 @@ export const CircuitJsonPreview = ({
               >
                 {circuitJson ? (
                   <PcbViewerWithContainerHeight
-                    key={pcbViewerKey.current}
                     disableAutoFocus
                     focusOnHover={false}
                     circuitJson={circuitJson}

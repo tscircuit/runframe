@@ -30,6 +30,7 @@ export interface RunFrameWithApiProps {
   leftHeaderContent?: React.ReactNode
   defaultToFullScreen?: boolean
   showToggleFullScreen?: boolean
+  snippetId?: string
 }
 
 export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
@@ -76,6 +77,8 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   const entrypoint =
     guessEntrypoint(Array.from(fsMap.keys())) ?? "entrypoint.tsx"
 
+  const runFrameKey = props.snippetId ?? entrypoint
+
   useEffect(() => {
     debug(`entrypoint set to ${entrypoint}`, {
       fsKeys: Array.from(fsMap.keys()),
@@ -93,6 +96,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
 
   return (
     <RunFrame
+      key={runFrameKey}
       fsMap={fsMap}
       evalVersion={props.evalVersion}
       forceLatestEvalVersion={props.forceLatestEvalVersion}

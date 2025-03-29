@@ -143,15 +143,13 @@ export const RunframeCliLeftHeader = (props: {
     } as RequestToSaveSnippetEvent)
   }
 
-  const circuitJson = useRunFrameStore((state) => state.circuitJson)
-
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
 
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <div className="rf-whitespace-nowrap rf-text-xs font-medium rf-p-2 rf-mx-1 rf-cursor-pointer rf-relative">
+          <div className="rf-whitespace-nowrap rf-text-xs font-medium rf-p-2 rf-mx-1 rf-cursor-pointer rf-relative rf-flex rf-items-center">
             File
           </div>
         </DropdownMenuTrigger>

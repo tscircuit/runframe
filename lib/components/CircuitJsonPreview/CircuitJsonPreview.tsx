@@ -7,7 +7,7 @@ import {
 import { cn } from "lib/utils"
 import { CadViewer } from "@tscircuit/3d-viewer"
 import { PCBViewer } from "@tscircuit/pcb-viewer"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState, useRef, forwardRef } from "react"
 import { ErrorFallback } from "../ErrorFallback"
 import { ErrorBoundary } from "react-error-boundary"
 import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
@@ -91,6 +91,7 @@ export const CircuitJsonPreview = ({
 
   const [activeTab, setActiveTabState] = useState(defaultActiveTab ?? "pcb")
   const [isFullScreen, setIsFullScreen] = useState(defaultToFullScreen)
+
   const setActiveTab = useCallback(
     (tab: TabId) => {
       setActiveTabState(tab)
@@ -279,11 +280,13 @@ export const CircuitJsonPreview = ({
               <div className="rf-h-full">{codeTabContent}</div>
             </TabsContent>
           )}
-          <TabsContent value="pcb">
+          <TabsContent value="pcb" forceMount>
             <div
               className={cn(
                 "rf-overflow-hidden",
                 isFullScreen ? "rf-h-[calc(100vh-52px)]" : "rf-h-[620px]",
+                // Hide when not active
+                activeTab !== "pcb" && "rf-hidden",
               )}
             >
               <ErrorBoundary
@@ -361,11 +364,12 @@ export const CircuitJsonPreview = ({
               </ErrorBoundary>
             </div>
           </TabsContent>
-          <TabsContent value="schematic">
+          <TabsContent value="schematic" forceMount>
             <div
               className={cn(
                 "rf-overflow-auto",
                 isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
+                activeTab !== "schematic" && "rf-hidden",
               )}
             >
               <ErrorBoundary
@@ -400,11 +404,12 @@ export const CircuitJsonPreview = ({
             </div>
           </TabsContent>
 
-          <TabsContent value="cad">
+          <TabsContent value="cad" forceMount>
             <div
               className={cn(
                 "rf-overflow-auto",
                 isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
+                activeTab !== "cad" && "rf-hidden",
               )}
             >
               <ErrorBoundary FallbackComponent={ErrorFallback}>

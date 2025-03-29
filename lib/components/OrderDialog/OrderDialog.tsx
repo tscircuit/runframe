@@ -15,24 +15,40 @@ interface OrderDialogProps {
 }
 
 const orderSteps: Step[] = [
-  { id: 1, key: "are_gerbers_generated", title: "Generate Gerbers", completed: false },
-  { id: 2, key: "are_gerbers_uploaded", title: "Upload Gerbers", completed: false },
-  { id: 3, key: "is_gerber_analyzed", title: "Analyze Gerber", completed: false },
-  { id: 4, key: "are_initial_costs_calculated", title: "Calculate Initial Costs", completed: false },
-  { id: 5, key: "is_pcb_added_to_cart", title: "Add PCB to Cart", completed: false },
-  { id: 6, key: "is_bom_uploaded", title: "Upload BOM", completed: false },
-  { id: 7, key: "is_pnp_uploaded", title: "Upload PnP", completed: false },
-  { id: 8, key: "is_bom_pnp_analyzed", title: "Analyze BOM & PnP", completed: false },
-  { id: 9, key: "is_bom_parsing_complete", title: "BOM Parsing Complete", completed: false },
-  { id: 10, key: "are_components_available", title: "Components Available", completed: false },
-  { id: 11, key: "is_patch_map_generated", title: "Generate Patch Map", completed: false },
-  { id: 12, key: "is_json_merge_file_created", title: "Create JSON Merge File", completed: false },
-  { id: 13, key: "is_dfm_result_generated", title: "Generate DFM Result", completed: false },
-  { id: 14, key: "are_files_downloaded", title: "Download Files", completed: false },
-  { id: 15, key: "are_product_categories_fetched", title: "Fetch Product Categories", completed: false },
-  { id: 16, key: "are_final_costs_calculated", title: "Calculate Final Costs", completed: true },
-  { id: 17, key: "is_json_merge_file_updated", title: "Update JSON Merge File", completed: true },
-  { id: 18, key: "is_added_to_cart", title: "Add to Cart", completed: false },
+  { id: 1, key: "are_gerbers_generated", title: "Generate Gerbers" },
+  { id: 2, key: "are_gerbers_uploaded", title: "Upload Gerbers" },
+  { id: 3, key: "is_gerber_analyzed", title: "Analyze Gerber" },
+  {
+    id: 4,
+    key: "are_initial_costs_calculated",
+    title: "Calculate Initial Costs",
+  },
+  { id: 5, key: "is_pcb_added_to_cart", title: "Add PCB to Cart" },
+  { id: 6, key: "is_bom_uploaded", title: "Upload BOM" },
+  { id: 7, key: "is_pnp_uploaded", title: "Upload PnP" },
+  { id: 8, key: "is_bom_pnp_analyzed", title: "Analyze BOM & PnP" },
+  { id: 9, key: "is_bom_parsing_complete", title: "BOM Parsing Complete" },
+  { id: 10, key: "are_components_available", title: "Components Available" },
+  { id: 11, key: "is_patch_map_generated", title: "Generate Patch Map" },
+  {
+    id: 12,
+    key: "is_json_merge_file_created",
+    title: "Create JSON Merge File",
+  },
+  { id: 13, key: "is_dfm_result_generated", title: "Generate DFM Result" },
+  { id: 14, key: "are_files_downloaded", title: "Download Files" },
+  {
+    id: 15,
+    key: "are_product_categories_fetched",
+    title: "Fetch Product Categories",
+  },
+  { id: 16, key: "are_final_costs_calculated", title: "Calculate Final Costs" },
+  {
+    id: 17,
+    key: "is_json_merge_file_updated",
+    title: "Update JSON Merge File",
+  },
+  { id: 18, key: "is_added_to_cart", title: "Add to Cart" },
 ].map((step, index) => ({
   ...step,
   completed: false,
@@ -98,10 +114,10 @@ export const OrderDialog: FC<OrderDialogProps> = ({
     setLoading(true)
     try {
       // Simulate some async work
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      setSteps(currentSteps => {
-        const activeStepIndex = currentSteps.findIndex(step => step.active)
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      setSteps((currentSteps) => {
+        const activeStepIndex = currentSteps.findIndex((step) => step.active)
         if (activeStepIndex === -1) return currentSteps
 
         const newSteps = [...currentSteps]
@@ -109,9 +125,9 @@ export const OrderDialog: FC<OrderDialogProps> = ({
         newSteps[activeStepIndex] = {
           ...newSteps[activeStepIndex],
           completed: true,
-          active: false
+          active: false,
         }
-        
+
         // If this was the last step, move to checkout
         if (activeStepIndex === currentSteps.length - 1) {
           setTimeout(() => setStage("checkout"), 500) // Small delay to show completion
@@ -119,7 +135,7 @@ export const OrderDialog: FC<OrderDialogProps> = ({
           // Activate next step
           newSteps[activeStepIndex + 1] = {
             ...newSteps[activeStepIndex + 1],
-            active: true
+            active: true,
           }
         }
 

@@ -1,22 +1,22 @@
-import { Check, ArrowRight, Loader2, ArrowDown } from "lucide-react";
-import { Progress } from "lib/components/ui/progress";
-import { Button } from "lib/components/ui/button";
+import { Check, ArrowRight, Loader2, ArrowDown } from "lucide-react"
+import { Progress } from "lib/components/ui/progress"
+import { Button } from "lib/components/ui/button"
 
 export type Step = {
-  id: number;
-  title: string;
-  completed: boolean;
-  active?: boolean;
-};
+  id: number
+  title: string
+  completed: boolean
+  active?: boolean
+}
 
 interface StepwiseProgressPanelProps {
-  steps: Step[];
-  title?: string;
-  onCancel?: () => void;
-  onContinue?: () => void;
-  continueButtonText?: string;
-  cancelButtonText?: string;
-  loading?: boolean;
+  steps: Step[]
+  title?: string
+  onCancel?: () => void
+  onContinue?: () => void
+  continueButtonText?: string
+  cancelButtonText?: string
+  loading?: boolean
 }
 
 export const StepwiseProgressPanel = ({
@@ -28,12 +28,12 @@ export const StepwiseProgressPanel = ({
   cancelButtonText = "Cancel",
   loading = false,
 }: StepwiseProgressPanelProps) => {
-  const completedSteps = steps.filter((step) => step.completed);
-  const activeStep = steps.find((step) => step.active);
-  const totalSteps = steps.length;
-  const progress = Math.round((completedSteps.length / totalSteps) * 100);
-  
-  const displayedCompletedSteps = completedSteps.slice(-1);
+  const completedSteps = steps.filter((step) => step.completed)
+  const activeStep = steps.find((step) => step.active)
+  const totalSteps = steps.length
+  const progress = Math.round((completedSteps.length / totalSteps) * 100)
+
+  const displayedCompletedSteps = completedSteps.slice(-1)
 
   return (
     <div className="rf-flex rf-flex-col rf-bg-white rf-rounded-xl rf-p-6 rf-max-w-xl rf-w-full rf-mx-auto">
@@ -56,7 +56,9 @@ export const StepwiseProgressPanel = ({
             </div>
             <div className="rf-flex-1">
               <p className="rf-text-sm rf-font-medium rf-text-muted-foreground">
-                {index === displayedCompletedSteps.length - 1 ? "Last Completed" : "Completed"}
+                {index === displayedCompletedSteps.length - 1
+                  ? "Last Completed"
+                  : "Completed"}
               </p>
               <p className="rf-font-medium rf-text-green-600">
                 {step.id}. {step.title}
@@ -83,7 +85,9 @@ export const StepwiseProgressPanel = ({
               </div>
             </div>
             <div className="rf-flex-1">
-              <p className="rf-text-sm rf-font-medium rf-text-muted-foreground">Current Step</p>
+              <p className="rf-text-sm rf-font-medium rf-text-muted-foreground">
+                Current Step
+              </p>
               <p className="rf-font-medium rf-text-blue-600">
                 {activeStep.id}. {activeStep.title}
               </p>
@@ -94,11 +98,7 @@ export const StepwiseProgressPanel = ({
 
       <div className="rf-flex rf-justify-end rf-gap-3 rf-mt-auto">
         {onCancel && (
-          <Button
-            variant="outline"
-            onClick={onCancel}
-            className="rf-px-6"
-          >
+          <Button variant="outline" onClick={onCancel} className="rf-px-6">
             {cancelButtonText}
           </Button>
         )}
@@ -120,5 +120,5 @@ export const StepwiseProgressPanel = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}

@@ -22,8 +22,8 @@ export const useOrderDialog = () => {
     setStage,
     OrderDialog: () => {
       return (
-        <OrderDialog 
-          isOpen={isOpen} 
+        <OrderDialog
+          isOpen={isOpen}
           onClose={handleClose}
           stage={stage}
           setStage={setStage}

@@ -9,7 +9,7 @@ export default () => {
   const pushEvent = useRunFrameStore((state) => state.pushEvent)
   const [selectedScenario, setSelectedScenario] = useState<string>("none")
   const [setSimulateScenarioOrder] = useRunFrameStore((s) => [
-    s.setSimulateScenarioOrder
+    s.setSimulateScenarioOrder,
   ])
 
   const orderSteps = [
@@ -27,7 +27,10 @@ export default () => {
     { key: "is_json_merge_file_created", label: "Create JSON Merge File" },
     { key: "is_dfm_result_generated", label: "Generate DFM Result" },
     { key: "are_files_downloaded", label: "Download Files" },
-    { key: "are_product_categories_fetched", label: "Fetch Product Categories" },
+    {
+      key: "are_product_categories_fetched",
+      label: "Fetch Product Categories",
+    },
     { key: "are_final_costs_calculated", label: "Calculate Final Costs" },
     { key: "is_json_merge_file_updated", label: "Update JSON Merge File" },
     { key: "is_added_to_cart", label: "Add to Cart" },
@@ -118,11 +121,14 @@ circuit.add(
 
   return (
     <>
-      <RunFrameForCli 
-        debug 
+      <RunFrameForCli
+        debug
         scenarioSelectorContent={
           <div className="rf-flex rf-items-center">
-            <label htmlFor="scenario" className="rf-mr-2 rf-text-red-700 rf-text-sm">
+            <label
+              htmlFor="scenario"
+              className="rf-mr-2 rf-text-red-700 rf-text-sm"
+            >
               Select Test Scenario:
             </label>
             <select
@@ -131,7 +137,9 @@ circuit.add(
               value={selectedScenario}
               onChange={(e) => {
                 setSelectedScenario(e.target.value)
-                setSimulateScenarioOrder(e.target.value === "none" ? "" : e.target.value)
+                setSimulateScenarioOrder(
+                  e.target.value === "none" ? "" : e.target.value,
+                )
               }}
             >
               <option value="none">None</option>

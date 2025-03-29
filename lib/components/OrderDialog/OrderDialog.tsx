@@ -15,7 +15,6 @@ import {
 import { Button } from "../ui/button"
 import { Checkbox } from "../ui/checkbox"
 
-
 interface OrderDialogProps {
   isOpen: boolean
   onClose: () => void
@@ -56,7 +55,9 @@ export const OrderDialog: React.FC<OrderDialogProps> = ({
   )
 
   const circuitJson = useRunFrameStore((state) => state.circuitJson)
-  const simulateScenarioOrder = useRunFrameStore((state) => state.simulateScenarioOrder)
+  const simulateScenarioOrder = useRunFrameStore(
+    (state) => state.simulateScenarioOrder,
+  )
 
   const createOrder = async () => {
     const { order } = await ky
@@ -76,16 +77,18 @@ export const OrderDialog: React.FC<OrderDialogProps> = ({
     let response: any
     try {
       response = await ky
-      .get("registry/orders/get", {
-        searchParams: {
-          order_id: orderId,
-          ...(simulateScenarioOrder ? { _simulate_scenario: simulateScenarioOrder } : {}),
-        },
-        headers: {
-          Authorization: `Bearer account-1234`,
-        },
-      })
-      .json()
+        .get("registry/orders/get", {
+          searchParams: {
+            order_id: orderId,
+            ...(simulateScenarioOrder
+              ? { _simulate_scenario: simulateScenarioOrder }
+              : {}),
+          },
+          headers: {
+            Authorization: `Bearer account-1234`,
+          },
+        })
+        .json()
     } catch (error) {
       console.error(error)
     }
@@ -112,7 +115,9 @@ export const OrderDialog: React.FC<OrderDialogProps> = ({
                     id={`checkbox-${stage.key}`}
                   />
                   <label htmlFor={`checkbox-${stage.key}`} className="rf-ml-2">
-                    <h3>{indx + 1}. {stage.label}</h3>
+                    <h3>
+                      {indx + 1}. {stage.label}
+                    </h3>
                   </label>
                 </div>
               ))}

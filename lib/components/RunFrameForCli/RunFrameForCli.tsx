@@ -2,7 +2,7 @@ import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { RunFrameWithApi } from "../RunFrameWithApi/RunFrameWithApi"
 import { RunframeCliLeftHeader } from "./LeftHeader"
 
-export const RunFrameForCli = (props: { 
+export const RunFrameForCli = (props: {
   debug?: boolean
   scenarioSelectorContent?: React.ReactNode
 }) => {

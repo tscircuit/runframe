@@ -3,7 +3,7 @@ import { Progress } from "lib/components/ui/progress"
 import { Button } from "lib/components/ui/button"
 
 export type Step = {
-  id: number
+  order_step_id: number
   title: string
   completed: boolean
   active?: boolean
@@ -48,7 +48,10 @@ export const StepwiseProgressPanel = ({
 
       <div className="rf-space-y-6 rf-mb-8">
         {displayedCompletedSteps.map((step, index) => (
-          <div key={step.id} className="rf-flex rf-items-start rf-gap-4">
+          <div
+            key={step.order_step_id}
+            className="rf-flex rf-items-start rf-gap-4"
+          >
             <div className="rf-flex-shrink-0 rf-mt-0.5">
               <div className="rf-w-8 rf-h-8 rf-rounded-full rf-bg-green-100 rf-flex rf-items-center rf-justify-center">
                 <Check className="rf-h-5 rf-w-5 rf-text-green-600" />
@@ -61,7 +64,7 @@ export const StepwiseProgressPanel = ({
                   : "Completed"}
               </p>
               <p className="rf-font-medium rf-text-green-600">
-                {step.id}. {step.title}
+                {step.order_step_id}. {step.title}
               </p>
             </div>
           </div>
@@ -89,7 +92,7 @@ export const StepwiseProgressPanel = ({
                 Current Step
               </p>
               <p className="rf-font-medium rf-text-blue-600">
-                {activeStep.id}. {activeStep.title}
+                {activeStep.order_step_id}. {activeStep.title}
               </p>
             </div>
           </div>

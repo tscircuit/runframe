@@ -119,6 +119,10 @@ export const CircuitJsonPreview = ({
     }
   }, [circuitJson])
 
+  const sourceProjectMetadata = circuitJson?.find(
+    (elm: any) => elm.type === "source_project_metadata",
+  )
+
   return (
     <div
       className={cn("flex flex-col relative rf-overflow-x-hidden", className)}
@@ -257,6 +261,16 @@ export const CircuitJsonPreview = ({
                           .join(".")}
                       </div>
                     </DropdownMenuItem>
+                    {sourceProjectMetadata && (
+                      <DropdownMenuItem
+                        disabled
+                        className="rf-opacity-60 rf-cursor-default rf-select-none"
+                      >
+                        <div className="rf-pr-2 rf-text-xs rf-text-gray-500">
+                          {sourceProjectMetadata?.software_used_string}
+                        </div>
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TabsList>

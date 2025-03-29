@@ -1,58 +1,54 @@
 import ky from "ky"
-import type React from "react"
+import { AlertDialog, AlertDialogContent } from "lib/components/ui/alert-dialog"
+import type { FC } from "react"
 import { useState } from "react"
-import { toast } from "react-hot-toast"
-import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
 import { useRunFrameStore } from "../RunFrameWithApi/store"
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "../ui/alert-dialog"
-import { Button } from "../ui/button"
-import { Checkbox } from "../ui/checkbox"
+import { CheckoutOrder } from "./CheckoutOrder"
+import { InitialOrderScreen } from "./InitialOrder"
+import { type Step, StepwiseProgressPanel } from "./StepwiseProgress"
 
 interface OrderDialogProps {
   isOpen: boolean
   onClose: () => void
+  stage: "initial" | "progress" | "checkout"
+  setStage: (stage: "initial" | "progress" | "checkout") => void
 }
 
-const orderSteps = [
-  { key: "are_gerbers_generated", label: "Generate Gerbers" },
-  { key: "are_gerbers_uploaded", label: "Upload Gerbers" },
-  { key: "is_gerber_analyzed", label: "Analyze Gerber" },
-  { key: "are_initial_costs_calculated", label: "Calculate Initial Costs" },
-  { key: "is_pcb_added_to_cart", label: "Add PCB to Cart" },
-  { key: "is_bom_uploaded", label: "Upload BOM" },
-  { key: "is_pnp_uploaded", label: "Upload PnP" },
-  { key: "is_bom_pnp_analyzed", label: "Analyze BOM & PnP" },
-  { key: "is_bom_parsing_complete", label: "BOM Parsing Complete" },
-  { key: "are_components_available", label: "Components Available" },
-  { key: "is_patch_map_generated", label: "Generate Patch Map" },
-  { key: "is_json_merge_file_created", label: "Create JSON Merge File" },
-  { key: "is_dfm_result_generated", label: "Generate DFM Result" },
-  { key: "are_files_downloaded", label: "Download Files" },
-  {
-    key: "are_product_categories_fetched",
-    label: "Fetch Product Categories",
-  },
-  { key: "are_final_costs_calculated", label: "Calculate Final Costs" },
-  { key: "is_json_merge_file_updated", label: "Update JSON Merge File" },
-  { key: "is_added_to_cart", label: "Add to Cart" },
-]
+const orderSteps: Step[] = [
+  { id: 1, key: "are_gerbers_generated", title: "Generate Gerbers", completed: false },
+  { id: 2, key: "are_gerbers_uploaded", title: "Upload Gerbers", completed: false },
+  { id: 3, key: "is_gerber_analyzed", title: "Analyze Gerber", completed: false },
+  { id: 4, key: "are_initial_costs_calculated", title: "Calculate Initial Costs", completed: false },
+  { id: 5, key: "is_pcb_added_to_cart", title: "Add PCB to Cart", completed: false },
+  { id: 6, key: "is_bom_uploaded", title: "Upload BOM", completed: false },
+  { id: 7, key: "is_pnp_uploaded", title: "Upload PnP", completed: false },
+  { id: 8, key: "is_bom_pnp_analyzed", title: "Analyze BOM & PnP", completed: false },
+  { id: 9, key: "is_bom_parsing_complete", title: "BOM Parsing Complete", completed: false },
+  { id: 10, key: "are_components_available", title: "Components Available", completed: false },
+  { id: 11, key: "is_patch_map_generated", title: "Generate Patch Map", completed: false },
+  { id: 12, key: "is_json_merge_file_created", title: "Create JSON Merge File", completed: false },
+  { id: 13, key: "is_dfm_result_generated", title: "Generate DFM Result", completed: false },
+  { id: 14, key: "are_files_downloaded", title: "Download Files", completed: false },
+  { id: 15, key: "are_product_categories_fetched", title: "Fetch Product Categories", completed: false },
+  { id: 16, key: "are_final_costs_calculated", title: "Calculate Final Costs", completed: true },
+  { id: 17, key: "is_json_merge_file_updated", title: "Update JSON Merge File", completed: true },
+  { id: 18, key: "is_added_to_cart", title: "Add to Cart", completed: false },
+].map((step, index) => ({
+  ...step,
+  completed: false,
+  active: index === 0, // First step starts as active
+}))
 
-export const OrderDialog: React.FC<OrderDialogProps> = ({
+export const OrderDialog: FC<OrderDialogProps> = ({
   isOpen,
   onClose,
+  stage,
+  setStage,
 }) => {
   const [order, setOrder] = useState<any>(null)
   const [orderState, setOrderState] = useState<any>(null)
-  const [stage, setStage] = useState<"setup" | "order-progress" | "finished">(
-    "setup",
-  )
+  const [steps, setSteps] = useState<Step[]>(orderSteps)
+  const [loading, setLoading] = useState(false)
 
   const circuitJson = useRunFrameStore((state) => state.circuitJson)
   const simulateScenarioOrder = useRunFrameStore(
@@ -95,64 +91,77 @@ export const OrderDialog: React.FC<OrderDialogProps> = ({
 
     setOrder(response.order)
     setOrderState(response.orderState)
-    setStage("order-progress")
+    setStage("progress")
+  }
+
+  const handleProgressContinue = async () => {
+    setLoading(true)
+    try {
+      // Simulate some async work
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      setSteps(currentSteps => {
+        const activeStepIndex = currentSteps.findIndex(step => step.active)
+        if (activeStepIndex === -1) return currentSteps
+
+        const newSteps = [...currentSteps]
+        // Complete current step
+        newSteps[activeStepIndex] = {
+          ...newSteps[activeStepIndex],
+          completed: true,
+          active: false
+        }
+        
+        // If this was the last step, move to checkout
+        if (activeStepIndex === currentSteps.length - 1) {
+          setTimeout(() => setStage("checkout"), 500) // Small delay to show completion
+        } else {
+          // Activate next step
+          newSteps[activeStepIndex + 1] = {
+            ...newSteps[activeStepIndex + 1],
+            active: true
+          }
+        }
+
+        return newSteps
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleInitialContinue = () => {
+    setStage("progress")
   }
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Order PCB</AlertDialogTitle>
-        </AlertDialogHeader>
-
-        {stage === "order-progress" && (
-          <>
-            <div className="rf-grid rf-grid-cols-2 rf-gap-4 rf-py-4">
-              {orderSteps.map((stage, indx) => (
-                <div key={stage.key} className="rf-flex rf-items-center">
-                  <Checkbox
-                    checked={orderState?.[stage.key]}
-                    id={`checkbox-${stage.key}`}
-                  />
-                  <label htmlFor={`checkbox-${stage.key}`} className="rf-ml-2">
-                    <h3>
-                      {indx + 1}. {stage.label}
-                    </h3>
-                  </label>
-                </div>
-              ))}
-            </div>
-            <div className="rf-space-y-4 rf-py-4 ">
-              {order?.error && (
-                <ErrorTabContent
-                  code={order.error.error_code}
-                  errorMessage={order.error.message}
-                />
-              )}
-            </div>
-          </>
-        )}
-
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
-          {stage === "setup" && (
-            <Button
-              onClick={async () => {
-                if (!circuitJson) {
-                  toast.error("No circuit JSON found")
-                  return
-                }
-                const order = await createOrder()
-                getOrderState(order.order_id)
-              }}
-            >
-              Submit Order
-            </Button>
+      <AlertDialogContent className="!rf-max-w-[660px] !rf-p-0">
+        <div className="rf-relative rf-w-full">
+          {stage === "initial" && (
+            <InitialOrderScreen
+              onCancel={onClose}
+              onContinue={handleInitialContinue}
+            />
           )}
-          {stage === "order-progress" && (
-            <Button disabled>Continue to Shipping</Button>
+
+          {stage === "progress" && (
+            <StepwiseProgressPanel
+              steps={steps}
+              onCancel={onClose}
+              onContinue={handleProgressContinue}
+              loading={loading}
+            />
           )}
-        </AlertDialogFooter>
+
+          {stage === "checkout" && (
+            <CheckoutOrder
+              finalCost={0}
+              onConfirmCheckout={() => onClose()}
+              onBack={() => setStage("progress")}
+            />
+          )}
+        </div>
       </AlertDialogContent>
     </AlertDialog>
   )

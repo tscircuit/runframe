@@ -1,6 +1,8 @@
 import ky from "ky"
 import type React from "react"
 import { useState } from "react"
+import { toast } from "react-hot-toast"
+import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
 import { useRunFrameStore } from "../RunFrameWithApi/store"
 import {
   AlertDialog,
@@ -11,8 +13,6 @@ import {
   AlertDialogTitle,
 } from "../ui/alert-dialog"
 import { Button } from "../ui/button"
-import { toast } from "react-hot-toast"
-import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
 import { Checkbox } from "../ui/checkbox"
 
 
@@ -54,11 +54,9 @@ export const OrderDialog: React.FC<OrderDialogProps> = ({
   const [stage, setStage] = useState<"setup" | "order-progress" | "finished">(
     "setup",
   )
-  const [simulateScenario, setSimulateScenario] = useState<any>(null)
 
   const circuitJson = useRunFrameStore((state) => state.circuitJson)
-
-  const simulate = window.location.hostname === "localhost"
+  const simulateScenarioOrder = useRunFrameStore((state) => state.simulateScenarioOrder)
 
   const createOrder = async () => {
     const { order } = await ky
@@ -81,7 +79,7 @@ export const OrderDialog: React.FC<OrderDialogProps> = ({
       .get("registry/orders/get", {
         searchParams: {
           order_id: orderId,
-          ...(simulateScenario ? { _simulate_scenario: simulateScenario } : {}),
+          ...(simulateScenarioOrder ? { _simulate_scenario: simulateScenarioOrder } : {}),
         },
         headers: {
           Authorization: `Bearer account-1234`,
@@ -103,30 +101,6 @@ export const OrderDialog: React.FC<OrderDialogProps> = ({
         <AlertDialogHeader>
           <AlertDialogTitle>Order PCB</AlertDialogTitle>
         </AlertDialogHeader>
-
-        {stage === "setup" && simulate && (
-          <div className="rf-flex rf-items-center">
-            <label
-              htmlFor="scenario"
-              className="rf-mr-2 rf-text-gray-700 rf-text-sm"
-            >
-              Scenario:
-            </label>
-            <select
-              id="scenario"
-              className="rf-bg-white rf-border rf-border-gray-300 rf-rounded-md rf-shadow-sm rf-px-3 rf-py-1.5 rf-text-sm focus:rf-outline-none focus:rf-ring-2 focus:rf-ring-blue-500 focus:rf-border-blue-500"
-              defaultValue="None"
-              onChange={(e) => setSimulateScenario(e.target.value)}
-            >
-              <option value="none">None</option>
-              {orderSteps.map((stage) => (
-                <option key={stage.key} value={stage.key}>
-                  {stage.label} Failed
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
 
         {stage === "order-progress" && (
           <>

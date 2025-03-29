@@ -1,18 +1,18 @@
-import { create } from "zustand"
-import { devtools } from "zustand/middleware"
-import type {
-  FilePath,
-  FileContent,
-  File,
-  FileUpdatedEvent,
-  RunFrameState,
-  RunFrameEvent,
-} from "./types"
-import { API_BASE } from "./api-base"
-import type { ManualEditEvent } from "@tscircuit/props"
 import { applyEditEventsToManualEditsFile } from "@tscircuit/core"
+import type { ManualEditEvent } from "@tscircuit/props"
 import type { CircuitJson } from "circuit-json"
 import Debug from "lib/utils/debug"
+import { create } from "zustand"
+import { devtools } from "zustand/middleware"
+import { API_BASE } from "./api-base"
+import type {
+  File,
+  FileContent,
+  FilePath,
+  FileUpdatedEvent,
+  RunFrameEvent,
+  RunFrameState,
+} from "./types"
 
 const debug = Debug.extend("store")
 
@@ -73,6 +73,7 @@ export const useRunFrameStore = create<RunFrameState>()(
       circuitJson: null,
       lastManualEditsChangeSentAt: 0,
       recentEvents: [],
+      simulateScenarioOrder: undefined,
 
       loadInitialFiles: async () => {
         const fsMap = await getInitialFilesApi()
@@ -204,6 +205,9 @@ export const useRunFrameStore = create<RunFrameState>()(
           JSON.stringify(updatedManualEditsFileContent, null, 2),
         )
       },
+
+      setSimulateScenarioOrder: (scenarioOrder?: string) =>
+        set({ simulateScenarioOrder: scenarioOrder }),
     }),
     { name: "run-frame-store" },
   ),

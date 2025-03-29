@@ -91,7 +91,7 @@ export interface RunFrameState {
   circuitJson: CircuitJson | null
   lastManualEditsChangeSentAt: number
   recentEvents: RunFrameEvent[]
-
+  simulateScenarioOrder: string | undefined
   // Actions
   upsertFile: (path: FilePath, content: FileContent) => Promise<void>
   getFile: (path: FilePath) => Promise<void>
@@ -103,6 +103,7 @@ export interface RunFrameState {
   ) => Promise<void>
   pushEvent: (event: RunFrameEventInput) => Promise<void>
   loadInitialFiles: () => Promise<void>
+  setSimulateScenarioOrder: (simulateScenarioOrder: string) => void
 }
 
 declare global {

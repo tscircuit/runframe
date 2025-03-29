@@ -11,10 +11,12 @@ const registryDb = createDatabase()
 
 const fileServerHandler = getNodeHandler(winterspecBundle as any, {})
 const fakeRegistryHandler = getNodeHandler(fakeRegistryBundle as any, {
-  middleware: [(req, ctx, next) => {
-    (ctx as any).db = registryDb
-    return next(req, ctx)
-  }]
+  middleware: [
+    (req, ctx, next) => {
+      ;(ctx as any).db = registryDb
+      return next(req, ctx)
+    },
+  ],
 })
 
 function fileServerPlugin(): Plugin {

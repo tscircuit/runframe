@@ -2,7 +2,10 @@ import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { RunFrameWithApi } from "../RunFrameWithApi/RunFrameWithApi"
 import { RunframeCliLeftHeader } from "./LeftHeader"
 
-export const RunFrameForCli = (props: { debug?: boolean }) => {
+export const RunFrameForCli = (props: {
+  debug?: boolean
+  scenarioSelectorContent?: React.ReactNode
+}) => {
   const [shouldLoadLatestEval, setLoadLatestEval] = useLocalStorageState(
     "load-latest-eval",
     true,
@@ -12,9 +15,9 @@ export const RunFrameForCli = (props: { debug?: boolean }) => {
       debug={props.debug}
       forceLatestEvalVersion={shouldLoadLatestEval}
       defaultToFullScreen={true}
-      showToggleFullScreen={false} // Hide the fullscreen toggle button in CLI
+      showToggleFullScreen={false}
       leftHeaderContent={
-        <div className="rf-flex">
+        <div className="rf-flex rf-items-center rf-justify-between">
           <RunframeCliLeftHeader
             shouldLoadLatestEval={shouldLoadLatestEval}
             onChangeShouldLoadLatestEval={(newShouldLoadLatestEval) => {
@@ -22,6 +25,7 @@ export const RunFrameForCli = (props: { debug?: boolean }) => {
               globalThis.runFrameWorker = null
             }}
           />
+          {props.scenarioSelectorContent}
         </div>
       }
     />

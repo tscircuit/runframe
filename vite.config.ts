@@ -4,10 +4,20 @@ import { resolve } from "node:path"
 import { type Plugin, defineConfig } from "vite"
 import { getNodeHandler } from "winterspec/adapters/node"
 import fakeRegistryBundle from "@tscircuit/fake-snippets/dist/bundle"
+import { createDatabase } from "@tscircuit/fake-snippets"
 import ky from "ky"
 
+const registryDb = createDatabase()
+
 const fileServerHandler = getNodeHandler(winterspecBundle as any, {})
-const fakeRegistryHandler = getNodeHandler(fakeRegistryBundle as any, {})
+const fakeRegistryHandler = getNodeHandler(fakeRegistryBundle as any, {
+  middleware: [
+    (req, ctx, next) => {
+      ;(ctx as any).db = registryDb
+      return next(req, ctx)
+    },
+  ],
+})
 
 function fileServerPlugin(): Plugin {
   return {

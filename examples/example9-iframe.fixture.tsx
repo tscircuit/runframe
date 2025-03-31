@@ -10,7 +10,7 @@ import React from "react"
 // When you're done, make sure you comment out the iframeUrl
 export default () => (
   <RunFrameWithIframe
-    iframeUrl="http://localhost:3000/iframe.html"
+    // iframeUrl="http://localhost:3000/iframe.html"
     fsMap={{
       "main.tsx": `
 circuit.add(

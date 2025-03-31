@@ -1,5 +1,6 @@
 import type { ManualEditEvent } from "@tscircuit/props"
 import type { CircuitJson } from "circuit-json"
+import type { ComponentSearchResult } from "../ImportComponentDialog"
 // Types
 export type FilePath = string
 export type FileContent = string
@@ -44,6 +45,12 @@ export interface SnippetSavedEvent {
   event_type: "SNIPPET_SAVED"
   created_at: string
 }
+export interface InstallPackageEvent {
+  event_id: string
+  event_type: "INSTALL_PACKAGE"
+  created_at: string
+  full_package_name: string
+}
 
 export interface SnippetExportCreatedEvent {
   event_id: string
@@ -66,6 +73,7 @@ export type RunFrameEvent =
   | SnippetSavedEvent
   | SnippetExportCreatedEvent
   | RequestToExportSnippetEvent
+  | InstallPackageEvent
 
 type MappedOmit<T, K extends keyof T> = {
   [P in keyof T as P extends K ? never : P]: T[P]
@@ -83,7 +91,7 @@ export interface RunFrameState {
   circuitJson: CircuitJson | null
   lastManualEditsChangeSentAt: number
   recentEvents: RunFrameEvent[]
-
+  simulateScenarioOrder: string | undefined
   // Actions
   upsertFile: (path: FilePath, content: FileContent) => Promise<void>
   getFile: (path: FilePath) => Promise<void>
@@ -95,6 +103,7 @@ export interface RunFrameState {
   ) => Promise<void>
   pushEvent: (event: RunFrameEventInput) => Promise<void>
   loadInitialFiles: () => Promise<void>
+  setSimulateScenarioOrder: (simulateScenarioOrder: string) => void
 }
 
 declare global {

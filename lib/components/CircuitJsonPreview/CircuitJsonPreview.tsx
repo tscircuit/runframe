@@ -60,7 +60,6 @@ export const CircuitJsonPreview = ({
   code,
   onRunClicked = undefined,
   errorMessage,
-  circuitJsonKey = "",
   circuitJson,
   autoroutingGraphics,
   showRightHeaderContent = true,
@@ -303,7 +302,6 @@ export const CircuitJsonPreview = ({
               >
                 {circuitJson ? (
                   <PcbViewerWithContainerHeight
-                    key={circuitJsonKey}
                     disableAutoFocus
                     focusOnHover={false}
                     circuitJson={circuitJson}

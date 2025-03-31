@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
 import { useRunFrameStore } from "./store"
-import type { ManualEditEvent } from "@tscircuit/props"
 import { API_BASE } from "./api-base"
 import { useEditEventController } from "lib/hooks/use-edit-event-controller"
 import Debug from "debug"
+import { applyPcbEditEventsToManualEditsFile } from "@tscircuit/core"
 
 const debug = Debug("run-frame:RunFrameWithApi")
 
@@ -13,6 +13,11 @@ export const guessEntrypoint = (files: string[]) =>
   files.find((file) => file.includes("index.")) ??
   files.find((file) => file.includes("main.")) ??
   files.find((file) => file.endsWith(".tsx"))
+
+export const guessManualEditsFilePath = (files: string[]) =>
+  files.find((file) => file.includes("manual-edits.")) ??
+  files.find((file) => file.includes("manual-edit.")) ??
+  files.find((file) => file.endsWith(".json"))
 
 export interface RunFrameWithApiProps {
   /**
@@ -40,7 +45,10 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       loadInitialFiles: s.loadInitialFiles,
     }),
   )
+
   const fsMap = useRunFrameStore((s) => s.fsMap)
+  const circuitJson = useRunFrameStore((s) => s.circuitJson)
+
   useEffect(() => {
     loadInitialFiles()
   }, [])
@@ -109,6 +117,28 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
           body: JSON.stringify({
             event_type: "USER_CREATED_MANUAL_EDIT",
             ...ee,
+          }),
+        })
+
+        const manualEditsFilePath =
+          guessManualEditsFilePath(Array.from(fsMap.keys())) ??
+          "manual-edits.json"
+
+        const manualEditsFile = fsMap.get(manualEditsFilePath)
+
+        const updatedManualEdits = applyPcbEditEventsToManualEditsFile({
+          circuitJson: circuitJson!,
+          editEvents: [ee],
+          manualEditsFile: JSON.parse(manualEditsFile ?? "{}"),
+        })
+
+        fetch(`${API_BASE}/files/upsert`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            file_path: manualEditsFilePath,
+            text_content: JSON.stringify(updatedManualEdits),
+            initiator: "runframe",
           }),
         })
       }}

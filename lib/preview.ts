@@ -1,1 +1,5 @@
 export * from "./components/CircuitJsonPreview/CircuitJsonPreview"
+export * from "./components/BomTable"
+export * from "./components/PcbViewerWithContainerHeight"
+export { PCBViewer as PcbViewer } from "@tscircuit/pcb-viewer"
+export { SchematicViewer } from "@tscircuit/schematic-viewer"

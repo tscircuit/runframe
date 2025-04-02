@@ -1,3 +1,4 @@
+import ky from "ky"
 import { RunFrameForCli } from "lib/components/RunFrameForCli/RunFrameForCli"
 import { useEventHandler } from "lib/components/RunFrameForCli/useEventHandler"
 import { useRunFrameStore } from "lib/components/RunFrameWithApi/store"
@@ -35,6 +36,24 @@ export default () => {
     { key: "is_json_merge_file_updated", label: "Update JSON Merge File" },
     { key: "is_added_to_cart", label: "Add to Cart" },
   ]
+
+  useEffect(() => {
+    const pollInterval = setInterval(async () => {
+      try {
+        await ky
+          .get("/registry/_fake/move_orders_forward", {
+            headers: {
+              Authorization: `Bearer account-1234`,
+            },
+          })
+          .json()
+      } catch (error) {
+        console.error("Error polling order progress:", error)
+      }
+    }, 2000) // Poll every 2 seconds
+
+    return () => clearInterval(pollInterval)
+  }, [])
 
   useEventHandler(async (event) => {
     if (event.event_type === "REQUEST_TO_SAVE_SNIPPET") {
@@ -152,7 +171,7 @@ circuit.add(
           </div>
         }
       />
-      {/* <DebugEventsTable /> */}
+      <DebugEventsTable />
     </>
   )
 }

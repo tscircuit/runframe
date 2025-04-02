@@ -19,13 +19,13 @@ interface SavedAddress {
 interface CheckoutOrderProps {
   finalCost: number
   onConfirmCheckout: () => void
-  onBack: () => void
+  onCancel: () => void
 }
 
 export const CheckoutOrder = ({
   finalCost,
   onConfirmCheckout,
-  onBack,
+  onCancel,
 }: CheckoutOrderProps) => {
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
     null,
@@ -261,10 +261,10 @@ export const CheckoutOrder = ({
 
               <Button
                 variant="outline"
-                onClick={onBack}
+                onClick={onCancel}
                 className="rf-w-full rf-mt-3"
               >
-                Back to PCB Order
+                Cancel
               </Button>
             </div>
           </div>

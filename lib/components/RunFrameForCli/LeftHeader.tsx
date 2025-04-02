@@ -322,7 +322,12 @@ export const RunframeCliLeftHeader = (props: {
         }}
       />
       <Toaster position="top-center" reverseOrder={false} />
-      <orderDialog.OrderDialog />
+      <orderDialog.OrderDialog
+        isOpen={orderDialog.isOpen}
+        onClose={orderDialog.close}
+        stage={orderDialog.stage}
+        setStage={orderDialog.setStage}
+      />
     </>
   )
 }

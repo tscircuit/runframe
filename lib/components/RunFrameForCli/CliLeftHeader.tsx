@@ -39,7 +39,7 @@ import { Toaster } from "react-hot-toast"
 import { importComponentFromJlcpcb } from "lib/optional-features/importing/import-component-from-jlcpcb"
 import { useOrderDialog } from "../OrderDialog/useOrderDialog"
 
-export const RunframeCliLeftHeader = (props: {
+export const CliLeftHeader = (props: {
   shouldLoadLatestEval: boolean
   onChangeShouldLoadLatestEval: (shouldLoadLatestEval: boolean) => void
 }) => {
@@ -156,13 +156,14 @@ export const RunframeCliLeftHeader = (props: {
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem
+          {/* Saving disabled until we support full save in RunFrame */}
+          {/* <DropdownMenuItem
             className="rf-text-xs"
             onSelect={triggerSaveSnippet}
             disabled={isSaving}
           >
             {isSaving ? "Saving..." : "Push"}
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
           {/* HACK until ordering is ready, only show in cosmos runframe */}
           {parseInt(window.location.port) > 5000 && (
             <DropdownMenuItem

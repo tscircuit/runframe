@@ -41,6 +41,6 @@ export const useOrderDialog = () => {
     open: () => setIsOpen(true),
     close: handleClose,
     setStage,
-    OrderDialog: OrderDialogComponent // returns reference and not factory
+    OrderDialog: OrderDialogComponent, // returns reference and not factory
   }
 }

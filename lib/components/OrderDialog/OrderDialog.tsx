@@ -55,29 +55,29 @@ export const OrderDialog: FC<OrderDialogProps> = ({
       <AlertDialog open={isOpen} onOpenChange={onClose}>
         <AlertDialogContent className="!rf-max-w-[660px] !rf-p-0">
           <div className="rf-relative rf-w-full">
-          {stage === "initial" && (
-            <InitialOrderScreen
-              onCancel={onClose}
-              onContinue={handleInitialContinue}
-            />
-          )}
+            {stage === "initial" && (
+              <InitialOrderScreen
+                onCancel={onClose}
+                onContinue={handleInitialContinue}
+              />
+            )}
 
-          {stage === "progress" && order?.order_id && (
-            <StepwiseProgressPanel
-              onCancel={onClose}
-              loading={loading}
-              orderId={order?.order_id}
-              setStage={setStage}
-            />
-          )}
+            {stage === "progress" && order?.order_id && (
+              <StepwiseProgressPanel
+                onCancel={onClose}
+                loading={loading}
+                orderId={order?.order_id}
+                setStage={setStage}
+              />
+            )}
 
-          {stage === "checkout" && (
-            <CheckoutOrder
-              finalCost={0}
-              onConfirmCheckout={() => onClose()}
-              onCancel={() => onClose()}
-            />
-          )}
+            {stage === "checkout" && (
+              <CheckoutOrder
+                finalCost={0}
+                onConfirmCheckout={() => onClose()}
+                onCancel={() => onClose()}
+              />
+            )}
           </div>
         </AlertDialogContent>
       </AlertDialog>

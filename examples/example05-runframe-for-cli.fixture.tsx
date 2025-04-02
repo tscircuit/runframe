@@ -40,13 +40,15 @@ export default () => {
   useEffect(() => {
     const pollInterval = setInterval(async () => {
       try {
-        await ky.get('/registry/_fake/move_orders_forward', {
-          headers: {
-            Authorization: `Bearer account-1234`,
-          },
-        }).json()
+        await ky
+          .get("/registry/_fake/move_orders_forward", {
+            headers: {
+              Authorization: `Bearer account-1234`,
+            },
+          })
+          .json()
       } catch (error) {
-        console.error('Error polling order progress:', error)
+        console.error("Error polling order progress:", error)
       }
     }, 2000) // Poll every 2 seconds
 

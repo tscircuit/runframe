@@ -41,14 +41,16 @@ export const StepwiseProgressPanel = ({
   setStage,
 }: StepwiseProgressPanelProps) => {
   const { data, isLoading } = useQuery<OrderState>({
-    queryKey: ['orderState', orderId],
+    queryKey: ["orderState", orderId],
     queryFn: async () => {
-      const response: OrderState = await ky.get('registry/orders/get', {
-        searchParams: { order_id: orderId },
-        headers: {
-          Authorization: `Bearer account-1234`,
-        },
-      }).json()
+      const response: OrderState = await ky
+        .get("registry/orders/get", {
+          searchParams: { order_id: orderId },
+          headers: {
+            Authorization: `Bearer account-1234`,
+          },
+        })
+        .json()
 
       if (response.orderState.current_step === "is_added_to_cart") {
         setStage("checkout")
@@ -64,13 +66,17 @@ export const StepwiseProgressPanel = ({
     if (!data?.orderState) return step
 
     // Find current step index
-    const currentStepIndex = orderSteps.findIndex(orderStep => orderStep.key === data.orderState.current_step)
-    const stepIndex = orderSteps.findIndex(orderStep => orderStep.key === step.key)
+    const currentStepIndex = orderSteps.findIndex(
+      (orderStep) => orderStep.key === data.orderState.current_step,
+    )
+    const stepIndex = orderSteps.findIndex(
+      (orderStep) => orderStep.key === step.key,
+    )
 
     return {
       ...step,
       completed: stepIndex < currentStepIndex,
-      active: stepIndex === currentStepIndex
+      active: stepIndex === currentStepIndex,
     }
   })
 

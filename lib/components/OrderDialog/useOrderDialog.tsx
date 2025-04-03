@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { OrderDialog } from "./OrderDialog"
+import { CliOrderDialog } from "lib/components/OrderDialog/CliOrderDialog"
 
 type OrderStage = "initial" | "progress" | "checkout"
 
@@ -15,7 +15,7 @@ const OrderDialogComponent = ({
   setStage: (stage: OrderStage) => void
 }) => {
   return (
-    <OrderDialog
+    <CliOrderDialog
       isOpen={isOpen}
       onClose={onClose}
       stage={stage}

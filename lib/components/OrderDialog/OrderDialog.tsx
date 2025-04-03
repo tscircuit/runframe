@@ -3,10 +3,10 @@ import { AlertDialog, AlertDialogContent } from "lib/components/ui/alert-dialog"
 import type { FC } from "react"
 import { useState } from "react"
 import { QueryClient, QueryClientProvider } from "react-query"
-import { useRunFrameStore } from "../RunFrameWithApi/store"
 import { CheckoutOrder } from "./CheckoutOrder"
 import { InitialOrderScreen } from "./InitialOrder"
 import { StepwiseProgressPanel } from "./StepwiseProgress"
+import type { CircuitJson } from "circuit-json"
 
 const queryClient = new QueryClient()
 interface OrderDialogProps {
@@ -14,6 +14,7 @@ interface OrderDialogProps {
   onClose: () => void
   stage: "initial" | "progress" | "checkout"
   setStage: (stage: "initial" | "progress" | "checkout") => void
+  circuitJson?: CircuitJson
 }
 
 export const OrderDialog: FC<OrderDialogProps> = ({
@@ -21,14 +22,10 @@ export const OrderDialog: FC<OrderDialogProps> = ({
   onClose,
   stage,
   setStage,
+  circuitJson,
 }) => {
   const [order, setOrder] = useState<any>(null)
   const [loading, setLoading] = useState(false)
-
-  const circuitJson = useRunFrameStore((state) => state.circuitJson)
-  const simulateScenarioOrder = useRunFrameStore(
-    (state) => state.simulateScenarioOrder,
-  )
 
   const createOrder = async () => {
     const { order } = await ky

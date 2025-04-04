@@ -18,7 +18,7 @@ const SelectTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       "rf-flex rf-h-10 rf-w-full rf-items-center rf-justify-between rf-rounded-md rf-border rf-border-input rf-bg-background rf-px-3 rf-py-2 rf-text-sm rf-ring-offset-background rf-placeholder:text-muted-foreground focus:rf-outline-none focus:rf-ring-2 focus:rf-ring-ring focus:rf-ring-offset-2 disabled:rf-cursor-not-allowed disabled:rf-opacity-50 [&>span]:rf-line-clamp-1",
-      className
+      className,
     )}
     {...props}
   >
@@ -38,7 +38,7 @@ const SelectScrollUpButton = React.forwardRef<
     ref={ref}
     className={cn(
       "rf-flex rf-cursor-default rf-items-center rf-justify-center rf-py-1",
-      className
+      className,
     )}
     {...props}
   >
@@ -55,7 +55,7 @@ const SelectScrollDownButton = React.forwardRef<
     ref={ref}
     className={cn(
       "rf-flex rf-cursor-default rf-items-center rf-justify-center rf-py-1",
-      className
+      className,
     )}
     {...props}
   >
@@ -76,7 +76,7 @@ const SelectContent = React.forwardRef<
         "rf-relative rf-z-[100] rf-max-h-96 rf-min-w-[8rem] rf-overflow-hidden rf-rounded-md rf-border rf-bg-white rf-text-black rf-shadow-md data-[state=open]:rf-animate-in data-[state=closed]:rf-animate-out data-[state=closed]:rf-fade-out-0 data-[state=open]:rf-fade-in-0 data-[state=closed]:rf-zoom-out-95 data-[state=open]:rf-zoom-in-95 data-[side=bottom]:rf-slide-in-from-top-2 data-[side=left]:rf-slide-in-from-right-2 data-[side=right]:rf-slide-in-from-left-2 data-[side=top]:rf-slide-in-from-bottom-2",
         position === "popper" &&
           "data-[side=bottom]:rf-translate-y-1 data-[side=left]:-rf-translate-x-1 data-[side=right]:rf-translate-x-1 data-[side=top]:-rf-translate-y-1",
-        className
+        className,
       )}
       position={position}
       {...props}
@@ -86,7 +86,7 @@ const SelectContent = React.forwardRef<
         className={cn(
           "rf-p-1",
           position === "popper" &&
-            "rf-h-[var(--radix-select-trigger-height)] rf-w-full rf-min-w-[var(--radix-select-trigger-width)]"
+            "rf-h-[var(--radix-select-trigger-height)] rf-w-full rf-min-w-[var(--radix-select-trigger-width)]",
         )}
       >
         {children}
@@ -103,7 +103,10 @@ const SelectLabel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SelectPrimitive.Label
     ref={ref}
-    className={cn("rf-py-1.5 rf-pl-8 rf-pr-2 rf-text-sm rf-font-semibold", className)}
+    className={cn(
+      "rf-py-1.5 rf-pl-8 rf-pr-2 rf-text-sm rf-font-semibold",
+      className,
+    )}
     {...props}
   />
 ))
@@ -117,7 +120,7 @@ const SelectItem = React.forwardRef<
     ref={ref}
     className={cn(
       "rf-relative rf-flex rf-w-full rf-cursor-default rf-select-none rf-items-center rf-rounded-sm rf-py-1.5 rf-pl-8 rf-pr-2 rf-text-sm rf-text-gray-800 rf-outline-none focus:rf-bg-gray-100 focus:rf-text-gray-900 data-[disabled]:rf-pointer-events-none data-[disabled]:rf-opacity-50",
-      className
+      className,
     )}
     {...props}
   >
@@ -145,5 +148,14 @@ const SelectSeparator = React.forwardRef<
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName
 
 export {
-  Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectScrollDownButton, SelectScrollUpButton, SelectSeparator, SelectTrigger, SelectValue
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectScrollDownButton,
+  SelectScrollUpButton,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
 }

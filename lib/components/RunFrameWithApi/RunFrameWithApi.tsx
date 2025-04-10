@@ -5,8 +5,7 @@ import { RunFrame } from "../RunFrame/RunFrame"
 import { API_BASE } from "./api-base"
 import { useRunFrameStore } from "./store"
 import {
-  applyPcbEditEventsToManualEditsFile,
-  applySchematicEditEventsToManualEditsFile,
+  applyEditEventsToManualEditsFile
 } from "@tscircuit/core"
 import type { ManualEditsFile } from "@tscircuit/props"
 
@@ -130,39 +129,22 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
 
         const manualEditsFile = fsMap.get(manualEditsFilePath)
 
-        let currentState: ManualEditsFile = {
-          pcb_placements: [],
-          schematic_placements: [],
-          manual_trace_hints: [],
-        }
-        try {
-          if (manualEditsFile) {
-            currentState = JSON.parse(manualEditsFile)
-          }
-        } catch (e) {
-          console.error("Error parsing manual edits file:", e)
-        }
+        const updatedManualEdits: ManualEditsFile = JSON.parse(
+          manualEditsFile ?? "{}",
+        )
 
-        if (ee?.edit_event_type === "edit_pcb_component_location") {
-          currentState = applyPcbEditEventsToManualEditsFile({
-            circuitJson: circuitJson!,
-            editEvents: [ee],
-            manualEditsFile: currentState,
-          })
-        } else {
-          currentState = applySchematicEditEventsToManualEditsFile({
-            circuitJson: circuitJson!,
-            editEvents: [ee],
-            manualEditsFile: currentState,
-          })
-        }
+        applyEditEventsToManualEditsFile({
+          circuitJson: circuitJson!,
+          editEvents: [ee],
+          manualEditsFile: updatedManualEdits,
+        })
 
         fetch(`${API_BASE}/files/upsert`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             file_path: manualEditsFilePath,
-            text_content: JSON.stringify(currentState),
+            text_content: JSON.stringify(updatedManualEdits),
             initiator: "runframe",
           }),
         })

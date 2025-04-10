@@ -97,27 +97,6 @@ export const RunFrame = (props: RunFrameProps) => {
       return
     }
 
-    // Check if no entrypoint is provided
-    if (!props.entrypoint) {
-      setError({
-        error: "No entrypoint provided. Please specify an entrypoint file.",
-        stack: "",
-      })
-      setIsRunning(false)
-      return
-    }
-
-    // Check if entrypoint exists and has no content
-    if (!fsMapObj[props.entrypoint]?.trim()) {
-      setError({
-        error:
-          "No files provided. Please provide at least one file with code to execute.",
-        stack: "",
-      })
-      setIsRunning(false)
-      return
-    }
-
     const wasTriggeredByRunButton =
       props.showRunButton && runCountTrigger !== lastRunCountTriggerRef.current
     if (lastFsMapRef.current && circuitJson) {
@@ -141,7 +120,7 @@ export const RunFrame = (props: RunFrameProps) => {
     }
 
     lastFsMapRef.current = fsMap
-    lastEntrypointRef.current = props.entrypoint
+    lastEntrypointRef.current = props.entrypoint ?? null
     lastRunCountTriggerRef.current = runCountTrigger
     setIsRunning(true)
 

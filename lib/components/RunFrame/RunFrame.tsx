@@ -306,7 +306,9 @@ export const RunFrame = (props: RunFrameProps) => {
   const dragTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const handleEditEvent = (event: EditEvent) => {
     if (!event || event === null) {
-      console.warn("[RunFrame] handleEditEvent received null or undefined event.")
+      console.warn(
+        "[RunFrame] handleEditEvent received null or undefined event.",
+      )
       return
     }
     if (event.in_progress) {

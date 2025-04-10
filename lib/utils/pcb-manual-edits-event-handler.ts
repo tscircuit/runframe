@@ -100,8 +100,7 @@ export const applyPcbEditEvents = ({
       }
 
       if (existingPlacementIndex !== -1) {
-        newManualEditState.pcb_placements[existingPlacementIndex] =
-          newPlacement
+        newManualEditState.pcb_placements[existingPlacementIndex] = newPlacement
       } else {
         newManualEditState.pcb_placements.push(newPlacement)
       }

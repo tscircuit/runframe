@@ -28,7 +28,9 @@ export const applySchematicEditEvents = ({
   circuitJson: AnyCircuitElement[]
   schematicEditsFileContent?: string
 }): ManualEditState => {
-  const validatedSchematicEdits = ensureValidSchematicState(schematicEditsFileContent)
+  const validatedSchematicEdits = ensureValidSchematicState(
+    schematicEditsFileContent,
+  )
 
   const newSchematicEditState: ManualEditState = {
     pcb_placements: [...validatedSchematicEdits.pcb_placements],
@@ -85,7 +87,8 @@ export const applySchematicEditEvents = ({
       }
 
       if (existingPlacementIndex !== -1) {
-        newSchematicEditState.schematic_placements[existingPlacementIndex] = newPlacement
+        newSchematicEditState.schematic_placements[existingPlacementIndex] =
+          newPlacement
       } else {
         newSchematicEditState.schematic_placements.push(newPlacement)
       }
@@ -99,7 +102,9 @@ export const applySchematicEditEvents = ({
   return newSchematicEditState
 }
 
-const ensureValidSchematicState = (schematicEditsFileContent?: string): ManualEditState => {
+const ensureValidSchematicState = (
+  schematicEditsFileContent?: string,
+): ManualEditState => {
   if (!schematicEditsFileContent) return createInitialManualEditState()
 
   const schematicEditState = JSON.parse(schematicEditsFileContent)

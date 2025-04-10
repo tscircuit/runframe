@@ -1,6 +1,9 @@
 import Debug from "debug"
 import { useEditEventController } from "lib/hooks/use-edit-event-controller"
-import { type ManualEditState, applyPcbEditEvents } from "lib/utils/pcb-manual-edits-event-handler"
+import {
+  type ManualEditState,
+  applyPcbEditEvents,
+} from "lib/utils/pcb-manual-edits-event-handler"
 import { applySchematicEditEvents } from "lib/utils/schematic-manual-edits-event-handler"
 import { useEffect } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
@@ -12,7 +15,7 @@ const debug = Debug("run-frame:RunFrameWithApi")
 export const guessEntrypoint = (files: string[]) =>
   files.find((file) => file.includes("entrypoint.")) ??
   files.find((file) => file.includes("index.")) ??
-  files.find((file) => file.includes("main.")) ?? 
+  files.find((file) => file.includes("main.")) ??
   files.find((file) => file.endsWith(".tsx"))
 
 export const guessManualEditsFilePath = (files: string[]) =>
@@ -131,7 +134,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
           pcb_placements: [],
           schematic_placements: [],
           edit_events: [],
-          manual_trace_hints: []
+          manual_trace_hints: [],
         }
         try {
           if (manualEditsFile) {
@@ -142,7 +145,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
         }
 
         let updatedManualEdits: ManualEditState
-        if(ee?.edit_event_type === "edit_pcb_component_location") {
+        if (ee?.edit_event_type === "edit_pcb_component_location") {
           updatedManualEdits = applyPcbEditEvents({
             circuitJson: circuitJson!,
             editEvents: [ee],

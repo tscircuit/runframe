@@ -8,9 +8,10 @@ export interface RunFrameProps {
   fsMap: Map<string, string> | Record<string, string>
 
   /**
-   * The entry point file that will be executed first
+   * The entry point file that will be executed first. If not provided,
+   * @tscircuit/eval will infer the entrypoint
    */
-  entrypoint: string
+  entrypoint?: string
 
   /**
    * Whether to show a run button that controls when code executes

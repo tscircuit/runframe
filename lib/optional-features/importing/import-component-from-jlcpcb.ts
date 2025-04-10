@@ -4,6 +4,7 @@ import ky from "ky"
 
 export const importComponentFromJlcpcb = async (jlcpcbPartNumber: string) => {
   const component = await fetchEasyEDAComponent(jlcpcbPartNumber, {
+    // @ts-ignore
     fetch: (url, options: any) => {
       return fetch(`${API_BASE}/proxy`, {
         ...options,

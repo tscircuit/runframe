@@ -1,17 +1,18 @@
+import Debug from "debug"
+import { useEditEventController } from "lib/hooks/use-edit-event-controller"
+import { type ManualEditState, applyPcbEditEvents } from "lib/utils/pcb-manual-edits-event-handler"
+import { applySchematicEditEvents } from "lib/utils/schematic-manual-edits-event-handler"
 import { useEffect } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
-import { useRunFrameStore } from "./store"
 import { API_BASE } from "./api-base"
-import { useEditEventController } from "lib/hooks/use-edit-event-controller"
-import Debug from "debug"
-import { applyPcbEditEventsToManualEditsFile } from "@tscircuit/core"
+import { useRunFrameStore } from "./store"
 
 const debug = Debug("run-frame:RunFrameWithApi")
 
 export const guessEntrypoint = (files: string[]) =>
   files.find((file) => file.includes("entrypoint.")) ??
   files.find((file) => file.includes("index.")) ??
-  files.find((file) => file.includes("main.")) ??
+  files.find((file) => file.includes("main.")) ?? 
   files.find((file) => file.endsWith(".tsx"))
 
 export const guessManualEditsFilePath = (files: string[]) =>
@@ -126,11 +127,34 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
 
         const manualEditsFile = fsMap.get(manualEditsFilePath)
 
-        const updatedManualEdits = applyPcbEditEventsToManualEditsFile({
-          circuitJson: circuitJson!,
-          editEvents: [ee],
-          manualEditsFile: JSON.parse(manualEditsFile ?? "{}"),
-        })
+        let currentState: ManualEditState = {
+          pcb_placements: [],
+          schematic_placements: [],
+          edit_events: [],
+          manual_trace_hints: []
+        }
+        try {
+          if (manualEditsFile) {
+            currentState = JSON.parse(manualEditsFile)
+          }
+        } catch (e) {
+          console.error("Error parsing manual edits file:", e)
+        }
+
+        let updatedManualEdits: ManualEditState
+        if(ee?.edit_event_type === "edit_pcb_component_location") {
+          updatedManualEdits = applyPcbEditEvents({
+            circuitJson: circuitJson!,
+            editEvents: [ee],
+            manualEditsFileContent: JSON.stringify(currentState),
+          })
+        } else {
+          updatedManualEdits = applySchematicEditEvents({
+            circuitJson: circuitJson!,
+            editEvents: [ee],
+            schematicEditsFileContent: JSON.stringify(currentState),
+          })
+        }
 
         fetch(`${API_BASE}/files/upsert`, {
           method: "POST",

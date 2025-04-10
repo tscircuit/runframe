@@ -18,8 +18,16 @@
         "@tscircuit/eval": "^0.0.150",
         "@tscircuit/file-server": "^0.0.18",
         "@tscircuit/pcb-viewer": "^1.11.91",
+<<<<<<< HEAD
         "@tscircuit/props": "^0.0.168",
+=======
+        "@tscircuit/props": "^0.0.165",
+<<<<<<< HEAD
+>>>>>>> b42ffd8 (feat: add schematic manual edits)
         "@tscircuit/schematic-viewer": "2.0.11",
+=======
+        "@tscircuit/schematic-viewer": "^2.0.11",
+>>>>>>> 8b1333d (feat: add schematic manual edits)
         "circuit-to-svg": "^0.0.114",
         "clsx": "^2.1.1",
         "comlink": "^4.4.2",

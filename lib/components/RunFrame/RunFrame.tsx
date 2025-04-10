@@ -1,11 +1,11 @@
 import { createCircuitWebWorker } from "@tscircuit/eval/worker"
+import Debug from "debug"
+import { Loader2, Play, Square } from "lucide-react"
+import { useEffect, useReducer, useRef, useState } from "react"
 import {
   CircuitJsonPreview,
   type TabId,
 } from "../CircuitJsonPreview/CircuitJsonPreview"
-import { useEffect, useMemo, useReducer, useRef, useState } from "react"
-import Debug from "debug"
-import { Loader2, Play, Square } from "lucide-react"
 import { Button } from "../ui/button"
 
 // TODO waiting for core PR: https://github.com/tscircuit/core/pull/489
@@ -19,15 +19,15 @@ declare global {
   var runFrameWorker: any
 }
 
-import { useRunFrameStore } from "../RunFrameWithApi/store"
-import { getChangesBetweenFsMaps } from "../../utils/getChangesBetweenFsMaps"
-import type { RenderLog } from "lib/render-logging/RenderLog"
-import { getPhaseTimingsFromRenderEvents } from "lib/render-logging/getPhaseTimingsFromRenderEvents"
-import type { RunFrameProps } from "./RunFrameProps"
-import { useMutex } from "./useMutex"
 import type { AutoroutingStartEvent } from "@tscircuit/core"
 import type { EditEvent } from "@tscircuit/pcb-viewer"
+import type { RenderLog } from "lib/render-logging/RenderLog"
+import { getPhaseTimingsFromRenderEvents } from "lib/render-logging/getPhaseTimingsFromRenderEvents"
+import { getChangesBetweenFsMaps } from "../../utils/getChangesBetweenFsMaps"
+import { useRunFrameStore } from "../RunFrameWithApi/store"
+import type { RunFrameProps } from "./RunFrameProps"
 import { useRunnerStore } from "./runner-store/use-runner-store"
+import { useMutex } from "./useMutex"
 
 export type { RunFrameProps }
 
@@ -305,6 +305,10 @@ export const RunFrame = (props: RunFrameProps) => {
   const lastEditEventRef = useRef<any>(null)
   const dragTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const handleEditEvent = (event: EditEvent) => {
+    if (!event || event === null) {
+      console.warn("[RunFrame] handleEditEvent received null or undefined event.")
+      return
+    }
     if (event.in_progress) {
       lastEditEventRef.current = event
       if (dragTimeout.current) {
@@ -316,7 +320,9 @@ export const RunFrame = (props: RunFrameProps) => {
         clearTimeout(dragTimeout.current)
       }
       dragTimeout.current = setTimeout(() => {
-        props.onEditEvent?.(lastEditEventRef.current)
+        // Use the current event if available, otherwise use the last in-progress event
+        const eventToSend = event || lastEditEventRef.current
+        props.onEditEvent?.(eventToSend)
         lastEditEventRef.current = null
         dragTimeout.current = null
       }, 100)

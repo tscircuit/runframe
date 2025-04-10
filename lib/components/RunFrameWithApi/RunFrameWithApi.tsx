@@ -4,9 +4,7 @@ import { useEffect } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
 import { API_BASE } from "./api-base"
 import { useRunFrameStore } from "./store"
-import {
-  applyEditEventsToManualEditsFile
-} from "@tscircuit/core"
+import { applyEditEventsToManualEditsFile } from "@tscircuit/core"
 import type { ManualEditsFile } from "@tscircuit/props"
 
 const debug = Debug("run-frame:RunFrameWithApi")

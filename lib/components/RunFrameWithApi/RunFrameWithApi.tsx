@@ -1,14 +1,11 @@
 import Debug from "debug"
 import { useEditEventController } from "lib/hooks/use-edit-event-controller"
-import {
-  type ManualEditState,
-  applyPcbEditEvents,
-} from "lib/utils/pcb-manual-edits-event-handler"
-import { applySchematicEditEvents } from "lib/utils/schematic-manual-edits-event-handler"
 import { useEffect } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
 import { API_BASE } from "./api-base"
 import { useRunFrameStore } from "./store"
+import { applyPcbEditEventsToManualEditsFile, applySchematicEditEventsToManualEditsFile } from "@tscircuit/core"
+import type { ManualEditsFile  } from "@tscircuit/props"
 
 const debug = Debug("run-frame:RunFrameWithApi")
 
@@ -130,10 +127,9 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
 
         const manualEditsFile = fsMap.get(manualEditsFilePath)
 
-        let currentState: ManualEditState = {
+        let currentState: ManualEditsFile = {
           pcb_placements: [],
           schematic_placements: [],
-          edit_events: [],
           manual_trace_hints: [],
         }
         try {
@@ -144,18 +140,17 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
           console.error("Error parsing manual edits file:", e)
         }
 
-        let updatedManualEdits: ManualEditState
         if (ee?.edit_event_type === "edit_pcb_component_location") {
-          updatedManualEdits = applyPcbEditEvents({
+          currentState = applyPcbEditEventsToManualEditsFile({
             circuitJson: circuitJson!,
             editEvents: [ee],
-            manualEditsFileContent: JSON.stringify(currentState),
+            manualEditsFile: currentState,
           })
         } else {
-          updatedManualEdits = applySchematicEditEvents({
+          currentState = applySchematicEditEventsToManualEditsFile({
             circuitJson: circuitJson!,
             editEvents: [ee],
-            schematicEditsFileContent: JSON.stringify(currentState),
+            manualEditsFile: currentState,
           })
         }
 
@@ -164,7 +159,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             file_path: manualEditsFilePath,
-            text_content: JSON.stringify(updatedManualEdits),
+            text_content: JSON.stringify(currentState),
             initiator: "runframe",
           }),
         })

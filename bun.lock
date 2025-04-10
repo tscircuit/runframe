@@ -13,7 +13,11 @@
         "@radix-ui/react-tabs": "^1.1.2",
         "@tscircuit/3d-viewer": "^0.0.188",
         "@tscircuit/assembly-viewer": "^0.0.1",
+<<<<<<< HEAD
         "@tscircuit/core": "^0.0.365",
+=======
+        "@tscircuit/core": "^0.0.363",
+>>>>>>> c895f67 (use manual edits util from core)
         "@tscircuit/create-snippet-url": "^0.0.8",
         "@tscircuit/eval": "^0.0.150",
         "@tscircuit/file-server": "^0.0.18",
@@ -539,7 +543,11 @@
 
     "@tscircuit/circuit-json-util": ["@tscircuit/circuit-json-util@0.0.45", "", { "dependencies": { "parsel-js": "^1.1.2" }, "peerDependencies": { "circuit-json": "*", "transformation-matrix": "*", "zod": "*" } }, "sha512-zIcI5Fp1UllIm/JsjJsXhmgRDYReDUddJtylh5PZnkRK3ZVkMj+HV34A39qGHeYDg3bhf/89OQoxz+1fL68jug=="],
 
+<<<<<<< HEAD
     "@tscircuit/core": ["@tscircuit/core@0.0.365", "", { "dependencies": { "@lume/kiwi": "^0.4.3", "@tscircuit/capacity-autorouter": "^0.0.49", "@tscircuit/checks": "^0.0.30", "@tscircuit/circuit-json-util": "^0.0.45", "@tscircuit/infgrid-ijump-astar": "^0.0.33", "@tscircuit/math-utils": "^0.0.12", "@tscircuit/props": "^0.0.167", "@tscircuit/schematic-autolayout": "^0.0.6", "@tscircuit/soup-util": "^0.0.41", "circuit-json": "^0.0.153", "circuit-json-to-connectivity-map": "^0.0.17", "format-si-unit": "^0.0.3", "nanoid": "^5.0.7", "performance-now": "^2.1.0", "react-reconciler": "^0.31.0", "react-reconciler-18": "npm:react-reconciler@0.29.2", "schematic-symbols": "^0.0.121", "transformation-matrix": "^2.16.1", "zod": "^3.23.8" }, "peerDependencies": { "@tscircuit/footprinter": "*", "typescript": "^5.0.0" } }, "sha512-i10YRFpgLQNOYIh58N18Axy+sDJnGz9VBLDXXvEoVwfrDdIhXbyoEJQqNsO2XCB8rRsBpkYxldwdEAvQTHkmJg=="],
+=======
+    "@tscircuit/core": ["@tscircuit/core@0.0.363", "", { "dependencies": { "@lume/kiwi": "^0.4.3", "@tscircuit/capacity-autorouter": "^0.0.49", "@tscircuit/checks": "^0.0.30", "@tscircuit/circuit-json-util": "^0.0.45", "@tscircuit/infgrid-ijump-astar": "^0.0.33", "@tscircuit/math-utils": "^0.0.12", "@tscircuit/props": "^0.0.165", "@tscircuit/schematic-autolayout": "^0.0.6", "@tscircuit/soup-util": "^0.0.41", "circuit-json": "^0.0.153", "circuit-json-to-connectivity-map": "^0.0.17", "format-si-unit": "^0.0.3", "nanoid": "^5.0.7", "performance-now": "^2.1.0", "react-reconciler": "^0.31.0", "react-reconciler-18": "npm:react-reconciler@0.29.2", "schematic-symbols": "^0.0.121", "transformation-matrix": "^2.16.1", "zod": "^3.23.8" }, "peerDependencies": { "@tscircuit/footprinter": "*", "typescript": "^5.0.0" } }, "sha512-82GVB+mzT+hq9/eP/VBj2+uvxKFajoIcGN0TZNf/5pKT4CDI1VpPX7XnXrTMqjKuqwSC/HP3aiJU19F5X8/9VA=="],
+>>>>>>> c895f67 (use manual edits util from core)
 
     "@tscircuit/create-snippet-url": ["@tscircuit/create-snippet-url@0.0.8", "", { "dependencies": { "fflate": "^0.8.2" }, "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-VMixgwQRsOXlQGwVh2RZIFLLtsn8YWl2Bht61T26MHNM71A1Wzo5qGZtqcdbVkFnvlA42KmdVVjvxYDvEyWdJw=="],
 
@@ -2169,8 +2177,11 @@
 
     "@tscircuit/3d-viewer/@tscircuit/core": ["@tscircuit/core@0.0.362", "", { "dependencies": { "@lume/kiwi": "^0.4.3", "@tscircuit/capacity-autorouter": "^0.0.49", "@tscircuit/checks": "^0.0.30", "@tscircuit/circuit-json-util": "^0.0.45", "@tscircuit/infgrid-ijump-astar": "^0.0.33", "@tscircuit/math-utils": "^0.0.12", "@tscircuit/props": "^0.0.165", "@tscircuit/schematic-autolayout": "^0.0.6", "@tscircuit/soup-util": "^0.0.41", "circuit-json": "^0.0.153", "circuit-json-to-connectivity-map": "^0.0.17", "format-si-unit": "^0.0.3", "nanoid": "^5.0.7", "performance-now": "^2.1.0", "react-reconciler": "^0.31.0", "react-reconciler-18": "npm:react-reconciler@0.29.2", "schematic-symbols": "^0.0.121", "transformation-matrix": "^2.16.1", "zod": "^3.23.8" }, "peerDependencies": { "@tscircuit/footprinter": "*", "typescript": "^5.0.0" } }, "sha512-q/fjx4GKt5jaxvYJkqNxUmMiU6y6Zr304XsGCBKfXyKlPR9MdqzBZG+xlkctK6b++iuVFh+rcORz8hIGEzq+fA=="],
 
+<<<<<<< HEAD
     "@tscircuit/3d-viewer/@tscircuit/props": ["@tscircuit/props@0.0.165", "", { "peerDependencies": { "@tscircuit/layout": "*", "circuit-json": "*", "react": "*", "zod": "*" } }, "sha512-Hdd8FYR5TBxe1TDVqKQH7JXO2vFAtKsu1L4dQFQisqN5Mxi89OwNT+d0ocrTENjidaJARF9RclOwrz9Ud8o0Sw=="],
 
+=======
+>>>>>>> c895f67 (use manual edits util from core)
     "@tscircuit/3d-viewer/jscad-electronics": ["jscad-electronics@0.0.27", "", { "dependencies": { "@tscircuit/footprinter": "^0.0.132", "circuit-json": "^0.0.92" } }, "sha512-oczsbRWTRxkHfXcmyCVHuBa2ZWVGFJbrjWKR4Xhz4+4DxRk1+qG2hceAFZjYe1jTa57Yg3uct1naG+96tHo/zw=="],
 
     "@tscircuit/3d-viewer/jscad-fiber": ["jscad-fiber@0.0.79", "", { "dependencies": { "color": "^4.2.3", "lucide-react": "^0.456.0", "react-code-blocks": "^0.1.6", "react-reconciler": "^0.29.2" }, "peerDependencies": { "@jscad/modeling": "*", "@react-three/fiber": "*", "react": "*", "three": "*" } }, "sha512-pSj1vwBxKxW0c7xnE82nElPecKUfUMR/Gl2SHRPIqaibPvn4wxu+Pp0sB6KDLnB1nmnKa4F2queRdGDN9AeZxw=="],

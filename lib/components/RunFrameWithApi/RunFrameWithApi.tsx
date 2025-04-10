@@ -74,21 +74,6 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     return () => stopPolling()
   }, [startPolling, stopPolling])
 
-  useEffect(() => {
-    debug(`entrypoint set to ${entrypoint}`, {
-      fsKeys: Array.from(fsMap.keys()),
-    })
-  }, [entrypoint])
-
-  if (!fsMap.get(entrypoint)) {
-    return (
-      <div>
-        No entrypoint found for Run Frame! Found files:{" "}
-        {Array.from(fsMap.keys()).join(",")}
-      </div>
-    )
-  }
-
   return (
     <RunFrame
       fsMap={fsMap}

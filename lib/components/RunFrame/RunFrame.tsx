@@ -180,15 +180,6 @@ export const RunFrame = (props: RunFrameProps) => {
       const fsMapObj =
         fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap
 
-      if (!fsMapObj[props.entrypoint]) {
-        setError({
-          error: `Entrypoint not found (entrypoint: "${props.entrypoint}", fsMapKeys: ${Object.keys(fsMapObj).join(", ")})`,
-          stack: "",
-        })
-        setIsRunning(false)
-        return
-      }
-
       const renderIds = new Set<string>()
       const startRenderTime = Date.now()
       let lastRenderLogSet = Date.now()

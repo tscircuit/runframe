@@ -74,9 +74,6 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     return () => stopPolling()
   }, [startPolling, stopPolling])
 
-  const entrypoint =
-    guessEntrypoint(Array.from(fsMap.keys())) ?? "entrypoint.tsx"
-
   useEffect(() => {
     debug(`entrypoint set to ${entrypoint}`, {
       fsKeys: Array.from(fsMap.keys()),
@@ -108,7 +105,6 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
         debug("onRenderFinished / markRenderComplete")
         markRenderComplete()
       }}
-      entrypoint={entrypoint}
       editEvents={editEventsForRender}
       onEditEvent={(ee) => {
         pushEditEvent(ee)

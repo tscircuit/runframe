@@ -1,10 +1,11 @@
+import Debug from "debug"
+import { useEditEventController } from "lib/hooks/use-edit-event-controller"
 import { useEffect } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
-import { useRunFrameStore } from "./store"
 import { API_BASE } from "./api-base"
-import { useEditEventController } from "lib/hooks/use-edit-event-controller"
-import Debug from "debug"
-import { applyPcbEditEventsToManualEditsFile } from "@tscircuit/core"
+import { useRunFrameStore } from "./store"
+import { applyEditEventsToManualEditsFile } from "@tscircuit/core"
+import type { ManualEditsFile } from "@tscircuit/props"
 
 const debug = Debug("run-frame:RunFrameWithApi")
 
@@ -126,10 +127,14 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
 
         const manualEditsFile = fsMap.get(manualEditsFilePath)
 
-        const updatedManualEdits = applyPcbEditEventsToManualEditsFile({
+        const updatedManualEdits: ManualEditsFile = JSON.parse(
+          manualEditsFile ?? "{}",
+        )
+
+        applyEditEventsToManualEditsFile({
           circuitJson: circuitJson!,
           editEvents: [ee],
-          manualEditsFile: JSON.parse(manualEditsFile ?? "{}"),
+          manualEditsFile: updatedManualEdits,
         })
 
         fetch(`${API_BASE}/files/upsert`, {

@@ -188,7 +188,9 @@ export const RunFrame = (props: RunFrameProps) => {
         const estProgress = 1 - Math.exp(-estProgressLinear * 3)
 
         renderLog.progress = hasProcessedEnoughToEstimateProgress
-          ? estProgress
+          ? estProgress === 0.998426301854949684866369352675974369049072265625 // Maximum achievable progress value in the system (~99.84%)
+            ? 1
+            : estProgress
           : // Until we have enough events to estimate progress, we use the 0-5%
             // range and assume that there are ~500 renderIds, this will usually
             // be an underestimate.

@@ -20,7 +20,6 @@ declare global {
 }
 
 import type { AutoroutingStartEvent } from "@tscircuit/core"
-import type { EditEvent } from "@tscircuit/pcb-viewer"
 import type { RenderLog } from "lib/render-logging/RenderLog"
 import { getPhaseTimingsFromRenderEvents } from "lib/render-logging/getPhaseTimingsFromRenderEvents"
 import { getChangesBetweenFsMaps } from "../../utils/getChangesBetweenFsMaps"
@@ -28,6 +27,7 @@ import { useRunFrameStore } from "../RunFrameWithApi/store"
 import type { RunFrameProps } from "./RunFrameProps"
 import { useRunnerStore } from "./runner-store/use-runner-store"
 import { useMutex } from "./useMutex"
+import type { ManualEditEvent } from "@tscircuit/props"
 
 export type { RunFrameProps }
 
@@ -274,7 +274,7 @@ export const RunFrame = (props: RunFrameProps) => {
   // Updated to debounce edit events so only the last event is emitted after dragging ends
   const lastEditEventRef = useRef<any>(null)
   const dragTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const handleEditEvent = (event: EditEvent) => {
+  const handleEditEvent = (event: ManualEditEvent) => {
     if (!event || event === null) {
       console.warn(
         "[RunFrame] handleEditEvent received null or undefined event.",

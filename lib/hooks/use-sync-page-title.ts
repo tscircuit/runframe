@@ -2,7 +2,7 @@ import { useRunFrameStore } from "lib/components/RunFrameWithApi/store"
 import { guessEntrypoint } from "lib/runner"
 import { useEffect } from "react"
 
-export const useCircuitTitle = () => {
+export const useSyncPageTitle = () => {
   const fsMap = useRunFrameStore((s) => s.fsMap)
 
   useEffect(() => {

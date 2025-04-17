@@ -56,28 +56,23 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
 
   useEffect(() => {
     if (!document || !fsMap) return
+    const fileKeys = Array.from(fsMap.keys())
+    const entrypoint = guessEntrypoint(fileKeys)
+    const packageJsonContent = fsMap.get("package.json")
 
-    const setCircuitTitle = () => {
-      const fileKeys = Array.from(fsMap.keys())
-      const entrypoint = guessEntrypoint(fileKeys)
-      const packageJsonContent = fsMap.get("package.json")
-
-      try {
-        if (packageJsonContent) {
-          const parsedPackageJson = JSON.parse(packageJsonContent)
-          if (parsedPackageJson?.name) {
-            document.title = parsedPackageJson.name
-            return
-          }
+    try {
+      if (packageJsonContent) {
+        const parsedPackageJson = JSON.parse(packageJsonContent)
+        if (parsedPackageJson?.name) {
+          document.title = parsedPackageJson.name
+          return
         }
-      } catch (e) {}
-
-      if (entrypoint) {
-        document.title = entrypoint
       }
-    }
+    } catch (e) {}
 
-    setCircuitTitle()
+    if (entrypoint) {
+      document.title = entrypoint
+    }
   }, [fsMap])
 
   const {

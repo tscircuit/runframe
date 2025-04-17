@@ -313,6 +313,10 @@ export const RunframeCliLeftHeader = (props: {
             },
             {
               loading: `Importing component: "${component.name}"`,
+              error: (error: Error) => {
+                console.error("IMPORT ERROR", error)
+                return `Error importing component: "${component.name}": ${error.toString()}`
+              },
               success: (data: any) =>
                 data?.filePath
                   ? `Imported to "${data.filePath}"`

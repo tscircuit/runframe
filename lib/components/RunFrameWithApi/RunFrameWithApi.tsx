@@ -1,5 +1,6 @@
 import Debug from "debug"
 import { useEditEventController } from "lib/hooks/use-edit-event-controller"
+import { useCircuitTitle } from "lib/hooks/use-circuit-title"
 import { useEffect } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
 import { API_BASE } from "./api-base"
@@ -54,31 +55,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     loadInitialFiles()
   }, [])
 
-  useEffect(() => {
-    if (!document || !fsMap) return
-
-    const setCircuitTitle = () => {
-      const fileKeys = Array.from(fsMap.keys())
-      const entrypoint = guessEntrypoint(fileKeys)
-      const packageJsonContent = fsMap.get("package.json")
-
-      try {
-        if (packageJsonContent) {
-          const parsedPackageJson = JSON.parse(packageJsonContent)
-          if (parsedPackageJson?.name) {
-            document.title = parsedPackageJson.name
-            return
-          }
-        }
-      } catch (e) {}
-
-      if (entrypoint) {
-        document.title = entrypoint
-      }
-    }
-
-    setCircuitTitle()
-  }, [fsMap])
+  useCircuitTitle()
 
   const {
     editEventsForRender,

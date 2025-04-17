@@ -1,5 +1,6 @@
 import Debug from "debug"
 import { useEditEventController } from "lib/hooks/use-edit-event-controller"
+import { useSyncPageTitle } from "lib/hooks/use-sync-page-title"
 import { useEffect } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
 import { API_BASE } from "./api-base"
@@ -53,6 +54,8 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   useEffect(() => {
     loadInitialFiles()
   }, [])
+
+  useSyncPageTitle()
 
   const {
     editEventsForRender,

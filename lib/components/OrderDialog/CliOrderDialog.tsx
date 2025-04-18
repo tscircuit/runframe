@@ -2,7 +2,7 @@ import type { FC } from "react"
 import { useRunFrameStore } from "../RunFrameWithApi/store"
 import { OrderDialog } from "./OrderDialog"
 
-interface CliOrderDialogProps {
+export interface CliOrderDialogProps {
   isOpen: boolean
   onClose: () => void
   stage: "initial" | "progress" | "checkout"

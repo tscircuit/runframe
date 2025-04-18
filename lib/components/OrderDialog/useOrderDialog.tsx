@@ -1,33 +1,14 @@
-import { useState } from "react"
+import type { CircuitJson } from "circuit-json"
 import { CliOrderDialog } from "lib/components/OrderDialog/CliOrderDialog"
+import { OrderDialog } from "lib/components/OrderDialog/OrderDialog"
+import { useStyles } from "lib/hooks/use-styles"
+import { useState } from "react"
 
 type OrderStage = "initial" | "progress" | "checkout"
 
-const OrderDialogComponent = ({
-  isOpen,
-  onClose,
-  stage,
-  setStage,
-}: {
-  isOpen: boolean
-  onClose: () => void
-  stage: OrderStage
-  setStage: (stage: OrderStage) => void
-}) => {
-  return (
-    <CliOrderDialog
-      isOpen={isOpen}
-      onClose={onClose}
-      stage={stage}
-      setStage={setStage}
-    />
-  )
-}
-
-export const useOrderDialog = () => {
+export const useOrderDialogCli = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [stage, setStage] = useState<OrderStage>("initial")
-  const [isRegistryConnected, setIsRegistryConnected] = useState(false)
 
   const handleClose = () => {
     setIsOpen(false)
@@ -37,10 +18,30 @@ export const useOrderDialog = () => {
   return {
     isOpen,
     stage,
-    isRegistryConnected,
     open: () => setIsOpen(true),
     close: handleClose,
     setStage,
-    OrderDialog: OrderDialogComponent, // returns reference and not factory
+    OrderDialog: CliOrderDialog,
+  }
+}
+
+export const useOrderDialog = () => {
+  useStyles()
+
+  const [isOpen, setIsOpen] = useState(false)
+  const [stage, setStage] = useState<OrderStage>("initial")
+
+  const handleClose = () => {
+    setIsOpen(false)
+    setStage("initial")
+  }
+
+  return {
+    isOpen,
+    stage,
+    open: () => setIsOpen(true),
+    close: handleClose,
+    setStage,
+    OrderDialog: OrderDialog,
   }
 }

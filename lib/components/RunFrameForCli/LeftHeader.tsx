@@ -37,7 +37,7 @@ import {
 import { toast } from "lib/utils/toast"
 import { Toaster } from "react-hot-toast"
 import { importComponentFromJlcpcb } from "lib/optional-features/importing/import-component-from-jlcpcb"
-import { useOrderDialog } from "../OrderDialog/useOrderDialog"
+import { useOrderDialogCli } from "../OrderDialog/useOrderDialog"
 
 export const RunframeCliLeftHeader = (props: {
   shouldLoadLatestEval: boolean
@@ -62,7 +62,7 @@ export const RunframeCliLeftHeader = (props: {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isError, setIsError] = useState(false)
   const [isExporting, setisExporting] = useState(false)
-  const orderDialog = useOrderDialog()
+  const orderDialog = useOrderDialogCli()
 
   const pushEvent = useRunFrameStore((state) => state.pushEvent)
   const recentEvents = useRunFrameStore((state) => state.recentEvents)

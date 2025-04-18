@@ -13,7 +13,7 @@ export function getRegistryKy() {
   // Check flag at execution time rather than module load time
   const useRegistryPrefix =
     typeof window !== "undefined" &&
-    window.__RUNFRAME_REGISTRY_PREFIX__ === true
+    window.__RUNFRAME_REGISTRY_BASE_URL__ === true
 
   // Set the appropriate prefix based on the environment
   const registryApiBaseUrl = useRegistryPrefix

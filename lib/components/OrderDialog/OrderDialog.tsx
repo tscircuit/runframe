@@ -1,4 +1,3 @@
-import ky from "ky"
 import { AlertDialog, AlertDialogContent } from "lib/components/ui/alert-dialog"
 import type { FC } from "react"
 import { useState } from "react"
@@ -7,9 +6,12 @@ import { CheckoutOrder } from "./CheckoutOrder"
 import { InitialOrderScreen } from "./InitialOrder"
 import { StepwiseProgressPanel } from "./StepwiseProgress"
 import type { CircuitJson } from "circuit-json"
+import ky from "ky"
+import { useStyles } from "lib/hooks/use-styles"
+import { registryKy } from "lib/utils/get-registry-ky"
 
 const queryClient = new QueryClient()
-interface OrderDialogProps {
+export interface OrderDialogProps {
   isOpen: boolean
   onClose: () => void
   stage: "initial" | "progress" | "checkout"
@@ -27,14 +29,14 @@ export const OrderDialog: FC<OrderDialogProps> = ({
   const [order, setOrder] = useState<any>(null)
   const [loading, setLoading] = useState(false)
 
-  const createOrder = async () => {
-    const { order } = await ky
-      .post("registry/orders/create", {
+  const createOrder = async (sessionId?: string) => {
+    const { order } = await registryKy
+      .post("orders/create", {
         json: {
           circuit_json: circuitJson,
         },
         headers: {
-          Authorization: `Bearer account-1234`,
+          Authorization: `Bearer ${sessionId ?? "account-1234"}`,
         },
       })
       .json<{ order: any }>()
@@ -71,8 +73,9 @@ export const OrderDialog: FC<OrderDialogProps> = ({
             {stage === "checkout" && (
               <CheckoutOrder
                 finalCost={0}
-                onConfirmCheckout={() => onClose()}
-                onCancel={() => onClose()}
+                // TODO: Redirect to stripe
+                onConfirmCheckout={onClose}
+                onCancel={onClose}
               />
             )}
           </div>

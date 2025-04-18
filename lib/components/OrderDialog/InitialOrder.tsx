@@ -1,3 +1,4 @@
+import ky from "ky"
 import { Button } from "lib/components/ui/button"
 import {
   Select,
@@ -7,9 +8,9 @@ import {
   SelectValue,
 } from "lib/components/ui/select"
 import { Skeleton } from "lib/components/ui/skeleton"
+import { registryKy } from "lib/utils/get-registry-ky"
 import { ArrowDown } from "lucide-react"
-import { useEffect } from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 interface InitialOrderScreenProps {
   onCancel: () => void
   onContinue: () => void
@@ -40,18 +41,80 @@ export const InitialOrderScreen = ({
     }, 0)
   }
 
-  const handleGetEstimate = () => {
+  const createOrderQuote = async () => {
+    const { order_quote_id } = await registryKy
+      .post("order_quotes/create", {
+        json: {
+          package_release_id: "",
+          vendor_name: "",
+        },
+      })
+      .json<{ order_quote_id: string }>()
+    return order_quote_id
+  }
+
+  const getOrderQuote = async (order_quote_id: string) => {
+    const { order_quote } = await registryKy
+      .post(`order_quotes/get`, {
+        json: {
+          order_quote_id,
+        },
+      })
+      .json<{ order_quote: any }>()
+    return order_quote
+  }
+
+  const pollOrderQuote = async (quoteId: string, maxAttempts = 30) => {
+    let attempts = 0
+
+    while (attempts < maxAttempts) {
+      try {
+        const orderQuote = await getOrderQuote(quoteId)
+
+        if (orderQuote.is_complete) {
+          setEstimatedCost(orderQuote.total_cost)
+          setIsLoading(false)
+          return orderQuote
+        }
+
+        if (orderQuote.has_error) {
+          throw new Error(orderQuote.error)
+        }
+
+        attempts++
+
+        await new Promise((resolve) => setTimeout(resolve, 2000))
+      } catch (error) {
+        console.error("Error polling order quote:", error)
+        setIsLoading(false)
+      }
+    }
+
+    setIsLoading(false)
+    throw new Error("Polling timed out after maximum attempts")
+  }
+
+  const handleGetEstimate = async () => {
     if (!selectedCategory) return
+
+    const order_quote_id = await createOrderQuote()
+
+    if (!order_quote_id) {
+      console.error("Error creating order quote")
+      setEstimatedCost(null)
+      return
+    }
 
     setIsLoading(true)
     setEstimatedCost(null)
 
-    // TODO: Replace with fake API call
-    setTimeout(() => {
-      const cost = Math.floor(Math.random() * 150) + 50
-      setEstimatedCost(cost)
-      setIsLoading(false)
-    }, 1500)
+    try {
+      const orderQuote = await pollOrderQuote(order_quote_id)
+      setEstimatedCost(orderQuote.total_cost)
+    } catch (error) {
+      console.error("Error getting estimate:", error)
+      setEstimatedCost(null)
+    }
   }
 
   return (
@@ -116,7 +179,6 @@ export const InitialOrderScreen = ({
 
         <Button
           onClick={estimatedCost !== null ? onContinue : handleGetEstimate}
-          disabled={!selectedCategory || isLoading}
           className={
             estimatedCost !== null
               ? "rf-px-8 rf-bg-gray-700 hover:rf-bg-gray-800"

@@ -3,7 +3,7 @@ import ky from "ky"
 // Flag to identify if we're running inside runframe specifically
 declare global {
   interface Window {
-    __RUNFRAME_REGISTRY_PREFIX__?: boolean
+    __RUNFRAME_REGISTRY_BASE_URL__?: boolean
   }
 }
 

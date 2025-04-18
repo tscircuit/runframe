@@ -38,7 +38,7 @@ export const OrderDialog: FC<OrderDialogProps> = ({
         headers: {
           Authorization: `Bearer ${sessionId ?? "account-1234"}`,
         },
-      }) 
+      })
       .json<{ order: any }>()
     return order
   }

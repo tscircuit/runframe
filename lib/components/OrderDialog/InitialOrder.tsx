@@ -65,16 +65,16 @@ export const InitialOrderScreen = ({
   }
 
   const pollOrderQuote = async (quoteId: string, maxAttempts = 30) => {
-    let attempts = 0;
-    
+    let attempts = 0
+
     while (attempts < maxAttempts) {
       try {
-        const orderQuote = await getOrderQuote(quoteId);
-        
+        const orderQuote = await getOrderQuote(quoteId)
+
         if (orderQuote.is_complete) {
-          setEstimatedCost(orderQuote.total_cost);
-          setIsLoading(false);
-          return orderQuote;
+          setEstimatedCost(orderQuote.total_cost)
+          setIsLoading(false)
+          return orderQuote
         }
 
         if (orderQuote.has_error) {

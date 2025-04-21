@@ -1,1 +1,1 @@
-export const API_BASE = window.API_BASE_URL ?? "/api"
+export const API_BASE = window.TSCIRCUIT_FILESERVER_API_BASE_URL ?? "/api"

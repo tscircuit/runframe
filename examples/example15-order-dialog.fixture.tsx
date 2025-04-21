@@ -10,7 +10,7 @@ const circuitJson: AnyCircuitElement[] = []
 export default () => {
   useEffect(() => {
     if (typeof window !== "undefined") {
-      window.__RUNFRAME_REGISTRY_BASE_URL__ = true
+      window.TSCIRCUIT_REGISTRY_API_BASE_URL = "http://localhost:3000"
     }
   }, [])
 

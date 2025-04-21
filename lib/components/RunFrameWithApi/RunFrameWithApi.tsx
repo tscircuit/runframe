@@ -67,7 +67,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   // Initialize API base URL
   useEffect(() => {
     if (apiBaseUrl) {
-      window.API_BASE_URL = apiBaseUrl
+      window.TSCIRCUIT_FILESERVER_API_BASE_URL = apiBaseUrl
     }
   }, [apiBaseUrl])
 

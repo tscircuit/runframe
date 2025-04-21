@@ -89,9 +89,6 @@ export const CircuitJsonPreview = ({
 }: PreviewContentProps) => {
   useStyles()
 
-  const [schematicEditEvents, setSchematicEditEvents] = useState<
-    ManualEditEvent[]
-  >([...(editEvents ?? [])])
   const [activeTab, setActiveTabState] = useState(defaultActiveTab ?? "pcb")
   const [isFullScreen, setIsFullScreen] = useState(defaultToFullScreen)
   const setActiveTab = useCallback(
@@ -392,10 +389,8 @@ export const CircuitJsonPreview = ({
                     }}
                     editingEnabled
                     onEditEvent={(ee) => {
-                      setSchematicEditEvents((prev) => [...prev, ee])
                       onEditEvent?.(ee)
                     }}
-                    editEvents={schematicEditEvents}
                     debugGrid={showSchematicDebugGrid}
                   />
                 ) : (

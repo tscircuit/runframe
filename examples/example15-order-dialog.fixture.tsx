@@ -10,7 +10,8 @@ const circuitJson: AnyCircuitElement[] = []
 export default () => {
   useEffect(() => {
     if (typeof window !== "undefined") {
-      window.__RUNFRAME_REGISTRY_BASE_URL__ = true
+      // Using the `/registry` path for the registry API
+      window.TSCIRCUIT_REGISTRY_API_BASE_URL = `${window.location.origin}/registry`
     }
   }, [])
 

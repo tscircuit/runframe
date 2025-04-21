@@ -108,6 +108,13 @@ export interface RunFrameState {
 
 declare global {
   interface Window {
-    API_BASE_URL: string
+    /**
+     * The base URL for the file server API
+     */
+    TSCIRCUIT_FILESERVER_API_BASE_URL: string
+    /**
+     * The base URL for the registry API
+     */
+    TSCIRCUIT_REGISTRY_API_BASE_URL: string
   }
 }

@@ -1,15 +1,10 @@
 import ky from "ky"
 
 export function getRegistryKy() {
-  const isDevelopment = process.env.NODE_ENV === "development"
-
   const registryApiBaseUrl =
     (typeof window !== "undefined"
       ? window.TSCIRCUIT_REGISTRY_API_BASE_URL
-      : null) ??
-    (isDevelopment
-      ? `${window.location.origin}/registry`
-      : "https://registry-api.tscircuit.com")
+      : null) ?? "https://registry-api.tscircuit.com"
 
   return ky.create({
     prefixUrl: registryApiBaseUrl,

@@ -12,7 +12,7 @@ interface InitialOrderScreenProps {
 }
 
 export const InitialOrderScreen = ({
-  onCancel, 
+  onCancel,
   onContinue,
 }: InitialOrderScreenProps) => {
   const [quotes, setQuotes] = useState<OrderQuote[]>([])

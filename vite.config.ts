@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react"
 import { resolve } from "node:path"
 import { type Plugin, defineConfig } from "vite"
 import { getNodeHandler } from "winterspec/adapters/node"
-import fakeRegistryBundle from "@tscircuit/fake-snippets/dist/bundle"
+import fakeRegistryBundle from "@tscircuit/fake-snippets/bundle"
 import { createDatabase } from "@tscircuit/fake-snippets"
 import ky from "ky"
 

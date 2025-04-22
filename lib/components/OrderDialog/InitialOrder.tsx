@@ -51,14 +51,14 @@ export const InitialOrderScreen = ({
   // Fake order quote value
   // TODO: Remove this once we have a real API
   const getFakeOrderQuotes = async (order_quote_id: string) => {
-    const { order_quote } = await registryKy
+    const { order_quotes } = await registryKy
       .post(`_fake/received_quotes`, {
         json: {
           order_quote_id,
         },
       })
-      .json<{ order_quote: OrderQuote }>()
-    return order_quote
+      .json<{ order_quotes: OrderQuote[] }>()
+    return order_quotes
   }
 
   const pollToGetOrderQuotes = async (quoteId: string, maxAttempts = 2) => {
@@ -106,7 +106,7 @@ export const InitialOrderScreen = ({
         await pollToGetOrderQuotes(quoteId)
       } catch (error) {
         const quotes = await getFakeOrderQuotes(quoteId)
-        setQuotes([quotes])
+        setQuotes([...quotes])
         setLoading(false)
       }
     }

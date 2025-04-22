@@ -51,7 +51,7 @@ export default function VendorQuoteCard({
               ${subtotal.toFixed(2)}
             </span>
             <span className="rf-font-bold rf-text-xl rf-text-blue-600">
-              $50.00
+              ${vendor.total_cost_after_discount.toFixed(2)}
             </span>
           </div>
         </div>
@@ -89,9 +89,9 @@ export default function VendorQuoteCard({
                       {ship.service}
                     </div>
                   </div>
-                  <div className="rf-font-semibold">
+                  {/* <div className="rf-font-semibold">
                     ${ship.cost.toFixed(2)}
-                  </div>
+                  </div> */}
                 </button>
               ))}
             </div>
@@ -105,11 +105,14 @@ export default function VendorQuoteCard({
             <span className="rf-text-gray-800 rf-font-medium">
               Total (incl. shipping):
             </span>
-            <span className="rf-font-bold rf-text-lg rf-text-blue-700">
+            {/* <span className="rf-font-bold rf-text-lg rf-text-blue-700">
               $
               {(
                 subtotal + vendor.shipping_options[selectedShippingIdx].cost
               ).toFixed(2)}
+            </span> */}
+            <span className="rf-font-bold rf-text-lg rf-text-blue-700">
+              ${vendor.total_cost_after_discount.toFixed(2)}
             </span>
           </div>
         </div>

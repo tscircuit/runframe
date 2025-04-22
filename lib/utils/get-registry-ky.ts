@@ -4,7 +4,7 @@ export function getRegistryKy() {
   const registryApiBaseUrl =
     (typeof window !== "undefined"
       ? window.TSCIRCUIT_REGISTRY_API_BASE_URL
-      : null) ?? "https://registry-api.tscircuit.com"
+      : null) ?? import.meta.env.VITE_TSCIRCUIT_REGISTRY_API_BASE_URL
 
   return ky.create({
     prefixUrl: registryApiBaseUrl,

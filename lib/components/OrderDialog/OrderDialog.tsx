@@ -6,8 +6,6 @@ import { CheckoutOrder } from "./CheckoutOrder"
 import { InitialOrderScreen } from "./InitialOrder"
 import { StepwiseProgressPanel } from "./StepwiseProgress"
 import type { CircuitJson } from "circuit-json"
-import ky from "ky"
-import { useStyles } from "lib/hooks/use-styles"
 import { registryKy } from "lib/utils/get-registry-ky"
 
 const queryClient = new QueryClient()
@@ -26,28 +24,28 @@ export const OrderDialog: FC<OrderDialogProps> = ({
   setStage,
   circuitJson,
 }) => {
-  const [order, setOrder] = useState<any>(null)
-  const [loading, setLoading] = useState(false)
+  // const [order, setOrder] = useState<any>(null)
+  // const [loading, setLoading] = useState(false)
 
-  const createOrder = async (sessionId?: string) => {
-    const { order } = await registryKy
-      .post("orders/create", {
-        json: {
-          circuit_json: circuitJson,
-        },
-        headers: {
-          Authorization: `Bearer ${sessionId ?? "account-1234"}`,
-        },
-      })
-      .json<{ order: any }>()
-    return order
-  }
+  // const createOrder = async (sessionId?: string) => {
+  //   const { order } = await registryKy
+  //     .post("orders/create", {
+  //       json: {
+  //         circuit_json: circuitJson,
+  //       },
+  //       headers: {
+  //         Authorization: `Bearer ${sessionId ?? "account-1234"}`,
+  //       },
+  //     })
+  //     .json<{ order: any }>()
+  //   return order
+  // }
 
-  const handleInitialContinue = async () => {
-    const order = await createOrder()
-    setOrder(order)
-    setStage("progress")
-  }
+  // const handleInitialContinue = async () => {
+  //   const order = await createOrder()
+  //   setOrder(order)
+  //   setStage("checkout")
+  // }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -57,11 +55,12 @@ export const OrderDialog: FC<OrderDialogProps> = ({
             {stage === "initial" && (
               <InitialOrderScreen
                 onCancel={onClose}
-                onContinue={handleInitialContinue}
+                // TODO: Link to stripe checkout
+                onContinue={onClose}
               />
             )}
 
-            {stage === "progress" && order?.order_id && (
+            {/* {stage === "progress" && order?.order_id && (
               <StepwiseProgressPanel
                 onCancel={onClose}
                 loading={loading}
@@ -77,7 +76,7 @@ export const OrderDialog: FC<OrderDialogProps> = ({
                 onConfirmCheckout={onClose}
                 onCancel={onClose}
               />
-            )}
+            )} */}
           </div>
         </AlertDialogContent>
       </AlertDialog>

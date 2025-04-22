@@ -1,47 +1,31 @@
-import ky from "ky"
 import { Button } from "lib/components/ui/button"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "lib/components/ui/select"
-import { Skeleton } from "lib/components/ui/skeleton"
-import { registryKy } from "lib/utils/get-registry-ky"
-import { ArrowDown } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
+import VendorQuoteCard from "./VendorQuoteCard"
+import { toast } from "lib/utils/toast"
+import { registryKy } from "lib/utils/get-registry-ky"
+import type { OrderQuote } from "@tscircuit/fake-snippets/schema"
+
 interface InitialOrderScreenProps {
   onCancel: () => void
-  onContinue: () => void
+  onContinue: (selected: { vendor: OrderQuote; shippingIdx: number }) => void
 }
 
 export const InitialOrderScreen = ({
   onCancel,
   onContinue,
 }: InitialOrderScreenProps) => {
-  const productCategories = [
-    { id: "prototype", name: "Prototype" },
-    { id: "development", name: "Development board" },
-  ]
+  const [quotes, setQuotes] = useState<OrderQuote[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selectedVendorIdx, setSelectedVendorIdx] = useState<number | null>(
+    null,
+  )
+  const [selectedShippingIdx, setSelectedShippingIdx] = useState<number | null>(
+    null,
+  )
+  const [fetchError, setFetchError] = useState<string | null>(null)
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [estimatedCost, setEstimatedCost] = useState<number | null>(null)
-  const [selectedCategory, setSelectedCategory] = useState<string>("prototype") // Set default to prototype
-
-  useEffect(() => {
-    handleGetEstimate()
-  }, [])
-
-  const handleSelectCategory = (category: string) => {
-    setSelectedCategory(category)
-    setEstimatedCost(null)
-    setTimeout(() => {
-      handleGetEstimate()
-    }, 0)
-  }
-
-  const createOrderQuote = async () => {
+  const createOrderQuotes = async () => {
     const { order_quote_id } = await registryKy
       .post("order_quotes/create", {
         json: {
@@ -53,7 +37,7 @@ export const InitialOrderScreen = ({
     return order_quote_id
   }
 
-  const getOrderQuote = async (order_quote_id: string) => {
+  const getOrderQuotes = async (order_quote_id: string) => {
     const { order_quote } = await registryKy
       .post(`order_quotes/get`, {
         json: {
@@ -64,16 +48,27 @@ export const InitialOrderScreen = ({
     return order_quote
   }
 
-  const pollOrderQuote = async (quoteId: string, maxAttempts = 30) => {
+  // Fake order quote value
+  // TODO: Remove this once we have a real API
+  const getFakeOrderQuotes = async (order_quote_id: string) => {
+    const { order_quote } = await registryKy
+      .post(`_fake/received_quotes`, {
+        json: {
+          order_quote_id,
+        },
+      })
+      .json<{ order_quote: OrderQuote }>()
+    return order_quote
+  }
+
+  const pollToGetOrderQuotes = async (quoteId: string, maxAttempts = 2) => {
     let attempts = 0
 
     while (attempts < maxAttempts) {
       try {
-        const orderQuote = await getOrderQuote(quoteId)
+        const orderQuote = await getOrderQuotes(quoteId)
 
         if (orderQuote.is_complete) {
-          setEstimatedCost(orderQuote.total_cost)
-          setIsLoading(false)
           return orderQuote
         }
 
@@ -86,107 +81,113 @@ export const InitialOrderScreen = ({
         await new Promise((resolve) => setTimeout(resolve, 2000))
       } catch (error) {
         console.error("Error polling order quote:", error)
-        setIsLoading(false)
       }
     }
 
-    setIsLoading(false)
     throw new Error("Polling timed out after maximum attempts")
   }
 
-  const handleGetEstimate = async () => {
-    if (!selectedCategory) return
+  // Fetch order quotes
+  useEffect(() => {
+    const fetchQuotes = async () => {
+      setLoading(true)
+      setQuotes([])
+      setFetchError(null)
 
-    const order_quote_id = await createOrderQuote()
+      const quoteId = await createOrderQuotes()
 
-    if (!order_quote_id) {
-      console.error("Error creating order quote")
-      setEstimatedCost(null)
-      return
+      if (!quoteId) {
+        toast.error("Failed to create order quote.")
+        setLoading(false)
+        return
+      }
+
+      try {
+        await pollToGetOrderQuotes(quoteId)
+      } catch (error) {
+        const quotes = await getFakeOrderQuotes(quoteId)
+        setQuotes([quotes])
+        setLoading(false)
+      }
     }
 
-    setIsLoading(true)
-    setEstimatedCost(null)
+    fetchQuotes()
+  }, [])
 
-    try {
-      const orderQuote = await pollOrderQuote(order_quote_id)
-      setEstimatedCost(orderQuote.total_cost)
-    } catch (error) {
-      console.error("Error getting estimate:", error)
-      setEstimatedCost(null)
-    }
-  }
+  // Reset shipping selection when changing vendor
+  useEffect(() => {
+    setSelectedShippingIdx(null)
+  }, [selectedVendorIdx])
 
   return (
-    <div className="rf-flex rf-flex-col rf-bg-white rf-rounded-xl rf-p-8 rf-max-w-md rf-w-full rf-mx-auto">
+    <div className="rf-max-w-lg rf-mx-auto rf-bg-white rf-rounded-2xl rf-p-8 rf-flex rf-flex-col rf-gap-3">
       <h2 className="rf-text-3xl rf-font-bold rf-text-center rf-mb-8">
-        Order PCB
+        Order PCB – Choose a Vendor
       </h2>
-
-      <div className="rf-mb-8">
-        <label
-          htmlFor="category"
-          className="rf-block rf-text-sm rf-font-medium rf-text-gray-700 rf-mb-2"
-        >
-          Select Product Category
-        </label>
-        <Select
-          onValueChange={handleSelectCategory}
-          value={selectedCategory || undefined}
-        >
-          <SelectTrigger className="rf-w-full">
-            <SelectValue placeholder="Select a category" />
-          </SelectTrigger>
-          <SelectContent>
-            {productCategories.map((category) => (
-              <SelectItem key={category.id} value={category.id}>
-                {category.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="rf-mb-4 rf-text-gray-700 rf-text-center">
+        Select a quote from below, then pick a shipping method.
       </div>
-
-      {isLoading ? (
-        <div className="rf-flex rf-flex-col rf-items-center rf-mb-8">
-          <div className="rf-animate-pulse rf-flex rf-space-x-2 rf-items-center rf-mb-3">
-            <ArrowDown className="rf-h-5 rf-w-5 rf-text-gray-400" />
-            <span className="rf-text-gray-500">Fetching estimate...</span>
-          </div>
-          <Skeleton className="rf-h-6 rf-w-3/4 rf-mb-2" />
-          <Skeleton className="rf-h-6 rf-w-1/2" />
+      {loading ? (
+        <div className="rf-flex rf-flex-col rf-items-center rf-gap-2 rf-my-12">
+          <Loader2 className="rf-animate-spin rf-w-8 rf-h-8 rf-text-gray-400" />
+          <p className="rf-text-gray-600">Fetching quotes...</p>
         </div>
-      ) : estimatedCost !== null ? (
-        <div className="rf-bg-gray-50 rf-p-4 rf-rounded-lg rf-mb-8">
-          <p className="rf-text-sm rf-text-gray-600 rf-mb-2">Estimated Cost:</p>
-          <p className="rf-text-2xl rf-font-bold rf-text-gray-900">
-            ${estimatedCost.toFixed(2)}
-          </p>
-          <p className="rf-text-xs rf-text-gray-500 rf-mt-1">
-            Pricing may vary based on specifications
-          </p>
+      ) : quotes.length === 0 ? (
+        <div className="rf-text-red-600 rf-text-center rf-py-12">
+          No quotes available.
         </div>
-      ) : null}
+      ) : (
+        quotes.map((quote, idx) => (
+          <VendorQuoteCard
+            key={quote.order_quote_id}
+            vendor={quote}
+            isActive={selectedVendorIdx === idx}
+            onSelect={() => setSelectedVendorIdx(idx)}
+            selectedShippingIdx={
+              selectedVendorIdx === idx ? selectedShippingIdx : null
+            }
+            onSelectShipping={setSelectedShippingIdx}
+          />
+        ))
+      )}
 
-      <div className="rf-flex rf-justify-between rf-mt-auto">
+      <div className="rf-flex rf-justify-between rf-mt-5 rf-gap-4">
         <Button
           variant="outline"
+          type="button"
+          className="rf-w-1/2 rf-border-red-500 rf-text-red-500 rf-hover:bg-red-50 rf-hover:text-red-600"
           onClick={onCancel}
-          className="rf-px-8 rf-border-red-500 rf-text-red-500 hover:rf-bg-red-50 hover:rf-text-red-600"
         >
           Cancel
         </Button>
-
         <Button
-          onClick={estimatedCost !== null ? onContinue : handleGetEstimate}
-          className={
-            estimatedCost !== null
-              ? "rf-px-8 rf-bg-gray-700 hover:rf-bg-gray-800"
-              : "rf-px-8 rf-bg-blue-600 hover:rf-bg-blue-700"
+          type="button"
+          className="rf-w-1/2 rf-bg-blue-600 rf-hover:bg-blue-700"
+          disabled={
+            selectedVendorIdx === null ||
+            selectedShippingIdx === null ||
+            loading
           }
+          onClick={() => {
+            if (
+              selectedVendorIdx === null ||
+              selectedShippingIdx === null ||
+              loading
+            ) {
+              toast.error("Please select a vendor and shipping option.")
+              return
+            }
+            onContinue({
+              vendor: quotes[selectedVendorIdx],
+              shippingIdx: selectedShippingIdx,
+            })
+          }}
         >
-          {estimatedCost !== null ? "Continue" : "Get Estimate"}
+          Continue
         </Button>
+      </div>
+      <div className="rf-text-xs rf-text-center rf-text-gray-400 rf-mt-4">
+        Pricing may vary based on specifications.
       </div>
     </div>
   )

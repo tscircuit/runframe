@@ -1,5 +1,5 @@
 export const tips = [
-  "Always initialize your project using 'tsci init' before adding components.",
+  "Always initialize your project using ['tsci init'](https://github.com/tscircuit/cli) before adding components.",
   "Use the visual editor for real-time PCB layout and placement feedback.",
   "Leverage automatic routing for faster PCB trace connections.",
   "Define reusable subcircuits for common electronic patterns.",
@@ -37,11 +37,12 @@ export const getRandomTipForUser = () => {
 
   tip = tip.replace(
     /(?<!href=")(?<!\()(?<!\]\()(https?:\/\/[^\s\)\]]+)/g,
-    (match, p1) => `<a href="${match}" target="_blank">${match}</a>`,
+    (match, p1) =>
+      `<a class="rf-text-blue-500 rf-underline"  href="${match}" target="_blank">${match}</a>`,
   )
   tip = tip.replace(
     /\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g,
-    '<a href="$2" target="_blank">$1</a>',
+    '<a class="rf-text-blue-500 rf-underline" href="$2" target="_blank">$1</a>',
   )
 
   return tip

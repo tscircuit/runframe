@@ -1,60 +1,48 @@
-export const tips_part_1 = [
-  "Always initialize your project using 'tsci-init' before adding components.",
+export const tips = [
+  "Always initialize your project using 'tsci init' before adding components.",
   "Use the visual editor for real-time PCB layout and placement feedback.",
   "Leverage automatic routing for faster PCB trace connections.",
   "Define reusable subcircuits for common electronic patterns.",
   "Utilize board constraints to stay within manufacturing parameters.",
-  "Run 'tsci-dev' to preview your boards before export.",
-  "Document your elements with clear param names for future re-use.",
+  "Run 'tsci dev' to preview your boards before export.",
   "Use units like mm or mils consistently across your designs.",
-  "Test integrations using 'tsci-push' and validate on the web interface.",
   "Reference the 'element' docs for correct pin and footprint placement.",
   "Consult 'ordering-prototypes' for recommended PCB fab workflows.",
   "Use 'net' and 'group' constructs to organize complex schematics.",
   "Review 'manual-edits' for advanced board customization.",
   "Serialize your circuits to JSON for interoperability and versioning.",
   "Import components from external libraries with 'importing-modules-and-chips'.",
-  "Follow the contributor guide to submit new footprints or modules.",
   "Leverage the image generation API to render board previews.",
   "Use 'essential-elements' to quickly scaffold new circuits.",
   "Check 'platform-configuration' for custom toolchain commands.",
   "Optimize layouts using the 'automatic-layout' guide.",
   "Stick to known footprints for easier assembly and rework.",
-  "Review 'understanding-fabrication-files' before sending to fab.",
   "Configure chips using pin selectors for precise control.",
   "Publish modules via the registry for team-wide access.",
   "Explore tutorials for real-world circuit design examples.",
-]
-
-const tips_part_2 = [
-  "The easiest way to get bounties and sponsorship is to actually use tscircuit and try to build a circuit.",
-  "If you're interested in using tscircuit without React, upvote the related GitHub issue.",
-  "Make sure you've joined the Discord server so we can help you get started and reviewed quickly.",
   "Upload your Circuit JSON to circuitjson.com for a quick preview.",
   "Use the <CircuitJsonPreview /> component to display all available previews for a Circuit JSON array.",
-  "Check the RunFrame online examples page to see different circuit designs and their implementation.",
   "Use a <group /> element to move multiple components at once in a schematic or PCB layout.",
   "Refer to the GitHub Discussions page to request more platform features tailored to your needs.",
-  "Ensure you install bun before contributing to tscircuit as all projects use it.",
   "Use the grid function from math-utils to create a grid of components for LED matrix layouts.",
   "Use the RootCircuit platform configuration to customize registry and autorouter behavior.",
-  "Provide a fsMap object when using the <RunFrame /> component to manage file system imports.",
-  "Refer to the schematic-symbols repository for contributing to symbol libraries.",
   "Use the <constraint /> element to enforce geometric relationships in PCB designs.",
   "Follow the recommended contribution order to understand the tscircuit ecosystem better.",
-  "Use the CircuitRunner platform configuration to evaluate and render tscircuit designs.",
   "Join the Discord server to discuss issues and get help directly from the community.",
-  "Use the RunFrame component to run tscircuit code directly in the browser without Circuit JSON.",
-  "Refer to the bounty board or Discord channel for open issues and opportunities.",
-  "Help build the largest library of schematic symbols by contributing to schematic-symbols.",
-  "Learn how to contribute to footprinter by watching the related video tutorial.",
-  "Ensure your GitHub Sponsors profile is enabled to be eligible for sponsorship.",
-  "Use the RunFrame examples directory to explore how different circuits can be implemented.",
   "Reach out to enterprise support for running the tscircuit platform privately within your organization.",
 ]
 
-export const tips = [...tips_part_1, ...tips_part_2]
+export const getRandomTipForUser = () => {
+  let tip = tips[Math.floor(Math.random() * tips.length)]
 
-export const getTipForUser = () => {
-  return tips[Math.floor(Math.random() * tips.length)]
+  tip = tip.replace(
+    /(?<!href=")(?<!\()(?<!\]\()(https?:\/\/[^\s\)\]]+)/g,
+    (match, p1) => `<a href="${match}" target="_blank">${match}</a>`,
+  )
+  tip = tip.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g,
+    '<a href="$2" target="_blank">$1</a>',
+  )
+
+  return tip
 }

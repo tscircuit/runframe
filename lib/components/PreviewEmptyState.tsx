@@ -1,12 +1,17 @@
 import { Button } from "lib/components/ui/button"
-import { PlayIcon } from "lucide-react"
+import { getRandomTipForUser } from "lib/utils/getRandomTipForUser "
+import { LightbulbIcon, PlayIcon } from "lucide-react"
 
 const PreviewEmptyState = ({ onRunClicked }: { onRunClicked?: () => void }) => (
-  <div className="rf-flex rf-items-center rf-gap-3 rf-bg-gray-100 rf-text-center rf-justify-center rf-py-10">
-    No circuit json loaded
+  <div className="rf-flex rf-flex-col rf-items-center rf-justify-center rf-h-full rf-bg-gray-50 rf-text-gray-500 rf-p-4">
+    <LightbulbIcon className="rf-size-14 rf-mb-4" />
+    <p className="rf-text-md rf-break-words rf-max-w-xl rf-text-center">
+      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: its internal function */}
+      Tip: <span dangerouslySetInnerHTML={{ __html: getRandomTipForUser() }} />
+    </p>
     {onRunClicked && (
       <Button
-        className="rf-bg-blue-600 rf-hover:bg-blue-500"
+        className="rf-mt-4 rf-bg-blue-600 rf-hover:bg-blue-500"
         onClick={onRunClicked}
       >
         Run Code

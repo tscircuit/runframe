@@ -1,13 +1,22 @@
 import ky from "ky"
 
+function getWindowVar(name: string) {
+  return typeof window !== "undefined" ? (window as any)[name] : null
+}
+
 export function getRegistryKy() {
   const registryApiBaseUrl =
-    (typeof window !== "undefined"
-      ? window.TSCIRCUIT_REGISTRY_API_BASE_URL
-      : null) ?? import.meta.env.VITE_TSCIRCUIT_REGISTRY_API_BASE_URL
+    getWindowVar("TSCIRCUIT_REGISTRY_API_BASE_URL") ||
+    import.meta.env.VITE_TSCIRCUIT_REGISTRY_API_BASE_URL ||
+    "https://registry-api.tscircuit.com"
+
+  const registryToken = getWindowVar("TSCIRCUIT_REGISTRY_TOKEN")
 
   return ky.create({
     prefixUrl: registryApiBaseUrl,
+    headers: {
+      Authorization: `Bearer ${registryToken}`,
+    },
     timeout: 30000,
   })
 }

@@ -42,6 +42,9 @@ function fakeRegistryPlugin(): Plugin {
     async configureServer(server) {
       const port = server.config.server.port
       server.middlewares.use(async (req, res, next) => {
+        if (process.env.REGISTRY_API_BASE_URL) {
+          // TODO Proxy requests to the registry API base URL
+        }
         if (req.url?.startsWith("/registry/")) {
           if (!initialized) {
             initialized = true

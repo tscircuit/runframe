@@ -116,5 +116,9 @@ declare global {
      * The base URL for the registry API
      */
     TSCIRCUIT_REGISTRY_API_BASE_URL: string
+    /**
+     * The base URL for the stripe checkout API
+     */
+    TSCIRCUIT_STRIPE_CHECKOUT_BASE_URL: string
   }
 }

@@ -1,12 +1,8 @@
 import { AlertDialog, AlertDialogContent } from "lib/components/ui/alert-dialog"
 import type { FC } from "react"
-import { useState } from "react"
 import { QueryClient, QueryClientProvider } from "react-query"
-import { CheckoutOrder } from "./CheckoutOrder"
 import { InitialOrderScreen } from "./InitialOrder"
-import { StepwiseProgressPanel } from "./StepwiseProgress"
 import type { CircuitJson } from "circuit-json"
-import { registryKy } from "lib/utils/get-registry-ky"
 
 const queryClient = new QueryClient()
 export interface OrderDialogProps {
@@ -15,6 +11,7 @@ export interface OrderDialogProps {
   stage: "initial" | "progress" | "checkout"
   setStage: (stage: "initial" | "progress" | "checkout") => void
   circuitJson?: CircuitJson
+  packageReleaseId?: string
 }
 
 export const OrderDialog: FC<OrderDialogProps> = ({
@@ -23,30 +20,8 @@ export const OrderDialog: FC<OrderDialogProps> = ({
   stage,
   setStage,
   circuitJson,
+  packageReleaseId,
 }) => {
-  // const [order, setOrder] = useState<any>(null)
-  // const [loading, setLoading] = useState(false)
-
-  // const createOrder = async (sessionId?: string) => {
-  //   const { order } = await registryKy
-  //     .post("orders/create", {
-  //       json: {
-  //         circuit_json: circuitJson,
-  //       },
-  //       headers: {
-  //         Authorization: `Bearer ${sessionId ?? "account-1234"}`,
-  //       },
-  //     })
-  //     .json<{ order: any }>()
-  //   return order
-  // }
-
-  // const handleInitialContinue = async () => {
-  //   const order = await createOrder()
-  //   setOrder(order)
-  //   setStage("checkout")
-  // }
-
   return (
     <QueryClientProvider client={queryClient}>
       <AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -55,8 +30,7 @@ export const OrderDialog: FC<OrderDialogProps> = ({
             {stage === "initial" && (
               <InitialOrderScreen
                 onCancel={onClose}
-                // TODO: Link to stripe checkout
-                onContinue={onClose}
+                packageReleaseId={packageReleaseId ?? ""}
               />
             )}
 

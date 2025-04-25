@@ -5,15 +5,16 @@ import VendorQuoteCard from "./VendorQuoteCard"
 import { toast } from "lib/utils/toast"
 import { registryKy } from "lib/utils/get-registry-ky"
 import type { OrderQuote } from "@tscircuit/fake-snippets/schema"
+import { getWindowVar } from "lib/utils/get-registry-ky"
 
 interface InitialOrderScreenProps {
   onCancel: () => void
-  onContinue: (selected: { vendor: OrderQuote; shippingIdx: number }) => void
+  packageReleaseId: string
 }
 
 export const InitialOrderScreen = ({
   onCancel,
-  onContinue,
+  packageReleaseId,
 }: InitialOrderScreenProps) => {
   const [quotes, setQuotes] = useState<OrderQuote[]>([])
   const [loading, setLoading] = useState(true)
@@ -24,67 +25,70 @@ export const InitialOrderScreen = ({
     null,
   )
   const [fetchError, setFetchError] = useState<string | null>(null)
+  const [orderQuoteReceived, setOrderQuoteReceived] =
+    useState<OrderQuote | null>(null)
 
   const createOrderQuotes = async () => {
     const { order_quote_id } = await registryKy
       .post("order_quotes/create", {
         json: {
-          package_release_id: "",
-          vendor_name: "",
+          package_release_id: packageReleaseId,
+          vendor_name: "jlcpcb", // TODO: Remove this once we have more vendor
         },
       })
       .json<{ order_quote_id: string }>()
     return order_quote_id
   }
 
-  const getOrderQuotes = async (order_quote_id: string) => {
+  const getOrderQuotes = async (orderQuoteId: string) => {
     const { order_quote } = await registryKy
-      .post(`order_quotes/get`, {
-        json: {
-          order_quote_id,
+      .get(`order_quotes/get`, {
+        searchParams: {
+          order_quote_id: orderQuoteId,
         },
       })
-      .json<{ order_quote: any }>()
+      .json<{ order_quote: OrderQuote }>()
     return order_quote
   }
 
-  // Fake order quote value
-  // TODO: Remove this once we have a real API
-  const getFakeOrderQuotes = async (order_quote_id: string) => {
-    const { order_quotes } = await registryKy
-      .post(`_fake/received_quotes`, {
-        json: {
-          order_quote_id,
-        },
-      })
-      .json<{ order_quotes: OrderQuote[] }>()
-    return order_quotes
-  }
-
-  const pollToGetOrderQuotes = async (quoteId: string, maxAttempts = 2) => {
+  const pollToGetOrderQuotes = async (
+    orderQuoteId: string,
+    maxAttempts = 10,
+  ) => {
     let attempts = 0
 
     while (attempts < maxAttempts) {
       try {
-        const orderQuote = await getOrderQuotes(quoteId)
+        const orderQuote = await getOrderQuotes(orderQuoteId)
 
-        if (orderQuote.is_complete) {
+        if (orderQuote.is_completed) {
+          setOrderQuoteReceived(orderQuote)
           return orderQuote
         }
 
         if (orderQuote.has_error) {
-          throw new Error(orderQuote.error)
+          throw new Error(orderQuote.error?.message ?? "Unknown error")
         }
 
         attempts++
 
         await new Promise((resolve) => setTimeout(resolve, 2000))
       } catch (error) {
+        attempts++
         console.error("Error polling order quote:", error)
+        await new Promise((resolve) => setTimeout(resolve, 2000))
       }
     }
 
     throw new Error("Polling timed out after maximum attempts")
+  }
+
+  const redirectToStripeCheckout = async (orderQuoteId: string) => {
+    const stripeCheckoutBaseUrl = getWindowVar(
+      "TSCIRCUIT_STRIPE_CHECKOUT_BASE_URL",
+    )
+
+    window.location.href = `${stripeCheckoutBaseUrl}?client_reference_id=${orderQuoteId}`
   }
 
   // Fetch order quotes
@@ -94,19 +98,21 @@ export const InitialOrderScreen = ({
       setQuotes([])
       setFetchError(null)
 
-      const quoteId = await createOrderQuotes()
+      const orderQuoteId = await createOrderQuotes()
 
-      if (!quoteId) {
+      if (!orderQuoteId) {
         toast.error("Failed to create order quote.")
         setLoading(false)
         return
       }
 
       try {
-        await pollToGetOrderQuotes(quoteId)
+        const orderQuote = await pollToGetOrderQuotes(orderQuoteId)
+        setQuotes([orderQuote])
+        setLoading(false)
       } catch (error) {
-        const quotes = await getFakeOrderQuotes(quoteId)
-        setQuotes([...quotes])
+        console.error(error)
+        toast.error("Failed to fetch order quotes.")
         setLoading(false)
       }
     }
@@ -165,22 +171,22 @@ export const InitialOrderScreen = ({
           className="rf-w-1/2 rf-bg-blue-600 rf-hover:bg-blue-700"
           disabled={
             selectedVendorIdx === null ||
-            selectedShippingIdx === null ||
+            // selectedShippingIdx === null ||
             loading
           }
           onClick={() => {
             if (
               selectedVendorIdx === null ||
-              selectedShippingIdx === null ||
+              // selectedShippingIdx === null ||
               loading
             ) {
               toast.error("Please select a vendor and shipping option.")
               return
             }
-            onContinue({
-              vendor: quotes[selectedVendorIdx],
-              shippingIdx: selectedShippingIdx,
-            })
+            
+            if (orderQuoteReceived) {
+              redirectToStripeCheckout(orderQuoteReceived.order_quote_id)
+            }
           }}
         >
           Continue

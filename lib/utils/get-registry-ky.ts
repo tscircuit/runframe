@@ -1,6 +1,6 @@
 import ky from "ky"
 
-function getWindowVar(name: string) {
+export function getWindowVar(name: string) {
   return typeof window !== "undefined" ? (window as any)[name] : null
 }
 

@@ -1,4 +1,4 @@
-import { AlertDialog, AlertDialogContent } from "lib/components/ui/alert-dialog"
+import { Dialog, DialogContent } from "lib/components/ui/dialog"
 import type { FC } from "react"
 import { QueryClient, QueryClientProvider } from "react-query"
 import { InitialOrderScreen } from "./InitialOrder"
@@ -24,8 +24,13 @@ export const OrderDialog: FC<OrderDialogProps> = ({
 }) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <AlertDialog open={isOpen} onOpenChange={onClose}>
-        <AlertDialogContent className="!rf-max-w-[660px] !rf-p-0">
+      <Dialog
+        open={isOpen}
+        onOpenChange={(open) => {
+          if (!open) onClose()
+        }}
+      >
+        <DialogContent className="!rf-max-w-[660px] !rf-p-0">
           <div className="rf-relative rf-w-full">
             {stage === "initial" && (
               <InitialOrderScreen
@@ -52,8 +57,8 @@ export const OrderDialog: FC<OrderDialogProps> = ({
               />
             )} */}
           </div>
-        </AlertDialogContent>
-      </AlertDialog>
+        </DialogContent>
+      </Dialog>
     </QueryClientProvider>
   )
 }

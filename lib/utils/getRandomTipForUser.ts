@@ -7,6 +7,7 @@ export const tips = [
   "Check out the guide on [ordering prototypes](https://docs.tscircuit.com/building-electronics/ordering-prototypes)",
   "Use [net labels](https://docs.tscircuit.com/elements/net) and [group elements](https://docs.tscircuit.com/elements/group) to organize complex schematics.",
   "You can manually drag components on the PCB and Schematic using [manual edits](https://docs.tscircuit.com/guides/manual-edits)",
+  "Every tscircuit module can export to [Circuit JSON](https://github.com/tscircuit/circuit-json), Gerbers, Pick'n'Place CSV files, Bill of Materials CSV and more",
   "You can import components from [JLCPCB](https://docs.tscircuit.com/guides/importing-modules-and-chips/importing-from-jlcpcb) or [KiCad](https://docs.tscircuit.com/guides/importing-modules-and-chips/importing-from-kicad)",
   "Any module you push to the [registry](https://tscircuit.com/trending) will have [simple image urls](https://docs.tscircuit.com/web-apis/image-generation-api) you can use display images on a website",
   "The default [Parts Engine](https://docs.tscircuit.com/guides/platform-configuration) will automatically find parts from common vendors for your BOM",

@@ -183,7 +183,7 @@ export const InitialOrderScreen = ({
               toast.error("Please select a vendor and shipping option.")
               return
             }
-            
+
             if (orderQuoteReceived) {
               redirectToStripeCheckout(orderQuoteReceived.order_quote_id)
             }

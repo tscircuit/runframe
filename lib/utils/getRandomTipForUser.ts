@@ -27,6 +27,8 @@ export const tips = [
 export const getRandomTipForUser = () => {
   let tip = tips[Math.floor(Math.random() * tips.length)]
 
+  tip = tip.replace(/</g, "&lt;")
+  tip = tip.replace(/>/g, "&gt;")
   tip = tip.replace(
     /(?<!href=")(?<!\()(?<!\]\()(https?:\/\/[^\s\)\]]+)/g,
     (match, p1) =>

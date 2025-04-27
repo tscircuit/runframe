@@ -258,6 +258,17 @@ export const RunFrame = (props: RunFrameProps) => {
       props.onRenderFinished?.({ circuitJson })
       setAutoroutingGraphics({})
 
+      console.log(
+        circuitJson.filter(
+          (x: any) => x.type.includes("error") && x.error_type,
+        ),
+      )
+      circuitJson
+        .filter((x: any) => x.type.includes("error") && x.error_type)
+        .forEach((x) =>
+          setError({ error: (x as any).message || "Unknown error" }),
+        )
+
       if (activeTab === "render_log") {
         renderLog.phaseTimings = getPhaseTimingsFromRenderEvents(
           renderLog.renderEvents ?? [],

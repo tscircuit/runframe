@@ -1,5 +1,5 @@
 import { GitHubLogoIcon } from "@radix-ui/react-icons"
-import { ClipboardIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
+import { ClipboardIcon, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "lib/components/ui/button"
 import { createSnippetUrl } from "@tscircuit/create-snippet-url"
 import { AutoroutingLogOptions } from "./AutoroutingLogOptions"
@@ -78,39 +78,39 @@ export const ErrorTabContent = ({
 
   return (
     <>
-      <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200 rf-max-h-[500px] rf-overflow-y-auto rf-px-2">
-        {/* New Pagination UI on top left */}
-        <div className="rf-flex rf-flex-col rf-items-start rf-p-2">
-          <div className="rf-text-xs rf-font-bold rf-text-red-800 mb-1">
-            Error {currentIndex + 1} of {errorsList.length}
-          </div>
-          <div className="rf-flex rf-gap-1">
-            <Button
-              variant="outline"
-              className="rf-p-0.5"
-              onClick={handlePrev}
-              disabled={currentIndex === 0}
-            >
-              <ChevronLeftIcon className="rf-w-3 rf-h-3 rf-text-red-600 rf-opacity-75" />
-            </Button>
-            <Button
-              variant="outline"
-              className="rf-p-0.5"
-              onClick={handleNext}
-              disabled={currentIndex === errorsList.length - 1}
-            >
-              <ChevronRightIcon className="rf-w-3 rf-h-3 rf-text-red-600 rf-opacity-75" />
-            </Button>
-          </div>
+      <div className="rf-w-[95%] rf-mx-auto">
+        {/* Navigation positioned above the border */}
+        <div className="rf-flex rf-items-center rf-gap-2 rf-mb-2">
+          <button
+            className="rf-p-1 rf-bg-gray-100 rf-rounded-sm rf-transition-colors"
+            onClick={handlePrev}
+            disabled={currentIndex === 0}
+          >
+            <ChevronLeft className="rf-h-4 rf-w-4 rf-text-red-500" />
+          </button>
+          <button
+            className="rf-p-1 rf-bg-gray-100 rf-rounded-sm rf-transition-colors"
+            onClick={handleNext}
+            disabled={currentIndex === errorsList.length - 1}
+          >
+            <ChevronRight className="rf-h-4 rf-w-4 rf-text-red-500" />
+          </button>
+          <span>
+            {currentIndex + 1} of {errorsList.length} error
+          </span>
         </div>
-        {/* Error details */}
-        <div className="rf-p-4">
-          <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-1">
-            {errorsList[currentIndex].heading}
-          </h3>
-          <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600">
-            {errorsList[currentIndex].message}
-          </p>
+
+        <div className="rf-w-full rf-bg-white rf-border rf-border-gray-200 rf-rounded-md rf-shadow-sm rf-overflow-hidden">
+          <div className="rf-p-4">
+            <div className="rf-py-2">
+              <h2 className="rf-text-2xl rf-font-bold rf-text-gray-900">
+                {errorsList[currentIndex].heading}
+              </h2>
+              <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600">
+                Error: {errorsList[currentIndex].message}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
       <div className="rf-flex rf-gap-2 rf-mt-4 rf-justify-end">

@@ -36,12 +36,15 @@ export const RunFrame = (props: RunFrameProps) => {
     s.circuitJson,
     s.setCircuitJson,
   ])
-  const [error, setError] = useState<{
-    phase?: string
-    componentDisplayName?: string
-    error?: string
-    stack?: string
-  } | null>(null)
+  const [errors, setErrors] = useState<
+    Array<{
+      phase?: string
+      componentDisplayName?: string
+      error?: string
+      stack?: string
+      errorType?: string
+    }>
+  >([]) // Changed to an array to store multiple errors
   const [autoroutingGraphics, setAutoroutingGraphics] = useState<any>(null)
   const [runCountTrigger, incRunCountTrigger] = useReducer(
     (acc: number, s: number) => acc + 1,
@@ -86,13 +89,16 @@ export const RunFrame = (props: RunFrameProps) => {
     const fsMapObj =
       fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap
 
-    // Check if no files are provided
     if (!fsMapObj || Object.keys(fsMapObj).length === 0) {
-      setError({
-        error:
-          "No files provided. Please provide at least one file with code to execute.",
-        stack: "",
-      })
+      setErrors((prevErrors) => [
+        ...prevErrors,
+        {
+          error:
+            "No files provided. Please provide at least one file with code to execute.",
+          stack: "",
+          errorType: "fsMap",
+        },
+      ])
       setIsRunning(false)
       return
     }
@@ -126,7 +132,7 @@ export const RunFrame = (props: RunFrameProps) => {
 
     const runWorker = async () => {
       debug("running render worker")
-      setError(null)
+      setErrors([]) // Reset errors before starting
       const renderLog: RenderLog = { progress: 0 }
 
       let evalVersion = props.evalVersion ?? "latest"
@@ -224,7 +230,10 @@ export const RunFrame = (props: RunFrameProps) => {
           // removing the prefix "Eval compiled js error for "./main.tsx":"
           const message: string = e.message.replace("Error: ", "")
           props.onError?.(e)
-          setError({ error: message, stack: e.stack })
+          setErrors((prevErrors) => [
+            ...prevErrors,
+            { error: message, stack: e.stack, errorType: "execution" },
+          ]) // Store error in the array
           console.error(e)
           return { success: false }
         })
@@ -239,7 +248,10 @@ export const RunFrame = (props: RunFrameProps) => {
       let circuitJson = await worker.getCircuitJson().catch((e: any) => {
         debug("error getting initial circuit json", e)
         props.onError?.(e)
-        setError({ error: e.message, stack: e.stack })
+        setErrors((prevErrors) => [
+          ...prevErrors,
+          { error: e.message, stack: e.stack, errorType: "circuitJson" },
+        ]) // Store error in the array
         setIsRunning(false)
         return null
       })
@@ -258,15 +270,17 @@ export const RunFrame = (props: RunFrameProps) => {
       props.onRenderFinished?.({ circuitJson })
       setAutoroutingGraphics({})
 
-      console.log(
-        circuitJson.filter(
-          (x: any) => x.type.includes("error") && x.error_type,
-        ),
-      )
       circuitJson
         .filter((x: any) => x.type.includes("error") && x.error_type)
-        .forEach((x) =>
-          setError({ error: (x as any).message || "Unknown error" }),
+        .forEach(
+          (x) =>
+            setErrors((prevErrors) => [
+              ...prevErrors,
+              {
+                error: (x as any).message || "Unknown error",
+                errorType: (x as any).error_type,
+              },
+            ]), // Store error in the array
         )
 
       if (activeTab === "render_log") {
@@ -311,7 +325,6 @@ export const RunFrame = (props: RunFrameProps) => {
       }, 100)
     }
   }
-
   return (
     <CircuitJsonPreview
       defaultActiveTab={props.defaultActiveTab}
@@ -371,7 +384,7 @@ export const RunFrame = (props: RunFrameProps) => {
       circuitJson={circuitJson}
       renderLog={renderLog}
       isRunningCode={isRunning}
-      errorMessage={error?.error}
+      errorMessages={errors}
       onEditEvent={handleEditEvent}
       editEvents={props.editEvents}
       defaultToFullScreen={props.defaultToFullScreen}

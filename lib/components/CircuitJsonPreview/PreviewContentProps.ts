@@ -18,7 +18,15 @@ export interface PreviewContentProps {
   readOnly?: boolean
   onRunClicked?: () => void
   tsxRunTriggerCount?: number
-  errorMessage?: string | null
+  errorMessages?:
+    | {
+        phase?: string
+        componentDisplayName?: string
+        error?: string
+        stack?: string
+        errorType?: string
+      }[]
+    | null
   autoroutingGraphics?: any
   circuitJson: any
   className?: string

@@ -7,7 +7,7 @@ import {
 import { cn } from "lib/utils"
 import { CadViewer } from "@tscircuit/3d-viewer"
 import { PCBViewer } from "@tscircuit/pcb-viewer"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState, useRef, useMemo } from "react"
 import { ErrorFallback } from "../ErrorFallback"
 import { ErrorBoundary } from "react-error-boundary"
 import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
@@ -59,7 +59,7 @@ export type { PreviewContentProps, TabId }
 export const CircuitJsonPreview = ({
   code,
   onRunClicked = undefined,
-  errorMessage,
+  errorMessages,
   circuitJson,
   autoroutingGraphics,
   showRightHeaderContent = true,
@@ -89,7 +89,10 @@ export const CircuitJsonPreview = ({
 }: PreviewContentProps) => {
   useStyles()
 
-  const [activeTab, setActiveTabState] = useState(defaultActiveTab ?? "pcb")
+  const prevErrorCount = useRef(0)
+  const [activeTab, setActiveTabState] = useState<TabId>(
+    defaultActiveTab ?? "pcb",
+  )
   const [isFullScreen, setIsFullScreen] = useState(defaultToFullScreen)
   const setActiveTab = useCallback(
     (tab: TabId) => {
@@ -104,20 +107,18 @@ export const CircuitJsonPreview = ({
   }
 
   useEffect(() => {
-    if (errorMessage) {
+    // Auto-switch to 'errors' only when errors appear for the first time
+    if (
+      errorMessages &&
+      errorMessages.length > 0 &&
+      prevErrorCount.current === 0
+    ) {
       setActiveTab("errors")
     }
-  }, [errorMessage])
+    prevErrorCount.current = errorMessages ? errorMessages.length : 0
+  }, [errorMessages])
 
-  useEffect(() => {
-    if (
-      (activeTab === "code" || activeTab === "errors") &&
-      circuitJson &&
-      !errorMessage
-    ) {
-      setActiveTab(defaultActiveTab ?? "pcb")
-    }
-  }, [circuitJson])
+  console.log("CircuitJsonPreview")
 
   return (
     <div
@@ -216,7 +217,7 @@ export const CircuitJsonPreview = ({
                   <DropdownMenuTrigger asChild>
                     <div className="rf-whitespace-nowrap rf-p-2 rf-mr-1 rf-cursor-pointer rf-relative">
                       <EllipsisIcon className="rf-w-4 rf-h-4" />
-                      {errorMessage && (
+                      {errorMessages && errorMessages.length > 0 && (
                         <span className="rf-inline-flex rf-absolute rf-top-[6px] rf-right-[4px] rf-items-center rf-justify-center rf-w-1 rf-h-1 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full" />
                       )}
                     </div>
@@ -236,11 +237,13 @@ export const CircuitJsonPreview = ({
                         <div className="rf-pr-2">
                           {capitalizeFirstLetters(item)}
                         </div>
-                        {item === "errors" && errorMessage && (
-                          <span className="rf-inline-flex rf-items-center rf-justify-center rf-w-3 rf-h-3 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full">
-                            1
-                          </span>
-                        )}
+                        {item === "errors" &&
+                          errorMessages &&
+                          errorMessages.length > 0 && (
+                            <span className="rf-inline-flex rf-items-center rf-justify-center rf-w-3 rf-h-3 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full">
+                              {errorMessages.length}
+                            </span>
+                          )}
                       </DropdownMenuItem>
                     ))}
                     <DropdownMenuItem
@@ -472,10 +475,10 @@ export const CircuitJsonPreview = ({
                 isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
               )}
             >
-              {circuitJson || errorMessage ? (
+              {circuitJson || (errorMessages && errorMessages.length > 0) ? (
                 <ErrorTabContent
                   code={code}
-                  errorMessage={errorMessage}
+                  errorMessages={errorMessages}
                   autoroutingLog={autoroutingLog}
                   onReportAutoroutingLog={onReportAutoroutingLog}
                 />

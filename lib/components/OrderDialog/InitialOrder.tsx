@@ -4,10 +4,8 @@ import { useEffect, useState } from "react"
 import VendorQuoteCard from "./VendorQuoteCard"
 import { toast } from "lib/utils/toast"
 import { getWindowVar } from "lib/utils/get-registry-ky"
+import { useCreateOrderQuote } from "lib/hooks/use-create-order-quote"
 import { useOrderQuotePolling } from "lib/hooks/use-order-quote-polling"
-import debug from "debug"
-
-const log = debug("tscircuit:runframe:order-dialog:initial-order")
 
 interface InitialOrderScreenProps {
   onCancel: () => void
@@ -18,30 +16,14 @@ export const InitialOrderScreen = ({
   onCancel,
   packageReleaseId,
 }: InitialOrderScreenProps) => {
-  const [selectedVendorIdx, setSelectedVendorIdx] = useState<number | null>(
-    null,
-  )
-  const [selectedShippingIdx, setSelectedShippingIdx] = useState<number | null>(
-    null,
-  )
+  const [selectedVendorIdx, setSelectedVendorIdx] = useState<number | null>(null)
+  const [selectedShippingIdx, setSelectedShippingIdx] = useState<number | null>(null)
 
-  const {
-    status,
-    data: orderQuote,
-    error,
-    stopPolling,
-  } = useOrderQuotePolling(packageReleaseId)
-
-  const handleCancel = () => {
-    log("Cancelling order")
-    stopPolling()
-    onCancel()
-  }
+  const { mutate: createOrderQuote, data: orderQuoteId } = useCreateOrderQuote()
+  const { status, data: orderQuote, error } = useOrderQuotePolling(orderQuoteId)
 
   const redirectToStripeCheckout = async (orderQuoteId: string) => {
-    const stripeCheckoutBaseUrl = getWindowVar(
-      "TSCIRCUIT_STRIPE_CHECKOUT_BASE_URL",
-    )
+    const stripeCheckoutBaseUrl = getWindowVar("TSCIRCUIT_STRIPE_CHECKOUT_BASE_URL")
     window.location.href = `${stripeCheckoutBaseUrl}?client_reference_id=${orderQuoteId}`
   }
 
@@ -49,6 +31,10 @@ export const InitialOrderScreen = ({
   useEffect(() => {
     setSelectedShippingIdx(null)
   }, [selectedVendorIdx])
+
+  useEffect(() => {
+    createOrderQuote(packageReleaseId)
+  }, [packageReleaseId, createOrderQuote])
 
   return (
     <div className="rf-max-w-lg rf-mx-auto rf-bg-white rf-rounded-2xl rf-p-8 rf-flex rf-flex-col rf-gap-3">
@@ -77,9 +63,7 @@ export const InitialOrderScreen = ({
           vendor={orderQuote}
           isActive={selectedVendorIdx === 0}
           onSelect={() => setSelectedVendorIdx(0)}
-          selectedShippingIdx={
-            selectedVendorIdx === 0 ? selectedShippingIdx : null
-          }
+          selectedShippingIdx={selectedVendorIdx === 0 ? selectedShippingIdx : null}
           onSelectShipping={setSelectedShippingIdx}
         />
       )}
@@ -89,7 +73,7 @@ export const InitialOrderScreen = ({
           variant="outline"
           type="button"
           className="rf-w-1/2 rf-border-red-500 rf-text-red-500 rf-hover:bg-red-50 rf-hover:text-red-600"
-          onClick={handleCancel}
+          onClick={onCancel}
         >
           Cancel
         </Button>

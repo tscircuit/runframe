@@ -22,4 +22,4 @@ export const getOrderQuote = async (orderQuoteId: string) => {
     })
     .json<{ order_quote: OrderQuote }>()
   return order_quote
-} 
+}

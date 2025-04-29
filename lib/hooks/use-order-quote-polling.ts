@@ -2,7 +2,11 @@ import { useQuery } from "react-query"
 import { getOrderQuote } from "lib/api/order-quotes"
 
 export const useOrderQuotePolling = (orderQuoteId: string | undefined) => {
-  const { data: orderQuote, error, status } = useQuery(
+  const {
+    data: orderQuote,
+    error,
+    status,
+  } = useQuery(
     ["getOrderQuote", orderQuoteId],
     () => getOrderQuote(orderQuoteId!),
     {
@@ -16,11 +20,16 @@ export const useOrderQuotePolling = (orderQuoteId: string | undefined) => {
       },
       refetchIntervalInBackground: true,
       retry: false,
-    }
+    },
   )
 
   return {
-    status: status === "loading" ? "loading" : status === "error" ? "error" : "success",
+    status:
+      status === "loading"
+        ? "loading"
+        : status === "error"
+          ? "error"
+          : "success",
     data: orderQuote ?? null,
     error: error instanceof Error ? error : null,
   }

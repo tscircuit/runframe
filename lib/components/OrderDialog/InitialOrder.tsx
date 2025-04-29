@@ -16,14 +16,20 @@ export const InitialOrderScreen = ({
   onCancel,
   packageReleaseId,
 }: InitialOrderScreenProps) => {
-  const [selectedVendorIdx, setSelectedVendorIdx] = useState<number | null>(null)
-  const [selectedShippingIdx, setSelectedShippingIdx] = useState<number | null>(null)
+  const [selectedVendorIdx, setSelectedVendorIdx] = useState<number | null>(
+    null,
+  )
+  const [selectedShippingIdx, setSelectedShippingIdx] = useState<number | null>(
+    null,
+  )
 
   const { mutate: createOrderQuote, data: orderQuoteId } = useCreateOrderQuote()
   const { status, data: orderQuote, error } = useOrderQuotePolling(orderQuoteId)
 
   const redirectToStripeCheckout = async (orderQuoteId: string) => {
-    const stripeCheckoutBaseUrl = getWindowVar("TSCIRCUIT_STRIPE_CHECKOUT_BASE_URL")
+    const stripeCheckoutBaseUrl = getWindowVar(
+      "TSCIRCUIT_STRIPE_CHECKOUT_BASE_URL",
+    )
     window.location.href = `${stripeCheckoutBaseUrl}?client_reference_id=${orderQuoteId}`
   }
 
@@ -63,7 +69,9 @@ export const InitialOrderScreen = ({
           vendor={orderQuote}
           isActive={selectedVendorIdx === 0}
           onSelect={() => setSelectedVendorIdx(0)}
-          selectedShippingIdx={selectedVendorIdx === 0 ? selectedShippingIdx : null}
+          selectedShippingIdx={
+            selectedVendorIdx === 0 ? selectedShippingIdx : null
+          }
           onSelectShipping={setSelectedShippingIdx}
         />
       )}

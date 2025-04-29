@@ -13,7 +13,7 @@ export const createOrderQuote = async (packageReleaseId: string) => {
   return order_quote_id
 }
 
-export const getOrderQuotes = async (orderQuoteId: string) => {
+export const getOrderQuote = async (orderQuoteId: string) => {
   const { order_quote } = await registryKy
     .get(`order_quotes/get`, {
       searchParams: {

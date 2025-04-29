@@ -1,10 +1,10 @@
 import { useQuery } from "react-query"
-import { getOrderQuotes } from "lib/api/order-quotes"
+import { getOrderQuote } from "lib/api/order-quotes"
 
 export const useOrderQuotePolling = (orderQuoteId: string | undefined) => {
   const { data: orderQuote, error, status } = useQuery(
     ["getOrderQuote", orderQuoteId],
-    () => getOrderQuotes(orderQuoteId!),
+    () => getOrderQuote(orderQuoteId!),
     {
       enabled: !!orderQuoteId,
       refetchInterval: (data) => {

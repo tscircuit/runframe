@@ -1,10 +1,14 @@
 import { Button } from "lib/components/ui/button"
 import { getRandomTipForUser } from "lib/utils/getRandomTipForUser"
 import { LightbulbIcon, PlayIcon } from "lucide-react"
-import { useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 const PreviewEmptyState = ({ onRunClicked }: { onRunClicked?: () => void }) => {
-  const tipHtml = useMemo(() => getRandomTipForUser(), [])
+  const [tipHtml, setTipHtml] = useState<string>("")
+
+  useEffect(() => {
+    setTipHtml(getRandomTipForUser())
+  }, [])
 
   return (
     <div className="rf-flex rf-flex-col rf-items-center rf-justify-center rf-h-full rf-bg-gray-50 rf-text-gray-500 rf-p-4">

@@ -1,7 +1,7 @@
 import { Button } from "lib/components/ui/button"
 import { getRandomTipForUser } from "lib/utils/getRandomTipForUser"
 import { LightbulbIcon, PlayIcon } from "lucide-react"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 
 const PreviewEmptyState = ({ onRunClicked }: { onRunClicked?: () => void }) => {
   const [tipHtml, setTipHtml] = useState<string>("")

@@ -6,7 +6,6 @@ import {
 } from "lib/components/ui/tabs"
 import { cn } from "lib/utils"
 import { CadViewer } from "@tscircuit/3d-viewer"
-import { PCBViewer } from "@tscircuit/pcb-viewer"
 import { useCallback, useEffect, useState, useRef, useMemo } from "react"
 import { ErrorFallback } from "../ErrorFallback"
 import { ErrorBoundary } from "react-error-boundary"
@@ -46,6 +45,11 @@ import { capitalizeFirstLetters } from "lib/utils"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
 import { version } from "../../../package.json"
 
+interface CircuitJsonErrors {
+  error: string
+  errorMessage: string
+}
+
 const dropdownMenuItems = [
   "assembly",
   "bom",
@@ -59,7 +63,7 @@ export type { PreviewContentProps, TabId }
 export const CircuitJsonPreview = ({
   code,
   onRunClicked = undefined,
-  errorMessages,
+  errorMessage,
   circuitJson,
   autoroutingGraphics,
   showRightHeaderContent = true,
@@ -89,7 +93,25 @@ export const CircuitJsonPreview = ({
 }: PreviewContentProps) => {
   useStyles()
 
-  const prevErrorCount = useRef(0)
+  const [circuitJsonErrors, setCircuitJsonErrors] = useState<
+    CircuitJsonErrors[] | null
+  >(null)
+
+  useEffect(() => {
+    if (circuitJson) {
+      const extractedErrors = circuitJson
+        .filter((e: any) => e.type?.includes("error") && e.error_type)
+        .map((e: any) => ({
+          error: e.error_type,
+          errorMessage: e.message,
+        }))
+
+      setCircuitJsonErrors(extractedErrors.length > 0 ? extractedErrors : null)
+    } else {
+      setCircuitJsonErrors(null)
+    }
+  }, [circuitJson])
+
   const [activeTab, setActiveTabState] = useState<TabId>(
     defaultActiveTab ?? "pcb",
   )
@@ -107,18 +129,43 @@ export const CircuitJsonPreview = ({
   }
 
   useEffect(() => {
-    // Auto-switch to 'errors' only when errors appear for the first time
-    if (
-      errorMessages &&
-      errorMessages.length > 0 &&
-      prevErrorCount.current === 0
-    ) {
+    if (circuitJsonErrors || errorMessage) {
       setActiveTab("errors")
     }
-    prevErrorCount.current = errorMessages ? errorMessages.length : 0
-  }, [errorMessages])
+  }, [circuitJsonErrors, errorMessage])
 
-  console.log("CircuitJsonPreview")
+  useEffect(() => {
+    if (
+      (activeTab === "code" || activeTab === "errors") &&
+      circuitJson &&
+      !circuitJsonErrors
+    ) {
+      setActiveTab(defaultActiveTab ?? "pcb")
+    }
+  }, [circuitJson])
+
+  const errorsList = useMemo(() => {
+    const combinedErrorList: { errorTitle: string; errorMessage: string }[] = []
+
+    if (errorMessage) {
+      combinedErrorList.push({
+        errorTitle: "Error",
+        errorMessage: errorMessage,
+      })
+    }
+
+    if (circuitJsonErrors) {
+      for (const { error, errorMessage } of circuitJsonErrors) {
+        const errorTitle = error
+          .split("_")
+          .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ")
+        combinedErrorList.push({ errorTitle: errorTitle, errorMessage })
+      }
+    }
+
+    return combinedErrorList.length > 0 ? combinedErrorList : null
+  }, [errorMessage, circuitJsonErrors])
 
   return (
     <div
@@ -217,7 +264,7 @@ export const CircuitJsonPreview = ({
                   <DropdownMenuTrigger asChild>
                     <div className="rf-whitespace-nowrap rf-p-2 rf-mr-1 rf-cursor-pointer rf-relative">
                       <EllipsisIcon className="rf-w-4 rf-h-4" />
-                      {errorMessages && errorMessages.length > 0 && (
+                      {errorsList && (
                         <span className="rf-inline-flex rf-absolute rf-top-[6px] rf-right-[4px] rf-items-center rf-justify-center rf-w-1 rf-h-1 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full" />
                       )}
                     </div>
@@ -237,13 +284,11 @@ export const CircuitJsonPreview = ({
                         <div className="rf-pr-2">
                           {capitalizeFirstLetters(item)}
                         </div>
-                        {item === "errors" &&
-                          errorMessages &&
-                          errorMessages.length > 0 && (
-                            <span className="rf-inline-flex rf-items-center rf-justify-center rf-w-3 rf-h-3 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full">
-                              {errorMessages.length}
-                            </span>
-                          )}
+                        {item === "errors" && errorsList && (
+                          <span className="rf-inline-flex rf-items-center rf-justify-center rf-w-3 rf-h-3 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full">
+                            1
+                          </span>
+                        )}
                       </DropdownMenuItem>
                     ))}
                     <DropdownMenuItem
@@ -475,10 +520,10 @@ export const CircuitJsonPreview = ({
                 isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
               )}
             >
-              {circuitJson || (errorMessages && errorMessages.length > 0) ? (
+              {circuitJson || errorsList ? (
                 <ErrorTabContent
                   code={code}
-                  errorMessages={errorMessages}
+                  errorsList={errorsList}
                   autoroutingLog={autoroutingLog}
                   onReportAutoroutingLog={onReportAutoroutingLog}
                 />

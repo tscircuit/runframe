@@ -300,6 +300,7 @@ export const RunFrame = (props: RunFrameProps) => {
       }, 100)
     }
   }
+
   return (
     <CircuitJsonPreview
       defaultActiveTab={props.defaultActiveTab}

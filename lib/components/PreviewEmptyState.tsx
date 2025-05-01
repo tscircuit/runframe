@@ -2,6 +2,7 @@ import { Button } from "lib/components/ui/button"
 import { getRandomTipForUser } from "lib/utils/getRandomTipForUser"
 import { LightbulbIcon, PlayIcon } from "lucide-react"
 
+//Storing tip in global
 const tipHtml: string = getRandomTipForUser()
 
 const PreviewEmptyState = ({ onRunClicked }: { onRunClicked?: () => void }) => {

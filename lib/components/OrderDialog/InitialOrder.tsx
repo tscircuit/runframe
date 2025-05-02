@@ -57,7 +57,7 @@ export const InitialOrderScreen = ({
         </div>
       ) : status === "error" || orderQuote?.error ? (
         <div className="rf-text-red-600 rf-text-center rf-py-12">
-          {error?.message || "Failed to fetch quotes"}
+          {orderQuote?.error?.message || "Failed to fetch quotes"}
         </div>
       ) : !orderQuote ? (
         <div className="rf-text-red-600 rf-text-center rf-py-12">

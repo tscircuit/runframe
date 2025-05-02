@@ -54,7 +54,8 @@ export default function VendorQuoteCard({
         </div>
       </div>
 
-      {isActive && (
+      {/* TODO: Add shipping options currently default shipping */}
+      {/* {isActive && (
         <>
           <hr className="rf-border-gray-200" />
           <div className="rf-px-6 rf-py-2">
@@ -86,34 +87,25 @@ export default function VendorQuoteCard({
                       {ship.service}
                     </div>
                   </div>
-                  {/* <div className="rf-font-semibold">
-                    ${ship.cost.toFixed(2)}
-                  </div> */}
                 </button>
               ))}
             </div>
           </div>
         </>
-      )}
+      )} */}
 
-      {isActive && selectedShippingIdx !== null && (
+      {/* {isActive && selectedShippingIdx !== null && (
         <div className="rf-px-6 rf-pb-3">
           <div className="rf-flex rf-justify-between rf-items-center rf-mt-2">
             <span className="rf-text-gray-800 rf-font-medium">
               Total (incl. shipping):
             </span>
-            {/* <span className="rf-font-bold rf-text-lg rf-text-blue-700">
-              $
-              {(
-                subtotal + vendor.shipping_options[selectedShippingIdx].cost
-              ).toFixed(2)}
-            </span> */}
             <span className="rf-font-bold rf-text-lg rf-text-blue-700">
               ${vendor.total_cost_without_shipping.toFixed(2)}
             </span>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   )
 }

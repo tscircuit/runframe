@@ -63,6 +63,11 @@ export const InitialOrderScreen = ({
         <div className="rf-text-red-600 rf-text-center rf-py-12">
           No quotes available.
         </div>
+      ) : !orderQuote.is_completed ? (
+        <div className="rf-flex rf-flex-col rf-items-center rf-gap-2 rf-my-12">
+          <Loader2 className="rf-animate-spin rf-w-8 rf-h-8 rf-text-gray-400" />
+          <p className="rf-text-gray-600">Calculating quote...</p>
+        </div>
       ) : (
         <VendorQuoteCard
           key={orderQuote.order_quote_id}

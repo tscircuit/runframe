@@ -45,11 +45,6 @@ import { capitalizeFirstLetters } from "lib/utils"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
 import { version } from "../../../package.json"
 
-interface CircuitJsonErrors {
-  error: string
-  errorMessage: string
-}
-
 const dropdownMenuItems = [
   "assembly",
   "bom",
@@ -93,23 +88,17 @@ export const CircuitJsonPreview = ({
 }: PreviewContentProps) => {
   useStyles()
 
-  const [circuitJsonErrors, setCircuitJsonErrors] = useState<
-    CircuitJsonErrors[] | null
-  >(null)
+  const errors = useMemo(() => {
+    if (!circuitJson) return null
 
-  useEffect(() => {
-    if (circuitJson) {
-      const extractedErrors = circuitJson
-        .filter((e: any) => e.type?.includes("error") && e.error_type)
-        .map((e: any) => ({
-          error: e.error_type,
-          errorMessage: e.message,
-        }))
+    const extractedErrors = circuitJson
+      .filter((e: any) => e.type && e.type?.includes("error") && e.error_type)
+      .map((e: any) => ({
+        errorTitle: e.error_type,
+        errorMessage: e.message,
+      }))
 
-      setCircuitJsonErrors(extractedErrors.length > 0 ? extractedErrors : null)
-    } else {
-      setCircuitJsonErrors(null)
-    }
+    return extractedErrors.length > 0 ? extractedErrors : null
   }, [circuitJson])
 
   const [activeTab, setActiveTabState] = useState<TabId>(
@@ -129,43 +118,20 @@ export const CircuitJsonPreview = ({
   }
 
   useEffect(() => {
-    if (circuitJsonErrors || errorMessage) {
+    if (errorMessage) {
       setActiveTab("errors")
     }
-  }, [circuitJsonErrors, errorMessage])
+  }, [errorMessage])
 
   useEffect(() => {
     if (
       (activeTab === "code" || activeTab === "errors") &&
       circuitJson &&
-      !circuitJsonErrors
+      !errorMessage
     ) {
       setActiveTab(defaultActiveTab ?? "pcb")
     }
   }, [circuitJson])
-
-  const errorsList = useMemo(() => {
-    const combinedErrorList: { errorTitle: string; errorMessage: string }[] = []
-
-    if (errorMessage) {
-      combinedErrorList.push({
-        errorTitle: "Error",
-        errorMessage: errorMessage,
-      })
-    }
-
-    if (circuitJsonErrors) {
-      for (const { error, errorMessage } of circuitJsonErrors) {
-        const errorTitle = error
-          .split("_")
-          .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" ")
-        combinedErrorList.push({ errorTitle: errorTitle, errorMessage })
-      }
-    }
-
-    return combinedErrorList.length > 0 ? combinedErrorList : null
-  }, [errorMessage, circuitJsonErrors])
 
   return (
     <div
@@ -264,7 +230,7 @@ export const CircuitJsonPreview = ({
                   <DropdownMenuTrigger asChild>
                     <div className="rf-whitespace-nowrap rf-p-2 rf-mr-1 rf-cursor-pointer rf-relative">
                       <EllipsisIcon className="rf-w-4 rf-h-4" />
-                      {errorsList && (
+                      {(errors || errorMessage) && (
                         <span className="rf-inline-flex rf-absolute rf-top-[6px] rf-right-[4px] rf-items-center rf-justify-center rf-w-1 rf-h-1 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full" />
                       )}
                     </div>
@@ -284,9 +250,9 @@ export const CircuitJsonPreview = ({
                         <div className="rf-pr-2">
                           {capitalizeFirstLetters(item)}
                         </div>
-                        {item === "errors" && errorsList && (
+                        {item === "errors" && (errors || errorMessage) && (
                           <span className="rf-inline-flex rf-items-center rf-justify-center rf-w-3 rf-h-3 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full">
-                            1
+                            {errorMessage ? 1 : errors?.length}
                           </span>
                         )}
                       </DropdownMenuItem>
@@ -520,10 +486,11 @@ export const CircuitJsonPreview = ({
                 isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
               )}
             >
-              {circuitJson || errorsList ? (
+              {circuitJson ? (
                 <ErrorTabContent
                   code={code}
-                  errorsList={errorsList}
+                  errorsList={errors}
+                  errorMessage={errorMessage}
                   autoroutingLog={autoroutingLog}
                   onReportAutoroutingLog={onReportAutoroutingLog}
                 />

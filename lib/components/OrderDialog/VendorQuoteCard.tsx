@@ -44,7 +44,7 @@ export default function VendorQuoteCard({
           <span className="rf-text-gray-500 rf-text-sm">PCB + Components</span>
           <div className="rf-flex rf-items-center rf-gap-2">
             <span className="rf-text-gray-400 rf-line-through rf-text-base rf-mr-2">
-              ${vendor.total_cost.toFixed(2)}
+              ${vendor.total_cost_without_shipping.toFixed(2)}
             </span>
             {/* TODO: Remove this hardcoded value of JLCPCB and add in API*/}
             <span className="rf-font-bold rf-text-xl rf-text-blue-600">
@@ -109,7 +109,7 @@ export default function VendorQuoteCard({
               ).toFixed(2)}
             </span> */}
             <span className="rf-font-bold rf-text-lg rf-text-blue-700">
-              ${vendor.total_cost.toFixed(2)}
+              ${vendor.total_cost_without_shipping.toFixed(2)}
             </span>
           </div>
         </div>

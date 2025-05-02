@@ -6,7 +6,7 @@ import {
 } from "lib/components/ui/tabs"
 import { cn } from "lib/utils"
 import { CadViewer } from "@tscircuit/3d-viewer"
-import { useCallback, useEffect, useState, useRef, useMemo } from "react"
+import { useCallback, useEffect, useState, useMemo } from "react"
 import { ErrorFallback } from "../ErrorFallback"
 import { ErrorBoundary } from "react-error-boundary"
 import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
@@ -88,7 +88,7 @@ export const CircuitJsonPreview = ({
 }: PreviewContentProps) => {
   useStyles()
 
-  const errors = useMemo(() => {
+  const errorsList = useMemo(() => {
     if (!circuitJson) return null
 
     const extractedErrors = circuitJson
@@ -230,7 +230,7 @@ export const CircuitJsonPreview = ({
                   <DropdownMenuTrigger asChild>
                     <div className="rf-whitespace-nowrap rf-p-2 rf-mr-1 rf-cursor-pointer rf-relative">
                       <EllipsisIcon className="rf-w-4 rf-h-4" />
-                      {(errors || errorMessage) && (
+                      {(errorsList || errorMessage) && (
                         <span className="rf-inline-flex rf-absolute rf-top-[6px] rf-right-[4px] rf-items-center rf-justify-center rf-w-1 rf-h-1 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full" />
                       )}
                     </div>
@@ -250,9 +250,9 @@ export const CircuitJsonPreview = ({
                         <div className="rf-pr-2">
                           {capitalizeFirstLetters(item)}
                         </div>
-                        {item === "errors" && (errors || errorMessage) && (
+                        {item === "errors" && (errorsList || errorMessage) && (
                           <span className="rf-inline-flex rf-items-center rf-justify-center rf-w-3 rf-h-3 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full">
-                            {errorMessage ? 1 : errors?.length}
+                            {errorMessage ? 1 : errorsList?.length}
                           </span>
                         )}
                       </DropdownMenuItem>
@@ -489,7 +489,7 @@ export const CircuitJsonPreview = ({
               {circuitJson ? (
                 <ErrorTabContent
                   code={code}
-                  errorsList={errors}
+                  errorsList={errorsList}
                   errorMessage={errorMessage}
                   autoroutingLog={autoroutingLog}
                   onReportAutoroutingLog={onReportAutoroutingLog}

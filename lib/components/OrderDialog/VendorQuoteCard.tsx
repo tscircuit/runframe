@@ -109,8 +109,7 @@ export default function VendorQuoteCard({
               ).toFixed(2)}
             </span> */}
             <span className="rf-font-bold rf-text-lg rf-text-blue-700">
-              $
-              {vendor.total_cost_without_shipping.toFixed(2)}
+              ${vendor.total_cost_without_shipping.toFixed(2)}
             </span>
           </div>
         </div>

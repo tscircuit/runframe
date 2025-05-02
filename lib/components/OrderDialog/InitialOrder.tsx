@@ -50,12 +50,12 @@ export const InitialOrderScreen = ({
       <div className="rf-mb-4 rf-text-gray-700 rf-text-center">
         Select a quote from below, then pick a shipping method.
       </div>
-      {status === "loading" ? (
+      {status === "loading" || !orderQuoteId ? (
         <div className="rf-flex rf-flex-col rf-items-center rf-gap-2 rf-my-12">
           <Loader2 className="rf-animate-spin rf-w-8 rf-h-8 rf-text-gray-400" />
           <p className="rf-text-gray-600">Fetching quotes...</p>
         </div>
-      ) : status === "error" ? (
+      ) : status === "error" || orderQuote?.error ? (
         <div className="rf-text-red-600 rf-text-center rf-py-12">
           {error?.message || "Failed to fetch quotes"}
         </div>

@@ -3,32 +3,29 @@ import { ClipboardIcon, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "lib/components/ui/button"
 import { createSnippetUrl } from "@tscircuit/create-snippet-url"
 import { AutoroutingLogOptions } from "./AutoroutingLogOptions"
-import { useMemo, useState } from "react"
+import { useState } from "react"
+import type { CircuitJson } from "circuit-json"
+import type { CircuitJsonErrors } from "../../components/CircuitJsonPreview/CircuitJsonPreview"
 
 export const ErrorTabContent = ({
   code,
   autoroutingLog,
   isStreaming,
-  errorsList,
+  circuitJsonErrors,
   onReportAutoroutingLog,
   errorMessage,
 }: {
   code?: string
   autoroutingLog?: Record<string, { simpleRouteJson: any }>
   isStreaming?: boolean
-  errorsList:
-    | {
-        errorTitle: string
-        errorMessage: string
-      }[]
-    | null
+  circuitJsonErrors: CircuitJsonErrors | null
   errorMessage?: string | null
   onReportAutoroutingLog?: (
     name: string,
     data: { simpleRouteJson: any },
   ) => void
 }) => {
-  if (!errorMessage && !errorsList) {
+  if (!errorMessage && !circuitJsonErrors) {
     return (
       <div className="px-2">
         <div className="rf-mt-4 rf-bg-green-50 rf-rounded-md rf-border rf-border-green-200">
@@ -58,7 +55,9 @@ export const ErrorTabContent = ({
   }
 
   const handleNext = () => {
-    setCurrentErrorIndex((prev) => Math.min(prev + 1, errorsList!.length - 1))
+    setCurrentErrorIndex((prev) =>
+      Math.min(prev + 1, circuitJsonErrors!.length - 1),
+    )
   }
 
   return (
@@ -75,7 +74,7 @@ export const ErrorTabContent = ({
           </div>
         )}
 
-        {errorsList && errorsList.length > 0 && (
+        {circuitJsonErrors && circuitJsonErrors.length > 0 && (
           <>
             <div className="rf-flex rf-items-center rf-gap-2 rf-mb-2">
               <button
@@ -88,22 +87,22 @@ export const ErrorTabContent = ({
               <button
                 className="rf-p-1 rf-rounded-sm rf-transition-colors"
                 onClick={handleNext}
-                disabled={currentErrorIndex === errorsList!.length - 1}
+                disabled={currentErrorIndex === circuitJsonErrors!.length - 1}
               >
                 <ChevronRight className="rf-h-4 rf-w-4 rf-text-red-500" />
               </button>
               <span>
-                {currentErrorIndex + 1} of {errorsList!.length} error
+                {currentErrorIndex + 1} of {circuitJsonErrors!.length} error
               </span>
             </div>
 
             <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200 rf-max-h-[500px] rf-overflow-y-auto rf-px-2">
               <div className="rf-p-4">
                 <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-1">
-                  {errorsList![currentErrorIndex].errorTitle}
+                  {circuitJsonErrors![currentErrorIndex].error_type}
                 </h3>
                 <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600">
-                  {errorsList![currentErrorIndex].errorMessage}
+                  {circuitJsonErrors![currentErrorIndex].message}
                 </p>
               </div>
             </div>
@@ -119,14 +118,10 @@ export const ErrorTabContent = ({
           variant="outline"
           className="rf-p-1"
           onClick={() => {
-            const error = errorsList
-              ? errorsList[currentErrorIndex]
-              : {
-                  errorTitle: "Execution Error",
-                  errorMessage: errorMessage ?? "",
-                }
-            const combined = `${error.errorTitle}: ${error.errorMessage}`
-            navigator.clipboard.writeText(combined)
+            const activeError = circuitJsonErrors![currentErrorIndex]
+            navigator.clipboard.writeText(
+              `${activeError.error_type}: ${activeError.message}`,
+            )
             alert("Error copied to clipboard!")
           }}
         >
@@ -137,22 +132,22 @@ export const ErrorTabContent = ({
           variant="outline"
           className="rf-p-1"
           onClick={() => {
-            const error = errorsList
-              ? errorsList[currentErrorIndex]
+            const error = circuitJsonErrors
+              ? circuitJsonErrors[currentErrorIndex]
               : {
-                  errorTitle: "Execution Error",
-                  errorMessage: errorMessage ?? "",
+                  error_type: "Execution Error",
+                  message: errorMessage ?? "",
                 }
-            const title = `Error: ${error.errorTitle}`
+            const title = `Error: ${error.error_type}`
               .replace(/[^a-zA-Z0-9 ]/g, " ")
               .replace(/\s+/g, " ")
               .slice(0, 100)
 
             const url = createSnippetUrl(code ?? "")
-            let body = `[Snippet code to reproduce](${url})\n\n### Error\n\\\n${error.errorTitle}: ${error.errorMessage}\n\\\n`
+            let body = `[Snippet code to reproduce](${url})\n\n### Error\n\\\n${error.error_type}: ${error.message}\n\\\n`
 
             if (body.length > 4000) {
-              body = `\`\`\`tsx\n// Please paste the code here\n\`\`\`\n\n### Error\n\`\`\`\n${error.errorTitle}: ${error.errorMessage}\n\`\`\``
+              body = `\`\`\`tsx\n// Please paste the code here\n\`\`\`\n\n### Error\n\`\`\`\n${error.error_type}: ${error.message}\n\`\`\``
             }
 
             window.open(

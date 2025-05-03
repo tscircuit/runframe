@@ -44,6 +44,7 @@ import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { capitalizeFirstLetters } from "lib/utils"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
 import { version } from "../../../package.json"
+import type { CircuitJson } from "circuit-json"
 
 const dropdownMenuItems = [
   "assembly",
@@ -54,6 +55,13 @@ const dropdownMenuItems = [
 ]
 
 export type { PreviewContentProps, TabId }
+
+function getCircuitJsonErrors(circuitJson: CircuitJson | null) {
+  if (!circuitJson) return null
+  return circuitJson.filter((e) => e && "error_type" in e)
+}
+
+export type CircuitJsonErrors = ReturnType<typeof getCircuitJsonErrors>
 
 export const CircuitJsonPreview = ({
   code,
@@ -88,18 +96,10 @@ export const CircuitJsonPreview = ({
 }: PreviewContentProps) => {
   useStyles()
 
-  const errorsList = useMemo(() => {
-    if (!circuitJson) return null
-
-    const extractedErrors = circuitJson
-      .filter((e: any) => e.type && e.type?.includes("error") && e.error_type)
-      .map((e: any) => ({
-        errorTitle: e.error_type,
-        errorMessage: e.message,
-      }))
-
-    return extractedErrors.length > 0 ? extractedErrors : null
-  }, [circuitJson])
+  const circuitJsonErrors = useMemo(
+    () => getCircuitJsonErrors(circuitJson),
+    [circuitJson],
+  )
 
   const [activeTab, setActiveTabState] = useState<TabId>(
     defaultActiveTab ?? "pcb",
@@ -230,7 +230,8 @@ export const CircuitJsonPreview = ({
                   <DropdownMenuTrigger asChild>
                     <div className="rf-whitespace-nowrap rf-p-2 rf-mr-1 rf-cursor-pointer rf-relative">
                       <EllipsisIcon className="rf-w-4 rf-h-4" />
-                      {(errorsList || errorMessage) && (
+                      {((circuitJsonErrors && circuitJsonErrors.length > 0) ||
+                        errorMessage) && (
                         <span className="rf-inline-flex rf-absolute rf-top-[6px] rf-right-[4px] rf-items-center rf-justify-center rf-w-1 rf-h-1 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full" />
                       )}
                     </div>
@@ -250,11 +251,14 @@ export const CircuitJsonPreview = ({
                         <div className="rf-pr-2">
                           {capitalizeFirstLetters(item)}
                         </div>
-                        {item === "errors" && (errorsList || errorMessage) && (
-                          <span className="rf-inline-flex rf-items-center rf-justify-center rf-w-3 rf-h-3 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full">
-                            {errorMessage ? 1 : errorsList?.length}
-                          </span>
-                        )}
+                        {item === "errors" &&
+                          ((circuitJsonErrors &&
+                            circuitJsonErrors.length > 0) ||
+                            errorMessage) && (
+                            <span className="rf-inline-flex rf-items-center rf-justify-center rf-w-3 rf-h-3 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full">
+                              {errorMessage ? 1 : circuitJsonErrors?.length}
+                            </span>
+                          )}
                       </DropdownMenuItem>
                     ))}
                     <DropdownMenuItem
@@ -489,7 +493,7 @@ export const CircuitJsonPreview = ({
               {circuitJson ? (
                 <ErrorTabContent
                   code={code}
-                  errorsList={errorsList}
+                  circuitJsonErrors={circuitJsonErrors}
                   errorMessage={errorMessage}
                   autoroutingLog={autoroutingLog}
                   onReportAutoroutingLog={onReportAutoroutingLog}

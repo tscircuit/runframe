@@ -21,7 +21,7 @@ export interface PreviewContentProps {
   tsxRunTriggerCount?: number
   errorMessage?: string | null
   autoroutingGraphics?: any
-  circuitJson: CircuitJson
+  circuitJson: CircuitJson | null
   className?: string
   showCodeTab?: boolean
   showRenderLogTab?: boolean

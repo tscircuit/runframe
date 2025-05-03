@@ -2,7 +2,7 @@
   "name": "@tscircuit/runframe",
   "main": "dist/preview.js",
   "type": "module",
-  "version": "0.0.394",
+  "version": "0.0.395",
   "exports": {
     ".": "./dist/preview.js",
     "./preview": "./dist/preview.js",

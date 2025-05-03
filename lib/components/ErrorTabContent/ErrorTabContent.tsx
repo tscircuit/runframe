@@ -1,26 +1,31 @@
 import { GitHubLogoIcon } from "@radix-ui/react-icons"
-import { ClipboardIcon, CircuitBoardIcon } from "lucide-react"
+import { ClipboardIcon, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "lib/components/ui/button"
 import { createSnippetUrl } from "@tscircuit/create-snippet-url"
 import { AutoroutingLogOptions } from "./AutoroutingLogOptions"
+import { useState } from "react"
+import type { CircuitJson } from "circuit-json"
+import type { CircuitJsonErrors } from "../../components/CircuitJsonPreview/CircuitJsonPreview"
 
 export const ErrorTabContent = ({
   code,
   autoroutingLog,
   isStreaming,
-  errorMessage,
+  circuitJsonErrors,
   onReportAutoroutingLog,
+  errorMessage,
 }: {
   code?: string
   autoroutingLog?: Record<string, { simpleRouteJson: any }>
   isStreaming?: boolean
+  circuitJsonErrors: CircuitJsonErrors | null
   errorMessage?: string | null
   onReportAutoroutingLog?: (
     name: string,
     data: { simpleRouteJson: any },
   ) => void
 }) => {
-  if (!errorMessage) {
+  if (!errorMessage && !circuitJsonErrors) {
     return (
       <div className="px-2">
         <div className="rf-mt-4 rf-bg-green-50 rf-rounded-md rf-border rf-border-green-200">
@@ -43,17 +48,66 @@ export const ErrorTabContent = ({
     )
   }
 
+  const [currentErrorIndex, setCurrentErrorIndex] = useState(0)
+
+  const handlePrev = () => {
+    setCurrentErrorIndex((prev) => Math.max(prev - 1, 0))
+  }
+
+  const handleNext = () => {
+    setCurrentErrorIndex((prev) =>
+      Math.min(prev + 1, circuitJsonErrors!.length - 1),
+    )
+  }
+
   return (
     <>
-      <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200 rf-max-h-[500px] rf-overflow-y-auto rf-px-2">
-        <div className="rf-p-4">
-          <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-3">
-            Error
-          </h3>
-          <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600 rf-mt-2">
-            {errorMessage}
-          </p>
-        </div>
+      <div className="rf-w-[95%] rf-mx-auto">
+        {errorMessage && (
+          <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200 rf-p-4">
+            <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-1">
+              Execution Error
+            </h3>
+            <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600">
+              {errorMessage}
+            </p>
+          </div>
+        )}
+
+        {circuitJsonErrors && circuitJsonErrors.length > 0 && (
+          <>
+            <div className="rf-flex rf-items-center rf-gap-2 rf-mb-2">
+              <button
+                className="rf-p-1 rf-rounded-sm rf-transition-colors"
+                onClick={handlePrev}
+                disabled={currentErrorIndex === 0}
+              >
+                <ChevronLeft className="rf-h-4 rf-w-4 rf-text-red-500" />
+              </button>
+              <button
+                className="rf-p-1 rf-rounded-sm rf-transition-colors"
+                onClick={handleNext}
+                disabled={currentErrorIndex === circuitJsonErrors!.length - 1}
+              >
+                <ChevronRight className="rf-h-4 rf-w-4 rf-text-red-500" />
+              </button>
+              <span>
+                {currentErrorIndex + 1} of {circuitJsonErrors!.length} error
+              </span>
+            </div>
+
+            <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200 rf-max-h-[500px] rf-overflow-y-auto rf-px-2">
+              <div className="rf-p-4">
+                <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-1">
+                  {circuitJsonErrors![currentErrorIndex].error_type}
+                </h3>
+                <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600">
+                  {circuitJsonErrors![currentErrorIndex].message}
+                </p>
+              </div>
+            </div>
+          </>
+        )}
       </div>
       <div className="rf-flex rf-gap-2 rf-mt-4 rf-justify-end">
         <AutoroutingLogOptions
@@ -62,9 +116,12 @@ export const ErrorTabContent = ({
         />
         <Button
           variant="outline"
+          className="rf-p-1"
           onClick={() => {
-            if (!errorMessage) return
-            navigator.clipboard.writeText(errorMessage)
+            const activeError = circuitJsonErrors![currentErrorIndex]
+            navigator.clipboard.writeText(
+              `${activeError.error_type}: ${activeError.message}`,
+            )
             alert("Error copied to clipboard!")
           }}
         >
@@ -73,23 +130,30 @@ export const ErrorTabContent = ({
         </Button>
         <Button
           variant="outline"
+          className="rf-p-1"
           onClick={() => {
-            const title = `Error: ${errorMessage
-              .replace("Render Error:", "")
-              .replace(/\"_errors\":\[\]/g, "")
-              .replace(/\{,/g, "{")
-              .replace(/"_errors":\[/g, "")
+            const error = circuitJsonErrors
+              ? circuitJsonErrors[currentErrorIndex]
+              : {
+                  error_type: "Execution Error",
+                  message: errorMessage ?? "",
+                }
+            const title = `Error: ${error.error_type}`
               .replace(/[^a-zA-Z0-9 ]/g, " ")
               .replace(/\s+/g, " ")
-              .replace(/ \d+ /g, " ")
-              .slice(0, 100)}`
+              .slice(0, 100)
+
             const url = createSnippetUrl(code ?? "")
-            let body = `[Snippet code to reproduce](${url})\n\n### Error\n\`\`\`\n${errorMessage.slice(0, 600)}\n\`\`\``
+            let body = `[Snippet code to reproduce](${url})\n\n### Error\n\\\n${error.error_type}: ${error.message}\n\\\n`
+
             if (body.length > 4000) {
-              body = `\`\`\`tsx\n// Please paste the code here\`\`\`\n\n### Error\n\`\`\`\n${errorMessage.slice(0, 2000)}\n\`\`\``
+              body = `\`\`\`tsx\n// Please paste the code here\n\`\`\`\n\n### Error\n\`\`\`\n${error.error_type}: ${error.message}\n\`\`\``
             }
+
             window.open(
-              `https://github.com/tscircuit/tscircuit.com/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`,
+              `https://github.com/tscircuit/tscircuit.com/issues/new?title=${encodeURIComponent(
+                title,
+              )}&body=${encodeURIComponent(body)}`,
               "_blank",
             )
           }}

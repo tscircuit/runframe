@@ -1,5 +1,6 @@
 import type { RenderLog } from "lib/render-logging/RenderLog"
 import type { ManualEditEvent } from "@tscircuit/props"
+import type { CircuitJson } from "circuit-json"
 
 export type TabId =
   | "code"
@@ -20,7 +21,7 @@ export interface PreviewContentProps {
   tsxRunTriggerCount?: number
   errorMessage?: string | null
   autoroutingGraphics?: any
-  circuitJson: any
+  circuitJson: CircuitJson | null
   className?: string
   showCodeTab?: boolean
   showRenderLogTab?: boolean

@@ -11,21 +11,21 @@ export const ErrorTabContent = ({
   code,
   autoroutingLog,
   isStreaming,
-  circuitJsonError,
+  circuitJsonErrors,
   onReportAutoroutingLog,
   errorMessage,
 }: {
   code?: string
   autoroutingLog?: Record<string, { simpleRouteJson: any }>
   isStreaming?: boolean
-  circuitJsonError: CircuitJsonError[] | null
+  circuitJsonErrors: CircuitJsonError[] | null
   errorMessage?: string | null
   onReportAutoroutingLog?: (
     name: string,
     data: { simpleRouteJson: any },
   ) => void
 }) => {
-  if (!errorMessage && !circuitJsonError) {
+  if (!errorMessage && !circuitJsonErrors) {
     return (
       <div className="px-2">
         <div className="rf-mt-4 rf-bg-green-50 rf-rounded-md rf-border rf-border-green-200">
@@ -56,7 +56,7 @@ export const ErrorTabContent = ({
 
   const handleNext = () => {
     setCurrentErrorIndex((prev) =>
-      Math.min(prev + 1, circuitJsonError!.length - 1),
+      Math.min(prev + 1, circuitJsonErrors!.length - 1),
     )
   }
 
@@ -74,7 +74,7 @@ export const ErrorTabContent = ({
           </div>
         )}
 
-        {circuitJsonError && circuitJsonError.length > 0 && (
+        {circuitJsonErrors && circuitJsonErrors.length > 0 && (
           <>
             <div className="rf-flex rf-items-center rf-gap-2 rf-mb-2">
               <button
@@ -87,22 +87,22 @@ export const ErrorTabContent = ({
               <button
                 className="rf-p-1 rf-rounded-sm rf-transition-colors"
                 onClick={handleNext}
-                disabled={currentErrorIndex === circuitJsonError!.length - 1}
+                disabled={currentErrorIndex === circuitJsonErrors!.length - 1}
               >
                 <ChevronRight className="rf-h-4 rf-w-4 rf-text-red-500" />
               </button>
               <span>
-                {currentErrorIndex + 1} of {circuitJsonError!.length} error
+                {currentErrorIndex + 1} of {circuitJsonErrors!.length} error
               </span>
             </div>
 
             <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200 rf-max-h-[500px] rf-overflow-y-auto rf-px-2">
               <div className="rf-p-4">
                 <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-1">
-                  {circuitJsonError![currentErrorIndex].type}
+                  {circuitJsonErrors![currentErrorIndex].type}
                 </h3>
                 <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600">
-                  {circuitJsonError![currentErrorIndex].message}
+                  {circuitJsonErrors![currentErrorIndex].message}
                 </p>
               </div>
             </div>
@@ -118,7 +118,7 @@ export const ErrorTabContent = ({
           variant="outline"
           className="rf-p-1"
           onClick={() => {
-            const activeError = circuitJsonError![currentErrorIndex]
+            const activeError = circuitJsonErrors![currentErrorIndex]
             navigator.clipboard.writeText(
               `${activeError.type}: ${activeError.message}`,
             )
@@ -132,8 +132,8 @@ export const ErrorTabContent = ({
           variant="outline"
           className="rf-p-1"
           onClick={() => {
-            const error = circuitJsonError
-              ? circuitJsonError[currentErrorIndex]
+            const error = circuitJsonErrors
+              ? circuitJsonErrors[currentErrorIndex]
               : {
                   type: "Execution Error",
                   message: errorMessage ?? "",

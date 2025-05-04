@@ -374,7 +374,7 @@ export const CircuitJsonPreview = ({
           <TabsContent value="schematic">
             <div
               className={cn(
-                "rf-overflow-auto",
+                "rf-overflow-auto rf-bg-white",
                 isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
               )}
             >
@@ -403,6 +403,11 @@ export const CircuitJsonPreview = ({
                       onEditEvent?.(ee)
                     }}
                     debugGrid={showSchematicDebugGrid}
+                    colorOverrides={{
+                      schematic: {
+                        background: "transparent",
+                      },
+                    }}
                   />
                 ) : (
                   <PreviewEmptyState onRunClicked={onRunClicked} />

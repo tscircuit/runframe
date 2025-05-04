@@ -56,13 +56,6 @@ const dropdownMenuItems = [
 
 export type { PreviewContentProps, TabId }
 
-function getCircuitJsonErrors(circuitJson: CircuitJson | null) {
-  if (!circuitJson) return null
-  return circuitJson.filter((e) => e && "error_type" in e)
-}
-
-export type CircuitJsonErrors = ReturnType<typeof getCircuitJsonErrors>
-
 export const CircuitJsonPreview = ({
   code,
   onRunClicked = undefined,
@@ -96,10 +89,10 @@ export const CircuitJsonPreview = ({
 }: PreviewContentProps) => {
   useStyles()
 
-  const circuitJsonErrors = useMemo(
-    () => getCircuitJsonErrors(circuitJson),
-    [circuitJson],
-  )
+  const circuitJsonErrors = useMemo(() => {
+    if (!circuitJson) return null
+    return circuitJson.filter((e) => e && "error_type" in e)
+  }, [circuitJson])
 
   const [activeTab, setActiveTabState] = useState<TabId>(
     defaultActiveTab ?? "pcb",

@@ -5,7 +5,7 @@ import { createSnippetUrl } from "@tscircuit/create-snippet-url"
 import { AutoroutingLogOptions } from "./AutoroutingLogOptions"
 import { useState } from "react"
 import type { CircuitJson } from "circuit-json"
-import type { CircuitJsonErrors } from "../../components/CircuitJsonPreview/CircuitJsonPreview"
+import type { CircuitJsonError } from "circuit-json"
 
 export const ErrorTabContent = ({
   code,
@@ -18,7 +18,7 @@ export const ErrorTabContent = ({
   code?: string
   autoroutingLog?: Record<string, { simpleRouteJson: any }>
   isStreaming?: boolean
-  circuitJsonErrors: CircuitJsonErrors | null
+  circuitJsonErrors: CircuitJsonError[] | null
   errorMessage?: string | null
   onReportAutoroutingLog?: (
     name: string,
@@ -99,7 +99,7 @@ export const ErrorTabContent = ({
             <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200 rf-max-h-[500px] rf-overflow-y-auto rf-px-2">
               <div className="rf-p-4">
                 <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-1">
-                  {circuitJsonErrors![currentErrorIndex].error_type}
+                  {circuitJsonErrors![currentErrorIndex].type}
                 </h3>
                 <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600">
                   {circuitJsonErrors![currentErrorIndex].message}
@@ -120,7 +120,7 @@ export const ErrorTabContent = ({
           onClick={() => {
             const activeError = circuitJsonErrors![currentErrorIndex]
             navigator.clipboard.writeText(
-              `${activeError.error_type}: ${activeError.message}`,
+              `${activeError.type}: ${activeError.message}`,
             )
             alert("Error copied to clipboard!")
           }}
@@ -135,19 +135,19 @@ export const ErrorTabContent = ({
             const error = circuitJsonErrors
               ? circuitJsonErrors[currentErrorIndex]
               : {
-                  error_type: "Execution Error",
+                  type: "Execution Error",
                   message: errorMessage ?? "",
                 }
-            const title = `Error: ${error.error_type}`
+            const title = `Error: ${error.type}`
               .replace(/[^a-zA-Z0-9 ]/g, " ")
               .replace(/\s+/g, " ")
               .slice(0, 100)
 
             const url = createSnippetUrl(code ?? "")
-            let body = `[Snippet code to reproduce](${url})\n\n### Error\n\\\n${error.error_type}: ${error.message}\n\\\n`
+            let body = `[Snippet code to reproduce](${url})\n\n### Error\n\\\n${error.type}: ${error.message}\n\\\n`
 
             if (body.length > 4000) {
-              body = `\`\`\`tsx\n// Please paste the code here\n\`\`\`\n\n### Error\n\`\`\`\n${error.error_type}: ${error.message}\n\`\`\``
+              body = `\`\`\`tsx\n// Please paste the code here\n\`\`\`\n\n### Error\n\`\`\`\n${error.type}: ${error.message}\n\`\`\``
             }
 
             window.open(

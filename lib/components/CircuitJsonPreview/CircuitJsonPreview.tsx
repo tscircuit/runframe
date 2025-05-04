@@ -245,8 +245,7 @@ export const CircuitJsonPreview = ({
                           {capitalizeFirstLetters(item)}
                         </div>
                         {item === "errors" &&
-                          ((circuitJsonError &&
-                            circuitJsonError.length > 0) ||
+                          ((circuitJsonError && circuitJsonError.length > 0) ||
                             errorMessage) && (
                             <span className="rf-inline-flex rf-items-center rf-justify-center rf-w-3 rf-h-3 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full">
                               {errorMessage ? 1 : circuitJsonError?.length}

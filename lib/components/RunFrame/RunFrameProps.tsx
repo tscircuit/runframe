@@ -14,6 +14,12 @@ export interface RunFrameProps {
   entrypoint?: string
 
   /**
+   * The path to the main component that should be rendered. If not provided,
+   * the default component from the entry point will be used.
+   */
+  mainComponentPath?: string
+
+  /**
    * Whether to show a run button that controls when code executes
    */
   showRunButton?: boolean

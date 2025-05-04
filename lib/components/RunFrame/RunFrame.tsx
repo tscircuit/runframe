@@ -216,6 +216,9 @@ export const RunFrame = (props: RunFrameProps) => {
         .executeWithFsMap({
           entrypoint: props.entrypoint,
           fsMap: fsMapObj,
+          ...(props.mainComponentPath
+            ? { mainComponentPath: props.mainComponentPath }
+            : {}),
         })
         .then(() => {
           return { success: true }

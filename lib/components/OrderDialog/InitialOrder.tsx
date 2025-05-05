@@ -23,8 +23,13 @@ export const InitialOrderScreen = ({
     null,
   )
 
-  const { mutate: createOrderQuote, data: orderQuoteId } = useCreateOrderQuote()
-  const { status, data: orderQuote, error } = useOrderQuotePolling(orderQuoteId)
+  const {
+    mutate: createOrderQuote,
+    data: orderQuoteId,
+    error: createOrderQuoteError,
+    isError,
+  } = useCreateOrderQuote(packageReleaseId)
+  const { data: orderQuote } = useOrderQuotePolling(orderQuoteId)
 
   const redirectToStripeCheckout = async (orderQuoteId: string) => {
     const stripeCheckoutBaseUrl = getWindowVar(
@@ -38,8 +43,9 @@ export const InitialOrderScreen = ({
     setSelectedShippingIdx(null)
   }, [selectedVendorIdx])
 
+  // Create order quote when component mounts
   useEffect(() => {
-    createOrderQuote(packageReleaseId)
+    createOrderQuote()
   }, [packageReleaseId, createOrderQuote])
 
   return (
@@ -50,12 +56,16 @@ export const InitialOrderScreen = ({
       <div className="rf-mb-4 rf-text-gray-700 rf-text-center">
         Select a quote from below, then pick a shipping method.
       </div>
-      {status === "loading" || !orderQuoteId ? (
+      {!orderQuoteId && !isError ? (
         <div className="rf-flex rf-flex-col rf-items-center rf-gap-2 rf-my-12">
           <Loader2 className="rf-animate-spin rf-w-8 rf-h-8 rf-text-gray-400" />
           <p className="rf-text-gray-600">Fetching quotes...</p>
         </div>
-      ) : status === "error" || orderQuote?.error ? (
+      ) : createOrderQuoteError && isError ? (
+        <div className="rf-text-red-600 rf-text-center rf-py-12">
+          {JSON.stringify(createOrderQuoteError.message)}
+        </div>
+      ) : orderQuote?.error ? (
         <div className="rf-text-red-600 rf-text-center rf-py-12">
           {orderQuote?.error?.message || "Failed to fetch quotes"}
         </div>

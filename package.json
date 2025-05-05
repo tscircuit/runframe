@@ -85,7 +85,7 @@
     "@tscircuit/eval": "^0.0.181",
     "@tscircuit/file-server": "^0.0.21",
     "@tscircuit/pcb-viewer": "^1.11.111",
-    "@tscircuit/props": "^0.0.172",
+    "@tscircuit/props": "^0.0.173",
     "@tscircuit/schematic-viewer": "2.0.17",
     "circuit-to-svg": "^0.0.119",
     "clsx": "^2.1.1",

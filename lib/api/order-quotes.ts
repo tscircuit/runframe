@@ -1,14 +1,19 @@
 import { registryKy } from "lib/utils/get-registry-ky"
 import type { OrderQuote } from "@tscircuit/fake-snippets/schema"
 import { HTTPError } from "ky"
+import type { CircuitJson } from "circuit-json"
 
-export const createOrderQuote = async (packageReleaseId: string) => {
+export const createOrderQuote = async (
+  packageReleaseId: string,
+  circuitJson?: CircuitJson,
+) => {
   try {
     const { order_quote_id } = await registryKy
       .post("order_quotes/create", {
         json: {
           package_release_id: packageReleaseId,
           vendor_name: "jlcpcb", // TODO: Remove this once we have more vendor
+          circuit_json: circuitJson,
         },
       })
       .json<{

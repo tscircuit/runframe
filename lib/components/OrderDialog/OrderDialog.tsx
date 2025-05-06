@@ -36,6 +36,7 @@ export const OrderDialog: FC<OrderDialogProps> = ({
               <InitialOrderScreen
                 onCancel={onClose}
                 packageReleaseId={packageReleaseId ?? ""}
+                circuitJson={circuitJson}
               />
             )}
 

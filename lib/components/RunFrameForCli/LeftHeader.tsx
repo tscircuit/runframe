@@ -163,17 +163,14 @@ export const RunframeCliLeftHeader = (props: {
           >
             {isSaving ? "Saving..." : "Push"}
           </DropdownMenuItem>
-          {/* HACK until ordering is ready, only show in cosmos runframe */}
-          {parseInt(window.location.port) > 5000 && (
-            <DropdownMenuItem
-              className="rf-text-xs"
-              onSelect={() => {
-                orderDialog.open()
-              }}
-            >
-              Order
-            </DropdownMenuItem>
-          )}
+          <DropdownMenuItem
+            className="rf-text-xs"
+            onSelect={() => {
+              orderDialog.open()
+            }}
+          >
+            Order
+          </DropdownMenuItem>
           <DropdownMenuItem
             className="rf-text-xs"
             onSelect={() => setIsImportDialogOpen(true)}

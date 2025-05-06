@@ -6,15 +6,18 @@ import { toast } from "lib/utils/toast"
 import { getWindowVar } from "lib/utils/get-registry-ky"
 import { useCreateOrderQuote } from "lib/hooks/use-create-order-quote"
 import { useOrderQuotePolling } from "lib/hooks/use-order-quote-polling"
+import type { CircuitJson } from "circuit-json"
 
 interface InitialOrderScreenProps {
   onCancel: () => void
   packageReleaseId: string
+  circuitJson?: CircuitJson
 }
 
 export const InitialOrderScreen = ({
   onCancel,
   packageReleaseId,
+  circuitJson,
 }: InitialOrderScreenProps) => {
   const [selectedVendorIdx, setSelectedVendorIdx] = useState<number | null>(
     null,
@@ -28,7 +31,7 @@ export const InitialOrderScreen = ({
     data: orderQuoteId,
     error: createOrderQuoteError,
     isError,
-  } = useCreateOrderQuote(packageReleaseId)
+  } = useCreateOrderQuote(packageReleaseId, circuitJson)
   const { data: orderQuote } = useOrderQuotePolling(orderQuoteId)
 
   const redirectToStripeCheckout = async (orderQuoteId: string) => {

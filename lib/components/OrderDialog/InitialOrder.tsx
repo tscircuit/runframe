@@ -1,7 +1,7 @@
 import { Button } from "lib/components/ui/button"
 import { Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
-import VendorQuoteCard from "./VendorQuoteCard"
+import VendorQuoteCard, { type OrderQuote } from "./VendorQuoteCard"
 import { toast } from "lib/utils/toast"
 import { getWindowVar } from "lib/utils/get-registry-ky"
 import { useCreateOrderQuote } from "lib/hooks/use-create-order-quote"
@@ -16,9 +16,6 @@ export const InitialOrderScreen = ({
   onCancel,
   packageReleaseId,
 }: InitialOrderScreenProps) => {
-  const [selectedVendorIdx, setSelectedVendorIdx] = useState<number | null>(
-    null,
-  )
   const [selectedShippingCarrier, setSelectedShippingCarrier] = useState<
     string | null
   >(null)
@@ -38,10 +35,23 @@ export const InitialOrderScreen = ({
     window.location.href = `${stripeCheckoutBaseUrl}?client_reference_id=${orderQuoteId}&shipping_option=${selectedShippingCarrier}`
   }
 
-  // Reset shipping selection when changing vendor
+  // Auto-select the lowest cost shipping carrier when component mounts
   useEffect(() => {
-    setSelectedShippingCarrier(null)
-  }, [selectedVendorIdx])
+    if (selectedShippingCarrier === null && orderQuote?.shipping_options) {
+      const lowest = orderQuote.shipping_options.reduce(
+        (min, curr) => (curr.cost < min.cost ? curr : min),
+        orderQuote.shipping_options[0],
+      )
+      setSelectedShippingCarrier(lowest?.carrier || null)
+    }
+  }, [orderQuote])
+
+  // Calculate lowest shipping and original total (PCB + lowest shipping)
+  const lowestShippingCarrierCost =
+    orderQuote?.shipping_options?.reduce(
+      (min, curr) => (curr.cost < min.cost ? curr : min),
+      orderQuote?.shipping_options[0],
+    ).cost || 0
 
   // Create order quote when component mounts
   useEffect(() => {
@@ -49,12 +59,10 @@ export const InitialOrderScreen = ({
   }, [packageReleaseId, createOrderQuote])
 
   return (
-    <div className="rf-max-w-lg rf-mx-auto rf-bg-white rf-rounded-2xl rf-p-8 rf-flex rf-flex-col rf-gap-3">
-      <h2 className="rf-text-3xl rf-font-bold rf-text-center rf-mb-8">
-        Order PCB
-      </h2>
-      <div className="rf-mb-4 rf-text-gray-700 rf-text-center">
-        Select a quote from below, then pick a shipping method.
+    <div className="rf-max-w-lg rf-mx-auto rf-bg-white rf-rounded-2xl rf-py-8 rf-flex rf-flex-col rf-gap-3">
+      <h2 className="rf-text-3xl rf-font-bold rf-text-center">Order PCB</h2>
+      <div className="rf-bg-blue-100 rf-text-blue-800 rf-p-3 rf-rounded-md rf-text-center rf-text-sm">
+        This board is eligible for the tscircuit Flat Fee
       </div>
 
       {/* Loading States */}
@@ -78,13 +86,12 @@ export const InitialOrderScreen = ({
         !orderQuote?.error && (
           <VendorQuoteCard
             key={orderQuote?.order_quote_id}
-            vendor={orderQuote}
-            isActive={selectedVendorIdx === 0}
-            onSelect={() => setSelectedVendorIdx(0)}
-            selectedShippingCarrier={
-              selectedVendorIdx === 0 ? selectedShippingCarrier : null
-            }
+            orderQuote={orderQuote as OrderQuote}
+            selectedShippingCarrier={selectedShippingCarrier}
             onSelectShippingCarrier={setSelectedShippingCarrier}
+            lowestShippingCarrierCost={
+              lowestShippingCarrierCost + orderQuote.total_cost_without_shipping
+            }
           />
         )}
 
@@ -100,10 +107,10 @@ export const InitialOrderScreen = ({
         <Button
           type="button"
           className="rf-w-1/2 rf-bg-blue-600 rf-hover:bg-blue-700"
-          disabled={selectedVendorIdx === null || status === "loading"}
+          disabled={selectedShippingCarrier === null}
           onClick={() => {
-            if (selectedVendorIdx === null || status === "loading") {
-              toast.error("Please select a vendor and shipping option.")
+            if (selectedShippingCarrier === null) {
+              toast.error("Please select a shipping option.")
               return
             }
 

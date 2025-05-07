@@ -58,12 +58,11 @@ export const InitialOrderScreen = ({
       </div>
 
       {/* Loading States */}
-      {!orderQuoteId && !isError && (
-        <LoadingMessage message="Fetching quotes..." />
-      )}
+      {(!orderQuoteId || !orderQuote || !orderQuote?.is_completed) &&
+        !isError && <LoadingMessage message="Fetching quotes..." />}
 
       {/* Error States */}
-      {(createOrderQuoteError || orderQuote?.error) && (
+      {(createOrderQuoteError || orderQuote?.error || isError) && (
         <ErrorMessage
           message={
             createOrderQuoteError?.message ||

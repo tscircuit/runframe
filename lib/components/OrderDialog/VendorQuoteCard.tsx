@@ -50,9 +50,11 @@ export default function VendorQuoteCard({
   onSelectShippingCarrier,
 }: Props) {
   // Find the selected shipping option
-  const selectedShipping = selectedShippingCarrier 
-    ? vendor.shipping_options.find((ship) => ship.carrier === selectedShippingCarrier)
-    : null;
+  const selectedShipping = selectedShippingCarrier
+    ? vendor.shipping_options.find(
+        (ship) => ship.carrier === selectedShippingCarrier,
+      )
+    : null
 
   return (
     <div
@@ -134,7 +136,7 @@ export default function VendorQuoteCard({
                 ${vendor.total_cost_without_shipping.toFixed(2)}
               </span>
             </div>
-            
+
             <div className="rf-flex rf-justify-between rf-items-center">
               <span className="rf-text-gray-600 rf-text-sm">
                 Shipping cost:
@@ -143,7 +145,7 @@ export default function VendorQuoteCard({
                 ${selectedShipping.base_shipping_cost.toFixed(2)}
               </span>
             </div>
-            
+
             <div className="rf-flex rf-justify-between rf-items-center">
               <span className="rf-text-gray-600 rf-text-sm">
                 Duties & Taxes:
@@ -152,24 +154,25 @@ export default function VendorQuoteCard({
                 ${selectedShipping.duties_cost.toFixed(2)}
               </span>
             </div>
-            
+
             <div className="rf-flex rf-justify-between rf-items-center rf-text-sm rf-text-red-500">
+              <span className="rf-font-medium">Discount:</span>
               <span className="rf-font-medium">
-                Discount:
-              </span>
-              <span className="rf-font-medium">
-                -${(vendor.total_cost_without_shipping + selectedShipping.cost - 50).toFixed(2)}
+                -$
+                {(
+                  vendor.total_cost_without_shipping +
+                  selectedShipping.cost -
+                  50
+                ).toFixed(2)}
               </span>
             </div>
-            
+
             {/* Divider */}
             <div className="rf-w-full rf-border-t rf-border-gray-200 rf-my-1" />
-            
+
             {/* Total */}
             <div className="rf-flex rf-justify-between rf-items-center rf-mt-1">
-              <span className="rf-text-gray-800 rf-font-semibold">
-                Total:
-              </span>
+              <span className="rf-text-gray-800 rf-font-semibold">Total:</span>
               <div className="rf-flex rf-items-center">
                 <DollarSign className="rf-w-5 rf-h-5 rf-text-green-600" />
                 <span className="rf-font-bold rf-text-xl rf-text-green-600">

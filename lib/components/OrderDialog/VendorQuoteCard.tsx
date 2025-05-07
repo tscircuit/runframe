@@ -37,25 +37,22 @@ export default function VendorQuoteCard({
         <div className="rf-flex rf-items-center rf-gap-2">
           <Package className="rf-w-6 rf-h-6 rf-text-blue-500" />
           <span className="rf-font-semibold rf-text-lg">
-            {vendor.vendor_name}
+            {vendor.vendor_name.toUpperCase()}
           </span>
         </div>
         <div className="rf-flex rf-flex-col rf-items-end">
-          <span className="rf-text-gray-500 rf-text-sm">PCB + Components</span>
+          <span className="rf-text-gray-500 rf-text-sm">
+            Fully Assembled PCB
+          </span>
           <div className="rf-flex rf-items-center rf-gap-2">
-            <span className="rf-text-gray-400 rf-line-through rf-text-base rf-mr-2">
-              ${vendor.total_cost_without_shipping.toFixed(2)}
-            </span>
-            {/* TODO: Remove this hardcoded value of JLCPCB and add in API*/}
             <span className="rf-font-bold rf-text-xl rf-text-blue-600">
-              $50.00
+              ${vendor.total_cost_without_shipping.toFixed(2)}
             </span>
           </div>
         </div>
       </div>
 
-      {/* TODO: Add shipping options currently default shipping */}
-      {/* {isActive && (
+      {isActive && (
         <>
           <hr className="rf-border-gray-200" />
           <div className="rf-px-6 rf-py-2">
@@ -92,20 +89,27 @@ export default function VendorQuoteCard({
             </div>
           </div>
         </>
-      )} */}
+      )}
 
-      {/* {isActive && selectedShippingIdx !== null && (
+      {isActive && selectedShippingIdx !== null && (
         <div className="rf-px-6 rf-pb-3">
           <div className="rf-flex rf-justify-between rf-items-center rf-mt-2">
-            <span className="rf-text-gray-800 rf-font-medium">
+            <span className="rf-text-gray-800 rf-font-medium rf-text-sm">
               Total (incl. shipping):
             </span>
-            <span className="rf-font-bold rf-text-lg rf-text-blue-700">
-              ${vendor.total_cost_without_shipping.toFixed(2)}
-            </span>
+            <div className="rf-flex rf-items-center rf-gap-2">
+              <span className="rf-text-gray-400 rf-line-through rf-text-sm rf-mr-2">
+                (${vendor.total_cost_without_shipping.toFixed(2)} + $
+                {vendor.shipping_options[selectedShippingIdx].cost.toFixed(2)})
+              </span>
+              {/* TODO: Remove this hardcoded value of JLCPCB and add in API*/}
+              <span className="rf-font-bold rf-text-xl rf-text-blue-600">
+                $50.00
+              </span>
+            </div>
           </div>
         </div>
-      )} */}
+      )}
     </div>
   )
 }

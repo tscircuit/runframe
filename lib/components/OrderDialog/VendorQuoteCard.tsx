@@ -48,9 +48,11 @@ export default function VendorQuoteCard({
   lowestShippingCarrierCost,
 }: Props) {
   // Find the selected shipping option
-  const selectedShipping = selectedShippingCarrier 
-    ? orderQuote.shipping_options.find((ship) => ship.carrier === selectedShippingCarrier)
-    : null;
+  const selectedShipping = selectedShippingCarrier
+    ? orderQuote.shipping_options.find(
+        (ship) => ship.carrier === selectedShippingCarrier,
+      )
+    : null
 
   return (
     <div className="rf-rounded-xl rf-bg-white rf-shadow-lg rf-border rf-border-gray-200">
@@ -124,7 +126,10 @@ export default function VendorQuoteCard({
             </span>
             <div className="rf-flex rf-flex-col rf-items-end">
               <div className="rf-text-gray-400 rf-line-through rf-text-base">
-                ${(orderQuote.total_cost_without_shipping + selectedShipping.cost).toFixed(2)}
+                $
+                {(
+                  orderQuote.total_cost_without_shipping + selectedShipping.cost
+                ).toFixed(2)}
               </div>
               <div className="rf-flex rf-items-center">
                 <span className="rf-font-bold rf-text-xl rf-text-blue-600">

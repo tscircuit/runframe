@@ -38,18 +38,20 @@ export const InitialOrderScreen = ({
   // Auto-select the lowest cost shipping carrier when component mounts
   useEffect(() => {
     if (selectedShippingCarrier === null && orderQuote?.shipping_options) {
-      const lowest = orderQuote.shipping_options.reduce((min, curr) =>
-        curr.cost < min.cost ? curr : min
-      , orderQuote.shipping_options[0])
+      const lowest = orderQuote.shipping_options.reduce(
+        (min, curr) => (curr.cost < min.cost ? curr : min),
+        orderQuote.shipping_options[0],
+      )
       setSelectedShippingCarrier(lowest?.carrier || null)
     }
   }, [orderQuote])
 
   // Calculate lowest shipping and original total (PCB + lowest shipping)
-  const lowestShippingCarrierCost = orderQuote?.shipping_options?.reduce((min, curr) =>
-    curr.cost < min.cost ? curr : min,
-    orderQuote?.shipping_options[0]
-  ).cost || 0;
+  const lowestShippingCarrierCost =
+    orderQuote?.shipping_options?.reduce(
+      (min, curr) => (curr.cost < min.cost ? curr : min),
+      orderQuote?.shipping_options[0],
+    ).cost || 0
 
   // Create order quote when component mounts
   useEffect(() => {
@@ -58,9 +60,7 @@ export const InitialOrderScreen = ({
 
   return (
     <div className="rf-max-w-lg rf-mx-auto rf-bg-white rf-rounded-2xl rf-py-8 rf-flex rf-flex-col rf-gap-3">
-      <h2 className="rf-text-3xl rf-font-bold rf-text-center">
-        Order PCB
-      </h2>
+      <h2 className="rf-text-3xl rf-font-bold rf-text-center">Order PCB</h2>
       <div className="rf-bg-blue-100 rf-text-blue-800 rf-p-3 rf-rounded-md rf-text-center rf-text-sm">
         This board is eligible for the tscircuit Flat Fee
       </div>
@@ -89,7 +89,9 @@ export const InitialOrderScreen = ({
             orderQuote={orderQuote as OrderQuote}
             selectedShippingCarrier={selectedShippingCarrier}
             onSelectShippingCarrier={setSelectedShippingCarrier}
-            lowestShippingCarrierCost={lowestShippingCarrierCost + orderQuote.total_cost_without_shipping}
+            lowestShippingCarrierCost={
+              lowestShippingCarrierCost + orderQuote.total_cost_without_shipping
+            }
           />
         )}
 

@@ -51,45 +51,43 @@ export const InitialOrderScreen = ({
   return (
     <div className="rf-max-w-lg rf-mx-auto rf-bg-white rf-rounded-2xl rf-p-8 rf-flex rf-flex-col rf-gap-3">
       <h2 className="rf-text-3xl rf-font-bold rf-text-center rf-mb-8">
-        Order PCB – Choose a Vendor
+        Order PCB
       </h2>
       <div className="rf-mb-4 rf-text-gray-700 rf-text-center">
         Select a quote from below, then pick a shipping method.
       </div>
-      {!orderQuoteId && !isError ? (
-        <div className="rf-flex rf-flex-col rf-items-center rf-gap-2 rf-my-12">
-          <Loader2 className="rf-animate-spin rf-w-8 rf-h-8 rf-text-gray-400" />
-          <p className="rf-text-gray-600">Fetching quotes...</p>
-        </div>
-      ) : createOrderQuoteError && isError ? (
-        <div className="rf-text-red-600 rf-text-center rf-py-12">
-          {JSON.stringify(createOrderQuoteError.message)}
-        </div>
-      ) : orderQuote?.error ? (
-        <div className="rf-text-red-600 rf-text-center rf-py-12">
-          {orderQuote?.error?.message || "Failed to fetch quotes"}
-        </div>
-      ) : !orderQuote ? (
-        <div className="rf-text-red-600 rf-text-center rf-py-12">
-          No quotes available.
-        </div>
-      ) : !orderQuote.is_completed ? (
-        <div className="rf-flex rf-flex-col rf-items-center rf-gap-2 rf-my-12">
-          <Loader2 className="rf-animate-spin rf-w-8 rf-h-8 rf-text-gray-400" />
-          <p className="rf-text-gray-600">Calculating quote...</p>
-        </div>
-      ) : (
-        <VendorQuoteCard
-          key={orderQuote.order_quote_id}
-          vendor={orderQuote}
-          isActive={selectedVendorIdx === 0}
-          onSelect={() => setSelectedVendorIdx(0)}
-          selectedShippingIdx={
-            selectedVendorIdx === 0 ? selectedShippingIdx : null
+
+      {/* Loading States */}
+      {!orderQuoteId && !isError && (
+        <LoadingMessage message="Fetching quotes..." />
+      )}
+
+      {/* Error States */}
+      {(createOrderQuoteError || orderQuote?.error) && (
+        <ErrorMessage
+          message={
+            createOrderQuoteError?.message ||
+            orderQuote?.error?.message ||
+            "Failed to fetch quotes"
           }
-          onSelectShipping={setSelectedShippingIdx}
         />
       )}
+
+      {/* Success State */}
+      {orderQuote?.is_completed &&
+        !createOrderQuoteError &&
+        !orderQuote?.error && (
+          <VendorQuoteCard
+            key={orderQuote?.order_quote_id}
+            vendor={orderQuote}
+            isActive={selectedVendorIdx === 0}
+            onSelect={() => setSelectedVendorIdx(0)}
+            selectedShippingIdx={
+              selectedVendorIdx === 0 ? selectedShippingIdx : null
+            }
+            onSelectShipping={setSelectedShippingIdx}
+          />
+        )}
 
       <div className="rf-flex rf-justify-between rf-mt-5 rf-gap-4">
         <Button
@@ -124,3 +122,15 @@ export const InitialOrderScreen = ({
     </div>
   )
 }
+
+// Helper components for better organization
+const LoadingMessage = ({ message }: { message: string }) => (
+  <div className="rf-flex rf-flex-col rf-items-center rf-gap-2 rf-my-12">
+    <Loader2 className="rf-animate-spin rf-w-8 rf-h-8 rf-text-gray-400" />
+    <p className="rf-text-gray-600">{message}</p>
+  </div>
+)
+
+const ErrorMessage = ({ message }: { message: string }) => (
+  <div className="rf-text-red-600 rf-text-center rf-py-12">{message}</div>
+)

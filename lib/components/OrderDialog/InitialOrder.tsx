@@ -58,30 +58,36 @@ export const InitialOrderScreen = ({
       </div>
 
       {/* Loading States */}
-      {(!orderQuoteId && !isError) && (
+      {!orderQuoteId && !isError && (
         <LoadingMessage message="Fetching quotes..." />
       )}
 
       {/* Error States */}
       {(createOrderQuoteError || orderQuote?.error) && (
-        <ErrorMessage 
-          message={createOrderQuoteError?.message || orderQuote?.error?.message || "Failed to fetch quotes"} 
+        <ErrorMessage
+          message={
+            createOrderQuoteError?.message ||
+            orderQuote?.error?.message ||
+            "Failed to fetch quotes"
+          }
         />
       )}
 
       {/* Success State */}
-      {orderQuote?.is_completed && !createOrderQuoteError && !orderQuote?.error && (
-        <VendorQuoteCard
-          key={orderQuote?.order_quote_id}
-          vendor={orderQuote}
-          isActive={selectedVendorIdx === 0}
-          onSelect={() => setSelectedVendorIdx(0)}
-          selectedShippingIdx={
-            selectedVendorIdx === 0 ? selectedShippingIdx : null
-          }
-          onSelectShipping={setSelectedShippingIdx}
-        />
-      )}
+      {orderQuote?.is_completed &&
+        !createOrderQuoteError &&
+        !orderQuote?.error && (
+          <VendorQuoteCard
+            key={orderQuote?.order_quote_id}
+            vendor={orderQuote}
+            isActive={selectedVendorIdx === 0}
+            onSelect={() => setSelectedVendorIdx(0)}
+            selectedShippingIdx={
+              selectedVendorIdx === 0 ? selectedShippingIdx : null
+            }
+            onSelectShipping={setSelectedShippingIdx}
+          />
+        )}
 
       <div className="rf-flex rf-justify-between rf-mt-5 rf-gap-4">
         <Button
@@ -126,7 +132,5 @@ const LoadingMessage = ({ message }: { message: string }) => (
 )
 
 const ErrorMessage = ({ message }: { message: string }) => (
-  <div className="rf-text-red-600 rf-text-center rf-py-12">
-    {message}
-  </div>
+  <div className="rf-text-red-600 rf-text-center rf-py-12">{message}</div>
 )

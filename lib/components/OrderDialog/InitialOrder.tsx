@@ -37,7 +37,12 @@ export const InitialOrderScreen = ({
 
   // Auto-select the lowest cost shipping carrier when component mounts
   useEffect(() => {
-    if (selectedShippingCarrier === null && orderQuote?.shipping_options) {
+    if (
+      selectedShippingCarrier === null && 
+      orderQuote && 
+      Array.isArray(orderQuote.shipping_options) && 
+      orderQuote.shipping_options.length > 0
+    ) {
       const lowest = orderQuote.shipping_options.reduce(
         (min, curr) => (curr.cost < min.cost ? curr : min),
         orderQuote.shipping_options[0],
@@ -47,11 +52,14 @@ export const InitialOrderScreen = ({
   }, [orderQuote])
 
   // Calculate lowest shipping and original total (PCB + lowest shipping)
-  const lowestShippingCarrierCost =
-    orderQuote?.shipping_options?.reduce(
-      (min, curr) => (curr.cost < min.cost ? curr : min),
-      orderQuote?.shipping_options[0],
-    ).cost || 0
+  const lowestShippingCarrierCost = orderQuote && 
+    Array.isArray(orderQuote.shipping_options) && 
+    orderQuote.shipping_options.length > 0
+    ? orderQuote.shipping_options.reduce(
+        (min, curr) => (curr.cost < min.cost ? curr : min),
+        orderQuote.shipping_options[0]
+      ).cost
+    : 0;
 
   // Create order quote when component mounts
   useEffect(() => {
@@ -83,14 +91,16 @@ export const InitialOrderScreen = ({
       {/* Success State */}
       {orderQuote?.is_completed &&
         !createOrderQuoteError &&
-        !orderQuote?.error && (
+        !orderQuote?.error &&
+        Array.isArray(orderQuote?.shipping_options) &&
+        orderQuote.shipping_options.length > 0 && (
           <VendorQuoteCard
             key={orderQuote?.order_quote_id}
             orderQuote={orderQuote as OrderQuote}
             selectedShippingCarrier={selectedShippingCarrier}
             onSelectShippingCarrier={setSelectedShippingCarrier}
             lowestShippingCarrierCost={
-              lowestShippingCarrierCost + orderQuote.total_cost_without_shipping
+              lowestShippingCarrierCost + (orderQuote.total_cost_without_shipping || 0)
             }
           />
         )}

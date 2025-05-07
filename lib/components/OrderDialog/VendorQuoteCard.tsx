@@ -99,7 +99,8 @@ export default function VendorQuoteCard({
             </span>
             <div className="rf-flex rf-items-center rf-gap-2">
               <span className="rf-text-gray-400 rf-line-through rf-text-sm rf-mr-2">
-                (${vendor.total_cost_without_shipping.toFixed(2)} + ${vendor.shipping_options[selectedShippingIdx].cost.toFixed(2)})
+                (${vendor.total_cost_without_shipping.toFixed(2)} + $
+                {vendor.shipping_options[selectedShippingIdx].cost.toFixed(2)})
               </span>
               {/* TODO: Remove this hardcoded value of JLCPCB and add in API*/}
               <span className="rf-font-bold rf-text-xl rf-text-blue-600">

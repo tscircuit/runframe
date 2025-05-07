@@ -12,16 +12,16 @@ interface Props {
   vendor: OrderQuote
   isActive: boolean
   onSelect: () => void
-  selectedShippingIdx: number | null
-  onSelectShipping: (idx: number) => void
+  selectedShippingCarrier: string | null
+  onSelectShippingCarrier: (carrier: string) => void
 }
 
 export default function VendorQuoteCard({
   vendor,
   isActive,
   onSelect,
-  selectedShippingIdx,
-  onSelectShipping,
+  selectedShippingCarrier,
+  onSelectShippingCarrier,
 }: Props) {
   return (
     <div
@@ -66,13 +66,13 @@ export default function VendorQuoteCard({
                   type="button"
                   className={cn(
                     "rf-flex rf-items-center rf-gap-2 rf-px-4 rf-py-2 rf-rounded-lg rf-border rf-shadow rf-min-w-[148px] rf-transition-colors",
-                    selectedShippingIdx === idx
+                    selectedShippingCarrier === ship.carrier
                       ? "rf-border-blue-600 rf-bg-blue-50 rf-ring-2 rf-ring-blue-500"
                       : "rf-border-gray-300 rf-bg-gray-50 hover:rf-border-blue-300",
                   )}
                   onClick={(e) => {
                     e.stopPropagation()
-                    onSelectShipping(idx)
+                    onSelectShippingCarrier(ship.carrier)
                   }}
                 >
                   <Truck className="rf-w-5 rf-h-5 rf-text-yellow-500" />
@@ -91,7 +91,7 @@ export default function VendorQuoteCard({
         </>
       )}
 
-      {isActive && selectedShippingIdx !== null && (
+      {isActive && selectedShippingCarrier !== null && (
         <div className="rf-px-6 rf-pb-3">
           <div className="rf-flex rf-justify-between rf-items-center rf-mt-2">
             <span className="rf-text-gray-800 rf-font-medium rf-text-sm">
@@ -100,7 +100,10 @@ export default function VendorQuoteCard({
             <div className="rf-flex rf-items-center rf-gap-2">
               <span className="rf-text-gray-400 rf-line-through rf-text-sm rf-mr-2">
                 (${vendor.total_cost_without_shipping.toFixed(2)} + $
-                {vendor.shipping_options[selectedShippingIdx].cost.toFixed(2)})
+                {vendor.shipping_options
+                  .find((ship) => ship.carrier === selectedShippingCarrier)
+                  ?.cost.toFixed(2)}
+                )
               </span>
               {/* TODO: Remove this hardcoded value of JLCPCB and add in API*/}
               <span className="rf-font-bold rf-text-xl rf-text-blue-600">

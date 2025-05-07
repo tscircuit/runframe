@@ -19,9 +19,9 @@ export const InitialOrderScreen = ({
   const [selectedVendorIdx, setSelectedVendorIdx] = useState<number | null>(
     null,
   )
-  const [selectedShippingIdx, setSelectedShippingIdx] = useState<number | null>(
-    null,
-  )
+  const [selectedShippingCarrier, setSelectedShippingCarrier] = useState<
+    string | null
+  >(null)
 
   const {
     mutate: createOrderQuote,
@@ -35,12 +35,12 @@ export const InitialOrderScreen = ({
     const stripeCheckoutBaseUrl = getWindowVar(
       "TSCIRCUIT_STRIPE_CHECKOUT_BASE_URL",
     )
-    window.location.href = `${stripeCheckoutBaseUrl}?client_reference_id=${orderQuoteId}`
+    window.location.href = `${stripeCheckoutBaseUrl}?client_reference_id=${orderQuoteId}&shipping_option=${selectedShippingCarrier}`
   }
 
   // Reset shipping selection when changing vendor
   useEffect(() => {
-    setSelectedShippingIdx(null)
+    setSelectedShippingCarrier(null)
   }, [selectedVendorIdx])
 
   // Create order quote when component mounts
@@ -81,10 +81,10 @@ export const InitialOrderScreen = ({
             vendor={orderQuote}
             isActive={selectedVendorIdx === 0}
             onSelect={() => setSelectedVendorIdx(0)}
-            selectedShippingIdx={
-              selectedVendorIdx === 0 ? selectedShippingIdx : null
+            selectedShippingCarrier={
+              selectedVendorIdx === 0 ? selectedShippingCarrier : null
             }
-            onSelectShipping={setSelectedShippingIdx}
+            onSelectShippingCarrier={setSelectedShippingCarrier}
           />
         )}
 

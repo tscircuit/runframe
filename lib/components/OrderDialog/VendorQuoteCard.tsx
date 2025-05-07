@@ -1,4 +1,4 @@
-import { Truck, Package, DollarSign } from "lucide-react"
+import { Truck, Package } from "lucide-react"
 import { cn } from "lib/utils"
 
 export interface ShippingOption {
@@ -174,9 +174,8 @@ export default function VendorQuoteCard({
             <div className="rf-flex rf-justify-between rf-items-center rf-mt-1">
               <span className="rf-text-gray-800 rf-font-semibold">Total:</span>
               <div className="rf-flex rf-items-center">
-                <DollarSign className="rf-w-5 rf-h-5 rf-text-green-600" />
                 <span className="rf-font-bold rf-text-xl rf-text-green-600">
-                  50.00
+                  $50.00
                 </span>
               </div>
             </div>

@@ -1,11 +1,37 @@
-import { Truck, Package } from "lucide-react"
+import { Truck, Package, DollarSign } from "lucide-react"
 import { cn } from "lib/utils"
-import type { OrderQuote } from "@tscircuit/fake-snippets/schema"
 
 export interface ShippingOption {
   carrier: string
   service: string
   cost: number
+  base_shipping_cost: number
+  duties_cost: number
+}
+
+export interface OrderQuote {
+  account_id: string
+  bare_pcb_cost: number
+  completed_at: string
+  created_at: string
+  error: null | string
+  has_error: boolean
+  is_completed: boolean
+  is_processing: boolean
+  order_quote_id: string
+  package_release_id: string
+  quoted_components: {
+    available: boolean
+    manufacturer_part_number: string
+    supplier_part_number: string
+    quantity: number
+    unit_price: number
+    total_price: number
+  }[]
+  shipping_options: ShippingOption[]
+  total_cost_without_shipping: number
+  updated_at: string
+  vendor_name: string
 }
 
 interface Props {
@@ -23,6 +49,11 @@ export default function VendorQuoteCard({
   selectedShippingCarrier,
   onSelectShippingCarrier,
 }: Props) {
+  // Find the selected shipping option
+  const selectedShipping = selectedShippingCarrier 
+    ? vendor.shipping_options.find((ship) => ship.carrier === selectedShippingCarrier)
+    : null;
+
   return (
     <div
       className={cn(
@@ -91,24 +122,60 @@ export default function VendorQuoteCard({
         </>
       )}
 
-      {isActive && selectedShippingCarrier !== null && (
+      {isActive && selectedShippingCarrier !== null && selectedShipping && (
         <div className="rf-px-6 rf-pb-3">
-          <div className="rf-flex rf-justify-between rf-items-center rf-mt-2">
-            <span className="rf-text-gray-800 rf-font-medium rf-text-sm">
-              Total (incl. shipping):
-            </span>
-            <div className="rf-flex rf-items-center rf-gap-2">
-              <span className="rf-text-gray-400 rf-line-through rf-text-sm rf-mr-2">
-                (${vendor.total_cost_without_shipping.toFixed(2)} + $
-                {vendor.shipping_options
-                  .find((ship) => ship.carrier === selectedShippingCarrier)
-                  ?.cost.toFixed(2)}
-                )
+          <div className="rf-flex rf-flex-col rf-gap-1 rf-mt-2">
+            {/* Cost breakdown */}
+            <div className="rf-flex rf-justify-between rf-items-center">
+              <span className="rf-text-gray-600 rf-text-sm">
+                Subtotal (PCB Cost):
               </span>
-              {/* TODO: Remove this hardcoded value of JLCPCB and add in API*/}
-              <span className="rf-font-bold rf-text-xl rf-text-blue-600">
-                $50.00
+              <span className="rf-text-gray-800 rf-font-medium">
+                ${vendor.total_cost_without_shipping.toFixed(2)}
               </span>
+            </div>
+            
+            <div className="rf-flex rf-justify-between rf-items-center">
+              <span className="rf-text-gray-600 rf-text-sm">
+                Shipping cost:
+              </span>
+              <span className="rf-text-gray-800 rf-font-medium">
+                ${selectedShipping.base_shipping_cost.toFixed(2)}
+              </span>
+            </div>
+            
+            <div className="rf-flex rf-justify-between rf-items-center">
+              <span className="rf-text-gray-600 rf-text-sm">
+                Duties & Taxes:
+              </span>
+              <span className="rf-text-gray-800 rf-font-medium">
+                ${selectedShipping.duties_cost.toFixed(2)}
+              </span>
+            </div>
+            
+            <div className="rf-flex rf-justify-between rf-items-center rf-text-sm rf-text-red-500">
+              <span className="rf-font-medium">
+                Discount:
+              </span>
+              <span className="rf-font-medium">
+                -${(vendor.total_cost_without_shipping + selectedShipping.cost - 50).toFixed(2)}
+              </span>
+            </div>
+            
+            {/* Divider */}
+            <div className="rf-w-full rf-border-t rf-border-gray-200 rf-my-1" />
+            
+            {/* Total */}
+            <div className="rf-flex rf-justify-between rf-items-center rf-mt-1">
+              <span className="rf-text-gray-800 rf-font-semibold">
+                Total:
+              </span>
+              <div className="rf-flex rf-items-center">
+                <DollarSign className="rf-w-5 rf-h-5 rf-text-green-600" />
+                <span className="rf-font-bold rf-text-xl rf-text-green-600">
+                  50.00
+                </span>
+              </div>
             </div>
           </div>
         </div>

@@ -65,6 +65,11 @@ export const InitialOrderScreen = ({
         ).cost
       : 0
 
+  // Create order quote when component mounts
+  useEffect(() => {
+    createOrderQuote()
+  }, [packageReleaseId, createOrderQuote])
+
   if (!onSignIn) {
     return (
       <div className="rf-max-w-lg rf-mx-auto rf-bg-white rf-rounded-2xl rf-py-8 rf-flex rf-flex-col rf-gap-3">

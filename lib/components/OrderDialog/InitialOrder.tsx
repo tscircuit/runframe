@@ -11,13 +11,13 @@ import { GitHubLogoIcon } from "@radix-ui/react-icons"
 interface InitialOrderScreenProps {
   onCancel: () => void
   packageReleaseId: string
-  isSignIn?: () => void
+  onSignIn?: () => void
 }
 
 export const InitialOrderScreen = ({
   onCancel,
   packageReleaseId,
-  isSignIn,
+  onSignIn,
 }: InitialOrderScreenProps) => {
   const [selectedShippingCarrier, setSelectedShippingCarrier] = useState<
     string | null
@@ -65,7 +65,7 @@ export const InitialOrderScreen = ({
         ).cost
       : 0
 
-  if (!isSignIn) {
+  if (!onSignIn) {
     return (
       <div className="rf-max-w-lg rf-mx-auto rf-bg-white rf-rounded-2xl rf-py-8 rf-flex rf-flex-col rf-gap-3">
         <h2 className="rf-text-3xl rf-font-bold rf-text-center">Order PCB</h2>
@@ -76,7 +76,7 @@ export const InitialOrderScreen = ({
           </p>
           <div className="rf-flex rf-justify-center">
             <Button
-              onClick={isSignIn}
+              onClick={onSignIn}
               className="rf-flex rf-justify-center rf-items-center rf-w-48"
             >
               <GitHubLogoIcon className="rf-h-4 rf-w-4 rf-mr-2" />

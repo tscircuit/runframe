@@ -6,15 +6,18 @@ import { toast } from "lib/utils/toast"
 import { getWindowVar } from "lib/utils/get-registry-ky"
 import { useCreateOrderQuote } from "lib/hooks/use-create-order-quote"
 import { useOrderQuotePolling } from "lib/hooks/use-order-quote-polling"
+import { GitHubLogoIcon } from "@radix-ui/react-icons"
 
 interface InitialOrderScreenProps {
   onCancel: () => void
   packageReleaseId: string
+  isSignIn?: () => void
 }
 
 export const InitialOrderScreen = ({
   onCancel,
   packageReleaseId,
+  isSignIn,
 }: InitialOrderScreenProps) => {
   const [selectedShippingCarrier, setSelectedShippingCarrier] = useState<
     string | null
@@ -62,10 +65,28 @@ export const InitialOrderScreen = ({
         ).cost
       : 0
 
-  // Create order quote when component mounts
-  useEffect(() => {
-    createOrderQuote()
-  }, [packageReleaseId, createOrderQuote])
+  if (!isSignIn) {
+    return (
+      <div className="rf-max-w-lg rf-mx-auto rf-bg-white rf-rounded-2xl rf-py-8 rf-flex rf-flex-col rf-gap-3">
+        <h2 className="rf-text-3xl rf-font-bold rf-text-center">Order PCB</h2>
+        <div className="py-4">
+          <p className="rf-text-sm rf-text-gray-500 rf-mb-6 rf-text-center">
+            Sign in is required to Order. Please sign in with GitHub to
+            continue.
+          </p>
+          <div className="rf-flex rf-justify-center">
+            <Button
+              onClick={isSignIn}
+              className="rf-flex rf-justify-center rf-items-center rf-w-48"
+            >
+              <GitHubLogoIcon className="rf-h-4 rf-w-4 rf-mr-2" />
+              Sign in with GitHub
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="rf-max-w-lg rf-mx-auto rf-bg-white rf-rounded-2xl rf-py-8 rf-flex rf-flex-col rf-gap-3">

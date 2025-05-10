@@ -488,7 +488,9 @@ export const CircuitJsonPreview = ({
                 isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
               )}
             >
-              {circuitJson ? (
+              {(Array.isArray(circuitJsonErrors) &&
+                circuitJsonErrors.length > 0) ||
+              errorMessage ? (
                 <ErrorTabContent
                   code={code}
                   circuitJsonErrors={circuitJsonErrors}

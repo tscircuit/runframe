@@ -6,7 +6,7 @@ import {
 } from "lib/components/ui/tabs"
 import { cn } from "lib/utils"
 import { CadViewer } from "@tscircuit/3d-viewer"
-import { useCallback, useEffect, useState, useMemo } from "react"
+import { useCallback, useEffect, useState, useMemo, useRef } from "react"
 import { ErrorFallback } from "../ErrorFallback"
 import { ErrorBoundary } from "react-error-boundary"
 import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
@@ -45,6 +45,13 @@ import { capitalizeFirstLetters } from "lib/utils"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
 import { version } from "../../../package.json"
 import type { CircuitJson } from "circuit-json"
+import * as THREE from "three"
+
+declare global {
+  interface Window {
+    TSCIRCUIT_3D_OBJECT_REF: any // Use a specific type if known, e.g., THREE.Object3D
+  }
+}
 
 const dropdownMenuItems = [
   "assembly",
@@ -125,6 +132,15 @@ export const CircuitJsonPreview = ({
       setActiveTab(defaultActiveTab ?? "pcb")
     }
   }, [circuitJson])
+
+  const cadViewerRef = useRef<THREE.Object3D>()
+
+  const setCadViewerRef = useCallback((value: THREE.Object3D) => {
+    if (cadViewerRef.current !== value) {
+      window.TSCIRCUIT_3D_OBJECT_REF = value == null ? undefined : value
+      cadViewerRef.current = value
+    }
+  }, [])
 
   return (
     <div
@@ -426,7 +442,8 @@ export const CircuitJsonPreview = ({
               <ErrorBoundary FallbackComponent={ErrorFallback}>
                 {circuitJson ? (
                   <CadViewer
-                    soup={circuitJson as any}
+                    ref={setCadViewerRef}
+                    circuitJson={circuitJson as any}
                     autoRotateDisabled={autoRotate3dViewerDisabled}
                   />
                 ) : (

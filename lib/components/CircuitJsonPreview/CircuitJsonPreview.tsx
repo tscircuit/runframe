@@ -49,7 +49,7 @@ import * as THREE from "three"
 
 declare global {
   interface Window {
-    TSCIRCUIT_3D_OBJECT_REF: any // Use a specific type if known, e.g., THREE.Object3D
+    TSCIRCUIT_3D_OBJECT_REF: THREE.Object3D | undefined
   }
 }
 

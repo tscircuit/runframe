@@ -45,11 +45,11 @@ import { capitalizeFirstLetters } from "lib/utils"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
 import { version } from "../../../package.json"
 import type { CircuitJson } from "circuit-json"
-import * as THREE from "three"
+import { Object3D } from "three"
 
 declare global {
   interface Window {
-    TSCIRCUIT_3D_OBJECT_REF: THREE.Object3D | undefined
+    TSCIRCUIT_3D_OBJECT_REF: Object3D | undefined
   }
 }
 
@@ -133,9 +133,9 @@ export const CircuitJsonPreview = ({
     }
   }, [circuitJson])
 
-  const cadViewerRef = useRef<THREE.Object3D>()
+  const cadViewerRef = useRef<Object3D>()
 
-  const setCadViewerRef = useCallback((value: THREE.Object3D) => {
+  const setCadViewerRef = useCallback((value: Object3D) => {
     if (cadViewerRef.current !== value) {
       window.TSCIRCUIT_3D_OBJECT_REF = value == null ? undefined : value
       cadViewerRef.current = value

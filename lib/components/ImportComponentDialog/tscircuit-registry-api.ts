@@ -25,7 +25,7 @@ interface TscircuitSearchResponse {
  */
 export const searchTscircuitComponents = async (
   query: string,
-  limit: number = 10,
+  limit = 10,
 ): Promise<TscircuitSnippet[]> => {
   try {
     // Encode the query parameters

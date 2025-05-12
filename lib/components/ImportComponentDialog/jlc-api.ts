@@ -22,7 +22,7 @@ interface JLCSearchResponse {
  */
 export const searchJLCComponents = async (
   query: string,
-  limit: number = 10,
+  limit = 10,
 ): Promise<JLCComponent[]> => {
   try {
     // Encode the query parameters

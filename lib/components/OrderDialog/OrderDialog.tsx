@@ -12,6 +12,7 @@ export interface OrderDialogProps {
   setStage: (stage: "initial" | "progress" | "checkout") => void
   circuitJson?: CircuitJson
   packageReleaseId?: string
+  signIn: () => void
 }
 
 export const OrderDialog: FC<OrderDialogProps> = ({
@@ -21,6 +22,7 @@ export const OrderDialog: FC<OrderDialogProps> = ({
   setStage,
   circuitJson,
   packageReleaseId,
+  signIn,
 }) => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -36,6 +38,7 @@ export const OrderDialog: FC<OrderDialogProps> = ({
               <InitialOrderScreen
                 onCancel={onClose}
                 packageReleaseId={packageReleaseId ?? ""}
+                signIn={signIn}
               />
             )}
 

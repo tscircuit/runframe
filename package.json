@@ -2,7 +2,7 @@
   "name": "@tscircuit/runframe",
   "main": "dist/preview.js",
   "type": "module",
-  "version": "0.0.434",
+  "version": "0.0.435",
   "exports": {
     ".": "./dist/preview.js",
     "./preview": "./dist/preview.js",
@@ -78,7 +78,7 @@
     "@radix-ui/react-progress": "^1.1.2",
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-tabs": "^1.1.2",
-    "@tscircuit/3d-viewer": "^0.0.213",
+    "@tscircuit/3d-viewer": "^0.0.214",
     "@tscircuit/assembly-viewer": "^0.0.1",
     "@tscircuit/core": "^0.0.401",
     "@tscircuit/create-snippet-url": "^0.0.8",

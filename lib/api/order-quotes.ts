@@ -2,6 +2,11 @@ import { registryKy } from "lib/utils/get-registry-ky"
 import type { OrderQuote } from "@tscircuit/fake-snippets/schema"
 import { HTTPError } from "ky"
 
+export interface OrderQuoteError {
+  message: string
+  error_code: string
+}
+
 export const createOrderQuote = async (packageReleaseId: string) => {
   try {
     const { order_quote_id } = await registryKy
@@ -13,18 +18,15 @@ export const createOrderQuote = async (packageReleaseId: string) => {
       })
       .json<{
         order_quote_id?: string
-        error?: {
-          message: string
-          error_code: string
-        }
+        error?: OrderQuoteError
       }>()
     return order_quote_id
-  } catch (err) {
-    if (err instanceof HTTPError) {
-      const errorBody = await err.response.json()
-      throw new Error(errorBody.message || err.message)
+  } catch (error) {
+    if (error instanceof HTTPError) {
+      const errorBody = await error.response.json()
+      throw errorBody
     }
-    throw err
+    throw error
   }
 }
 

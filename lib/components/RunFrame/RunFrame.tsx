@@ -19,7 +19,10 @@ declare global {
   var runFrameWorker: any
 }
 
-import type { AutoroutingStartEvent } from "@tscircuit/core"
+import {
+  orderedRenderPhases,
+  type AutoroutingStartEvent,
+} from "@tscircuit/core"
 import type { RenderLog } from "lib/render-logging/RenderLog"
 import { getPhaseTimingsFromRenderEvents } from "lib/render-logging/getPhaseTimingsFromRenderEvents"
 import { getChangesBetweenFsMaps } from "../../utils/getChangesBetweenFsMaps"
@@ -170,31 +173,25 @@ export const RunFrame = (props: RunFrameProps) => {
           },
         })
       })
-      worker.on("renderable:renderLifecycle:anyEvent", (event: any) => {
+      worker.on("board:renderPhaseStarted", (event: any) => {
         renderLog.lastRenderEvent = event
         renderLog.eventsProcessed = (renderLog.eventsProcessed ?? 0) + 1
-        if (!renderIds.has(event.renderId)) {
-          renderIds.add(event.renderId)
-        }
-        const estTotalRenderEvents = renderIds.size * numRenderPhases * 2
         const hasProcessedEnoughToEstimateProgress =
-          renderLog.eventsProcessed > renderIds.size * 2
+          renderLog.eventsProcessed > 2
 
-        // This estimated progress goes over 100% because of repeated render
-        // events, so we use a exponential decay to make it appear [0, 100%]
         const estProgressLinear =
-          renderLog.eventsProcessed / estTotalRenderEvents
+          (orderedRenderPhases.indexOf(event.phase) / numRenderPhases) * 0.75 +
+          (renderLog.eventsProcessed / 1000) * 0.25
 
         const estProgress = 1 - Math.exp(-estProgressLinear * 3)
 
-        renderLog.progress = hasProcessedEnoughToEstimateProgress
-          ? estProgress
-          : // Until we have enough events to estimate progress, we use the 0-5%
-            // range and assume that there are ~500 renderIds, this will usually
-            // be an underestimate.
-            (1 - Math.exp(-(renderLog.eventsProcessed ?? 0) / 1000)) * 0.05
+        renderLog.progress = estProgress
 
-        if (activeTab === "render_log") {
+        setRenderLog({ ...renderLog })
+      })
+
+      if (activeTab === "render_log") {
+        worker.on("renderable:renderLifecycle:anyEvent", (event: any) => {
           renderLog.renderEvents = renderLog.renderEvents ?? []
           event.createdAt = Date.now()
           renderLog.renderEvents.push(event)
@@ -204,9 +201,9 @@ export const RunFrame = (props: RunFrameProps) => {
             )
             lastRenderLogSet = Date.now()
           }
-        }
-        setRenderLog({ ...renderLog })
-      })
+          setRenderLog({ ...renderLog })
+        })
+      }
 
       worker.on("autorouting:progress", (event: any) => {
         setAutoroutingGraphics(event.debugGraphics)

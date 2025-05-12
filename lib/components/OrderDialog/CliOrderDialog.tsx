@@ -7,7 +7,7 @@ export interface CliOrderDialogProps {
   onClose: () => void
   stage: "initial" | "progress" | "checkout"
   setStage: (stage: "initial" | "progress" | "checkout") => void
-  signIn: () => void
+  signIn?: () => void
 }
 
 export const CliOrderDialog: FC<CliOrderDialogProps> = ({

@@ -157,11 +157,7 @@ export const CircuitJsonPreview = ({
               <div className="rf-flex rf-items-center rf-gap-2">
                 {renderLog.lastRenderEvent && (
                   <div className="rf-text-xs rf-text-gray-500">
-                    {
-                      renderLog.lastRenderEvent?.type
-                        .split("renderable:renderLifecycle:")[1]
-                        .split(":")[0]
-                    }
+                    {renderLog.lastRenderEvent?.phase ?? ""}
                   </div>
                 )}
                 <div className="rf-w-4 rf-h-4 rf-bg-blue-500 rf-opacity-50 rf-rounded-full rf-text-white">

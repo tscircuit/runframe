@@ -178,4 +178,3 @@ const SignInView = ({ signIn }: { signIn: () => void }) => (
     </div>
   </div>
 )
-

@@ -27,7 +27,6 @@ export const InitialOrderScreen = ({
     mutate: createOrderQuote,
     data: orderQuoteId,
     error: createOrderQuoteError,
-    isError,
   } = useCreateOrderQuote(packageReleaseId)
   const { data: orderQuote } = useOrderQuotePolling(orderQuoteId)
 
@@ -84,11 +83,14 @@ export const InitialOrderScreen = ({
     <div className="rf-max-w-lg rf-mx-auto rf-bg-white rf-rounded-2xl rf-py-8 rf-flex rf-flex-col rf-gap-3">
       <h2 className="rf-text-3xl rf-font-bold rf-text-center">Order PCB</h2>
       {/* Loading States */}
-      {(!orderQuoteId || !orderQuote || !orderQuote?.is_completed) &&
-        !isError && <LoadingMessage message="Fetching quotes..." />}
+      {(!orderQuoteId ||
+        !orderQuote ||
+        (orderQuote?.is_processing && !orderQuote?.error)) && (
+        <LoadingMessage message="Fetching quotes..." />
+      )}
 
       {/* Error States */}
-      {(createOrderQuoteError || orderQuote?.error || isError) && (
+      {(createOrderQuoteError || orderQuote?.error) && (
         <ErrorMessage
           message={
             createOrderQuoteError?.message ||

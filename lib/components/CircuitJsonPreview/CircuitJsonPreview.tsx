@@ -44,7 +44,7 @@ import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { capitalizeFirstLetters } from "lib/utils"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
 import { version } from "../../../package.json"
-import type { CircuitJson } from "circuit-json"
+import type { CircuitJson, CircuitJsonError } from "circuit-json"
 
 const dropdownMenuItems = [
   "assembly",
@@ -89,9 +89,11 @@ export const CircuitJsonPreview = ({
 }: PreviewContentProps) => {
   useStyles()
 
-  const circuitJsonErrors = useMemo(() => {
+  const circuitJsonErrors = useMemo<CircuitJsonError[] | null>(() => {
     if (!circuitJson) return null
-    return circuitJson.filter((e) => e && "error_type" in e)
+    return circuitJson.filter(
+      (e) => (e && "error_type" in e) || e.type.includes("error"),
+    ) as any
   }, [circuitJson])
 
   const [activeTab, setActiveTabState] = useState<TabId>(
@@ -484,9 +486,7 @@ export const CircuitJsonPreview = ({
                 isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
               )}
             >
-              {(Array.isArray(circuitJsonErrors) &&
-                circuitJsonErrors.length > 0) ||
-              errorMessage ? (
+              {circuitJson ? (
                 <ErrorTabContent
                   code={code}
                   circuitJsonErrors={circuitJsonErrors}

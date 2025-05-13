@@ -1,3 +1,4 @@
+import type { CircuitJson } from "circuit-json"
 import { CircuitJsonPreview } from "lib/components/CircuitJsonPreview/CircuitJsonPreview"
 import {
   fullRenderToCircuitJson,

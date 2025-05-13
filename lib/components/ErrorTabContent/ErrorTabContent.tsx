@@ -78,6 +78,7 @@ export const ErrorTabContent = ({
           <>
             <div className="rf-flex rf-items-center rf-gap-2 rf-mb-2">
               <button
+                type="button"
                 className="rf-p-1 rf-rounded-sm rf-transition-colors"
                 onClick={handlePrev}
                 disabled={currentErrorIndex === 0}
@@ -85,6 +86,7 @@ export const ErrorTabContent = ({
                 <ChevronLeft className="rf-h-4 rf-w-4 rf-text-red-500" />
               </button>
               <button
+                type="button"
                 className="rf-p-1 rf-rounded-sm rf-transition-colors"
                 onClick={handleNext}
                 disabled={currentErrorIndex === circuitJsonErrors!.length - 1}

@@ -6,7 +6,7 @@ import {
 } from "lib/components/ui/tabs"
 import { cn } from "lib/utils"
 import { CadViewer } from "@tscircuit/3d-viewer"
-import { useCallback, useEffect, useState, useMemo, useRef } from "react"
+import { useCallback, useEffect, useState, useMemo } from "react"
 import { ErrorFallback } from "../ErrorFallback"
 import { ErrorBoundary } from "react-error-boundary"
 import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
@@ -132,8 +132,6 @@ export const CircuitJsonPreview = ({
       setActiveTab(defaultActiveTab ?? "pcb")
     }
   }, [circuitJson])
-
-  const cadViewerRef = useRef<Object3D>()
 
   const setCadViewerRef = useCallback((value: Object3D) => {
     if (cadViewerRef.current !== value) {

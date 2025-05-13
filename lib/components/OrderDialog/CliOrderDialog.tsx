@@ -8,6 +8,7 @@ export interface CliOrderDialogProps {
   stage: "initial" | "progress" | "checkout"
   setStage: (stage: "initial" | "progress" | "checkout") => void
   signIn?: () => void
+  isLoggedIn: boolean
 }
 
 export const CliOrderDialog: FC<CliOrderDialogProps> = ({
@@ -16,6 +17,7 @@ export const CliOrderDialog: FC<CliOrderDialogProps> = ({
   stage,
   setStage,
   signIn,
+  isLoggedIn,
 }) => {
   const circuitJson = useRunFrameStore((state) => state.circuitJson)
 
@@ -27,6 +29,7 @@ export const CliOrderDialog: FC<CliOrderDialogProps> = ({
       stage={stage}
       setStage={setStage}
       circuitJson={circuitJson!}
+      isLoggedIn={isLoggedIn}
     />
   )
 }

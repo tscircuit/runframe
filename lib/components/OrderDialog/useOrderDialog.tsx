@@ -53,7 +53,7 @@ export const useOrderDialog = ({
     ) => (
       <OrderDialog
         {...props}
-        signIn={isLoggedIn ? undefined : onSignIn}
+        signIn={onSignIn}
         isLoggedIn={isLoggedIn}
       />
     ),

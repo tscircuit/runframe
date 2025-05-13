@@ -8,7 +8,8 @@ export interface CliOrderDialogProps {
   stage: "initial" | "progress" | "checkout"
   setStage: (stage: "initial" | "progress" | "checkout") => void
   signIn?: () => void
-  isLoggedIn: boolean
+  // TODO: make this required prop
+  isLoggedIn?: boolean
 }
 
 export const CliOrderDialog: FC<CliOrderDialogProps> = ({
@@ -29,7 +30,7 @@ export const CliOrderDialog: FC<CliOrderDialogProps> = ({
       stage={stage}
       setStage={setStage}
       circuitJson={circuitJson!}
-      isLoggedIn={isLoggedIn}
+      isLoggedIn={isLoggedIn ?? false}
     />
   )
 }

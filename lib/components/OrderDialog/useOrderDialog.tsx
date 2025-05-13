@@ -50,12 +50,6 @@ export const useOrderDialog = ({
     setStage,
     OrderDialog: (
       props: Omit<Parameters<typeof OrderDialog>[0], "signIn" | "isLoggedIn">,
-    ) => (
-      <OrderDialog
-        {...props}
-        signIn={onSignIn}
-        isLoggedIn={isLoggedIn}
-      />
-    ),
+    ) => <OrderDialog {...props} signIn={onSignIn} isLoggedIn={isLoggedIn} />,
   }
 }

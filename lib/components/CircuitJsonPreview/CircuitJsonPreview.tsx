@@ -91,7 +91,9 @@ export const CircuitJsonPreview = ({
 
   const circuitJsonErrors = useMemo(() => {
     if (!circuitJson) return null
-    return circuitJson.filter((e) => e && "error_type" in e)
+    return circuitJson.filter(
+      (e) => (e && "error_type" in e) || e.type.includes("error"),
+    )
   }, [circuitJson])
 
   const [activeTab, setActiveTabState] = useState<TabId>(

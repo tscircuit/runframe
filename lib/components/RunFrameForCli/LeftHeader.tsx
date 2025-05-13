@@ -6,7 +6,6 @@ import type {
 } from "../RunFrameWithApi/types"
 import { SelectSnippetDialog } from "./SelectSnippetDialog"
 import { useEventHandler } from "./useEventHandler"
-import { CheckCircle } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuTrigger,

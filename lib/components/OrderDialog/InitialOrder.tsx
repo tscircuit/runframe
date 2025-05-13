@@ -1,5 +1,6 @@
 import { Button } from "lib/components/ui/button"
 import { Loader2 } from "lucide-react"
+import { GitHubLogoIcon } from "@radix-ui/react-icons"
 import { useEffect, useState } from "react"
 import VendorQuoteCard, { type OrderQuote } from "./VendorQuoteCard"
 import { toast } from "lib/utils/toast"
@@ -10,11 +11,15 @@ import { useOrderQuotePolling } from "lib/hooks/use-order-quote-polling"
 interface InitialOrderScreenProps {
   onCancel: () => void
   packageReleaseId: string
+  signIn: () => void
+  isLoggedIn: boolean
 }
 
 export const InitialOrderScreen = ({
   onCancel,
   packageReleaseId,
+  signIn,
+  isLoggedIn,
 }: InitialOrderScreenProps) => {
   const [selectedShippingCarrier, setSelectedShippingCarrier] = useState<
     string | null
@@ -24,7 +29,6 @@ export const InitialOrderScreen = ({
     mutate: createOrderQuote,
     data: orderQuoteId,
     error: createOrderQuoteError,
-    isError,
   } = useCreateOrderQuote(packageReleaseId)
   const { data: orderQuote } = useOrderQuotePolling(orderQuoteId)
 
@@ -67,15 +71,28 @@ export const InitialOrderScreen = ({
     createOrderQuote()
   }, [packageReleaseId, createOrderQuote])
 
+  // Check for no_token error
+  const isNoTokenError =
+    (createOrderQuoteError?.error_code?.includes("no_token") ||
+      orderQuote?.error?.error_code?.includes("no_token")) &&
+    signIn
+
+  if (!isLoggedIn || isNoTokenError) {
+    return <SignInView signIn={signIn} />
+  }
+
   return (
     <div className="rf-max-w-lg rf-mx-auto rf-bg-white rf-rounded-2xl rf-py-8 rf-flex rf-flex-col rf-gap-3">
       <h2 className="rf-text-3xl rf-font-bold rf-text-center">Order PCB</h2>
       {/* Loading States */}
-      {(!orderQuoteId || !orderQuote || !orderQuote?.is_completed) &&
-        !isError && <LoadingMessage message="Fetching quotes..." />}
+      {(!orderQuoteId ||
+        !orderQuote ||
+        (orderQuote?.is_processing && !orderQuote?.error)) && (
+        <LoadingMessage message="Fetching quotes..." />
+      )}
 
       {/* Error States */}
-      {(createOrderQuoteError || orderQuote?.error || isError) && (
+      {(createOrderQuoteError || orderQuote?.error) && (
         <ErrorMessage
           message={
             createOrderQuoteError?.message ||
@@ -152,4 +169,16 @@ const LoadingMessage = ({ message }: { message: string }) => (
 
 const ErrorMessage = ({ message }: { message: string }) => (
   <div className="rf-text-red-600 rf-text-center rf-py-12">{message}</div>
+)
+const SignInView = ({ signIn }: { signIn: () => void }) => (
+  <div className="rf-max-w-lg rf-mx-auto rf-bg-white rf-rounded-2xl rf-py-8 rf-flex rf-flex-col rf-gap-3">
+    <h2 className="rf-text-3xl rf-font-bold rf-text-center">Order PCB</h2>
+    <div className="rf-flex rf-flex-col rf-items-center rf-gap-4 rf-py-8">
+      <p className="rf-text-gray-600">Please sign in to continue</p>
+      <Button onClick={signIn} className="rf-flex rf-items-center rf-gap-2">
+        <GitHubLogoIcon className="rf-w-5 rf-h-5" />
+        Sign in with GitHub
+      </Button>
+    </div>
+  </div>
 )

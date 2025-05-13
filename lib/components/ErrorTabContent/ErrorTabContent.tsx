@@ -18,7 +18,7 @@ export const ErrorTabContent = ({
   code?: string
   autoroutingLog?: Record<string, { simpleRouteJson: any }>
   isStreaming?: boolean
-  circuitJsonErrors: CircuitJsonError[] | null
+  circuitJsonErrors?: CircuitJsonError[] | null
   errorMessage?: string | null
   onReportAutoroutingLog?: (
     name: string,

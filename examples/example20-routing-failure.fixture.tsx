@@ -12,39 +12,23 @@ export default () => {
     const fetchCircuitJson = async () => {
       const circuitJson = await fullRenderToCircuitJson(
         <board>
-          <resistor
-            name="R1"
-            resistance="10k"
-            footprint="0402"
-            pcbX="5mm"
-            pcbY="5mm"
-          />
-          <resistor
-            name="R2"
-            resistance="4.7k"
-            footprint="0402"
-            pcbX="6mm"
-            pcbY="6mm"
-          />
-          <resistor
-            name="R3"
-            resistance="4.7k"
-            footprint="0402"
-            pcbX="7mm"
-            pcbY="7mm"
-          />
-          <resistor
-            name="R4"
-            resistance="4.7k"
-            footprint="0603"
-            pcbX="4mm"
-            pcbY="4mm"
-          />
-          {/* Add a trace connecting the two resistors to trigger routing failure */}
-          <trace from=".R1 > .pin1" to=".R2 > .pin2" />
-          <trace from=".R1 > .pin2" to=".R2 > .pin1" />
-          <trace from=".R1 > .pin2" to=".R3 > .pin1" />
-          <trace from=".R1 > .pin2" to=".R4 > .pin1" />
+          <chip name="U1" footprint="soic16" pcbX="0mm" pcbY="0mm" />
+          <chip name="U2" footprint="soic16" pcbX="10mm" pcbY="0mm" />
+
+          <trace from=".U1 > .pin1" to=".U2 > .pin1" />
+          <trace from=".U1 > .pin2" to=".U2 > .pin2" />
+          <trace from=".U1 > .pin3" to=".U2 > .pin3" />
+          <trace from=".U1 > .pin4" to=".U2 > .pin4" />
+          <trace from=".U1 > .pin5" to=".U2 > .pin5" />
+          <trace from=".U1 > .pin6" to=".U2 > .pin6" />
+          <trace from=".U1 > .pin7" to=".U2 > .pin7" />
+          <trace from=".U1 > .pin8" to=".U2 > .pin8" />
+          <trace from=".U1 > .pin9" to=".U2 > .pin9" />
+          <trace from=".U1 > .pin10" to=".U2 > .pin10" />
+          <trace from=".U1 > .pin11" to=".U2 > .pin11" />
+          <trace from=".U1 > .pin12" to=".U2 > .pin12" />
+          <trace from=".U1 > .pin13" to=".U2 > .pin13" />
+          <trace from=".U1 > .pin14" to=".U2 > .pin14" />
         </board>,
       )
       setCircuitJson(circuitJson)

@@ -31,7 +31,9 @@ circuit.add(
     return null
   }
 
-  const orderDialog = useOrderDialog(signIn)
+  const orderDialog = useOrderDialog({
+    onSignIn: signIn,
+  })
 
   return (
     <div>

@@ -21,6 +21,10 @@ export function getRegistryKy() {
   })
 }
 
+export function hasRegistryToken() {
+  return Boolean(getWindowVar("TSCIRCUIT_REGISTRY_TOKEN"))
+}
+
 export const registryKy = {
   get: (url: string, options?: any) => getRegistryKy().get(url, options),
   post: (url: string, options?: any) => getRegistryKy().post(url, options),

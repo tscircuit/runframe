@@ -134,9 +134,10 @@ export const CircuitJsonPreview = ({
   }, [circuitJson])
 
   const setCadViewerRef = useCallback((value: Object3D) => {
-    if (cadViewerRef.current !== value) {
+    let cadViewer;
+    if (cadViewerRef !== value) {
       window.TSCIRCUIT_3D_OBJECT_REF = value === null ? undefined : value
-      cadViewerRef.current = value
+      cadViewer = value
     }
   }, [])
 

@@ -4,15 +4,15 @@ import {
   fullRenderToCircuitJson,
   renderToCircuitJson,
 } from "lib/dev/render-to-circuit-json"
+import { RunFrame } from "lib/runner"
 import { useEffect, useState } from "react"
 
 export default () => {
-  const [circuitJson, setCircuitJson] = useState<CircuitJson | null>(null)
-
-  useEffect(() => {
-    const fetchCircuitJson = async () => {
-      const circuitJson = await fullRenderToCircuitJson(
-        <board>
+  return (
+    <RunFrame
+      fsMap={{
+        "index.tsx": `
+      export default () => (<board>
           <chip name="U1" footprint="soic16" pcbX="0mm" pcbY="0mm" />
           <chip name="U2" footprint="soic16" pcbX="10mm" pcbY="0mm" />
 
@@ -30,16 +30,9 @@ export default () => {
           <trace from=".U1 > .pin12" to=".U2 > .pin12" />
           <trace from=".U1 > .pin13" to=".U2 > .pin13" />
           <trace from=".U1 > .pin14" to=".U2 > .pin14" />
-        </board>,
-      )
-      setCircuitJson(circuitJson)
-    }
-    fetchCircuitJson()
-  }, [])
-
-  if (!circuitJson) {
-    return <div>Loading...</div>
-  }
-
-  return <CircuitJsonPreview circuitJson={circuitJson} />
+        </board>)
+        `,
+      }}
+    />
+  )
 }

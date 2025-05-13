@@ -25,7 +25,13 @@ export const useOrderDialogCli = () => {
   }
 }
 
-export const useOrderDialog = ({ onSignIn }: { onSignIn: () => void }) => {
+export const useOrderDialog = ({
+  onSignIn,
+  isLoggedIn,
+}: {
+  onSignIn: () => void
+  isLoggedIn: boolean
+}) => {
   useStyles()
 
   const [isOpen, setIsOpen] = useState(false)
@@ -42,8 +48,8 @@ export const useOrderDialog = ({ onSignIn }: { onSignIn: () => void }) => {
     open: () => setIsOpen(true),
     close: handleClose,
     setStage,
-    OrderDialog: (props: Omit<Parameters<typeof OrderDialog>[0], "signIn">) => (
-      <OrderDialog {...props} signIn={onSignIn} />
-    ),
+    OrderDialog: (
+      props: Omit<Parameters<typeof OrderDialog>[0], "signIn" | "isLoggedIn">,
+    ) => <OrderDialog {...props} signIn={onSignIn} isLoggedIn={isLoggedIn} />,
   }
 }

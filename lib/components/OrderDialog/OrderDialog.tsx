@@ -13,6 +13,7 @@ export interface OrderDialogProps {
   circuitJson?: CircuitJson
   packageReleaseId?: string
   signIn?: () => void
+  isLoggedIn: boolean
 }
 
 export const OrderDialog: FC<OrderDialogProps> = ({
@@ -23,6 +24,7 @@ export const OrderDialog: FC<OrderDialogProps> = ({
   circuitJson,
   packageReleaseId,
   signIn,
+  isLoggedIn,
 }) => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -39,6 +41,7 @@ export const OrderDialog: FC<OrderDialogProps> = ({
                 onCancel={onClose}
                 packageReleaseId={packageReleaseId ?? ""}
                 signIn={signIn ?? (() => {})}
+                isLoggedIn={isLoggedIn}
               />
             )}
 

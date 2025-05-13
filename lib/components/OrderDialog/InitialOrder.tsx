@@ -12,12 +12,14 @@ interface InitialOrderScreenProps {
   onCancel: () => void
   packageReleaseId: string
   signIn: () => void
+  isLoggedIn: boolean
 }
 
 export const InitialOrderScreen = ({
   onCancel,
   packageReleaseId,
   signIn,
+  isLoggedIn,
 }: InitialOrderScreenProps) => {
   const [selectedShippingCarrier, setSelectedShippingCarrier] = useState<
     string | null
@@ -75,7 +77,7 @@ export const InitialOrderScreen = ({
       orderQuote?.error?.error_code?.includes("no_token")) &&
     signIn
 
-  if (isNoTokenError) {
+  if (!isLoggedIn || isNoTokenError) {
     return <SignInView signIn={signIn} />
   }
 

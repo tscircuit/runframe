@@ -45,6 +45,13 @@ import { capitalizeFirstLetters } from "lib/utils"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
 import { version } from "../../../package.json"
 import type { CircuitJson, CircuitJsonError } from "circuit-json"
+import { Object3D } from "three"
+
+declare global {
+  interface Window {
+    TSCIRCUIT_3D_OBJECT_REF: Object3D | undefined
+  }
+}
 
 const dropdownMenuItems = [
   "assembly",
@@ -127,6 +134,10 @@ export const CircuitJsonPreview = ({
       setActiveTab(defaultActiveTab ?? "pcb")
     }
   }, [circuitJson])
+
+  const setCadViewerRef = useCallback((value: Object3D | null) => {
+    window.TSCIRCUIT_3D_OBJECT_REF = value === null ? undefined : value
+  }, [])
 
   return (
     <div
@@ -424,7 +435,8 @@ export const CircuitJsonPreview = ({
               <ErrorBoundary FallbackComponent={ErrorFallback}>
                 {circuitJson ? (
                   <CadViewer
-                    soup={circuitJson as any}
+                    ref={setCadViewerRef}
+                    circuitJson={circuitJson as any}
                     autoRotateDisabled={autoRotate3dViewerDisabled}
                   />
                 ) : (

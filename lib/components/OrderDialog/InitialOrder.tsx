@@ -86,11 +86,9 @@ export const InitialOrderScreen = ({
       <h2 className="rf-text-3xl rf-font-bold rf-text-center">Order PCB</h2>
       {/* Loading States */}
       {!(createOrderQuoteError || orderQuote?.error) &&
-        (!orderQuoteId ||
-          !orderQuote ||
-          orderQuote?.is_processing) && (
-        <LoadingMessage message="Fetching quotes..." />
-      )}
+        (!orderQuoteId || !orderQuote || orderQuote?.is_processing) && (
+          <LoadingMessage message="Fetching quotes..." />
+        )}
 
       {/* Error States */}
       {(createOrderQuoteError || orderQuote?.error) && (

@@ -59,7 +59,7 @@ export const AutoroutingLogOptions = ({
                       onClick={(e) => {
                         e.stopPropagation()
                         if (onReportAutoroutingLog) {
-                          onReportAutoroutingLog(key, simpleRouteJson)
+                          onReportAutoroutingLog(key, { simpleRouteJson })
                         }
                       }}
                     >

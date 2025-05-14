@@ -31,6 +31,7 @@ import type { RunFrameProps } from "./RunFrameProps"
 import { useRunnerStore } from "./runner-store/use-runner-store"
 import { useMutex } from "./useMutex"
 import type { ManualEditEvent } from "@tscircuit/props"
+import { hasRegistryToken, registryKy } from "../../utils/get-registry-ky"
 
 export type { RunFrameProps }
 
@@ -301,13 +302,43 @@ export const RunFrame = (props: RunFrameProps) => {
     }
   }
 
+  const handleReportAutoroutingLog = async (
+    name: string,
+    data: { simpleRouteJson: any },
+  ) => {
+    await registryKy
+      .post("autorouting/bug_reports/create", {
+        json: {
+          title: name,
+          simple_route_json: data.simpleRouteJson,
+        },
+      })
+      .json<{ autorouting_bug_report: { autorouting_bug_report_id: string } }>()
+      .then(({ autorouting_bug_report }) => {
+        window.open(
+          `https://api.tscircuit.com/autorouting/bug_reports/view?autorouting_bug_report_id=${autorouting_bug_report.autorouting_bug_report_id}`,
+          "_blank",
+        )
+      })
+      .catch((error) => {
+        console.error("Failed to report autorouting bug", error)
+        if (error.message.includes("401")) {
+          alert("You must be logged in to report autorouting bugs")
+        } else {
+          alert(`Failed to report autorouting bug: ${error.message}`)
+        }
+      })
+  }
+
   return (
     <CircuitJsonPreview
       defaultActiveTab={props.defaultActiveTab}
       showToggleFullScreen={props.showToggleFullScreen}
       autoroutingGraphics={autoroutingGraphics}
       autoroutingLog={autoroutingLog}
-      onReportAutoroutingLog={props.onReportAutoroutingLog}
+      onReportAutoroutingLog={
+        props.onReportAutoroutingLog || handleReportAutoroutingLog
+      }
       leftHeaderContent={
         <>
           {props.showRunButton && (

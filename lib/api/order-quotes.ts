@@ -3,8 +3,10 @@ import type { OrderQuote } from "@tscircuit/fake-snippets/schema"
 import { HTTPError } from "ky"
 
 export interface OrderQuoteError {
-  message: string
-  error_code: string
+  error: {
+    message: string
+    error_code: string
+  }
 }
 
 export const createOrderQuote = async (packageReleaseId: string) => {
@@ -24,7 +26,12 @@ export const createOrderQuote = async (packageReleaseId: string) => {
   } catch (error) {
     if (error instanceof HTTPError) {
       const errorBody = await error.response.json()
-      throw errorBody
+      throw {
+        error: {
+          message: errorBody.message,
+          error_code: errorBody.error_code,
+        },
+      }
     }
     throw error
   }

@@ -73,7 +73,7 @@ export const InitialOrderScreen = ({
 
   // Check for no_token error
   const isNoTokenError =
-    (createOrderQuoteError?.error_code?.includes("no_token") ||
+    (createOrderQuoteError?.error?.error_code?.includes("no_token") ||
       orderQuote?.error?.error_code?.includes("no_token")) &&
     signIn
 
@@ -85,17 +85,16 @@ export const InitialOrderScreen = ({
     <div className="rf-max-w-lg rf-mx-auto rf-bg-white rf-rounded-2xl rf-py-8 rf-flex rf-flex-col rf-gap-3">
       <h2 className="rf-text-3xl rf-font-bold rf-text-center">Order PCB</h2>
       {/* Loading States */}
-      {(!orderQuoteId ||
-        !orderQuote ||
-        (orderQuote?.is_processing && !orderQuote?.error)) && (
-        <LoadingMessage message="Fetching quotes..." />
-      )}
+      {!(createOrderQuoteError || orderQuote?.error) &&
+        (!orderQuoteId || !orderQuote || orderQuote?.is_processing) && (
+          <LoadingMessage message="Fetching quotes..." />
+        )}
 
       {/* Error States */}
       {(createOrderQuoteError || orderQuote?.error) && (
         <ErrorMessage
           message={
-            createOrderQuoteError?.message ||
+            createOrderQuoteError?.error.message ||
             orderQuote?.error?.message ||
             "Failed to fetch quotes"
           }

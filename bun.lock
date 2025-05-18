@@ -35,7 +35,11 @@
       "devDependencies": {
         "@babel/standalone": "^7.26.10",
         "@biomejs/biome": "^1.9.4",
+<<<<<<< HEAD
         "@tscircuit/checks": "^0.0.48",
+=======
+        "@tscircuit/checks": "^0.0.47",
+>>>>>>> 6e8f2b0 (memoize the order dialog)
         "@tscircuit/fake-snippets": "^0.0.67",
         "@tscircuit/math-utils": "^0.0.18",
         "@types/bun": "latest",

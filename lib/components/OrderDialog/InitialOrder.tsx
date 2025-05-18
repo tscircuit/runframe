@@ -1,7 +1,7 @@
 import { Button } from "lib/components/ui/button"
 import { Loader2 } from "lucide-react"
 import { GitHubLogoIcon } from "@radix-ui/react-icons"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import VendorQuoteCard, { type OrderQuote } from "./VendorQuoteCard"
 import { toast } from "lib/utils/toast"
 import { getWindowVar } from "lib/utils/get-registry-ky"
@@ -25,11 +25,10 @@ export const InitialOrderScreen = ({
     string | null
   >(null)
 
-  const {
-    mutate: createOrderQuote,
-    data: orderQuoteId,
-    error: createOrderQuoteError,
-  } = useCreateOrderQuote(packageReleaseId)
+  const { data: orderQuoteId, error: createOrderQuoteError } =
+    useCreateOrderQuote(packageReleaseId, {
+      executeImmediately: true,
+    })
   const { data: orderQuote } = useOrderQuotePolling(orderQuoteId)
 
   const redirectToStripeCheckout = async (orderQuoteId: string) => {
@@ -56,20 +55,16 @@ export const InitialOrderScreen = ({
   }, [orderQuote])
 
   // Calculate lowest shipping and original total (PCB + lowest shipping)
-  const lowestShippingCarrierCost =
-    orderQuote &&
-    Array.isArray(orderQuote.shipping_options) &&
-    orderQuote.shipping_options.length > 0
+  const lowestShippingCarrierCost = useMemo(() => {
+    return orderQuote &&
+      Array.isArray(orderQuote.shipping_options) &&
+      orderQuote.shipping_options.length > 0
       ? orderQuote.shipping_options.reduce(
           (min, curr) => (curr.cost < min.cost ? curr : min),
           orderQuote.shipping_options[0],
         ).cost
       : 0
-
-  // Create order quote when component mounts
-  useEffect(() => {
-    createOrderQuote()
-  }, [packageReleaseId, createOrderQuote])
+  }, [orderQuote])
 
   // Check for no_token error
   const isNoTokenError =

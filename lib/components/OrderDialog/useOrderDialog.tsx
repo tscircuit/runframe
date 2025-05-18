@@ -39,15 +39,15 @@ export const useOrderDialog = ({
   const handleClose = useCallback(() => {
     setIsOpen(false)
     setStage("initial")
-  }, []);
+  }, [])
 
-  const open = useCallback(() => setIsOpen(true), []);
+  const open = useCallback(() => setIsOpen(true), [])
 
   const MemoizedOrderDialog = useMemo(() => {
-    return (props: Omit<Parameters<typeof OrderDialog>[0], "signIn" | "isLoggedIn">) => (
-      <OrderDialog {...props} signIn={onSignIn} isLoggedIn={isLoggedIn} />
-    );
-  }, [isLoggedIn]);
+    return (
+      props: Omit<Parameters<typeof OrderDialog>[0], "signIn" | "isLoggedIn">,
+    ) => <OrderDialog {...props} signIn={onSignIn} isLoggedIn={isLoggedIn} />
+  }, [isLoggedIn])
 
   return {
     isOpen,

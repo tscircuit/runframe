@@ -25,12 +25,10 @@ export const InitialOrderScreen = ({
     string | null
   >(null)
 
-  const {
-    data: orderQuoteId,
-    error: createOrderQuoteError,
-  } = useCreateOrderQuote(packageReleaseId, {
-    executeImmediately: true
-  })
+  const { data: orderQuoteId, error: createOrderQuoteError } =
+    useCreateOrderQuote(packageReleaseId, {
+      executeImmediately: true,
+    })
   const { data: orderQuote } = useOrderQuotePolling(orderQuoteId)
 
   const redirectToStripeCheckout = async (orderQuoteId: string) => {
@@ -59,8 +57,8 @@ export const InitialOrderScreen = ({
   // Calculate lowest shipping and original total (PCB + lowest shipping)
   const lowestShippingCarrierCost = useMemo(() => {
     return orderQuote &&
-    Array.isArray(orderQuote.shipping_options) &&
-    orderQuote.shipping_options.length > 0
+      Array.isArray(orderQuote.shipping_options) &&
+      orderQuote.shipping_options.length > 0
       ? orderQuote.shipping_options.reduce(
           (min, curr) => (curr.cost < min.cost ? curr : min),
           orderQuote.shipping_options[0],

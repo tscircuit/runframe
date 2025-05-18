@@ -8,10 +8,10 @@ interface UseCreateOrderQuoteOptions {
 
 export const useCreateOrderQuote = (
   packageReleaseId: string,
-  options?: UseCreateOrderQuoteOptions
+  options?: UseCreateOrderQuoteOptions,
 ): UseMutationResult<string | undefined, OrderQuoteError, void> => {
-  const initializedRef = useRef(false);
-  
+  const initializedRef = useRef(false)
+
   const mutation = useMutation<string | undefined, OrderQuoteError, void>({
     mutationFn: async () => {
       return await createOrderQuote(packageReleaseId)
@@ -20,11 +20,10 @@ export const useCreateOrderQuote = (
 
   useEffect(() => {
     if (options?.executeImmediately && !initializedRef.current) {
-      initializedRef.current = true;
-      mutation.mutate();
+      initializedRef.current = true
+      mutation.mutate()
     }
-    
-  }, [packageReleaseId, options?.executeImmediately]);
+  }, [packageReleaseId, options?.executeImmediately])
 
   return mutation
 }

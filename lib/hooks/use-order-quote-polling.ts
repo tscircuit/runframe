@@ -8,7 +8,7 @@ export const useOrderQuotePolling = (orderQuoteId: string | undefined) => {
     status,
   } = useQuery(
     ["getOrderQuote", orderQuoteId],
-    () => getOrderQuote(orderQuoteId!),
+    () => getOrderQuote(orderQuoteId || ""),
     {
       enabled: !!orderQuoteId,
       refetchInterval: (data) => {

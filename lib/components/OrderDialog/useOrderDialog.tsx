@@ -27,9 +27,11 @@ export const useOrderDialogCli = () => {
 export const useOrderDialog = ({
   onSignIn,
   isLoggedIn,
+  packageReleaseId,
 }: {
   onSignIn: () => void
   isLoggedIn: boolean
+  packageReleaseId: string
 }) => {
   useStyles()
 
@@ -46,8 +48,15 @@ export const useOrderDialog = ({
   const MemoizedOrderDialog = useMemo(() => {
     return (
       props: Omit<Parameters<typeof OrderDialog>[0], "signIn" | "isLoggedIn">,
-    ) => <OrderDialog {...props} signIn={onSignIn} isLoggedIn={isLoggedIn} />
-  }, [isLoggedIn])
+    ) => (
+      <OrderDialog
+        {...props}
+        signIn={onSignIn}
+        isLoggedIn={isLoggedIn}
+        packageReleaseId={packageReleaseId}
+      />
+    )
+  }, [isLoggedIn, packageReleaseId])
 
   return {
     isOpen,

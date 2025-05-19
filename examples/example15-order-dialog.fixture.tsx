@@ -4,15 +4,37 @@ import { useOrderDialog } from "lib/components/OrderDialog/useOrderDialog"
 import { RunFrame } from "lib/components/RunFrame/RunFrame"
 import { Button } from "lib/components/ui/button"
 import React, { useEffect, useState } from "react"
+import { registryKy } from "lib/utils/get-registry-ky"
+import type { Package } from "@tscircuit/fake-snippets/schema"
 
 const circuitJson: AnyCircuitElement[] = []
 
 export default () => {
+  const [packageReleaseId, setPackageReleaseId] = useState<string | undefined>(
+    undefined,
+  )
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       // Using the `/registry` path for the registry API
       window.TSCIRCUIT_REGISTRY_API_BASE_URL = `${window.location.origin}/registry`
     }
+  }, [])
+
+  useEffect(() => {
+    const fetchPackage = async () => {
+      try {
+        const getResponse = await registryKy.get("packages/get", {
+          searchParams: { name: "testuser/my-test-board" },
+        })
+        const data = (await getResponse.json()) as { package: Package }
+        setPackageReleaseId(data.package.latest_package_release_id ?? undefined)
+      } catch (error) {
+        console.error("Failed to fetch package:", error)
+      }
+    }
+
+    fetchPackage()
   }, [])
 
   const [code, setCode] = useState(
@@ -34,6 +56,7 @@ circuit.add(
   const orderDialog = useOrderDialog({
     onSignIn: signIn,
     isLoggedIn: true,
+    packageReleaseId: packageReleaseId ?? "",
   })
 
   return (

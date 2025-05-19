@@ -9,7 +9,9 @@ export interface OrderQuoteError {
   }
 }
 
-export const createOrderQuote = async (packageReleaseId: string) => {
+export const createOrderQuote = async (
+  packageReleaseId: string,
+): Promise<{ order_quote_id: string; error?: OrderQuoteError }> => {
   try {
     const { order_quote_id } = await registryKy
       .post("order_quotes/create", {
@@ -22,7 +24,9 @@ export const createOrderQuote = async (packageReleaseId: string) => {
         order_quote_id?: string
         error?: OrderQuoteError
       }>()
-    return order_quote_id
+    return {
+      order_quote_id: order_quote_id!,
+    }
   } catch (error) {
     if (error instanceof HTTPError) {
       const errorBody = await error.response.json()

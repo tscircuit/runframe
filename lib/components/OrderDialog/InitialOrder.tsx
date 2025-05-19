@@ -24,12 +24,25 @@ export const InitialOrderScreen = ({
   const [selectedShippingCarrier, setSelectedShippingCarrier] = useState<
     string | null
   >(null)
+  const [orderQuoteId, setOrderQuoteId] = useState<string | null>(null)
 
-  const { data: orderQuoteId, error: createOrderQuoteError } =
-    useCreateOrderQuote(packageReleaseId, {
-      executeImmediately: true,
-    })
-  const { data: orderQuote } = useOrderQuotePolling(orderQuoteId)
+  // Create order quote mutation
+  const { mutate: createOrderQuote, error: createOrderQuoteError } =
+    useCreateOrderQuote()
+
+  // Create the order quote when the component mounts or packageReleaseId changes
+  useEffect(() => {
+    if (packageReleaseId) {
+      createOrderQuote(packageReleaseId, {
+        onSuccess: (data) => {
+          setOrderQuoteId(data.order_quote_id)
+        },
+      })
+    }
+  }, [packageReleaseId])
+
+  // Poll for the order quote status
+  const { data: orderQuote } = useOrderQuotePolling(orderQuoteId || undefined)
 
   const redirectToStripeCheckout = async (orderQuoteId: string) => {
     const stripeCheckoutBaseUrl = getWindowVar(
@@ -68,9 +81,9 @@ export const InitialOrderScreen = ({
 
   // Check for no_token error
   const isNoTokenError =
-    (createOrderQuoteError?.error?.error_code?.includes("no_token") ||
-      orderQuote?.error?.error_code?.includes("no_token")) &&
-    signIn
+    (createOrderQuoteError &&
+      (createOrderQuoteError as any).error_code?.includes("no_token")) ||
+    (orderQuote?.error?.error_code?.includes("no_token") && signIn)
 
   if (!isLoggedIn || isNoTokenError) {
     return <SignInView signIn={signIn} />
@@ -89,7 +102,7 @@ export const InitialOrderScreen = ({
       {(createOrderQuoteError || orderQuote?.error) && (
         <ErrorMessage
           message={
-            createOrderQuoteError?.error.message ||
+            (createOrderQuoteError && (createOrderQuoteError as any).message) ||
             orderQuote?.error?.message ||
             "Failed to fetch quotes"
           }

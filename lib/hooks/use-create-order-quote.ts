@@ -11,7 +11,8 @@ export const useCreateOrderQuote = (): UseMutationResult<
 
   return useMutation<{ order_quote_id: string }, OrderQuoteError, string>({
     mutationKey: ["createOrderQuote"],
-    mutationFn: (packageReleaseId: string) => createOrderQuote(packageReleaseId),
+    mutationFn: (packageReleaseId: string) =>
+      createOrderQuote(packageReleaseId),
     onSuccess: (data) => {
       queryClient.invalidateQueries(["getOrderQuote", data.order_quote_id])
     },

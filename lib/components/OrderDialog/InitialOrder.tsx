@@ -27,10 +27,8 @@ export const InitialOrderScreen = ({
   const [orderQuoteId, setOrderQuoteId] = useState<string | null>(null)
 
   // Create order quote mutation
-  const {
-    mutate: createOrderQuote,
-    error: createOrderQuoteError,
-  } = useCreateOrderQuote()
+  const { mutate: createOrderQuote, error: createOrderQuoteError } =
+    useCreateOrderQuote()
 
   // Create the order quote when the component mounts or packageReleaseId changes
   useEffect(() => {
@@ -83,9 +81,9 @@ export const InitialOrderScreen = ({
 
   // Check for no_token error
   const isNoTokenError =
-    (createOrderQuoteError && (createOrderQuoteError as any).error_code?.includes("no_token")) ||
-    (orderQuote?.error?.error_code?.includes("no_token")) &&
-    signIn
+    (createOrderQuoteError &&
+      (createOrderQuoteError as any).error_code?.includes("no_token")) ||
+    (orderQuote?.error?.error_code?.includes("no_token") && signIn)
 
   if (!isLoggedIn || isNoTokenError) {
     return <SignInView signIn={signIn} />

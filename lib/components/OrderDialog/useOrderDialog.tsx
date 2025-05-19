@@ -48,7 +48,14 @@ export const useOrderDialog = ({
   const MemoizedOrderDialog = useMemo(() => {
     return (
       props: Omit<Parameters<typeof OrderDialog>[0], "signIn" | "isLoggedIn">,
-    ) => <OrderDialog {...props} signIn={onSignIn} isLoggedIn={isLoggedIn} packageReleaseId={packageReleaseId} />
+    ) => (
+      <OrderDialog
+        {...props}
+        signIn={onSignIn}
+        isLoggedIn={isLoggedIn}
+        packageReleaseId={packageReleaseId}
+      />
+    )
   }, [isLoggedIn, packageReleaseId])
 
   return {

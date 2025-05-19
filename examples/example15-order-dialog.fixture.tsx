@@ -10,7 +10,9 @@ import type { Package } from "@tscircuit/fake-snippets/schema"
 const circuitJson: AnyCircuitElement[] = []
 
 export default () => {
-  const [packageReleaseId, setPackageReleaseId] = useState<string | undefined>(undefined)
+  const [packageReleaseId, setPackageReleaseId] = useState<string | undefined>(
+    undefined,
+  )
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -25,7 +27,7 @@ export default () => {
         const getResponse = await registryKy.get("packages/get", {
           searchParams: { name: "testuser/my-test-board" },
         })
-        const data = await getResponse.json() as { package: Package }
+        const data = (await getResponse.json()) as { package: Package }
         setPackageReleaseId(data.package.latest_package_release_id ?? undefined)
       } catch (error) {
         console.error("Failed to fetch package:", error)

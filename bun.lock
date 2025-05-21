@@ -52,7 +52,7 @@
         "class-variance-authority": "^0.7.1",
         "concurrently": "^9.1.2",
         "debug": "^4.4.0",
-        "easyeda": "^0.0.134",
+        "easyeda": "^0.0.142",
         "jszip": "^3.10.1",
         "ky": "^1.7.5",
         "playwright": "^1.49.1",
@@ -1047,7 +1047,7 @@
 
     "eastasianwidth": ["eastasianwidth@0.2.0", "", {}, "sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA=="],
 
-    "easyeda": ["easyeda@0.0.134", "", { "dependencies": { "@tscircuit/mm": "^0.0.8", "commander": "^12.1.0", "transformation-matrix": "^2.16.1", "zod": "^3.24.2" }, "peerDependencies": { "typescript": "^5.5.2" }, "bin": { "easyeda": "dist/cli/main.js", "easyeda-converter": "dist/cli/main.js" } }, "sha512-CEaiwaT5MUiTYcA2aDRs9VX4PjvZ6BYzC4KtVooY4sq7ro4HRhQ1bkun4rUy+bx3Rvn92JJNk8owwbXqIuafvA=="],
+    "easyeda": ["easyeda@0.0.142", "", { "dependencies": { "@tscircuit/mm": "^0.0.8", "commander": "^12.1.0", "transformation-matrix": "^2.16.1", "zod": "^3.24.2" }, "peerDependencies": { "typescript": "^5.5.2" }, "bin": { "easyeda-converter": "dist/cli/main.js", "easyeda": "dist/cli/main.js" } }, "sha512-q79lGIXGSziuHLxTctIsiavtA39sr4cl0/RpI9Ms3HnU+0k8sS0NPwhU5qogV/AmJDoPgcEoZmYlNYVaJvBqDA=="],
 
     "edge-runtime": ["edge-runtime@2.5.10", "", { "dependencies": { "@edge-runtime/format": "2.2.1", "@edge-runtime/ponyfill": "2.4.2", "@edge-runtime/vm": "3.2.0", "async-listen": "3.0.1", "mri": "1.2.0", "picocolors": "1.0.0", "pretty-ms": "7.0.1", "signal-exit": "4.0.2", "time-span": "4.0.0" }, "bin": { "edge-runtime": "dist/cli/index.js" } }, "sha512-oe6JjFbU1MbISzeSBMHqmzBhNEwmy2AYDY0LxStl8FAIWSGdGO+CqzWub9nbgmANuJYPXZA0v3XAlbxeKV/Omw=="],
 

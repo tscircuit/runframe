@@ -45,7 +45,7 @@ import { capitalizeFirstLetters } from "lib/utils"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
 import { version } from "../../../package.json"
 import type { CircuitJson, CircuitJsonError } from "circuit-json"
-import { Object3D } from "three"
+import type { Object3D } from "three"
 
 declare global {
   interface Window {
@@ -498,7 +498,8 @@ export const CircuitJsonPreview = ({
                 isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
               )}
             >
-              {circuitJson ? (
+              {errorMessage ||
+              (circuitJsonErrors && circuitJsonErrors.length > 0) ? (
                 <ErrorTabContent
                   code={code}
                   circuitJsonErrors={circuitJsonErrors}

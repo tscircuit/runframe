@@ -18,14 +18,9 @@
         "@tscircuit/create-snippet-url": "^0.0.8",
         "@tscircuit/eval": "^0.0.216",
         "@tscircuit/file-server": "^0.0.24",
-<<<<<<< HEAD
-        "@tscircuit/pcb-viewer": "^1.11.133",
-        "@tscircuit/props": "^0.0.186",
-=======
         "@tscircuit/footprinter": "^0.0.164",
         "@tscircuit/pcb-viewer": "^1.11.147",
-        "@tscircuit/props": "^0.0.184",
->>>>>>> a7e34b3 (chore: update packages)
+        "@tscircuit/props": "^0.0.186",
         "@tscircuit/schematic-viewer": "2.0.20",
         "circuit-to-svg": "^0.0.130",
         "clsx": "^2.1.1",

@@ -16,17 +16,12 @@ import PreviewEmptyState from "../PreviewEmptyState"
 import { CircuitJsonTableViewer } from "../CircuitJsonTableViewer/CircuitJsonTableViewer"
 import { BomTable } from "../BomTable"
 import {
-  BoxIcon,
-  Square,
   CheckIcon,
   EllipsisIcon,
-  EllipsisVerticalIcon,
   FullscreenIcon,
   Loader2,
   LoaderCircleIcon,
-  LoaderIcon,
   MinimizeIcon,
-  PlusIcon,
   Circle,
 } from "lucide-react"
 import {
@@ -38,13 +33,11 @@ import {
 import { Button } from "../ui/button"
 import { PcbViewerWithContainerHeight } from "../PcbViewerWithContainerHeight"
 import { useStyles } from "lib/hooks/use-styles"
-import type { ManualEditEvent } from "@tscircuit/props"
-import type { RenderLog } from "lib/render-logging/RenderLog"
 import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { capitalizeFirstLetters } from "lib/utils"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
 import { version } from "../../../package.json"
-import type { CircuitJson, CircuitJsonError } from "circuit-json"
+import type { CircuitJsonError } from "circuit-json"
 import type { Object3D } from "three"
 
 declare global {

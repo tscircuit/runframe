@@ -332,7 +332,7 @@ export const RunFrame = (props: RunFrameProps) => {
 
   return (
     <CircuitJsonPreview
-      code={fsMap.get(props.entrypoint ?? "entrypoint.tsx")}
+      code={fsMap.get(props.entrypoint ?? props.mainComponentPath)}
       defaultActiveTab={props.defaultActiveTab}
       showToggleFullScreen={props.showToggleFullScreen}
       autoroutingGraphics={autoroutingGraphics}

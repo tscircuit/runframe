@@ -4,13 +4,11 @@ import { Button } from "lib/components/ui/button"
 import { createSnippetUrl } from "@tscircuit/create-snippet-url"
 import { AutoroutingLogOptions } from "./AutoroutingLogOptions"
 import { useState } from "react"
-import type { CircuitJson } from "circuit-json"
 import type { CircuitJsonError } from "circuit-json"
 
 export const ErrorTabContent = ({
   code,
   autoroutingLog,
-  isStreaming,
   circuitJsonErrors,
   onReportAutoroutingLog,
   errorMessage,

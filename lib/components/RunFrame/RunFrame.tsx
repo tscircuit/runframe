@@ -135,7 +135,7 @@ export const RunFrame = (props: RunFrameProps) => {
       setRenderLog(null)
       const renderLog: RenderLog = { progress: 0 }
       let cancelled = false
-      
+
       // Store cleanup function in ref to be called when execution is stopped
       cancelExecutionRef.current = () => {
         cancelled = true

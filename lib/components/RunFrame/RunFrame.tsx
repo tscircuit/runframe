@@ -46,6 +46,7 @@ export const RunFrame = (props: RunFrameProps) => {
     error?: string
     stack?: string
   } | null>(null)
+  const cancelExecutionRef = useRef<(() => void) | null>(null)
   const [autoroutingGraphics, setAutoroutingGraphics] = useState<any>(null)
   const [runCountTrigger, incRunCountTrigger] = useReducer(
     (acc: number, s: number) => acc + 1,
@@ -131,7 +132,14 @@ export const RunFrame = (props: RunFrameProps) => {
     const runWorker = async () => {
       debug("running render worker")
       setError(null)
+      setRenderLog(null)
       const renderLog: RenderLog = { progress: 0 }
+      let cancelled = false
+      
+      // Store cleanup function in ref to be called when execution is stopped
+      cancelExecutionRef.current = () => {
+        cancelled = true
+      }
 
       let evalVersion = props.evalVersion ?? "latest"
       if (!globalThis.runFrameWorker && props.forceLatestEvalVersion) {
@@ -188,7 +196,9 @@ export const RunFrame = (props: RunFrameProps) => {
 
         renderLog.progress = estProgress
 
-        setRenderLog({ ...renderLog })
+        if (!cancelled) {
+          setRenderLog({ ...renderLog })
+        }
       })
 
       if (activeTab === "render_log") {
@@ -202,7 +212,9 @@ export const RunFrame = (props: RunFrameProps) => {
             )
             lastRenderLogSet = Date.now()
           }
-          setRenderLog({ ...renderLog })
+          if (!cancelled) {
+            setRenderLog({ ...renderLog })
+          }
         })
       }
 
@@ -266,8 +278,11 @@ export const RunFrame = (props: RunFrameProps) => {
       }
       renderLog.progress = 1
 
-      setRenderLog({ ...renderLog })
+      if (!cancelled) {
+        setRenderLog({ ...renderLog })
+      }
       setIsRunning(false)
+      cancelExecutionRef.current = null
     }
     runMutex.runWithMutex(runWorker)
   }, [props.fsMap, props.entrypoint, runCountTrigger, props.evalVersion])
@@ -365,6 +380,15 @@ export const RunFrame = (props: RunFrameProps) => {
                     onClick={(e) => {
                       e.stopPropagation()
                       setIsRunning(false)
+                      setRenderLog(null)
+                      setError(null)
+                      // Call cleanup to prevent race conditions
+                      if (cancelExecutionRef.current) {
+                        cancelExecutionRef.current()
+                        cancelExecutionRef.current = null
+                      }
+                      // Cancel the mutex to allow next execution
+                      runMutex.cancel()
                       // Kill the worker using the provided kill function
                       if (globalThis.runFrameWorker) {
                         globalThis.runFrameWorker.kill()

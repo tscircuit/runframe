@@ -405,11 +405,6 @@ export const CircuitJsonPreview = ({
                       onEditEvent?.(ee)
                     }}
                     debugGrid={showSchematicDebugGrid}
-                    colorOverrides={{
-                      schematic: {
-                        background: "transparent",
-                      },
-                    }}
                   />
                 ) : (
                   <PreviewEmptyState onRunClicked={onRunClicked} />

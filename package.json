@@ -90,7 +90,7 @@
     "@tscircuit/pcb-viewer": "^1.11.156",
     "@tscircuit/props": "^0.0.205",
     "@tscircuit/schematic-viewer": "2.0.21",
-    "circuit-to-svg": "^0.0.135",
+    "circuit-to-svg": "^0.0.139",
     "clsx": "^2.1.1",
     "comlink": "^4.4.2",
     "cssnano": "^7.0.6",

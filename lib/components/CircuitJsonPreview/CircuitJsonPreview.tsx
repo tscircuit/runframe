@@ -86,6 +86,7 @@ export const CircuitJsonPreview = ({
   showSchematicDebugGrid = false,
   showToggleFullScreen = true,
   defaultToFullScreen = false,
+  activeAsyncEffect,
 }: PreviewContentProps) => {
   useStyles()
 
@@ -164,6 +165,11 @@ export const CircuitJsonPreview = ({
                 {renderLog.lastRenderEvent && (
                   <div className="rf-text-xs rf-text-gray-500">
                     {renderLog.lastRenderEvent?.phase ?? ""}
+                  </div>
+                )}
+                {activeAsyncEffect && (
+                  <div className="rf-text-xs rf-text-gray-500">
+                    {activeAsyncEffect}
                   </div>
                 )}
                 <div className="rf-w-4 rf-h-4 rf-bg-blue-500 rf-opacity-50 rf-rounded-full rf-text-white">

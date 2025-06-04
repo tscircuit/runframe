@@ -238,6 +238,7 @@ export const RunFrame = (props: RunFrameProps) => {
           const message: string = e.message.replace("Error: ", "")
           props.onError?.(e)
           setError({ error: message, stack: e.stack })
+          setRenderLog(null)
           console.error(e)
           return { success: false }
         })
@@ -253,6 +254,7 @@ export const RunFrame = (props: RunFrameProps) => {
         debug("error getting initial circuit json", e)
         props.onError?.(e)
         setError({ error: e.message, stack: e.stack })
+        setRenderLog(null)
         setIsRunning(false)
         return null
       })

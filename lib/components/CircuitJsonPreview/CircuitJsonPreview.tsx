@@ -159,7 +159,7 @@ export const CircuitJsonPreview = ({
               <Loader2 className="rf-w-4 rf-h-4 rf-animate-spin" />
             )}
             {!leftHeaderContent && <div className="rf-flex-grow" />}
-            {renderLog && renderLog.progress !== 1 && (
+            {renderLog && renderLog.progress !== 1 && !errorMessage && (
               <div className="rf-flex rf-items-center rf-gap-2">
                 {renderLog.lastRenderEvent && (
                   <div className="rf-text-xs rf-text-gray-500">

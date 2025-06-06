@@ -60,6 +60,7 @@ export const CircuitJsonPreview = ({
   code,
   onRunClicked = undefined,
   errorMessage,
+  errorStack,
   circuitJson,
   autoroutingGraphics,
   showRightHeaderContent = true,
@@ -492,6 +493,7 @@ export const CircuitJsonPreview = ({
                   code={code}
                   circuitJsonErrors={circuitJsonErrors}
                   errorMessage={errorMessage}
+                  errorStack={errorStack}
                   autoroutingLog={autoroutingLog}
                   onReportAutoroutingLog={onReportAutoroutingLog}
                 />

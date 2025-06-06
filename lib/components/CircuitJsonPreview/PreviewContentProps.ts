@@ -20,6 +20,7 @@ export interface PreviewContentProps {
   onRunClicked?: () => void
   tsxRunTriggerCount?: number
   errorMessage?: string | null
+  errorStack?: string | null
   autoroutingGraphics?: any
   circuitJson: CircuitJson | null
   className?: string

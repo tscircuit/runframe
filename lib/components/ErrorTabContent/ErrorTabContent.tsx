@@ -12,12 +12,14 @@ export const ErrorTabContent = ({
   circuitJsonErrors,
   onReportAutoroutingLog,
   errorMessage,
+  errorStack,
 }: {
   code?: string
   autoroutingLog?: Record<string, { simpleRouteJson: any }>
   isStreaming?: boolean
   circuitJsonErrors?: CircuitJsonError[] | null
   errorMessage?: string | null
+  errorStack?: string | null
   onReportAutoroutingLog?: (
     name: string,
     data: { simpleRouteJson: any },
@@ -69,6 +71,14 @@ export const ErrorTabContent = ({
             <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600">
               {errorMessage}
             </p>
+            {errorStack && (
+              <details
+                style={{ whiteSpace: "pre-wrap" }}
+                className="rf-text-xs rf-font-mono rf-text-red-600 rf-mt-2"
+              >
+                {errorStack}
+              </details>
+            )}
           </div>
         )}
 
@@ -118,9 +128,21 @@ export const ErrorTabContent = ({
           variant="outline"
           className="rf-p-1"
           onClick={() => {
-            const activeError = circuitJsonErrors![currentErrorIndex]
+            const activeError = circuitJsonErrors
+              ? (circuitJsonErrors[currentErrorIndex] as {
+                  type: string
+                  message: string
+                  stack?: string
+                })
+              : {
+                  type: "Execution Error",
+                  message: errorMessage ?? "",
+                  stack: errorStack ?? "",
+                }
             navigator.clipboard.writeText(
-              `${activeError.type}: ${activeError.message}`,
+              `${activeError.type}: ${activeError.message}${
+                activeError.stack ? "\n" + activeError.stack : ""
+              }`,
             )
             alert("Error copied to clipboard!")
           }}
@@ -133,10 +155,15 @@ export const ErrorTabContent = ({
           className="rf-p-1"
           onClick={() => {
             const error = circuitJsonErrors
-              ? circuitJsonErrors[currentErrorIndex]
+              ? (circuitJsonErrors[currentErrorIndex] as {
+                  type: string
+                  message: string
+                  stack?: string
+                })
               : {
                   type: "Execution Error",
                   message: errorMessage ?? "",
+                  stack: errorStack ?? "",
                 }
             const title = `Error: ${error.type}`
               .replace(/[^a-zA-Z0-9 ]/g, " ")
@@ -144,7 +171,9 @@ export const ErrorTabContent = ({
               .slice(0, 100)
 
             const url = createSnippetUrl(code ?? "")
-            let body = `[Snippet code to reproduce](${url})\n\n### Error\n\\\n${error.type}: ${error.message}\n\\\n`
+            let body = `[Snippet code to reproduce](${url})\n\n### Error\n\`\`\`\n${error.type}: ${error.message}${
+              error.stack ? "\n" + error.stack : ""
+            }\n\`\`\`\n`
 
             if (body.length > 4000) {
               body = `\`\`\`tsx\n// Please paste the code here\n\`\`\`\n\n### Error\n\`\`\`\n${error.type}: ${error.message}\n\`\`\``

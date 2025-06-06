@@ -419,6 +419,7 @@ export const RunFrame = (props: RunFrameProps) => {
       renderLog={renderLog}
       isRunningCode={isRunning}
       errorMessage={error?.error}
+      errorStack={error?.stack}
       onEditEvent={handleEditEvent}
       editEvents={props.editEvents}
       defaultToFullScreen={props.defaultToFullScreen}

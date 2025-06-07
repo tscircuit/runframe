@@ -18,7 +18,6 @@ import {
   searchTscircuitComponents,
   mapTscircuitSnippetToSearchResult,
 } from "./tscircuit-registry-api"
-import { createSvgUrl as createPngUrl } from "@tscircuit/create-snippet-url"
 
 export interface ComponentSearchResult {
   id: string
@@ -161,7 +160,10 @@ export const ImportComponentDialog = ({
                 onKeyDown={handleKeyDown}
               />
             </div>
-            <Button onClick={handleSearch} disabled={isLoading}>
+            <Button
+              onClick={handleSearch}
+              disabled={isLoading || searchQuery.trim().length < 1}
+            >
               {isLoading ? (
                 <Loader2 className="rf-h-4 rf-w-4 rf-animate-spin" />
               ) : (
@@ -238,130 +240,119 @@ export const ImportComponentDialog = ({
 
       {/* Component Details Dialog */}
       <AlertDialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <AlertDialogContent className="!rf-max-h-[70%] !rf-overflow-y-auto rf-flex rf-flex-col !rf-max-w-[60vw] !rf-overflow-x-hidden">
-          <AlertDialogHeader>
-            <AlertDialogTitle>{detailsComponent?.name}</AlertDialogTitle>
-            <AlertDialogDescription>
-              Detailed information about the selected component
-            </AlertDialogDescription>
-            <div className="rf-text-sm rf-text-muted-foreground">
-              {detailsComponent?.partNumber && (
-                <div className="rf-font-mono rf-text-sm rf-mb-2">
-                  {detailsComponent.partNumber}
-                </div>
-              )}
-              {detailsComponent?.description}
+        <AlertDialogContent className="rf-max-w-4xl rf-max-h-[85vh] rf-overflow-hidden rf-flex rf-flex-col">
+          <AlertDialogHeader className="rf-pb-4 rf-border-b">
+            <div className="rf-flex rf-items-start rf-justify-between rf-gap-4">
+              <div className="rf-flex-1 rf-min-w-0">
+                <AlertDialogTitle className="rf-text-xl rf-font-semibold rf-truncate">
+                  <a
+                    href={`https://tscircuit.com/${detailsComponent?.owner}/${detailsComponent?.name}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rf-text-black hover:rf-underline"
+                  >
+                    {detailsComponent?.name?.split("/").pop() ||
+                      detailsComponent?.name}
+                  </a>
+                </AlertDialogTitle>
+              </div>
             </div>
           </AlertDialogHeader>
 
-          {/* Component-specific information */}
-          {detailsComponent?.source === "jlcpcb" && (
-            <div className="rf-my-4 rf-border rf-rounded-md rf-p-4">
-              <div className="rf-text-sm rf-font-medium rf-mb-2">
-                JLCPCB Details
-              </div>
-              <div className="rf-grid rf-grid-cols-2 rf-gap-2">
-                {detailsComponent.package && (
-                  <div className="rf-flex rf-flex-col">
-                    <span className="rf-text-xs rf-text-zinc-500">Package</span>
-                    <span className="rf-font-medium">
-                      {detailsComponent.package}
-                    </span>
-                  </div>
-                )}
-                {detailsComponent.price !== undefined && (
-                  <div className="rf-flex rf-flex-col">
-                    <span className="rf-text-xs rf-text-zinc-500">Price</span>
-                    <span className="rf-font-medium">
-                      ${(detailsComponent as any).price.toFixed(4)}
-                    </span>
+          <div className="rf-flex-1 rf-overflow-y-auto rf-py-4 rf-space-y-6">
+            {/* Component Information */}
+            <div>
+              <div className="rf-space-y-3">
+                {detailsComponent?.owner && (
+                  <div>
+                    <label className="rf-text-xs rf-font-medium rf-text-gray-500 rf-uppercase rf-tracking-wide">
+                      Created by
+                    </label>
+                    <div className="rf-mt-1 rf-text-sm rf-font-medium">
+                      <a
+                        href={`https://tscircuit.com/${detailsComponent?.owner}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rf-text-black hover:rf-underline"
+                      >
+                        {detailsComponent?.owner}
+                      </a>
+                    </div>
                   </div>
                 )}
               </div>
             </div>
-          )}
 
-          {/* tscircuit-specific information */}
-          {detailsComponent?.source === "tscircuit.com" && (
-            <div className="rf-my-4 rf-border rf-rounded-md rf-p-4 !rf-max-w-[60vw] !rf-overflow-x-hidden">
-              <div className="rf-text-sm rf-font-medium rf-mb-2">
-                tscircuit Details
-              </div>
-              <div className="rf-grid rf-grid-cols-2 rf-gap-2">
-                {(detailsComponent as any).owner && (
-                  <div className="rf-flex rf-flex-col">
-                    <span className="rf-text-xs rf-text-zinc-500">Owner</span>
-                    <span className="rf-font-medium">
-                      {(detailsComponent as any).owner}
-                    </span>
+            {/* Preview Section */}
+            <div>
+              <h3 className="rf-text-lg rf-font-semibold rf-mb-4">Preview</h3>
+              <div className="rf-border rf-rounded-lg rf-overflow-hidden rf-bg-gray-50">
+                {detailsComponent?.code ? (
+                  <div className="rf-aspect-video rf-bg-white rf-flex rf-items-center rf-justify-center">
+                    <img
+                      src={`https://registry-api.tscircuit.com/packages/images/${detailsComponent.owner}/${detailsComponent.name}/pcb.png`}
+                      alt={`${detailsComponent.name} preview`}
+                      className="rf-w-full rf-h-full rf-object-cover rf-rounded"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement
+                        target.style.display = "none"
+                        const parent = target.parentElement
+                        if (parent) {
+                          parent.innerHTML =
+                            '<div class="rf-text-center rf-text-gray-500 rf-py-8"><div class="rf-text-sm">Preview not available</div><div class="rf-text-xs rf-mt-1">Image failed to load</div></div>'
+                        }
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="rf-aspect-video rf-flex rf-items-center rf-justify-center rf-text-gray-500">
+                    <div className="rf-text-center">
+                      <div className="rf-text-sm rf-font-medium">
+                        No preview available
+                      </div>
+                      <div className="rf-text-xs rf-mt-1">
+                        Preview cannot be generated
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
-              {detailsComponent.code && (
-                <div className="rf-mt-2">
-                  <div className="rf-text-xs rf-text-zinc-500 rf-mb-1">
-                    Code Preview
-                  </div>
-                  <pre className="rf-bg-zinc-50 rf-p-2 rf-rounded rf-text-xs rf-font-mono rf-max-h-32 rf-overflow-y-auto">
-                    {detailsComponent.code.substring(0, 500)}
-                    {detailsComponent.code.length > 500 && "..."}
-                  </pre>
-                </div>
-              )}
             </div>
-          )}
-
-          <div className="rf-my-4 rf-border rf-rounded-md rf-p-4">
-            <div className="rf-text-sm rf-font-medium rf-mb-2">Preview</div>
-            {detailsComponent?.source === "tscircuit.com" &&
-            detailsComponent.code ? (
-              <div className="rf-flex rf-justify-center">
-                <div className="rf-border rf-rounded rf-p-4 rf-bg-zinc-50">
-                  <img
-                    src={createPngUrl(detailsComponent.code!, "pcb")}
-                    alt={detailsComponent.name}
-                    className="rf-w-full rf-aspect-video rf-object-contain"
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="rf-text-center rf-text-zinc-500 rf-p-4">
-                No preview available
-              </div>
-            )}
           </div>
 
-          <div className="rf-flex rf-justify-between">
-            <Button
-              variant="outline"
-              size="sm"
-              className="rf-gap-1"
-              onClick={() => {
-                const url =
-                  detailsComponent?.source === "jlcpcb"
-                    ? `https://jlcpcb.com/partdetail/${detailsComponent.partNumber}`
-                    : `https://tscircuit.com/${(detailsComponent as any).owner}/${detailsComponent?.name.split("/").pop()}`
-                window.open(url, "_blank")
-              }}
-            >
-              View on{" "}
-              {detailsComponent?.source === "jlcpcb"
-                ? "JLCPCB"
-                : "tscircuit.com"}{" "}
-              <ExternalLink className="rf-h-3 rf-w-3" />
-            </Button>
-            <Button
-              onClick={() => {
-                setDetailsOpen(false)
-                if (detailsComponent) {
-                  onImport(detailsComponent)
-                  onClose()
-                }
-              }}
-            >
-              Import Component
-            </Button>
-          </div>
+          <AlertDialogFooter className="rf-pt-4 rf-border-t rf-flex rf-justify-between rf-items-center">
+            <div className="rf-flex-1">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rf-gap-2"
+                onClick={() => {
+                  const url = `https://tscircuit.com/${detailsComponent?.owner}/${detailsComponent?.name.split("/").pop()}`
+                  window.open(url, "_blank")
+                }}
+              >
+                <ExternalLink className="rf-h-4 rf-w-4" />
+                View on tscircuit.com
+              </Button>
+            </div>
+            <div className="rf-flex rf-gap-2">
+              <AlertDialogCancel onClick={() => setDetailsOpen(false)}>
+                Close
+              </AlertDialogCancel>
+              <Button
+                onClick={() => {
+                  setDetailsOpen(false)
+                  if (detailsComponent) {
+                    onImport(detailsComponent)
+                    onClose()
+                  }
+                }}
+                className="rf-bg-blue-600 hover:rf-bg-blue-700"
+              >
+                Import Component
+              </Button>
+            </div>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </AlertDialog>

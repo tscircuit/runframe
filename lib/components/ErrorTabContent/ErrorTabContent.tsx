@@ -56,7 +56,7 @@ export const ErrorTabContent = ({
 
   const handleNext = () => {
     setCurrentErrorIndex((prev) =>
-      Math.min(prev + 1, circuitJsonErrors!.length - 1),
+      Math.min(prev + 1, (circuitJsonErrors?.length || 1) - 1),
     )
   }
 
@@ -97,22 +97,24 @@ export const ErrorTabContent = ({
                 type="button"
                 className="rf-p-1 rf-rounded-sm rf-transition-colors"
                 onClick={handleNext}
-                disabled={currentErrorIndex === circuitJsonErrors!.length - 1}
+                disabled={currentErrorIndex === circuitJsonErrors.length - 1}
               >
                 <ChevronRight className="rf-h-4 rf-w-4 rf-text-red-500" />
               </button>
               <span>
-                {currentErrorIndex + 1} of {circuitJsonErrors!.length} error
+                {currentErrorIndex + 1} of {circuitJsonErrors.length} error
               </span>
             </div>
 
             <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200 rf-max-h-[500px] rf-overflow-y-auto rf-px-2">
               <div className="rf-p-4">
                 <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-1">
-                  {circuitJsonErrors![currentErrorIndex].type}
+                  {circuitJsonErrors[currentErrorIndex]?.type ||
+                    "Unknown Error"}
                 </h3>
                 <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600">
-                  {circuitJsonErrors![currentErrorIndex].message}
+                  {circuitJsonErrors[currentErrorIndex]?.message ||
+                    "No error message available"}
                 </p>
               </div>
             </div>
@@ -128,17 +130,20 @@ export const ErrorTabContent = ({
           variant="outline"
           className="rf-p-1"
           onClick={() => {
-            const activeError = circuitJsonErrors
-              ? (circuitJsonErrors[currentErrorIndex] as {
-                  type: string
-                  message: string
-                  stack?: string
-                })
-              : {
-                  type: "Execution Error",
-                  message: errorMessage ?? "",
-                  stack: errorStack ?? "",
-                }
+            const activeError =
+              circuitJsonErrors &&
+              circuitJsonErrors.length > 0 &&
+              circuitJsonErrors[currentErrorIndex]
+                ? (circuitJsonErrors[currentErrorIndex] as {
+                    type: string
+                    message: string
+                    stack?: string
+                  })
+                : {
+                    type: "Execution Error",
+                    message: errorMessage ?? "",
+                    stack: errorStack ?? "",
+                  }
             navigator.clipboard.writeText(
               `${activeError.type}: ${activeError.message}${
                 activeError.stack ? "\n" + activeError.stack : ""
@@ -154,37 +159,41 @@ export const ErrorTabContent = ({
           variant="outline"
           className="rf-p-1"
           onClick={() => {
-            const error = circuitJsonErrors
-              ? (circuitJsonErrors[currentErrorIndex] as {
-                  type: string
-                  message: string
-                  stack?: string
-                })
-              : {
-                  type: "Execution Error",
-                  message: errorMessage ?? "",
-                  stack: errorStack ?? "",
-                }
-            const title = `Error: ${error.type}`
+            const error =
+              circuitJsonErrors &&
+              circuitJsonErrors.length > 0 &&
+              circuitJsonErrors[currentErrorIndex]
+                ? (circuitJsonErrors[currentErrorIndex] as {
+                    type: string
+                    message: string
+                    stack?: string
+                  })
+                : {
+                    type: "Execution Error",
+                    message: errorMessage ?? "",
+                    stack: errorStack ?? "",
+                  }
+
+            const title = `Error ${error.type}`
               .replace(/[^a-zA-Z0-9 ]/g, " ")
               .replace(/\s+/g, " ")
               .slice(0, 100)
 
             const url = createSnippetUrl(code ?? "")
-            let body = `[Snippet code to reproduce](${url})\n\n### Error\n\`\`\`\n${error.type}: ${error.message}${
-              error.stack ? "\n" + error.stack : ""
-            }\n\`\`\`\n`
+            const errorDetails = `${error.type}: ${error.message}${error.stack ? "\n" + error.stack : ""}`
 
-            if (body.length > 4000) {
-              body = `\`\`\`tsx\n// Please paste the code here\n\`\`\`\n\n### Error\n\`\`\`\n${error.type}: ${error.message}\n\`\`\``
+            let body = `[Package code to reproduce](${url})\n\n### Error\n\`\`\`\n${errorDetails}\n\`\`\`\n`
+
+            if (url.length > 3000 || body.length > 4000) {
+              const truncatedMessage =
+                error.message.length > 500
+                  ? `${error.message.slice(0, 500)}...`
+                  : error.message
+              body = `### Error\n\`\`\`\n${error.type}: ${truncatedMessage}\n\`\`\``
             }
 
-            window.open(
-              `https://github.com/tscircuit/tscircuit.com/issues/new?title=${encodeURIComponent(
-                title,
-              )}&body=${encodeURIComponent(body)}`,
-              "_blank",
-            )
+            const issueUrl = `https://github.com/tscircuit/tscircuit.com/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`
+            window.open(issueUrl, "_blank")
           }}
         >
           <GitHubLogoIcon className="rf-w-4 rf-h-4" />

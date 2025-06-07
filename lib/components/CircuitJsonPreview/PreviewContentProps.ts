@@ -68,4 +68,9 @@ export interface PreviewContentProps {
     name: string,
     data: { simpleRouteJson: any },
   ) => void
+
+  /**
+   * Name of the longest running async effect in @tscircuit/core
+   */
+  activeAsyncEffect?: string | null
 }

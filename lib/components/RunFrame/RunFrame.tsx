@@ -69,6 +69,10 @@ export const RunFrame = (props: RunFrameProps) => {
 
   const [renderLog, setRenderLog] = useState<RenderLog | null>(null)
   const [autoroutingLog, setAutoroutingLog] = useState<Record<string, any>>({})
+  const [activeAsyncEffect, setActiveAsyncEffect] = useState<string | null>(
+    null,
+  )
+  const activeAsyncEffectsRef = useRef<Map<string, number>>(new Map())
   const [activeTab, setActiveTab] = useState<TabId>(
     props.defaultActiveTab ?? "pcb",
   )
@@ -133,6 +137,8 @@ export const RunFrame = (props: RunFrameProps) => {
       debug("running render worker")
       setError(null)
       setRenderLog(null)
+      setActiveAsyncEffect(null)
+      activeAsyncEffectsRef.current.clear()
       const renderLog: RenderLog = { progress: 0 }
       let cancelled = false
 
@@ -181,6 +187,31 @@ export const RunFrame = (props: RunFrameProps) => {
             simpleRouteJson: event.simpleRouteJson,
           },
         })
+      })
+      const updateLongestRunningEffect = () => {
+        const now = Date.now()
+        let candidate: string | null = null
+        let earliest = Infinity
+        activeAsyncEffectsRef.current.forEach((start, name) => {
+          if (now - start >= 500 && start < earliest) {
+            earliest = start
+            candidate = name
+          }
+        })
+        setActiveAsyncEffect(candidate)
+      }
+
+      worker.on("asyncEffect:start", (event: any) => {
+        activeAsyncEffectsRef.current.set(event.effectName, Date.now())
+        setTimeout(() => {
+          if (activeAsyncEffectsRef.current.has(event.effectName)) {
+            updateLongestRunningEffect()
+          }
+        }, 500)
+      })
+      worker.on("asyncEffect:end", (event: any) => {
+        activeAsyncEffectsRef.current.delete(event.effectName)
+        updateLongestRunningEffect()
       })
       worker.on("board:renderPhaseStarted", (event: any) => {
         renderLog.lastRenderEvent = event
@@ -284,6 +315,8 @@ export const RunFrame = (props: RunFrameProps) => {
         setRenderLog({ ...renderLog })
       }
       setIsRunning(false)
+      setActiveAsyncEffect(null)
+      activeAsyncEffectsRef.current.clear()
       cancelExecutionRef.current = null
     }
     runMutex.runWithMutex(runWorker)
@@ -384,6 +417,8 @@ export const RunFrame = (props: RunFrameProps) => {
                       setIsRunning(false)
                       setRenderLog(null)
                       setError(null)
+                      setActiveAsyncEffect(null)
+                      activeAsyncEffectsRef.current.clear()
                       // Call cleanup to prevent race conditions
                       if (cancelExecutionRef.current) {
                         cancelExecutionRef.current()
@@ -422,6 +457,7 @@ export const RunFrame = (props: RunFrameProps) => {
       errorStack={error?.stack}
       onEditEvent={handleEditEvent}
       editEvents={props.editEvents}
+      activeAsyncEffect={activeAsyncEffect}
       defaultToFullScreen={props.defaultToFullScreen}
     />
   )

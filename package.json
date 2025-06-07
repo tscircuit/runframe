@@ -86,7 +86,7 @@
     "@tscircuit/create-snippet-url": "^0.0.8",
     "@tscircuit/eval": "^0.0.216",
     "@tscircuit/file-server": "^0.0.24",
-    "@tscircuit/footprinter": "^0.0.173",
+    "@tscircuit/footprinter": "^0.0.176",
     "@tscircuit/pcb-viewer": "^1.11.156",
     "@tscircuit/props": "^0.0.210",
     "@tscircuit/schematic-viewer": "2.0.21",

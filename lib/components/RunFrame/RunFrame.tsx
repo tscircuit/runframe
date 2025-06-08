@@ -56,6 +56,7 @@ export const RunFrame = (props: RunFrameProps) => {
   const lastRunCountTriggerRef = useRef(0)
   const runMutex = useMutex()
   const [isRunning, setIsRunning] = useState(false)
+  const [dependenciesLoaded, setDependenciesLoaded] = useState(false)
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -66,6 +67,30 @@ export const RunFrame = (props: RunFrameProps) => {
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [isRunning])
+
+  useEffect(() => {
+    let cancelled = false
+    const load = async () => {
+      try {
+        if (!globalThis.runFrameWorker) {
+          const worker = await createCircuitWebWorker({
+            evalVersion: props.evalVersion ?? "latest",
+            webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
+            verbose: true,
+          })
+          if (cancelled) return
+          globalThis.runFrameWorker = worker
+        }
+        if (!cancelled) setDependenciesLoaded(true)
+      } catch (err) {
+        console.error("Failed to preload eval worker", err)
+      }
+    }
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [props.evalVersion, props.evalWebWorkerBlobUrl])
 
   const [renderLog, setRenderLog] = useState<RenderLog | null>(null)
   const [autoroutingLog, setAutoroutingLog] = useState<Record<string, any>>({})
@@ -367,10 +392,10 @@ export const RunFrame = (props: RunFrameProps) => {
                   incRunCountTrigger(1)
                 }}
                 className="rf-flex rf-items-center rf-gap-2 rf-px-4 rf-py-2 rf-bg-blue-600 hover:rf-bg-blue-700 rf-text-white rf-rounded-md disabled:rf-opacity-50 transition-colors duration-200"
-                disabled={isRunning}
+                disabled={isRunning || !dependenciesLoaded}
               >
                 Run{" "}
-                {isRunning ? (
+                {isRunning || !dependenciesLoaded ? (
                   <Loader2 className="rf-w-3 rf-h-3 rf-animate-spin" />
                 ) : (
                   <Play className="rf-w-3 rf-h-3" />

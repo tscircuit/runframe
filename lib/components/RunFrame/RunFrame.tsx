@@ -323,10 +323,15 @@ export const RunFrame = (props: RunFrameProps) => {
     name: string,
     data: { simpleRouteJson: any },
   ) => {
+    let urlPath = ""
+    try {
+      urlPath = window.location.pathname || ""
+    } catch {}
+    const title = urlPath ? `${urlPath} - ${name}` : name
     await registryKy
       .post("autorouting/bug_reports/create", {
         json: {
-          title: name,
+          title,
           simple_route_json: data.simpleRouteJson,
         },
       })

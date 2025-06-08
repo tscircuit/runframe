@@ -87,6 +87,7 @@ export const CircuitJsonPreview = ({
   showSchematicDebugGrid = false,
   showToggleFullScreen = true,
   defaultToFullScreen = false,
+  activeEffectName,
 }: PreviewContentProps) => {
   useStyles()
 
@@ -162,10 +163,16 @@ export const CircuitJsonPreview = ({
             {!leftHeaderContent && <div className="rf-flex-grow" />}
             {renderLog && renderLog.progress !== 1 && !errorMessage && (
               <div className="rf-flex rf-items-center rf-gap-2">
-                {renderLog.lastRenderEvent && (
+                {activeEffectName ? (
                   <div className="rf-text-xs rf-text-gray-500">
-                    {renderLog.lastRenderEvent?.phase ?? ""}
+                    {activeEffectName}
                   </div>
+                ) : (
+                  renderLog.lastRenderEvent && (
+                    <div className="rf-text-xs rf-text-gray-500">
+                      {renderLog.lastRenderEvent?.phase ?? ""}
+                    </div>
+                  )
                 )}
                 <div className="rf-w-4 rf-h-4 rf-bg-blue-500 rf-opacity-50 rf-rounded-full rf-text-white">
                   <LoaderCircleIcon className="rf-w-4 rf-h-4 rf-animate-spin" />

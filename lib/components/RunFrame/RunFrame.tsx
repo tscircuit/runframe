@@ -382,9 +382,19 @@ export const RunFrame = (props: RunFrameProps) => {
     data: { simpleRouteJson: any },
   ) => {
     let urlPath = ""
-    try {
-      urlPath = window.location.pathname || ""
-    } catch {}
+    const softwareMetadata =
+      Array.isArray(circuitJson) &&
+      (circuitJson as any[]).find(
+        (el) => el.type === "software_project_metadata",
+      )
+    const projectUrl = props.projectUrl ?? softwareMetadata?.project_url
+    if (projectUrl) {
+      try {
+        urlPath = new URL(projectUrl).pathname
+      } catch {
+        urlPath = projectUrl
+      }
+    }
     const title = urlPath ? `${urlPath} - ${name}` : name
     await registryKy
       .post("autorouting/bug_reports/create", {

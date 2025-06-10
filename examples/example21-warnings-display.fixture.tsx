@@ -15,6 +15,14 @@ export default () => {
             },
             relative_to: "group_center",
           },
+          {
+            selector: "R1",
+            center: {
+              x: 1.5,
+              y: -2.5,
+            },
+            relative_to: "group_center",
+          },
         ],
       }
 

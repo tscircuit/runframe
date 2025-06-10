@@ -47,14 +47,14 @@ export const ErrorTabContent = ({
     }
 
     if (circuitJsonErrors && circuitJsonErrors.length > 0) {
-      circuitJsonErrors.forEach((error) => {
+      for (const error of circuitJsonErrors) {
         errors.push({
           type: error.type || "Circuit JSON Error",
           message: error.message || "No error message available",
           stack: (error as any).stack || "",
           source: "circuitJson",
         })
-      })
+      }
     }
 
     return errors
@@ -64,14 +64,14 @@ export const ErrorTabContent = ({
     const warnings: UnifiedError[] = []
 
     if (circuitJsonWarnings && circuitJsonWarnings.length > 0) {
-      circuitJsonWarnings.forEach((warning) => {
+      for (const warning of circuitJsonWarnings) {
         warnings.push({
           type: warning.type || "Circuit JSON Warning",
           message: warning.message || "No warning message available",
           stack: (warning as any).stack || "",
           source: "circuitJson",
         })
-      })
+      }
     }
 
     return warnings
@@ -139,24 +139,26 @@ export const ErrorTabContent = ({
           </div>
         )}
 
-        <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200 rf-max-h-[500px] rf-overflow-y-auto rf-px-2">
-          <div className="rf-p-4">
-            <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-1">
-              {currentError.type}
-            </h3>
-            <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600">
-              {currentError.message}
-            </p>
-            {currentError.stack && (
-              <details
-                style={{ whiteSpace: "pre-wrap" }}
-                className="rf-text-xs rf-font-mono rf-text-red-600 rf-mt-2"
-              >
-                {currentError.stack}
-              </details>
-            )}
+        {currentError && (
+          <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200 rf-max-h-[500px] rf-overflow-y-auto rf-px-2">
+            <div className="rf-p-4">
+              <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-1">
+                {currentError.type}
+              </h3>
+              <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600">
+                {currentError.message}
+              </p>
+              {currentError.stack && (
+                <details
+                  style={{ whiteSpace: "pre-wrap" }}
+                  className="rf-text-xs rf-font-mono rf-text-red-600 rf-mt-2"
+                >
+                  {currentError.stack}
+                </details>
+              )}
+            </div>
           </div>
-        </div>
+        )}
         {unifiedWarnings.length > 0 && (
           <div className="rf-mt-4 rf-bg-orange-50 rf-rounded-md rf-border rf-border-orange-200 rf-max-h-[500px] rf-overflow-y-auto rf-px-2">
             {unifiedWarnings.map((warning, i) => (

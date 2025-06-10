@@ -17,6 +17,7 @@ export const ErrorTabContent = ({
   code,
   autoroutingLog,
   circuitJsonErrors,
+  circuitJsonWarnings,
   onReportAutoroutingLog,
   errorMessage,
   errorStack,
@@ -25,6 +26,7 @@ export const ErrorTabContent = ({
   autoroutingLog?: Record<string, { simpleRouteJson: any }>
   isStreaming?: boolean
   circuitJsonErrors?: CircuitJsonError[] | null
+  circuitJsonWarnings?: CircuitJsonError[] | null
   errorMessage?: string | null
   errorStack?: string | null
   onReportAutoroutingLog?: (
@@ -58,9 +60,26 @@ export const ErrorTabContent = ({
     return errors
   }, [errorMessage, errorStack, circuitJsonErrors])
 
+  const unifiedWarnings = useMemo<UnifiedError[]>(() => {
+    const warnings: UnifiedError[] = []
+
+    if (circuitJsonWarnings && circuitJsonWarnings.length > 0) {
+      circuitJsonWarnings.forEach((warning) => {
+        warnings.push({
+          type: warning.type || "Circuit JSON Warning",
+          message: warning.message || "No warning message available",
+          stack: (warning as any).stack || "",
+          source: "circuitJson",
+        })
+      })
+    }
+
+    return warnings
+  }, [circuitJsonWarnings])
+
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0)
 
-  if (unifiedErrors.length === 0) {
+  if (unifiedErrors.length === 0 && unifiedWarnings.length === 0) {
     return (
       <div className="px-2">
         <div className="rf-mt-4 rf-bg-green-50 rf-rounded-md rf-border rf-border-green-200">
@@ -138,6 +157,28 @@ export const ErrorTabContent = ({
             )}
           </div>
         </div>
+        {unifiedWarnings.length > 0 && (
+          <div className="rf-mt-4 rf-bg-orange-50 rf-rounded-md rf-border rf-border-orange-200 rf-max-h-[500px] rf-overflow-y-auto rf-px-2">
+            {unifiedWarnings.map((warning, i) => (
+              <div key={i} className="rf-p-4 rf-border-b rf-border-orange-200 last:rf-border-b-0">
+                <h3 className="rf-text-lg rf-font-semibold rf-text-orange-800 rf-mb-1">
+                  {warning.type}
+                </h3>
+                <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-orange-600">
+                  {warning.message}
+                </p>
+                {warning.stack && (
+                  <details
+                    style={{ whiteSpace: "pre-wrap" }}
+                    className="rf-text-xs rf-font-mono rf-text-orange-600 rf-mt-2"
+                  >
+                    {warning.stack}
+                  </details>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       <div className="rf-flex rf-gap-2 rf-mt-4 rf-justify-end">
         <AutoroutingLogOptions

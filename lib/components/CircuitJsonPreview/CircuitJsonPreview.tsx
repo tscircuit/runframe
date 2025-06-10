@@ -98,6 +98,13 @@ export const CircuitJsonPreview = ({
     ) as any
   }, [circuitJson])
 
+  const circuitJsonWarnings = useMemo<CircuitJsonError[] | null>(() => {
+    if (!circuitJson) return null
+    return circuitJson.filter(
+      (e) => (e && "warning_type" in e) || e.type.includes("warning"),
+    ) as any
+  }, [circuitJson])
+
   const [activeTab, setActiveTabState] = useState<TabId>(
     defaultActiveTab ?? "pcb",
   )
@@ -500,6 +507,7 @@ export const CircuitJsonPreview = ({
                 <ErrorTabContent
                   code={code}
                   circuitJsonErrors={circuitJsonErrors}
+                  circuitJsonWarnings={circuitJsonWarnings}
                   errorMessage={errorMessage}
                   errorStack={errorStack}
                   autoroutingLog={autoroutingLog}

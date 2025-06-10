@@ -17,6 +17,7 @@ export const ErrorTabContent = ({
   code,
   autoroutingLog,
   circuitJsonErrors,
+  circuitJsonWarnings,
   onReportAutoroutingLog,
   errorMessage,
   errorStack,
@@ -25,6 +26,7 @@ export const ErrorTabContent = ({
   autoroutingLog?: Record<string, { simpleRouteJson: any }>
   isStreaming?: boolean
   circuitJsonErrors?: CircuitJsonError[] | null
+  circuitJsonWarnings?: CircuitJsonError[] | null
   errorMessage?: string | null
   errorStack?: string | null
   onReportAutoroutingLog?: (
@@ -45,22 +47,40 @@ export const ErrorTabContent = ({
     }
 
     if (circuitJsonErrors && circuitJsonErrors.length > 0) {
-      circuitJsonErrors.forEach((error) => {
+      for (const error of circuitJsonErrors) {
         errors.push({
           type: error.type || "Circuit JSON Error",
           message: error.message || "No error message available",
           stack: (error as any).stack || "",
           source: "circuitJson",
         })
-      })
+      }
     }
 
     return errors
   }, [errorMessage, errorStack, circuitJsonErrors])
 
-  const [currentErrorIndex, setCurrentErrorIndex] = useState(0)
+  const unifiedWarnings = useMemo<UnifiedError[]>(() => {
+    const warnings: UnifiedError[] = []
 
-  if (unifiedErrors.length === 0) {
+    if (circuitJsonWarnings && circuitJsonWarnings.length > 0) {
+      for (const warning of circuitJsonWarnings) {
+        warnings.push({
+          type: warning.type || "Circuit JSON Warning",
+          message: warning.message || "No warning message available",
+          stack: (warning as any).stack || "",
+          source: "circuitJson",
+        })
+      }
+    }
+
+    return warnings
+  }, [circuitJsonWarnings])
+
+  const [currentErrorIndex, setCurrentErrorIndex] = useState(0)
+  const [currentWarningIndex, setCurrentWarningIndex] = useState(0)
+
+  if (unifiedErrors.length === 0 && unifiedWarnings.length === 0) {
     return (
       <div className="px-2">
         <div className="rf-mt-4 rf-bg-green-50 rf-rounded-md rf-border rf-border-green-200">
@@ -83,15 +103,26 @@ export const ErrorTabContent = ({
     )
   }
 
-  const handlePrev = () => {
+  const handlePrevError = () => {
     setCurrentErrorIndex((prev) => Math.max(prev - 1, 0))
   }
 
-  const handleNext = () => {
+  const handleNextError = () => {
     setCurrentErrorIndex((prev) => Math.min(prev + 1, unifiedErrors.length - 1))
   }
 
+  const handlePrevWarning = () => {
+    setCurrentWarningIndex((prev) => Math.max(prev - 1, 0))
+  }
+
+  const handleNextWarning = () => {
+    setCurrentWarningIndex((prev) =>
+      Math.min(prev + 1, unifiedWarnings.length - 1),
+    )
+  }
+
   const currentError = unifiedErrors[currentErrorIndex]
+  const currentWarning = unifiedWarnings[currentWarningIndex]
 
   return (
     <>
@@ -101,7 +132,7 @@ export const ErrorTabContent = ({
             <button
               type="button"
               className="rf-p-1 rf-rounded-sm rf-transition-colors"
-              onClick={handlePrev}
+              onClick={handlePrevError}
               disabled={currentErrorIndex === 0}
             >
               <ChevronLeft className="rf-h-4 rf-w-4 rf-text-red-500" />
@@ -109,7 +140,7 @@ export const ErrorTabContent = ({
             <button
               type="button"
               className="rf-p-1 rf-rounded-sm rf-transition-colors"
-              onClick={handleNext}
+              onClick={handleNextError}
               disabled={currentErrorIndex === unifiedErrors.length - 1}
             >
               <ChevronRight className="rf-h-4 rf-w-4 rf-text-red-500" />
@@ -120,24 +151,74 @@ export const ErrorTabContent = ({
           </div>
         )}
 
-        <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200 rf-max-h-[500px] rf-overflow-y-auto rf-px-2">
-          <div className="rf-p-4">
-            <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-1">
-              {currentError.type}
-            </h3>
-            <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600">
-              {currentError.message}
-            </p>
-            {currentError.stack && (
-              <details
-                style={{ whiteSpace: "pre-wrap" }}
-                className="rf-text-xs rf-font-mono rf-text-red-600 rf-mt-2"
-              >
-                {currentError.stack}
-              </details>
-            )}
+        {currentError && (
+          <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200 rf-max-h-[500px] rf-overflow-y-auto rf-px-2">
+            <div className="rf-p-4">
+              <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-1">
+                {currentError.type}
+              </h3>
+              <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600">
+                {currentError.message}
+              </p>
+              {currentError.stack && (
+                <details
+                  style={{ whiteSpace: "pre-wrap" }}
+                  className="rf-text-xs rf-font-mono rf-text-red-600 rf-mt-2"
+                >
+                  {currentError.stack}
+                </details>
+              )}
+            </div>
           </div>
-        </div>
+        )}
+
+        {unifiedWarnings.length > 0 && (
+          <>
+            {unifiedWarnings.length > 1 && (
+              <div className="rf-flex rf-items-center rf-gap-2 rf-mb-2 rf-mt-4">
+                <button
+                  type="button"
+                  className="rf-p-1 rf-rounded-sm rf-transition-colors"
+                  onClick={handlePrevWarning}
+                  disabled={currentWarningIndex === 0}
+                >
+                  <ChevronLeft className="rf-h-4 rf-w-4 rf-text-orange-500" />
+                </button>
+                <button
+                  type="button"
+                  className="rf-p-1 rf-rounded-sm rf-transition-colors"
+                  onClick={handleNextWarning}
+                  disabled={currentWarningIndex === unifiedWarnings.length - 1}
+                >
+                  <ChevronRight className="rf-h-4 rf-w-4 rf-text-orange-500" />
+                </button>
+                <span className="rf-text-sm rf-text-orange-600">
+                  {currentWarningIndex + 1} of {unifiedWarnings.length} warnings
+                </span>
+              </div>
+            )}
+            {currentWarning && (
+              <div className="rf-mt-4 rf-bg-orange-50 rf-rounded-md rf-border rf-border-orange-200 rf-max-h-[500px] rf-overflow-y-auto rf-px-2">
+                <div className="rf-p-4">
+                  <h3 className="rf-text-lg rf-font-semibold rf-text-orange-800 rf-mb-1">
+                    {currentWarning.type}
+                  </h3>
+                  <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-orange-600">
+                    {currentWarning.message}
+                  </p>
+                  {currentWarning.stack && (
+                    <details
+                      style={{ whiteSpace: "pre-wrap" }}
+                      className="rf-text-xs rf-font-mono rf-text-orange-600 rf-mt-2"
+                    >
+                      {currentWarning.stack}
+                    </details>
+                  )}
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
       <div className="rf-flex rf-gap-2 rf-mt-4 rf-justify-end">
         <AutoroutingLogOptions

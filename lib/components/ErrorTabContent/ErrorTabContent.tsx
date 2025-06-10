@@ -160,7 +160,10 @@ export const ErrorTabContent = ({
         {unifiedWarnings.length > 0 && (
           <div className="rf-mt-4 rf-bg-orange-50 rf-rounded-md rf-border rf-border-orange-200 rf-max-h-[500px] rf-overflow-y-auto rf-px-2">
             {unifiedWarnings.map((warning, i) => (
-              <div key={i} className="rf-p-4 rf-border-b rf-border-orange-200 last:rf-border-b-0">
+              <div
+                key={i}
+                className="rf-p-4 rf-border-b rf-border-orange-200 last:rf-border-b-0"
+              >
                 <h3 className="rf-text-lg rf-font-semibold rf-text-orange-800 rf-mb-1">
                   {warning.type}
                 </h3>

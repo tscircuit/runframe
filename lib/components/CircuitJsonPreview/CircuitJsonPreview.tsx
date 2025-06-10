@@ -495,7 +495,8 @@ export const CircuitJsonPreview = ({
               )}
             >
               {errorMessage ||
-              (circuitJsonErrors && circuitJsonErrors.length > 0) ? (
+              (circuitJsonErrors && circuitJsonErrors.length > 0) ||
+              circuitJson ? (
                 <ErrorTabContent
                   code={code}
                   circuitJsonErrors={circuitJsonErrors}

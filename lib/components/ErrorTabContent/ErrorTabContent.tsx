@@ -66,10 +66,10 @@ export const ErrorTabContent = ({
         <div className="rf-mt-4 rf-bg-green-50 rf-rounded-md rf-border rf-border-green-200">
           <div className="rf-p-4">
             <h3 className="rf-text-lg rf-font-semibold rf-text-green-800 rf-mb-3">
-              No Errors 👌
+              No errors or warnings!
             </h3>
             <p className="rf-text-sm rf-text-green-700">
-              Your code is running without any errors.
+              Your code is running without any errors or warnings.
             </p>
           </div>
         </div>

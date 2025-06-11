@@ -55,6 +55,11 @@ export interface PreviewContentProps {
 
   renderLog?: RenderLog | null
 
+  /**
+   * Name of the currently running async effect from @tscircuit/core, if any
+   */
+  activeEffectName?: string
+
   onEditEvent?: (editEvent: ManualEditEvent) => void
   editEvents?: ManualEditEvent[]
 

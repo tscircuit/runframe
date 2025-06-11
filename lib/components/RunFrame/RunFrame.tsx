@@ -56,6 +56,22 @@ export const RunFrame = (props: RunFrameProps) => {
   const lastRunCountTriggerRef = useRef(0)
   const runMutex = useMutex()
   const [isRunning, setIsRunning] = useState(false)
+  const [dependenciesLoaded, setDependenciesLoaded] = useState(false)
+  const [activeAsyncEffects, setActiveAsyncEffects] = useState<
+    Record<
+      string,
+      {
+        effectName: string
+        phase: string
+        componentDisplayName?: string
+        startTime: number
+      }
+    >
+  >({})
+
+  const activeEffectName = Object.values(activeAsyncEffects).sort(
+    (a, b) => a.startTime - b.startTime,
+  )[0]?.effectName
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -66,6 +82,30 @@ export const RunFrame = (props: RunFrameProps) => {
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [isRunning])
+
+  useEffect(() => {
+    let cancelled = false
+    const load = async () => {
+      try {
+        if (!globalThis.runFrameWorker) {
+          const worker = await createCircuitWebWorker({
+            evalVersion: props.evalVersion ?? "latest",
+            webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
+            verbose: true,
+          })
+          if (cancelled) return
+          globalThis.runFrameWorker = worker
+        }
+        if (!cancelled) setDependenciesLoaded(true)
+      } catch (err) {
+        console.error("Failed to preload eval worker", err)
+      }
+    }
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [props.evalVersion, props.evalWebWorkerBlobUrl])
 
   const [renderLog, setRenderLog] = useState<RenderLog | null>(null)
   const [autoroutingLog, setAutoroutingLog] = useState<Record<string, any>>({})
@@ -133,6 +173,7 @@ export const RunFrame = (props: RunFrameProps) => {
       debug("running render worker")
       setError(null)
       setRenderLog(null)
+      setActiveAsyncEffects({})
       const renderLog: RenderLog = { progress: 0 }
       let cancelled = false
 
@@ -174,6 +215,20 @@ export const RunFrame = (props: RunFrameProps) => {
       const renderIds = new Set<string>()
       const startRenderTime = Date.now()
       let lastRenderLogSet = Date.now()
+      worker.on("asyncEffect:start", (event: any) => {
+        const id = `${event.phase}|${event.componentDisplayName ?? ""}|${event.effectName}`
+        setActiveAsyncEffects((effects) => ({
+          ...effects,
+          [id]: { ...event, startTime: Date.now() },
+        }))
+      })
+      worker.on("asyncEffect:end", (event: any) => {
+        const id = `${event.phase}|${event.componentDisplayName ?? ""}|${event.effectName}`
+        setActiveAsyncEffects((effects) => {
+          const { [id]: _removed, ...rest } = effects
+          return rest
+        })
+      })
       worker.on("autorouting:start", (event: AutoroutingStartEvent) => {
         setAutoroutingLog({
           ...autoroutingLog,
@@ -244,6 +299,7 @@ export const RunFrame = (props: RunFrameProps) => {
         })
       if (!evalResult.success) {
         setIsRunning(false)
+        setActiveAsyncEffects({})
         return
       }
 
@@ -256,6 +312,7 @@ export const RunFrame = (props: RunFrameProps) => {
         setError({ error: e.message, stack: e.stack })
         setRenderLog(null)
         setIsRunning(false)
+        setActiveAsyncEffects({})
         return null
       })
       if (!circuitJson) return
@@ -284,6 +341,7 @@ export const RunFrame = (props: RunFrameProps) => {
         setRenderLog({ ...renderLog })
       }
       setIsRunning(false)
+      setActiveAsyncEffects({})
       cancelExecutionRef.current = null
     }
     runMutex.runWithMutex(runWorker)
@@ -323,10 +381,25 @@ export const RunFrame = (props: RunFrameProps) => {
     name: string,
     data: { simpleRouteJson: any },
   ) => {
+    let urlPath = ""
+    const softwareMetadata =
+      Array.isArray(circuitJson) &&
+      (circuitJson as any[]).find(
+        (el) => el.type === "software_project_metadata",
+      )
+    const projectUrl = props.projectUrl ?? softwareMetadata?.project_url
+    if (projectUrl) {
+      try {
+        urlPath = new URL(projectUrl).pathname
+      } catch {
+        urlPath = projectUrl
+      }
+    }
+    const title = urlPath ? `${urlPath} - ${name}` : name
     await registryKy
       .post("autorouting/bug_reports/create", {
         json: {
-          title: name,
+          title,
           simple_route_json: data.simpleRouteJson,
         },
       })
@@ -367,10 +440,10 @@ export const RunFrame = (props: RunFrameProps) => {
                   incRunCountTrigger(1)
                 }}
                 className="rf-flex rf-items-center rf-gap-2 rf-px-4 rf-py-2 rf-bg-blue-600 hover:rf-bg-blue-700 rf-text-white rf-rounded-md disabled:rf-opacity-50 transition-colors duration-200"
-                disabled={isRunning}
+                disabled={isRunning || !dependenciesLoaded}
               >
                 Run{" "}
-                {isRunning ? (
+                {isRunning || !dependenciesLoaded ? (
                   <Loader2 className="rf-w-3 rf-h-3 rf-animate-spin" />
                 ) : (
                   <Play className="rf-w-3 rf-h-3" />
@@ -391,6 +464,7 @@ export const RunFrame = (props: RunFrameProps) => {
                       }
                       // Cancel the mutex to allow next execution
                       runMutex.cancel()
+                      setActiveAsyncEffects({})
                       // Kill the worker using the provided kill function
                       if (globalThis.runFrameWorker) {
                         globalThis.runFrameWorker.kill()
@@ -417,6 +491,7 @@ export const RunFrame = (props: RunFrameProps) => {
       onActiveTabChange={setActiveTab}
       circuitJson={circuitJson}
       renderLog={renderLog}
+      activeEffectName={activeEffectName}
       isRunningCode={isRunning}
       errorMessage={error?.error}
       errorStack={error?.stack}

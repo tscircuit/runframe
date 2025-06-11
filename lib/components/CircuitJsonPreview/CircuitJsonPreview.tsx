@@ -87,6 +87,7 @@ export const CircuitJsonPreview = ({
   showSchematicDebugGrid = false,
   showToggleFullScreen = true,
   defaultToFullScreen = false,
+  activeEffectName,
 }: PreviewContentProps) => {
   useStyles()
 
@@ -94,6 +95,13 @@ export const CircuitJsonPreview = ({
     if (!circuitJson) return null
     return circuitJson.filter(
       (e) => (e && "error_type" in e) || e.type.includes("error"),
+    ) as any
+  }, [circuitJson])
+
+  const circuitJsonWarnings = useMemo<CircuitJsonError[] | null>(() => {
+    if (!circuitJson) return null
+    return circuitJson.filter(
+      (e) => (e && "warning_type" in e) || e.type.includes("warning"),
     ) as any
   }, [circuitJson])
 
@@ -162,10 +170,16 @@ export const CircuitJsonPreview = ({
             {!leftHeaderContent && <div className="rf-flex-grow" />}
             {renderLog && renderLog.progress !== 1 && !errorMessage && (
               <div className="rf-flex rf-items-center rf-gap-2">
-                {renderLog.lastRenderEvent && (
+                {activeEffectName ? (
                   <div className="rf-text-xs rf-text-gray-500">
-                    {renderLog.lastRenderEvent?.phase ?? ""}
+                    {activeEffectName}
                   </div>
+                ) : (
+                  renderLog.lastRenderEvent && (
+                    <div className="rf-text-xs rf-text-gray-500">
+                      {renderLog.lastRenderEvent?.phase ?? ""}
+                    </div>
+                  )
                 )}
                 <div className="rf-w-4 rf-h-4 rf-bg-blue-500 rf-opacity-50 rf-rounded-full rf-text-white">
                   <LoaderCircleIcon className="rf-w-4 rf-h-4 rf-animate-spin" />
@@ -488,10 +502,12 @@ export const CircuitJsonPreview = ({
               )}
             >
               {errorMessage ||
-              (circuitJsonErrors && circuitJsonErrors.length > 0) ? (
+              (circuitJsonErrors && circuitJsonErrors.length > 0) ||
+              circuitJson ? (
                 <ErrorTabContent
                   code={code}
                   circuitJsonErrors={circuitJsonErrors}
+                  circuitJsonWarnings={circuitJsonWarnings}
                   errorMessage={errorMessage}
                   errorStack={errorStack}
                   autoroutingLog={autoroutingLog}

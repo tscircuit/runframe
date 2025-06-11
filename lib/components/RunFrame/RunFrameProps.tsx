@@ -92,6 +92,12 @@ export interface RunFrameProps {
   evalVersion?: string
   forceLatestEvalVersion?: boolean
 
+  /**
+   * Optional project URL whose pathname will be used when
+   * reporting autorouting bugs
+   */
+  projectUrl?: string
+
   onReportAutoroutingLog?: (
     name: string,
     data: { simpleRouteJson: any },

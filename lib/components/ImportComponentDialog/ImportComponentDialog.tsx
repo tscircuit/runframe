@@ -10,7 +10,7 @@ import {
   AlertDialogCancel,
 } from "../ui/alert-dialog"
 import { Button } from "../ui/button"
-import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs"
 import { Loader2, Search, ExternalLink } from "lucide-react"
 import { Input } from "../ui/input"
 import { searchJLCComponents, mapJLCComponentToSearchResult } from "./jlc-api"
@@ -31,6 +31,12 @@ export interface ComponentSearchResult {
   // Additional tscircuit-specific properties
   code?: string
   owner?: string
+}
+
+interface TscircuitPackageDetails {
+  ai_description?: string
+  ai_usage_instructions?: string
+  [key: string]: any
 }
 
 interface ImportComponentDialogProps {
@@ -58,6 +64,31 @@ export const ImportComponentDialog = ({
   const [detailsOpen, setDetailsOpen] = useState(false)
   const [detailsComponent, setDetailsComponent] =
     useState<ComponentSearchResult | null>(null)
+  const [packageDetails, setPackageDetails] =
+    useState<TscircuitPackageDetails | null>(null)
+  const [packageDetailsLoading, setPackageDetailsLoading] = useState(false)
+  const [previewActiveTab, setPreviewActiveTab] = useState<"pcb" | "schematic">(
+    "pcb",
+  )
+
+  // Fetch package details with AI description
+  const fetchPackageDetails = async (owner: string, name: string) => {
+    setPackageDetailsLoading(true)
+    try {
+      const response = await fetch(
+        `https://registry-api.tscircuit.com/packages/get?name=${encodeURIComponent(`${owner}/${name}`)}`,
+      )
+      if (response.ok) {
+        const data = await response.json()
+        setPackageDetails(data.package || null)
+      }
+    } catch (error) {
+      console.error("Error fetching package details:", error)
+      setPackageDetails(null)
+    } finally {
+      setPackageDetailsLoading(false)
+    }
+  }
 
   // Search function that calls the appropriate API based on the active tab
   const handleSearch = async () => {
@@ -122,6 +153,14 @@ export const ImportComponentDialog = ({
   const showDetails = (component: ComponentSearchResult) => {
     setDetailsComponent(component)
     setDetailsOpen(true)
+    setPackageDetails(null)
+    setPreviewActiveTab("pcb")
+
+    // Fetch package details if it's a tscircuit component
+    if (component.source === "tscircuit.com" && component.owner) {
+      const packageName = component.name.split("/").pop() || component.name
+      fetchPackageDetails(component.owner, packageName)
+    }
   }
 
   return (
@@ -155,6 +194,8 @@ export const ImportComponentDialog = ({
                     : "Search JLCPCB parts (e.g. C14663)..."
                 }
                 className="rf-pl-8"
+                spellCheck={false}
+                autoComplete="off"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -240,7 +281,7 @@ export const ImportComponentDialog = ({
 
       {/* Component Details Dialog */}
       <AlertDialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <AlertDialogContent className="rf-max-w-4xl rf-max-h-[85vh] rf-overflow-hidden rf-flex rf-flex-col">
+        <AlertDialogContent className="rf-max-w-5xl rf-max-h-[90vh] rf-overflow-hidden rf-flex rf-flex-col rf-overflow-y-auto">
           <AlertDialogHeader className="rf-pb-4 rf-border-b">
             <div className="rf-flex rf-items-start rf-justify-between rf-gap-4">
               <div className="rf-flex-1 rf-min-w-0">
@@ -283,41 +324,140 @@ export const ImportComponentDialog = ({
               </div>
             </div>
 
-            {/* Preview Section */}
+            {/* Preview Section with Tabs */}
             <div>
               <h3 className="rf-text-lg rf-font-semibold rf-mb-4">Preview</h3>
-              <div className="rf-border rf-rounded-lg rf-overflow-hidden rf-bg-gray-50">
-                {detailsComponent?.code ? (
-                  <div className="rf-aspect-video rf-bg-white rf-flex rf-items-center rf-justify-center">
-                    <img
-                      src={`https://registry-api.tscircuit.com/packages/images/${detailsComponent.owner}/${detailsComponent.name}/pcb.png`}
-                      alt={`${detailsComponent.name} preview`}
-                      className="rf-w-full rf-h-full rf-object-cover rf-rounded"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement
-                        target.style.display = "none"
-                        const parent = target.parentElement
-                        if (parent) {
-                          parent.innerHTML =
-                            '<div class="rf-text-center rf-text-gray-500 rf-py-8"><div class="rf-text-sm">Preview not available</div><div class="rf-text-xs rf-mt-1">Image failed to load</div></div>'
-                        }
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <div className="rf-aspect-video rf-flex rf-items-center rf-justify-center rf-text-gray-500">
-                    <div className="rf-text-center">
-                      <div className="rf-text-sm rf-font-medium">
-                        No preview available
+
+              <Tabs
+                value={previewActiveTab}
+                onValueChange={(value) =>
+                  setPreviewActiveTab(value as "pcb" | "schematic")
+                }
+              >
+                <TabsList className="rf-inline-flex rf-h-9 rf-items-center rf-justify-center rf-rounded-lg rf-bg-zinc-100 rf-p-1 rf-text-zinc-500 dark:rf-bg-zinc-800 dark:rf-text-zinc-400">
+                  <TabsTrigger
+                    value="pcb"
+                    className="rf-inline-flex rf-items-center rf-justify-center rf-whitespace-nowrap rf-rounded-md rf-px-3 rf-py-1 rf-text-sm rf-font-medium rf-ring-offset-white rf-transition-all focus-visible:rf-outline-none focus-visible:rf-ring-2 focus-visible:rf-ring-zinc-950 focus-visible:rf-ring-offset-2 disabled:rf-pointer-events-none disabled:rf-opacity-50 data-[state=active]:rf-bg-white data-[state=active]:rf-text-zinc-950 data-[state=active]:rf-shadow dark:rf-ring-offset-zinc-950 dark:focus-visible:rf-ring-zinc-300 dark:data-[state=active]:rf-bg-zinc-950 dark:data-[state=active]:rf-text-zinc-50"
+                  >
+                    PCB
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="schematic"
+                    className="rf-inline-flex rf-items-center rf-justify-center rf-whitespace-nowrap rf-rounded-md rf-px-3 rf-py-1 rf-text-sm rf-font-medium rf-ring-offset-white rf-transition-all focus-visible:rf-outline-none focus-visible:rf-ring-2 focus-visible:rf-ring-zinc-950 focus-visible:rf-ring-offset-2 disabled:rf-pointer-events-none disabled:rf-opacity-50 data-[state=active]:rf-bg-white data-[state=active]:rf-text-zinc-950 data-[state=active]:rf-shadow dark:rf-ring-offset-zinc-950 dark:focus-visible:rf-ring-zinc-300 dark:data-[state=active]:rf-bg-zinc-950 dark:data-[state=active]:rf-text-zinc-50"
+                  >
+                    Schematic
+                  </TabsTrigger>
+                </TabsList>
+
+                <div className="rf-mt-4">
+                  <TabsContent
+                    value="pcb"
+                    className="rf-border rf-rounded-lg rf-overflow-hidden rf-bg-gray-50"
+                  >
+                    {detailsComponent?.code ? (
+                      <div className="rf-w-full rf-h-[400px] rf-bg-white rf-flex rf-items-center rf-justify-center rf-p-4">
+                        <img
+                          src={`https://registry-api.tscircuit.com/packages/images/${detailsComponent.owner}/${detailsComponent.name}/pcb.png`}
+                          alt={`${detailsComponent.name} PCB preview`}
+                          className="rf-max-w-full rf-max-h-full rf-object-contain rf-rounded"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement
+                            target.style.display = "none"
+                            const parent = target.parentElement
+                            if (parent) {
+                              parent.innerHTML =
+                                '<div class="rf-text-center rf-text-gray-500"><div class="rf-text-sm rf-font-medium">PCB preview not available</div><div class="rf-text-xs rf-mt-1">Image failed to load</div></div>'
+                            }
+                          }}
+                        />
                       </div>
-                      <div className="rf-text-xs rf-mt-1">
-                        Preview cannot be generated
+                    ) : (
+                      <div className="rf-h-[400px] rf-flex rf-items-center rf-justify-center rf-text-gray-500">
+                        <div className="rf-text-center">
+                          <div className="rf-text-sm rf-font-medium">
+                            No PCB preview available
+                          </div>
+                          <div className="rf-text-xs rf-mt-1">
+                            Preview cannot be generated
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+                    )}
+                  </TabsContent>
+
+                  <TabsContent
+                    value="schematic"
+                    className="rf-border rf-rounded-lg rf-overflow-hidden rf-bg-gray-50"
+                  >
+                    {detailsComponent?.code ? (
+                      <div className="rf-w-full rf-h-[400px] rf-bg-white rf-flex rf-items-center rf-justify-center rf-p-4">
+                        <img
+                          src={`https://registry-api.tscircuit.com/packages/images/${detailsComponent.owner}/${detailsComponent.name}/schematic.png`}
+                          alt={`${detailsComponent.name} schematic preview`}
+                          className="rf-max-w-full rf-max-h-full rf-object-contain rf-rounded"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement
+                            target.style.display = "none"
+                            const parent = target.parentElement
+                            if (parent) {
+                              parent.innerHTML =
+                                '<div class="rf-text-center rf-text-gray-500"><div class="rf-text-sm rf-font-medium">Schematic preview not available</div><div class="rf-text-xs rf-mt-1">Image failed to load</div></div>'
+                            }
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="rf-h-[400px] rf-flex rf-items-center rf-justify-center rf-text-gray-500">
+                        <div className="rf-text-center">
+                          <div className="rf-text-sm rf-font-medium">
+                            No schematic preview available
+                          </div>
+                          <div className="rf-text-xs rf-mt-1">
+                            Preview cannot be generated
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </TabsContent>
+                </div>
+              </Tabs>
             </div>
+
+            {/* AI Description Section */}
+            {packageDetails?.ai_description && (
+              <div>
+                <h3 className="rf-text-lg rf-font-semibold rf-mb-3">
+                  AI Description
+                </h3>
+                <div className="rf-bg-gray-50 rf-border rf-border-gray-200 rf-rounded-lg rf-p-4">
+                  <p className="rf-text-sm rf-text-gray-700 rf-leading-relaxed">
+                    {packageDetails.ai_description}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Usage Instructions Section */}
+            {packageDetails?.ai_usage_instructions && (
+              <div>
+                <h3 className="rf-text-lg rf-font-semibold rf-mb-3">
+                  Usage Instructions
+                </h3>
+                <div className="rf-bg-gray-50 rf-border rf-border-gray-200 rf-rounded-lg rf-p-4">
+                  <p className="rf-text-sm rf-text-gray-700 rf-leading-relaxed rf-whitespace-pre-wrap">
+                    {packageDetails.ai_usage_instructions}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Loading state for package details */}
+            {packageDetailsLoading && (
+              <div className="rf-flex rf-justify-center rf-text-center rf-items-center rf-gap-2 rf-text-gray-500">
+                <Loader2 className="rf-h-4 rf-w-4 rf-animate-spin" />
+                <span className="rf-text-sm">Loading package details...</span>
+              </div>
+            )}
           </div>
 
           <AlertDialogFooter className="rf-pt-4 rf-border-t rf-flex rf-justify-between rf-items-center">

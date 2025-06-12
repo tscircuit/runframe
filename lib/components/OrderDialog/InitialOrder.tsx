@@ -82,7 +82,7 @@ export const InitialOrderScreen = ({
   // Check for no_token error
   const isNoTokenError =
     (createOrderQuoteError &&
-      (createOrderQuoteError as any).error_code?.includes("no_token")) ||
+      (createOrderQuoteError as any).error?.error_code?.includes("no_token")) ||
     (orderQuote?.error?.error_code?.includes("no_token") && signIn)
 
   if (!isLoggedIn || isNoTokenError) {
@@ -102,7 +102,8 @@ export const InitialOrderScreen = ({
       {(createOrderQuoteError || orderQuote?.error) && (
         <ErrorMessage
           message={
-            (createOrderQuoteError && (createOrderQuoteError as any).message) ||
+            (createOrderQuoteError &&
+              (createOrderQuoteError as any).error?.message) ||
             orderQuote?.error?.message ||
             "Failed to fetch quotes"
           }

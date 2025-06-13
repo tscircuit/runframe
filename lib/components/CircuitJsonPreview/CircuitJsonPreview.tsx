@@ -122,6 +122,18 @@ export const CircuitJsonPreview = ({
   }
 
   useEffect(() => {
+    if (isFullScreen) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = ""
+    }
+
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [isFullScreen])
+
+  useEffect(() => {
     if (errorMessage) {
       setActiveTab("errors")
     }
@@ -148,7 +160,8 @@ export const CircuitJsonPreview = ({
       <div
         className={cn(
           "rf-md:sticky rf-md:top-2",
-          isFullScreen && "rf-fixed rf-top-0 rf-left-0 rf-w-full rf-bg-white",
+          isFullScreen &&
+            "rf-fixed rf-top-0 rf-left-0 rf-w-full rf-h-full rf-bg-white rf-z-50 rf-overflow-hidden",
         )}
       >
         <Tabs

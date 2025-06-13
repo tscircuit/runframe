@@ -9,6 +9,14 @@ export default () => {
   const recentEvents = useRunFrameStore((state) => state.recentEvents)
   const pushEvent = useRunFrameStore((state) => state.pushEvent)
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.TSCIRCUIT_REGISTRY_API_BASE_URL = `${window.location.origin}/registry`
+      window.TSCIRCUIT_REGISTRY_TOKEN =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50X2lkIjoiYWNjb3VudC0xMjM0IiwiZ2l0aHViX3VzZXJuYW1lIjoidGVzdHVzZXIiLCJzZXNzaW9uX2lkIjoic2Vzc2lvbi0xMjM0IiwidG9rZW4iOiIxMjM0In0.KvHMnB_ths0mI-f8Tj-t-OTOGRUPOEbFunima0dgMcQ"
+    }
+  }, [])
+
   useEventHandler(async (event) => {
     if (event.event_type === "REQUEST_TO_SAVE_SNIPPET") {
       await new Promise((resolve) => setTimeout(resolve, 1000))

@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "../ui/dialog"
 import { Button } from "../ui/button"
 import { useRunFrameStore } from "../RunFrameWithApi/store"
 import { registryKy, hasRegistryToken } from "lib/utils/get-registry-ky"
@@ -28,7 +35,8 @@ export const AiReviewDialog = ({
   const [loading, setLoading] = useState(false)
   const [creating, setCreating] = useState(false)
 
-  const selectedReview = reviews.find((r) => r.ai_review_id === selectedId) || null
+  const selectedReview =
+    reviews.find((r) => r.ai_review_id === selectedId) || null
 
   useEffect(() => {
     if (!isOpen || !packageName || !hasRegistryToken()) return
@@ -80,11 +88,18 @@ export const AiReviewDialog = ({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose() }}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose()
+      }}
+    >
       <DialogContent className="rf-max-w-2xl">
         <DialogHeader>
           <DialogTitle>AI Review</DialogTitle>
-          <DialogDescription>Select an AI review or request a new one.</DialogDescription>
+          <DialogDescription>
+            Select an AI review or request a new one.
+          </DialogDescription>
         </DialogHeader>
         <div className="rf-flex rf-gap-4 rf-mt-4">
           <div className="rf-w-48 rf-h-64 rf-overflow-y-auto rf-border rf-rounded rf-p-2 rf-flex-shrink-0">
@@ -94,27 +109,31 @@ export const AiReviewDialog = ({
               reviews.map((review) => (
                 <div
                   key={review.ai_review_id}
-                  className={`rf-text-sm rf-p-2 rf-cursor-pointer rf-rounded ${selectedId === review.ai_review_id ? 'rf-bg-zinc-100' : 'hover:rf-bg-zinc-100'}`}
+                  className={`rf-text-sm rf-p-2 rf-cursor-pointer rf-rounded ${selectedId === review.ai_review_id ? "rf-bg-zinc-100" : "hover:rf-bg-zinc-100"}`}
                   onClick={() => setSelectedId(review.ai_review_id)}
                 >
-                  {new Date(review.created_at || '').toLocaleString()}
+                  {new Date(review.created_at || "").toLocaleString()}
                 </div>
               ))
             ) : (
-              <div className="rf-text-sm rf-text-muted-foreground">No AI reviews found.</div>
+              <div className="rf-text-sm rf-text-muted-foreground">
+                No AI reviews found.
+              </div>
             )}
           </div>
           <div className="rf-flex-1 rf-h-64 rf-overflow-y-auto rf-border rf-rounded rf-p-2 rf-whitespace-pre-wrap rf-text-sm">
             {selectedReview ? (
-              selectedReview.ai_review_text || 'No review text yet.'
+              selectedReview.ai_review_text || "No review text yet."
             ) : (
-              <div className="rf-text-sm rf-text-muted-foreground">Select a review to view the text.</div>
+              <div className="rf-text-sm rf-text-muted-foreground">
+                Select a review to view the text.
+              </div>
             )}
           </div>
         </div>
         <DialogFooter className="rf-mt-4">
           <Button onClick={requestReview} disabled={creating}>
-            {creating ? 'Requesting...' : 'Review my Board'}
+            {creating ? "Requesting..." : "Review my Board"}
           </Button>
         </DialogFooter>
       </DialogContent>

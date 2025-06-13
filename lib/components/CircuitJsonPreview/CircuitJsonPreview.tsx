@@ -161,7 +161,7 @@ export const CircuitJsonPreview = ({
         className={cn(
           "rf-md:sticky rf-md:top-2",
           isFullScreen &&
-            "rf-fixed rf-top-0 rf-left-0 rf-w-full rf-h-full rf-bg-white rf-z-50 rf-overflow-hidden",
+            "rf-fixed rf-top-0 rf-left-0 rf-w-full rf-h-full rf-bg-white rf-overflow-hidden",
         )}
       >
         <Tabs

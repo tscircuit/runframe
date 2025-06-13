@@ -37,6 +37,8 @@ import { toast } from "lib/utils/toast"
 import { Toaster } from "react-hot-toast"
 import { importComponentFromJlcpcb } from "lib/optional-features/importing/import-component-from-jlcpcb"
 import { useOrderDialogCli } from "../OrderDialog/useOrderDialog"
+import { useAiReviewDialogCli } from "../AiReviewDialog/useAiReviewDialogCli"
+import { hasRegistryToken } from "lib/utils/get-registry-ky"
 
 export const RunframeCliLeftHeader = (props: {
   shouldLoadLatestEval: boolean
@@ -62,6 +64,7 @@ export const RunframeCliLeftHeader = (props: {
   const [isError, setIsError] = useState(false)
   const [isExporting, setisExporting] = useState(false)
   const orderDialog = useOrderDialogCli()
+  const aiReviewDialog = useAiReviewDialogCli()
 
   const pushEvent = useRunFrameStore((state) => state.pushEvent)
   const recentEvents = useRunFrameStore((state) => state.recentEvents)
@@ -179,6 +182,18 @@ export const RunframeCliLeftHeader = (props: {
             disabled={isSaving}
           >
             Import
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="rf-text-xs"
+            onSelect={() => {
+              if (!hasRegistryToken()) {
+                toast.error("Need to sign in to request AI review")
+                return
+              }
+              aiReviewDialog.open()
+            }}
+          >
+            AI Review
           </DropdownMenuItem>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger
@@ -325,6 +340,7 @@ export const RunframeCliLeftHeader = (props: {
         }}
       />
       <Toaster position="top-center" reverseOrder={false} />
+      <aiReviewDialog.AiReviewDialog packageName={snippetName ?? ""} />
       <orderDialog.OrderDialog
         isOpen={orderDialog.isOpen}
         onClose={orderDialog.close}

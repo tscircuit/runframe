@@ -33,6 +33,8 @@ import {
   availableExports,
   exportAndDownload,
 } from "lib/optional-features/exporting/export-and-download"
+import { AiReviewDialog } from "../AiReviewDialog"
+import { hasRegistryToken } from "lib/utils/get-registry-ky"
 import { toast } from "lib/utils/toast"
 import { Toaster } from "react-hot-toast"
 import { importComponentFromJlcpcb } from "lib/optional-features/importing/import-component-from-jlcpcb"
@@ -145,6 +147,7 @@ export const RunframeCliLeftHeader = (props: {
   const circuitJson = useRunFrameStore((state) => state.circuitJson)
 
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
+  const [isAiReviewDialogOpen, setIsAiReviewDialogOpen] = useState(false)
 
   return (
     <>
@@ -179,6 +182,18 @@ export const RunframeCliLeftHeader = (props: {
             disabled={isSaving}
           >
             Import
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="rf-text-xs"
+            onSelect={() => {
+              if (!hasRegistryToken()) {
+                toast.error("Requires tscircuit token")
+                return
+              }
+              setIsAiReviewDialogOpen(true)
+            }}
+          >
+            AI Review
           </DropdownMenuItem>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger
@@ -323,6 +338,11 @@ export const RunframeCliLeftHeader = (props: {
             },
           )
         }}
+      />
+      <AiReviewDialog
+        isOpen={isAiReviewDialogOpen}
+        onClose={() => setIsAiReviewDialogOpen(false)}
+        packageName={snippetName}
       />
       <Toaster position="top-center" reverseOrder={false} />
       <orderDialog.OrderDialog

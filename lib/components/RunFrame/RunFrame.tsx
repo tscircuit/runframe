@@ -183,6 +183,15 @@ export const RunFrame = (props: RunFrameProps) => {
       }
 
       let evalVersion = props.evalVersion ?? "latest"
+      if (!evalVersion || evalVersion === "latest") {
+        try {
+          const pkg = (await import("@tscircuit/eval/package.json"))
+            .default as {
+            version?: string
+          }
+          if (pkg?.version) evalVersion = pkg.version
+        } catch {}
+      }
       if (!globalThis.runFrameWorker && props.forceLatestEvalVersion) {
         // Force latest version by fetching from jsdelivr
         try {
@@ -193,7 +202,6 @@ export const RunFrame = (props: RunFrameProps) => {
             const data = await response.json()
             if (data.tags?.latest) {
               evalVersion = data.tags.latest
-              setLastRunEvalVersion(evalVersion)
             }
           }
         } catch (err) {}

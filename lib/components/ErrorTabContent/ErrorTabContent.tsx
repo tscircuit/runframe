@@ -177,10 +177,9 @@ export const ErrorTabContent = ({
                   style={{ whiteSpace: "pre-wrap" }}
                   className="rf-text-xs rf-font-mono rf-text-red-600 rf-mt-2"
                 >
+                  {evalVersion && `@tscircuit/eval@${evalVersion}\n`}
+                  {softwareUsedString && `${softwareUsedString}\n`}
                   {currentError.stack}
-                  {evalVersion && `\n@tscircuit/eval@${evalVersion}`}
-                  {softwareUsedString &&
-                    `\nsoftware_used_string: ${softwareUsedString}`}
                 </details>
               )}
             </div>
@@ -245,10 +244,9 @@ export const ErrorTabContent = ({
           className="rf-p-1"
           onClick={() => {
             let errorText = `${currentError.type}: ${currentError.message}`
-            if (currentError.stack) errorText += `\n${currentError.stack}`
             if (evalVersion) errorText += `\n@tscircuit/eval@${evalVersion}`
-            if (softwareUsedString)
-              errorText += `\nsoftware_used_string: ${softwareUsedString}`
+            if (softwareUsedString) errorText += `\n${softwareUsedString}`
+            if (currentError.stack) errorText += `\n${currentError.stack}`
             navigator.clipboard.writeText(errorText)
             alert("Error copied to clipboard!")
           }}
@@ -267,10 +265,9 @@ export const ErrorTabContent = ({
 
             const url = createSnippetUrl(code ?? "")
             let errorDetails = `${currentError.type}: ${currentError.message}`
-            if (currentError.stack) errorDetails += `\n${currentError.stack}`
             if (evalVersion) errorDetails += `\n@tscircuit/eval@${evalVersion}`
-            if (softwareUsedString)
-              errorDetails += `\nsoftware_used_string: ${softwareUsedString}`
+            if (softwareUsedString) errorDetails += `\n${softwareUsedString}`
+            if (currentError.stack) errorDetails += `\n${currentError.stack}`
 
             let body = `[Package code to reproduce](${url})\n\n### Error\n\`\`\`\n${errorDetails}\n\`\`\`\n`
 

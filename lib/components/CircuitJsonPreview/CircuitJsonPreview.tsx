@@ -33,6 +33,7 @@ import {
 import { Button } from "../ui/button"
 import { PcbViewerWithContainerHeight } from "../PcbViewerWithContainerHeight"
 import { useStyles } from "lib/hooks/use-styles"
+import { useFullscreenBodyScroll } from "lib/hooks/use-fullscreen-body-scroll"
 import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { capitalizeFirstLetters } from "lib/utils"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
@@ -109,6 +110,7 @@ export const CircuitJsonPreview = ({
     defaultActiveTab ?? "pcb",
   )
   const [isFullScreen, setIsFullScreen] = useState(defaultToFullScreen)
+  useFullscreenBodyScroll(isFullScreen)
   const setActiveTab = useCallback(
     (tab: TabId) => {
       setActiveTabState(tab)
@@ -120,18 +122,6 @@ export const CircuitJsonPreview = ({
   const toggleFullScreen = () => {
     setIsFullScreen(!isFullScreen)
   }
-
-  useEffect(() => {
-    if (isFullScreen) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = ""
-    }
-
-    return () => {
-      document.body.style.overflow = ""
-    }
-  }, [isFullScreen])
 
   useEffect(() => {
     if (errorMessage) {

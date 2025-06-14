@@ -21,6 +21,8 @@ export const ErrorTabContent = ({
   onReportAutoroutingLog,
   errorMessage,
   errorStack,
+  circuitJson,
+  evalVersion,
 }: {
   code?: string
   autoroutingLog?: Record<string, { simpleRouteJson: any }>
@@ -29,6 +31,8 @@ export const ErrorTabContent = ({
   circuitJsonWarnings?: CircuitJsonError[] | null
   errorMessage?: string | null
   errorStack?: string | null
+  circuitJson?: any
+  evalVersion?: string | undefined
   onReportAutoroutingLog?: (
     name: string,
     data: { simpleRouteJson: any },
@@ -59,6 +63,14 @@ export const ErrorTabContent = ({
 
     return errors
   }, [errorMessage, errorStack, circuitJsonErrors])
+
+  const softwareUsedString = useMemo(() => {
+    if (!circuitJson || !Array.isArray(circuitJson)) return undefined
+    const metadata = (circuitJson as any[]).find(
+      (el) => el.type === "source_project_metadata",
+    ) as { software_used_string?: string } | undefined
+    return metadata?.software_used_string
+  }, [circuitJson])
 
   const unifiedWarnings = useMemo<UnifiedError[]>(() => {
     const warnings: UnifiedError[] = []
@@ -160,12 +172,15 @@ export const ErrorTabContent = ({
               <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600">
                 {currentError.message}
               </p>
-              {currentError.stack && (
+              {(currentError.stack || evalVersion || softwareUsedString) && (
                 <details
                   style={{ whiteSpace: "pre-wrap" }}
                   className="rf-text-xs rf-font-mono rf-text-red-600 rf-mt-2"
                 >
                   {currentError.stack}
+                  {evalVersion && `\n@tscircuit/eval@${evalVersion}`}
+                  {softwareUsedString &&
+                    `\nsoftware_used_string: ${softwareUsedString}`}
                 </details>
               )}
             </div>
@@ -229,9 +244,11 @@ export const ErrorTabContent = ({
           variant="outline"
           className="rf-p-1"
           onClick={() => {
-            const errorText = `${currentError.type}: ${currentError.message}${
-              currentError.stack ? "\n" + currentError.stack : ""
-            }`
+            let errorText = `${currentError.type}: ${currentError.message}`
+            if (currentError.stack) errorText += `\n${currentError.stack}`
+            if (evalVersion) errorText += `\n@tscircuit/eval@${evalVersion}`
+            if (softwareUsedString)
+              errorText += `\nsoftware_used_string: ${softwareUsedString}`
             navigator.clipboard.writeText(errorText)
             alert("Error copied to clipboard!")
           }}
@@ -249,7 +266,11 @@ export const ErrorTabContent = ({
               .slice(0, 100)
 
             const url = createSnippetUrl(code ?? "")
-            const errorDetails = `${currentError.type}: ${currentError.message}${currentError.stack ? "\n" + currentError.stack : ""}`
+            let errorDetails = `${currentError.type}: ${currentError.message}`
+            if (currentError.stack) errorDetails += `\n${currentError.stack}`
+            if (evalVersion) errorDetails += `\n@tscircuit/eval@${evalVersion}`
+            if (softwareUsedString)
+              errorDetails += `\nsoftware_used_string: ${softwareUsedString}`
 
             let body = `[Package code to reproduce](${url})\n\n### Error\n\`\`\`\n${errorDetails}\n\`\`\`\n`
 

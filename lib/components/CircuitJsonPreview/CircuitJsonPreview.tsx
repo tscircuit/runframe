@@ -38,6 +38,7 @@ import { capitalizeFirstLetters } from "lib/utils"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
 import { version } from "../../../package.json"
 import type { CircuitJsonError } from "circuit-json"
+import { useRunnerStore } from "../RunFrame/runner-store/use-runner-store"
 import type { Object3D } from "three"
 
 declare global {
@@ -90,6 +91,8 @@ export const CircuitJsonPreview = ({
   activeEffectName,
 }: PreviewContentProps) => {
   useStyles()
+
+  const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
 
   const circuitJsonErrors = useMemo<CircuitJsonError[] | null>(() => {
     if (!circuitJson) return null
@@ -510,6 +513,8 @@ export const CircuitJsonPreview = ({
                   circuitJsonWarnings={circuitJsonWarnings}
                   errorMessage={errorMessage}
                   errorStack={errorStack}
+                  circuitJson={circuitJson}
+                  evalVersion={lastRunEvalVersion}
                   autoroutingLog={autoroutingLog}
                   onReportAutoroutingLog={onReportAutoroutingLog}
                 />

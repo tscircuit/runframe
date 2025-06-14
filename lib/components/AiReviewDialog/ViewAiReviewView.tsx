@@ -16,7 +16,7 @@ export const AiReviewViewView = ({
   // as loading
 
   const [aiReviewText, setAiReviewText] = useState<string | null>(
-    review.ai_review_text,
+    review.ai_review_text ?? null,
   )
 
   const registryKy = getRegistryKy()

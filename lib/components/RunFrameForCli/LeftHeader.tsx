@@ -344,7 +344,11 @@ export const RunframeCliLeftHeader = (props: {
         onClose={() => setIsAiReviewDialogOpen(false)}
         packageName={snippetName}
       />
-      <Toaster position="top-center" reverseOrder={false} />
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{ style: { zIndex: 100000 } }}
+      />
       <orderDialog.OrderDialog
         isOpen={orderDialog.isOpen}
         onClose={orderDialog.close}

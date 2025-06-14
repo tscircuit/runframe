@@ -96,6 +96,7 @@
     "cssnano": "^7.0.6",
     "jscad-fiber": "^0.0.77",
     "lucide-react": "^0.488.0",
+    "marked": "^15.0.12",
     "react-error-boundary": "^6.0.0",
     "react-query": "^3.39.3",
     "schematic-symbols": "^0.0.139",

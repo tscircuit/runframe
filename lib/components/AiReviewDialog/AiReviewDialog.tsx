@@ -1,8 +1,8 @@
 import { useState } from "react"
 import { Dialog, DialogContent } from "../ui/dialog"
 import type { AiReview } from "./types"
-import { AiReviewListStage } from "./list-stage"
-import { AiReviewViewStage } from "./view-stage"
+import { AiReviewListView } from "./ListAiReviewsView"
+import { AiReviewViewView } from "./ViewAiReviewView"
 
 export const AiReviewDialog = ({
   isOpen,
@@ -36,13 +36,13 @@ export const AiReviewDialog = ({
     >
       <DialogContent className="rf-max-w-2xl">
         {stage === "list_reviews" && (
-          <AiReviewListStage
+          <AiReviewListView
             packageName={packageName}
             onSelectReview={handleSelect}
           />
         )}
         {stage === "view_review" && selectedReview && (
-          <AiReviewViewStage
+          <AiReviewViewView
             review={selectedReview}
             onBack={() => setStage("list_reviews")}
           />

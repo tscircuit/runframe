@@ -12,7 +12,7 @@ import { toast } from "lib/utils/toast"
 import type { CircuitJson } from "circuit-json"
 import type { AiReview } from "./types"
 
-export const AiReviewListStage = ({
+export const AiReviewListView = ({
   packageName,
   onSelectReview,
 }: {
@@ -44,10 +44,6 @@ export const AiReviewListStage = ({
       toast.error("Need Circuit JSON to Request AI Review")
       return
     }
-    if (!packageName) {
-      toast.error("Package name unknown")
-      return
-    }
     if (!hasRegistryToken()) {
       toast.error("Missing registry token")
       return
@@ -57,7 +53,7 @@ export const AiReviewListStage = ({
       const { ai_review } = await registryKy
         .post("ai_reviews/create", {
           json: {
-            package_name: packageName,
+            package_name: packageName ?? "unknown",
             fs_map: Object.fromEntries(fsMap),
             circuit_json: circuitJson as CircuitJson,
           },

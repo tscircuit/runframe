@@ -347,6 +347,7 @@ export const RunframeCliLeftHeader = (props: {
       <Toaster
         position="top-center"
         reverseOrder={false}
+        containerStyle={{ zIndex: 100000 }}
         toastOptions={{ style: { zIndex: 100000 } }}
       />
       <orderDialog.OrderDialog

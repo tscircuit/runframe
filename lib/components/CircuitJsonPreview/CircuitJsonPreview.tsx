@@ -33,6 +33,7 @@ import {
 import { Button } from "../ui/button"
 import { PcbViewerWithContainerHeight } from "../PcbViewerWithContainerHeight"
 import { useStyles } from "lib/hooks/use-styles"
+import { useFullscreenBodyScroll } from "lib/hooks/use-fullscreen-body-scroll"
 import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { capitalizeFirstLetters } from "lib/utils"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
@@ -109,6 +110,7 @@ export const CircuitJsonPreview = ({
     defaultActiveTab ?? "pcb",
   )
   const [isFullScreen, setIsFullScreen] = useState(defaultToFullScreen)
+  useFullscreenBodyScroll(isFullScreen)
   const setActiveTab = useCallback(
     (tab: TabId) => {
       setActiveTabState(tab)
@@ -148,7 +150,8 @@ export const CircuitJsonPreview = ({
       <div
         className={cn(
           "rf-md:sticky rf-md:top-2",
-          isFullScreen && "rf-fixed rf-top-0 rf-left-0 rf-w-full rf-bg-white",
+          isFullScreen &&
+            "rf-fixed rf-top-0 rf-left-0 rf-w-full rf-h-full rf-bg-white rf-overflow-hidden",
         )}
       >
         <Tabs

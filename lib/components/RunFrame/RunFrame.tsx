@@ -371,6 +371,7 @@ export const RunFrame = (props: RunFrameProps) => {
       dragTimeout.current = setTimeout(() => {
         // Use the current event if available, otherwise use the last in-progress event
         const eventToSend = event || lastEditEventRef.current
+        incRunCountTrigger(1)
         props.onEditEvent?.(eventToSend)
         lastEditEventRef.current = null
         dragTimeout.current = null

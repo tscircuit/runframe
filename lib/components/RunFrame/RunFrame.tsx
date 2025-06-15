@@ -207,6 +207,7 @@ export const RunFrame = (props: RunFrameProps) => {
           verbose: true,
         }))
       globalThis.runFrameWorker = worker
+      setLastRunEvalVersion(evalVersion)
       props.onRenderStarted?.()
 
       const fsMapObj =

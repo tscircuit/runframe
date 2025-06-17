@@ -36,6 +36,7 @@ import { useStyles } from "lib/hooks/use-styles"
 import { useFullscreenBodyScroll } from "lib/hooks/use-fullscreen-body-scroll"
 import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { capitalizeFirstLetters } from "lib/utils"
+import { useErrorTelemetry } from "lib/hooks/use-error-telemetry"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
 import { version } from "../../../package.json"
 import type { CircuitJsonError } from "circuit-json"
@@ -108,6 +109,12 @@ export const CircuitJsonPreview = ({
       (e) => (e && "warning_type" in e) || e.type.includes("warning"),
     ) as any
   }, [circuitJson])
+
+  useErrorTelemetry({
+    errorMessage,
+    errorStack,
+    circuitJsonErrors,
+  })
 
   const [activeTab, setActiveTabState] = useState<TabId>(
     defaultActiveTab ?? "pcb",

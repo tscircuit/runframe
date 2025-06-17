@@ -4,7 +4,11 @@
   "packageRules": [
     {
       "packagePatterns": ["*"],
-      "excludePackagePatterns": ["@tscircuit/*", "circuit-to-svg", "circuit-json-*"],
+      "excludePackagePatterns": [
+        "@tscircuit/*",
+        "circuit-to-svg",
+        "circuit-json-*"
+      ],
       "enabled": false
     },
     {

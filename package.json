@@ -102,10 +102,11 @@
     "@radix-ui/react-progress": "^1.1.2",
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-tabs": "^1.1.2",
-    "react-error-boundary": "^6.0.0",
-    "marked": "^15.0.12",
+    "clsx": "^2.1.1",
     "comlink": "^4.4.2",
     "cssnano": "^7.0.6",
-    "clsx": "^2.1.1"
+    "marked": "^15.0.12",
+    "posthog-js": "^1.253.4",
+    "react-error-boundary": "^6.0.0"
   }
 }

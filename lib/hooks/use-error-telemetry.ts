@@ -3,9 +3,9 @@ import { posthog } from "lib/utils"
 import type { CircuitJsonError } from "circuit-json"
 
 interface UseErrorTelemetryParams {
-  errorMessage?: string
-  errorStack?: string
-  circuitJsonErrors: CircuitJsonError[] | null
+  errorMessage?: string | null | undefined
+  errorStack?: string | null | undefined
+  circuitJsonErrors?: CircuitJsonError[] | null | undefined
 }
 
 export const useErrorTelemetry = ({

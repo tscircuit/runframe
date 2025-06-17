@@ -32,7 +32,7 @@
   "devDependencies": {
     "@babel/standalone": "^7.26.10",
     "@biomejs/biome": "^1.9.4",
-    "@tscircuit/checks": "^0.0.52",
+    "@tscircuit/checks": "^0.0.53",
     "@tscircuit/eval": "^0.0.231",
     "@tscircuit/fake-snippets": "^0.0.87",
     "@tscircuit/math-utils": "^0.0.18",

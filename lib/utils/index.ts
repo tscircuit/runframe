@@ -8,3 +8,5 @@ export function cn(...inputs: ClassValue[]) {
 export const capitalizeFirstLetters = (str: string) => {
   return str.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
 }
+
+export { posthog } from "./posthog"

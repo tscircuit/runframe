@@ -2,6 +2,7 @@ import { Button } from "lib/components/ui/button"
 import { Loader2 } from "lucide-react"
 import { GitHubLogoIcon } from "@radix-ui/react-icons"
 import { useEffect, useMemo, useState } from "react"
+import { useErrorTelemetry } from "lib/hooks/use-error-telemetry"
 import VendorQuoteCard, { type OrderQuote } from "./VendorQuoteCard"
 import { toast } from "lib/utils/toast"
 import { getWindowVar } from "lib/utils/get-registry-ky"
@@ -43,6 +44,12 @@ export const InitialOrderScreen = ({
 
   // Poll for the order quote status
   const { data: orderQuote } = useOrderQuotePolling(orderQuoteId || undefined)
+
+  const errorMessage =
+    (createOrderQuoteError && (createOrderQuoteError as any).error?.message) ||
+    orderQuote?.error?.message
+
+  useErrorTelemetry({ errorMessage })
 
   const redirectToStripeCheckout = async (orderQuoteId: string) => {
     const stripeCheckoutBaseUrl = getWindowVar(

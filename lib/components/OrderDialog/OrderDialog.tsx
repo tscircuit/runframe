@@ -34,7 +34,7 @@ export const OrderDialog: FC<OrderDialogProps> = ({
           if (!open) onClose()
         }}
       >
-        <DialogContent className="!rf-max-w-[660px] !rf-p-0">
+        <DialogContent className="!rf-max-w-[660px] !rf-p-0 !rf-z-[101]">
           <div className="rf-relative rf-w-full">
             {stage === "initial" && (
               <InitialOrderScreen

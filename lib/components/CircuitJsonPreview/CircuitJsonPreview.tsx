@@ -298,6 +298,16 @@ export const CircuitJsonPreview = ({
                           .join(".")}
                       </div>
                     </DropdownMenuItem>
+                    {lastRunEvalVersion && (
+                      <DropdownMenuItem
+                        disabled
+                        className="rf-opacity-60 rf-cursor-default rf-select-none"
+                      >
+                        <div className="rf-pr-2 rf-text-xs rf-text-gray-500">
+                          @tscircuit/eval@{lastRunEvalVersion}
+                        </div>
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TabsList>

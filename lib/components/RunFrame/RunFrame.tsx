@@ -17,6 +17,7 @@ const debug = Debug("run-frame:RunFrame")
 
 declare global {
   var runFrameWorker: any
+  var runFrameEvalVersion: string | undefined
 }
 
 import {
@@ -88,13 +89,30 @@ export const RunFrame = (props: RunFrameProps) => {
     const load = async () => {
       try {
         if (!globalThis.runFrameWorker) {
+          let evalVersion = props.evalVersion ?? "latest"
+          if (evalVersion === "latest") {
+            try {
+              const response = await fetch(
+                "https://data.jsdelivr.com/v1/package/npm/@tscircuit/eval",
+              )
+              if (response.ok) {
+                const data = await response.json()
+                if (data.tags?.latest) {
+                  evalVersion = data.tags.latest
+                }
+              }
+            } catch (err) {
+              console.error("Failed to fetch latest eval version", err)
+            }
+          }
           const worker = await createCircuitWebWorker({
-            evalVersion: props.evalVersion ?? "latest",
+            evalVersion,
             webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
             verbose: true,
           })
           if (cancelled) return
           globalThis.runFrameWorker = worker
+          globalThis.runFrameEvalVersion = evalVersion
         }
         if (!cancelled) setDependenciesLoaded(true)
       } catch (err) {
@@ -182,9 +200,10 @@ export const RunFrame = (props: RunFrameProps) => {
         cancelled = true
       }
 
-      let evalVersion = props.evalVersion ?? "latest"
-      if (!globalThis.runFrameWorker && props.forceLatestEvalVersion) {
-        // Force latest version by fetching from jsdelivr
+      let evalVersion =
+        globalThis.runFrameEvalVersion ?? props.evalVersion ?? "latest"
+
+      if (evalVersion === "latest" || props.forceLatestEvalVersion) {
         try {
           const response = await fetch(
             "https://data.jsdelivr.com/v1/package/npm/@tscircuit/eval",
@@ -193,10 +212,11 @@ export const RunFrame = (props: RunFrameProps) => {
             const data = await response.json()
             if (data.tags?.latest) {
               evalVersion = data.tags.latest
-              setLastRunEvalVersion(evalVersion)
             }
           }
-        } catch (err) {}
+        } catch (err) {
+          console.error("Failed to fetch latest eval version", err)
+        }
       }
 
       const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
@@ -207,6 +227,7 @@ export const RunFrame = (props: RunFrameProps) => {
           verbose: true,
         }))
       globalThis.runFrameWorker = worker
+      globalThis.runFrameEvalVersion = evalVersion
       setLastRunEvalVersion(evalVersion)
       props.onRenderStarted?.()
 

@@ -45,7 +45,7 @@
     "chokidar-cli": "^3.0.0",
     "circuit-json": "^0.0.213",
     "circuit-json-to-bom-csv": "^0.0.7",
-    "circuit-json-to-gerber": "^0.0.16",
+    "circuit-json-to-gerber": "^0.0.23",
     "circuit-json-to-pnp-csv": "^0.0.6",
     "class-variance-authority": "^0.7.1",
     "concurrently": "^9.1.2",

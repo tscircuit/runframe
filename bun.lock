@@ -22,7 +22,7 @@
       "devDependencies": {
         "@babel/standalone": "^7.26.10",
         "@biomejs/biome": "^1.9.4",
-        "@tscircuit/3d-viewer": "^0.0.277",
+        "@tscircuit/3d-viewer": "^0.0.278",
         "@tscircuit/assembly-viewer": "^0.0.1",
         "@tscircuit/checks": "^0.0.53",
         "@tscircuit/create-snippet-url": "^0.0.8",
@@ -540,7 +540,7 @@
 
     "@ts-morph/common": ["@ts-morph/common@0.22.0", "", { "dependencies": { "fast-glob": "^3.3.2", "minimatch": "^9.0.3", "mkdirp": "^3.0.1", "path-browserify": "^1.0.1" } }, "sha512-HqNBuV/oIlMKdkLshXd1zKBqNQCsuPEsgQOkfFQ/eUKjRlwndXW1AjN9LVkBEIukm00gGXSRmfkl0Wv5VXLnlw=="],
 
-    "@tscircuit/3d-viewer": ["@tscircuit/3d-viewer@0.0.277", "", { "dependencies": { "@jscad/regl-renderer": "^2.6.12", "@jscad/stl-serializer": "^2.1.20", "@react-three/drei": "^9.121.4", "@react-three/fiber": "^8.17.14", "@tscircuit/core": "^0.0.454", "@tscircuit/props": "^0.0.234", "@tscircuit/soup-util": "^0.0.41", "jscad-electronics": "^0.0.29", "jscad-fiber": "^0.0.79", "jscad-planner": "^0.0.13", "manifold-3d": "^3.1.0", "react": "^18.3.1", "react-dom": "^18.3.1", "react-use-gesture": "^9.1.3" }, "peerDependencies": { "three": "*" } }, "sha512-EqoRZjf/8QUVVG0Wv2em2FxZC3a+RlODOsCoaDA0pJkDJ/H9ek7YVfrELnrtLWjqCx0Y9rE5gRlQhXSlIUBRVw=="],
+    "@tscircuit/3d-viewer": ["@tscircuit/3d-viewer@0.0.278", "", { "dependencies": { "@jscad/regl-renderer": "^2.6.12", "@jscad/stl-serializer": "^2.1.20", "@react-three/drei": "^9.121.4", "@react-three/fiber": "^8.17.14", "@tscircuit/core": "^0.0.454", "@tscircuit/props": "^0.0.234", "@tscircuit/soup-util": "^0.0.41", "jscad-electronics": "^0.0.29", "jscad-fiber": "^0.0.79", "jscad-planner": "^0.0.13", "manifold-3d": "^3.1.0", "react": "^18.3.1", "react-dom": "^18.3.1", "react-use-gesture": "^9.1.3" }, "peerDependencies": { "three": "*" } }, "sha512-SaN2tH8+guSOewhgrm5o1pkS6HsmsTE3v3F0kqlwYlm3yjE2FxXNIm7dZgubOty/4/WJJT65RS7kkJrN3FHVHw=="],
 
     "@tscircuit/alphabet": ["@tscircuit/alphabet@0.0.2", "", { "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-vLdnx3iJqBQhnFb7mf5IREemtQYidJzGBtYVvzxd3u1WOwgtXkrj9VY2hDjaPNozMVC4zjKOG87z0SHLO74uAQ=="],
 

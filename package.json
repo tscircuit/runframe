@@ -68,7 +68,7 @@
     "tsup": "^8.3.5",
     "vite": "^6.0.3",
     "yargs": "^17.7.2",
-    "@tscircuit/3d-viewer": "^0.0.279",
+    "@tscircuit/3d-viewer": "^0.0.280",
     "@tscircuit/assembly-viewer": "^0.0.1",
     "@tscircuit/create-snippet-url": "^0.0.8",
     "@tscircuit/file-server": "^0.0.24",

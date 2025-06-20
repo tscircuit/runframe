@@ -75,7 +75,7 @@
     "@tscircuit/footprinter": "^0.0.182",
     "@tscircuit/pcb-viewer": "^1.11.177",
     "@tscircuit/props": "^0.0.238",
-    "@tscircuit/schematic-viewer": "2.0.21",
+    "@tscircuit/schematic-viewer": "2.0.22",
     "circuit-to-svg": "^0.0.155",
     "jscad-fiber": "^0.0.79",
     "lucide-react": "^0.488.0",

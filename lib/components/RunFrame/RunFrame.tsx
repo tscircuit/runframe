@@ -17,6 +17,8 @@ const debug = Debug("run-frame:RunFrame")
 
 declare global {
   var runFrameWorker: any
+  var runFrameEvalVersion: string | undefined
+  var runFrameEvalVersionPromise: Promise<string> | null
 }
 
 import {
@@ -32,6 +34,7 @@ import { useRunnerStore } from "./runner-store/use-runner-store"
 import { useMutex } from "./useMutex"
 import type { ManualEditEvent } from "@tscircuit/props"
 import { hasRegistryToken, registryKy } from "../../utils/get-registry-ky"
+import { resolveEvalVersion } from "../../utils/resolveEvalVersion"
 
 export type { RunFrameProps }
 
@@ -88,13 +91,17 @@ export const RunFrame = (props: RunFrameProps) => {
     const load = async () => {
       try {
         if (!globalThis.runFrameWorker) {
+          let evalVersion = await resolveEvalVersion(
+            props.evalVersion ?? "latest",
+          )
           const worker = await createCircuitWebWorker({
-            evalVersion: props.evalVersion ?? "latest",
+            evalVersion,
             webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
             verbose: true,
           })
           if (cancelled) return
           globalThis.runFrameWorker = worker
+          globalThis.runFrameEvalVersion = evalVersion
         }
         if (!cancelled) setDependenciesLoaded(true)
       } catch (err) {
@@ -182,22 +189,10 @@ export const RunFrame = (props: RunFrameProps) => {
         cancelled = true
       }
 
-      let evalVersion = props.evalVersion ?? "latest"
-      if (!globalThis.runFrameWorker && props.forceLatestEvalVersion) {
-        // Force latest version by fetching from jsdelivr
-        try {
-          const response = await fetch(
-            "https://data.jsdelivr.com/v1/package/npm/@tscircuit/eval",
-          )
-          if (response.ok) {
-            const data = await response.json()
-            if (data.tags?.latest) {
-              evalVersion = data.tags.latest
-              setLastRunEvalVersion(evalVersion)
-            }
-          }
-        } catch (err) {}
-      }
+      let evalVersion = await resolveEvalVersion(
+        globalThis.runFrameEvalVersion ?? props.evalVersion ?? "latest",
+        props.forceLatestEvalVersion,
+      )
 
       const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
         globalThis.runFrameWorker ??
@@ -207,6 +202,7 @@ export const RunFrame = (props: RunFrameProps) => {
           verbose: true,
         }))
       globalThis.runFrameWorker = worker
+      globalThis.runFrameEvalVersion = evalVersion
       setLastRunEvalVersion(evalVersion)
       props.onRenderStarted?.()
 

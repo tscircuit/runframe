@@ -33,7 +33,7 @@
     "@babel/standalone": "^7.26.10",
     "@biomejs/biome": "^1.9.4",
     "@tscircuit/checks": "^0.0.53",
-    "@tscircuit/eval": "^0.0.231",
+    "@tscircuit/eval": "^0.0.236",
     "@tscircuit/fake-snippets": "^0.0.87",
     "@tscircuit/math-utils": "^0.0.18",
     "@types/bun": "latest",
@@ -80,7 +80,7 @@
     "jscad-fiber": "^0.0.79",
     "lucide-react": "^0.488.0",
     "react-query": "^3.39.3",
-    "schematic-symbols": "^0.0.139",
+    "schematic-symbols": "^0.0.162",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7"
   },

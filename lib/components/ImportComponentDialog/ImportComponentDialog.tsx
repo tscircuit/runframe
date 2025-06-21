@@ -1,14 +1,13 @@
 import * as React from "react"
 import { useState, useEffect } from "react"
 import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-} from "../ui/alert-dialog"
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "../ui/dialog"
 import { Button } from "../ui/button"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs"
 import { Loader2, Search, ExternalLink } from "lucide-react"
@@ -164,14 +163,14 @@ export const ImportComponentDialog = ({
   }
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={() => onClose()}>
-      <AlertDialogContent className="rf-max-w-3xl rf-w-full rf-max-h-[90vh] rf-overflow-y-auto rf-flex rf-flex-col">
-        <AlertDialogHeader>
-          <AlertDialogTitle>Import Component</AlertDialogTitle>
-          <AlertDialogDescription>
+    <Dialog open={isOpen} onOpenChange={() => onClose()}>
+      <DialogContent className="rf-max-w-3xl rf-w-full rf-max-h-[90vh] rf-overflow-y-auto rf-flex rf-flex-col">
+        <DialogHeader>
+          <DialogTitle>Import Component</DialogTitle>
+          <DialogDescription>
             Search for components from tscircuit.com or JLCPCB parts library.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
+          </DialogDescription>
+        </DialogHeader>
 
         <Tabs
           value={activeTab}
@@ -263,8 +262,10 @@ export const ImportComponentDialog = ({
           </div>
         </Tabs>
 
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
           <Button
             onClick={() => {
               if (selectedComponent) {
@@ -276,16 +277,16 @@ export const ImportComponentDialog = ({
           >
             Import Component
           </Button>
-        </AlertDialogFooter>
-      </AlertDialogContent>
+        </DialogFooter>
+      </DialogContent>
 
       {/* Component Details Dialog */}
-      <AlertDialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <AlertDialogContent className="rf-max-w-5xl rf-max-h-[90vh] rf-overflow-hidden rf-flex rf-flex-col rf-overflow-y-auto">
-          <AlertDialogHeader className="rf-pb-4 rf-border-b">
+      <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+        <DialogContent className="rf-max-w-5xl rf-max-h-[90vh] rf-overflow-hidden rf-flex rf-flex-col rf-overflow-y-auto">
+          <DialogHeader className="rf-pb-4 rf-border-b">
             <div className="rf-flex rf-items-start rf-justify-between rf-gap-4">
               <div className="rf-flex-1 rf-min-w-0">
-                <AlertDialogTitle className="rf-text-xl rf-font-semibold rf-truncate">
+                <DialogTitle className="rf-text-xl rf-font-semibold rf-truncate">
                   <a
                     href={`https://tscircuit.com/${detailsComponent?.owner}/${detailsComponent?.name}`}
                     target="_blank"
@@ -295,10 +296,10 @@ export const ImportComponentDialog = ({
                     {detailsComponent?.name?.split("/").pop() ||
                       detailsComponent?.name}
                   </a>
-                </AlertDialogTitle>
+                </DialogTitle>
               </div>
             </div>
-          </AlertDialogHeader>
+          </DialogHeader>
 
           <div className="rf-flex-1 rf-overflow-y-auto rf-py-4 rf-space-y-6">
             {/* Component Information */}
@@ -460,7 +461,7 @@ export const ImportComponentDialog = ({
             )}
           </div>
 
-          <AlertDialogFooter className="rf-pt-4 rf-border-t rf-flex rf-justify-between rf-items-center">
+          <DialogFooter className="rf-pt-4 rf-border-t rf-flex rf-justify-between rf-items-center">
             <div className="rf-flex-1">
               <Button
                 variant="outline"
@@ -476,9 +477,9 @@ export const ImportComponentDialog = ({
               </Button>
             </div>
             <div className="rf-flex rf-gap-2">
-              <AlertDialogCancel onClick={() => setDetailsOpen(false)}>
+              <Button variant="outline" onClick={() => setDetailsOpen(false)}>
                 Close
-              </AlertDialogCancel>
+              </Button>
               <Button
                 onClick={() => {
                   setDetailsOpen(false)
@@ -492,9 +493,9 @@ export const ImportComponentDialog = ({
                 Import Component
               </Button>
             </div>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </AlertDialog>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Dialog>
   )
 }

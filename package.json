@@ -50,7 +50,7 @@
     "class-variance-authority": "^0.7.1",
     "concurrently": "^9.1.2",
     "debug": "^4.4.0",
-    "easyeda": "^0.0.142",
+    "easyeda": "^0.0.185",
     "jszip": "^3.10.1",
     "ky": "^1.7.5",
     "playwright": "^1.49.1",

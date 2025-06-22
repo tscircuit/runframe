@@ -45,7 +45,7 @@
         "circuit-json-to-bom-csv": "^0.0.7",
         "circuit-json-to-gerber": "^0.0.23",
         "circuit-json-to-pnp-csv": "^0.0.7",
-        "circuit-to-svg": "^0.0.155",
+        "circuit-to-svg": "^0.0.157",
         "class-variance-authority": "^0.7.1",
         "concurrently": "^9.1.2",
         "debug": "^4.4.0",

@@ -155,11 +155,14 @@ export const CircuitJsonPreview = ({
 
   return (
     <div
-      className={cn("flex flex-col relative rf-overflow-x-hidden", className)}
+      className={cn(
+        "flex flex-col relative rf-overflow-x-hidden rf-h-full",
+        className,
+      )}
     >
       <div
         className={cn(
-          "rf-md:sticky rf-md:top-2",
+          "rf-md:sticky rf-md:top-2 rf-h-full",
           isFullScreen &&
             "rf-fixed rf-top-0 rf-left-0 rf-w-full rf-h-full rf-bg-white rf-overflow-hidden",
         )}
@@ -167,7 +170,7 @@ export const CircuitJsonPreview = ({
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab as any}
-          className="rf-flex-grow rf-flex rf-flex-col"
+          className="rf-flex-grow rf-flex rf-flex-col rf-h-full"
         >
           <div
             className={cn(
@@ -334,7 +337,7 @@ export const CircuitJsonPreview = ({
             <div
               className={cn(
                 "rf-overflow-hidden",
-                isFullScreen ? "rf-h-[calc(100vh-52px)]" : "rf-h-[620px]",
+                isFullScreen ? "rf-h-[calc(100vh-52px)]" : "rf-h-full",
               )}
             >
               <ErrorBoundary
@@ -392,7 +395,7 @@ export const CircuitJsonPreview = ({
             <div
               className={cn(
                 "rf-overflow-auto",
-                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-full",
               )}
             >
               <ErrorBoundary fallback={<div>Error loading Assembly</div>}>
@@ -415,7 +418,7 @@ export const CircuitJsonPreview = ({
             <div
               className={cn(
                 "rf-overflow-auto rf-bg-white",
-                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-full",
               )}
             >
               <ErrorBoundary
@@ -455,7 +458,7 @@ export const CircuitJsonPreview = ({
             <div
               className={cn(
                 "rf-overflow-auto",
-                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-full",
               )}
             >
               <ErrorBoundary FallbackComponent={ErrorFallback}>
@@ -476,7 +479,7 @@ export const CircuitJsonPreview = ({
             <div
               className={cn(
                 "rf-overflow-auto",
-                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-full",
               )}
             >
               <ErrorBoundary
@@ -505,7 +508,7 @@ export const CircuitJsonPreview = ({
             <div
               className={cn(
                 "rf-overflow-auto",
-                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-full",
               )}
             >
               <ErrorBoundary fallback={<div>Error loading JSON viewer</div>}>
@@ -521,7 +524,7 @@ export const CircuitJsonPreview = ({
             <div
               className={cn(
                 "rf-overflow-auto",
-                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-[620px]",
+                isFullScreen ? "rf-h-[calc(100vh-96px)]" : "rf-h-full",
               )}
             >
               {errorMessage ||

@@ -119,6 +119,7 @@ export const CircuitJsonPreview = ({
   const [activeTab, setActiveTabState] = useState<TabId>(
     defaultActiveTab ?? "pcb",
   )
+  const [lastActiveTab, setLastActiveTab] = useState<TabId | null>(null)
   const [isFullScreen, setIsFullScreen] = useState(defaultToFullScreen)
   useFullscreenBodyScroll(isFullScreen)
   const setActiveTab = useCallback(
@@ -135,6 +136,9 @@ export const CircuitJsonPreview = ({
 
   useEffect(() => {
     if (errorMessage) {
+      if (activeTab !== "errors") {
+        setLastActiveTab(activeTab)
+      }
       setActiveTab("errors")
     }
   }, [errorMessage])
@@ -145,7 +149,7 @@ export const CircuitJsonPreview = ({
       circuitJson &&
       !errorMessage
     ) {
-      setActiveTab(defaultActiveTab ?? "pcb")
+      setActiveTab(lastActiveTab ?? defaultActiveTab ?? "pcb")
     }
   }, [circuitJson])
 

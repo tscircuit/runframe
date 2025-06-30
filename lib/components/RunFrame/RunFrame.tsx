@@ -31,7 +31,7 @@ import type { RunFrameProps } from "./RunFrameProps"
 import { useRunnerStore } from "./runner-store/use-runner-store"
 import { useMutex } from "./useMutex"
 import type { ManualEditEvent } from "@tscircuit/props"
-import { hasRegistryToken, registryKy } from "../../utils/get-registry-ky"
+import { registryKy } from "../../utils/get-registry-ky"
 
 const fetchLatestEvalVersion = async () => {
   try {
@@ -54,8 +54,13 @@ const resolveEvalVersion = async (
 ) => {
   if (evalVersionProp) return evalVersionProp
   if (forceLatest) {
+    if (window.TSCIRCUIT_LATEST_EVAL_VERSION)
+      return window.TSCIRCUIT_LATEST_EVAL_VERSION
     const latest = await fetchLatestEvalVersion()
-    if (latest) return latest
+    if (latest) {
+      window.TSCIRCUIT_LATEST_EVAL_VERSION = latest
+      return latest
+    }
   }
   return "latest"
 }
@@ -238,8 +243,6 @@ export const RunFrame = (props: RunFrameProps) => {
       const fsMapObj =
         fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap
 
-      const renderIds = new Set<string>()
-      const startRenderTime = Date.now()
       let lastRenderLogSet = Date.now()
       worker.on("asyncEffect:start", (event: any) => {
         const id = `${event.phase}|${event.componentDisplayName ?? ""}|${event.effectName}`

@@ -124,5 +124,9 @@ declare global {
      * Registry authentication token
      */
     TSCIRCUIT_REGISTRY_TOKEN: string | null
+    /**
+     * The version of the eval package to use
+     */
+    TSCIRCUIT_LATEST_EVAL_VERSION: string | null
   }
 }

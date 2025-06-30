@@ -31,7 +31,39 @@ import type { RunFrameProps } from "./RunFrameProps"
 import { useRunnerStore } from "./runner-store/use-runner-store"
 import { useMutex } from "./useMutex"
 import type { ManualEditEvent } from "@tscircuit/props"
-import { hasRegistryToken, registryKy } from "../../utils/get-registry-ky"
+import { registryKy } from "../../utils/get-registry-ky"
+
+const fetchLatestEvalVersion = async () => {
+  try {
+    const response = await fetch(
+      "https://data.jsdelivr.com/v1/package/npm/@tscircuit/eval",
+    )
+    if (response.ok) {
+      const data = await response.json()
+      return data.tags?.latest as string | undefined
+    }
+  } catch (err) {
+    console.error("Failed to fetch latest eval version", err)
+  }
+  return undefined
+}
+
+const resolveEvalVersion = async (
+  evalVersionProp?: string,
+  forceLatest?: boolean,
+) => {
+  if (evalVersionProp) return evalVersionProp
+  if (forceLatest) {
+    if (window.TSCIRCUIT_LATEST_EVAL_VERSION)
+      return window.TSCIRCUIT_LATEST_EVAL_VERSION
+    const latest = await fetchLatestEvalVersion()
+    if (latest) {
+      window.TSCIRCUIT_LATEST_EVAL_VERSION = latest
+      return latest
+    }
+  }
+  return "latest"
+}
 
 export type { RunFrameProps }
 
@@ -88,13 +120,19 @@ export const RunFrame = (props: RunFrameProps) => {
     const load = async () => {
       try {
         if (!globalThis.runFrameWorker) {
+          const evalVersion = await resolveEvalVersion(
+            props.evalVersion,
+            props.forceLatestEvalVersion,
+          )
+
           const worker = await createCircuitWebWorker({
-            evalVersion: props.evalVersion ?? "latest",
+            evalVersion,
             webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
             verbose: true,
           })
           if (cancelled) return
           globalThis.runFrameWorker = worker
+          setLastRunEvalVersion(evalVersion)
         }
         if (!cancelled) setDependenciesLoaded(true)
       } catch (err) {
@@ -105,7 +143,11 @@ export const RunFrame = (props: RunFrameProps) => {
     return () => {
       cancelled = true
     }
-  }, [props.evalVersion, props.evalWebWorkerBlobUrl])
+  }, [
+    props.evalVersion,
+    props.evalWebWorkerBlobUrl,
+    props.forceLatestEvalVersion,
+  ])
 
   const [renderLog, setRenderLog] = useState<RenderLog | null>(null)
   const [autoroutingLog, setAutoroutingLog] = useState<Record<string, any>>({})
@@ -182,22 +224,10 @@ export const RunFrame = (props: RunFrameProps) => {
         cancelled = true
       }
 
-      let evalVersion = props.evalVersion ?? "latest"
-      if (!globalThis.runFrameWorker && props.forceLatestEvalVersion) {
-        // Force latest version by fetching from jsdelivr
-        try {
-          const response = await fetch(
-            "https://data.jsdelivr.com/v1/package/npm/@tscircuit/eval",
-          )
-          if (response.ok) {
-            const data = await response.json()
-            if (data.tags?.latest) {
-              evalVersion = data.tags.latest
-              setLastRunEvalVersion(evalVersion)
-            }
-          }
-        } catch (err) {}
-      }
+      const evalVersion = await resolveEvalVersion(
+        props.evalVersion,
+        !globalThis.runFrameWorker && props.forceLatestEvalVersion,
+      )
 
       const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
         globalThis.runFrameWorker ??
@@ -213,8 +243,6 @@ export const RunFrame = (props: RunFrameProps) => {
       const fsMapObj =
         fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap
 
-      const renderIds = new Set<string>()
-      const startRenderTime = Date.now()
       let lastRenderLogSet = Date.now()
       worker.on("asyncEffect:start", (event: any) => {
         const id = `${event.phase}|${event.componentDisplayName ?? ""}|${event.effectName}`

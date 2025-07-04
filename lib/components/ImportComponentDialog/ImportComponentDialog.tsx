@@ -98,9 +98,6 @@ export const ImportComponentDialog = ({
     // Determine search type based on query format
     // If query starts with C and followed by numbers, assume it's a JLC part number
     const isJlcPartNumber = /^C\d+/.test(searchQuery)
-    if (isJlcPartNumber) {
-      setActiveTab("jlcpcb")
-    }
 
     try {
       if (activeTab === "jlcpcb") {

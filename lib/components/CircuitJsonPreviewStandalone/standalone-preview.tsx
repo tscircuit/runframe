@@ -18,11 +18,13 @@ declare global {
 const root = createRoot(document.getElementById("root")!)
 
 root.render(
-  <CircuitJsonPreview
-    defaultActiveTab={"cad"}
-    autoRotate3dViewerDisabled={true}
-    showRightHeaderContent={false}
-    circuitJson={window.CIRCUIT_JSON || {}}
-    {...(window.CIRCUIT_JSON_PREVIEW_PROPS || {})}
-  />,
+  <div style={{ height: "100vh" }}>
+    <CircuitJsonPreview
+      defaultActiveTab={"cad"}
+      autoRotate3dViewerDisabled={true}
+      showRightHeaderContent={false}
+      circuitJson={window.CIRCUIT_JSON || {}}
+      {...(window.CIRCUIT_JSON_PREVIEW_PROPS || {})}
+    />
+  </div>,
 )

@@ -135,13 +135,13 @@ export const CircuitJsonPreview = ({
   }
 
   useEffect(() => {
-    if (errorMessage) {
+    if (errorMessage || circuitJsonErrors?.length) {
       if (activeTab !== "errors") {
         setLastActiveTab(activeTab)
       }
       setActiveTab("errors")
     }
-  }, [errorMessage])
+  }, [errorMessage, circuitJsonErrors])
 
   useEffect(() => {
     if (

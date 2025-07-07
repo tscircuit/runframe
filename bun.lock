@@ -29,7 +29,7 @@
         "@tscircuit/eval": "^0.0.247",
         "@tscircuit/fake-snippets": "^0.0.87",
         "@tscircuit/file-server": "^0.0.24",
-        "@tscircuit/footprinter": "^0.0.187",
+        "@tscircuit/footprinter": "^0.0.192",
         "@tscircuit/math-utils": "^0.0.18",
         "@tscircuit/pcb-viewer": "^1.11.177",
         "@tscircuit/props": "^0.0.251",
@@ -564,7 +564,7 @@
 
     "@tscircuit/file-server": ["@tscircuit/file-server@0.0.24", "", { "dependencies": { "winterspec": "^0.0.86", "zod": "^3.23.8", "zustand": "^4.5.5", "zustand-hoist": "^2.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "bin": { "file-server": "dist/cli.js" } }, "sha512-brJF94eQsgh2sA29LRn9USIhKlbwWrq8APCk24MyTszfXj1WzcvdL5memMEkAp3s+qWYoRJLRYjlJ9EN6t3kdw=="],
 
-    "@tscircuit/footprinter": ["@tscircuit/footprinter@0.0.187", "", { "dependencies": { "@tscircuit/mm": "^0.0.8", "zod": "^3.23.8" }, "peerDependencies": { "circuit-json": "*" } }, "sha512-7MFS/qq4o8WKecQSSwG06++EftxRAEcmSV1rV9FqOmMvEi7oMZ3zOETIKcT26T9Y/H5zEPUtCYkRVRppPo6h0Q=="],
+    "@tscircuit/footprinter": ["@tscircuit/footprinter@0.0.192", "", { "dependencies": { "@tscircuit/mm": "^0.0.8", "zod": "^3.23.8" }, "peerDependencies": { "circuit-json": "*" } }, "sha512-scz6CXHvy77a2Cy7+9pFQgzlOaDJHYw8D1UbzbfVhcPLFL6tY3vzna1eVsad5D6rggYaW+M3cIeETZB8M/eTHQ=="],
 
     "@tscircuit/infgrid-ijump-astar": ["@tscircuit/infgrid-ijump-astar@0.0.33", "", {}, "sha512-tmX4Esp+HqyIGCUD43steVUH8pKRuyBNs21r4NlApGGLu+K1XSrK9FinhVJyMiEsuwJdajLnMTzmVt8vSYSafA=="],
 

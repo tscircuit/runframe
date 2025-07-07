@@ -57,6 +57,8 @@ const dropdownMenuItems = [
   "render_log",
 ]
 
+const WHITELISTED_ERROR_TYPES = ["source_failed_to_create_component_error"]
+
 export type { PreviewContentProps, TabId }
 
 export const CircuitJsonPreview = ({
@@ -135,13 +137,18 @@ export const CircuitJsonPreview = ({
   }
 
   useEffect(() => {
-    if (errorMessage || circuitJsonErrors?.length) {
+    if (
+      errorMessage ||
+      circuitJsonErrors?.some((e) =>
+        WHITELISTED_ERROR_TYPES.includes(e.error_type),
+      )
+    ) {
       if (activeTab !== "errors") {
         setLastActiveTab(activeTab)
       }
       setActiveTab("errors")
     }
-  }, [errorMessage, circuitJsonErrors])
+  }, [errorMessage, circuitJsonErrors, activeTab, setActiveTab])
 
   useEffect(() => {
     if (

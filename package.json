@@ -77,7 +77,7 @@
     "@tscircuit/props": "^0.0.253",
     "@tscircuit/schematic-viewer": "2.0.23",
     "circuit-to-svg": "^0.0.166",
-    "jscad-fiber": "^0.0.79",
+    "jscad-fiber": "^0.0.80",
     "lucide-react": "^0.488.0",
     "react-query": "^3.39.3",
     "schematic-symbols": "^0.0.162",

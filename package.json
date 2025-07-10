@@ -35,7 +35,7 @@
     "@tscircuit/checks": "^0.0.54",
     "@tscircuit/eval": "^0.0.251",
     "@tscircuit/fake-snippets": "^0.0.87",
-    "@tscircuit/math-utils": "^0.0.18",
+    "@tscircuit/math-utils": "^0.0.19",
     "@types/bun": "latest",
     "@types/debug": "^4.1.12",
     "@types/react": "18",

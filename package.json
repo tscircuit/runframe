@@ -16,7 +16,7 @@
   "scripts": {
     "start": "bun run build:css && concurrently 'bun run cosmos' 'bun run build:css:watch'",
     "build": "bun run build:css && bun run build:standalone && bun run build:standalone-preview && bun run build:lib",
-    "build:lib": "tsup-node lib/preview.ts lib/runner.ts --platform browser --format esm --dts",
+    "build:lib": "tsup-node lib/preview.ts lib/runner.ts --external react-query schematic-symbols lucide-react circuit-to-svg @tscircuit/props jscad-fiber --platform browser --format esm --dts",
     "build:css": "bun run scripts/build-css.ts",
     "build:css:watch": "chokidar 'lib/components/**/*.tsx' -c 'bun run build:css'",
     "build:site": "cosmos-export && bun run build:iframe",
@@ -98,15 +98,5 @@
     "marked": "^15.0.12",
     "posthog-js": "^1.253.4",
     "react-error-boundary": "^6.0.0"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0",
-    "react-query": "*",
-    "schematic-symbols": "*",
-    "lucide-react": "*",
-    "circuit-to-svg": "*",
-    "@tscircuit/props": "*",
-    "jscad-fiber": "*"
-  },
-  "dependencies": {}
+  }
 }

@@ -27,7 +27,8 @@
     "format:check": "biome format .",
     "format": "biome format --write .",
     "vercel-build": "bun run build:css && cosmos-export",
-    "serve:cosmos": "serve cosmos-export"
+    "serve:cosmos": "serve cosmos-export",
+    "pkg-pr-new-release": "bunx pkg-pr-new publish --comment=off --peerDeps"
   },
   "devDependencies": {
     "@babel/standalone": "^7.26.10",

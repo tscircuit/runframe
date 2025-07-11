@@ -82,18 +82,7 @@
     "react-query": "^3.39.3",
     "schematic-symbols": "^0.0.162",
     "tailwind-merge": "^2.6.0",
-    "tailwindcss-animate": "^1.0.7"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0",
-    "react-query": "*",
-    "schematic-symbols": "*",
-    "lucide-react": "*",
-    "circuit-to-svg": "*",
-    "@tscircuit/props": "*",
-    "jscad-fiber": "*"
-  },
-  "dependencies": {
+    "tailwindcss-animate": "^1.0.7",
     "@radix-ui/react-alert-dialog": "^1.1.6",
     "@radix-ui/react-checkbox": "^1.1.4",
     "@radix-ui/react-dialog": "^1.1.11",
@@ -108,5 +97,15 @@
     "marked": "^15.0.12",
     "posthog-js": "^1.253.4",
     "react-error-boundary": "^6.0.0"
-  }
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0",
+    "react-query": "*",
+    "schematic-symbols": "*",
+    "lucide-react": "*",
+    "circuit-to-svg": "*",
+    "@tscircuit/props": "*",
+    "jscad-fiber": "*"
+  },
+  "dependencies": {}
 }

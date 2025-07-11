@@ -16,7 +16,7 @@
   "scripts": {
     "start": "bun run build:css && concurrently 'bun run cosmos' 'bun run build:css:watch'",
     "build": "bun run build:css && bun run build:standalone && bun run build:standalone-preview && bun run build:lib",
-    "build:lib": "tsup-node lib/preview.ts lib/runner.ts --platform browser --format esm --dts",
+    "build:lib": "tsup-node lib/preview.ts lib/runner.ts --external react-query schematic-symbols lucide-react circuit-to-svg @tscircuit/props jscad-fiber --platform browser --format esm --dts",
     "build:css": "bun run scripts/build-css.ts",
     "build:css:watch": "chokidar 'lib/components/**/*.tsx' -c 'bun run build:css'",
     "build:site": "cosmos-export && bun run build:iframe",
@@ -27,7 +27,8 @@
     "format:check": "biome format .",
     "format": "biome format --write .",
     "vercel-build": "bun run build:css && cosmos-export",
-    "serve:cosmos": "serve cosmos-export"
+    "serve:cosmos": "serve cosmos-export",
+    "pkg-pr-new-release": "bunx pkg-pr-new publish --comment=off --peerDeps"
   },
   "devDependencies": {
     "@babel/standalone": "^7.26.10",
@@ -82,18 +83,7 @@
     "react-query": "^3.39.3",
     "schematic-symbols": "^0.0.162",
     "tailwind-merge": "^2.6.0",
-    "tailwindcss-animate": "^1.0.7"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0",
-    "react-query": "*",
-    "schematic-symbols": "*",
-    "lucide-react": "*",
-    "circuit-to-svg": "*",
-    "@tscircuit/props": "*",
-    "jscad-fiber": "*"
-  },
-  "dependencies": {
+    "tailwindcss-animate": "^1.0.7",
     "@radix-ui/react-alert-dialog": "^1.1.6",
     "@radix-ui/react-checkbox": "^1.1.4",
     "@radix-ui/react-dialog": "^1.1.11",

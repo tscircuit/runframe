@@ -14,7 +14,7 @@ interface TscircuitSnippet {
 }
 
 interface TscircuitSearchResponse {
-  snippets: TscircuitSnippet[]
+  packages: TscircuitSnippet[]
 }
 
 /**
@@ -33,7 +33,7 @@ export const searchTscircuitComponents = async (
 
     // Make the API request
     const response = await fetch(
-      `https://registry-api.tscircuit.com/snippets/search?q=${encodedQuery}&limit=${limit}`,
+      `https://registry-api.tscircuit.com/packages/search?query=${encodedQuery}`,
     )
 
     if (!response.ok) {
@@ -43,7 +43,7 @@ export const searchTscircuitComponents = async (
     }
 
     const data: TscircuitSearchResponse = await response.json()
-    return data.snippets || []
+    return data.packages || []
   } catch (error) {
     console.error("Error searching tscircuit components:", error)
     throw error

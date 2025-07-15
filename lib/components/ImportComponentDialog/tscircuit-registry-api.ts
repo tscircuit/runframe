@@ -2,31 +2,27 @@
  * tscircuit Registry API service for fetching component data from the tscircuit registry API
  */
 
-interface TscircuitSnippet {
-  snippet_id: string
-  package_release_id: string
+interface TscircuitPackage {
+  package_id: string
+  latest_package_release_id: string
   unscoped_name: string
   name: string
-  owner_name: string
-  code: string
+  owner_github_username: string
   description?: string
-  preview_url?: string
 }
 
 interface TscircuitSearchResponse {
-  packages: TscircuitSnippet[]
+  packages: TscircuitPackage[]
 }
 
 /**
  * Search for components in the tscircuit registry
  * @param query Search query string
- * @param limit Maximum number of results to return (default: 10)
  * @returns Promise with search results
  */
 export const searchTscircuitComponents = async (
   query: string,
-  limit = 10,
-): Promise<TscircuitSnippet[]> => {
+): Promise<TscircuitPackage[]> => {
   try {
     // Encode the query parameters
     const encodedQuery = encodeURIComponent(query)
@@ -52,23 +48,21 @@ export const searchTscircuitComponents = async (
 
 /**
  * Map tscircuit component data to the ComponentSearchResult format used in the ImportComponentDialog
- * @param tscircuitSnippet tscircuit component data
+ * @param tscircuitPackage tscircuit component data
  * @returns Formatted component data for the UI
  */
 export const mapTscircuitSnippetToSearchResult = (
-  tscircuitSnippet: TscircuitSnippet,
+  tscircuitPackage: TscircuitPackage,
 ) => {
   return {
-    id: `tscircuit-${tscircuitSnippet.snippet_id}`,
-    name: tscircuitSnippet.unscoped_name,
+    id: `tscircuit-${tscircuitPackage.package_id}`,
+    name: tscircuitPackage.unscoped_name,
     description:
-      tscircuitSnippet.description ||
-      `Component by ${tscircuitSnippet.owner_name}`,
+      tscircuitPackage.description ||
+      `Component by ${tscircuitPackage.owner_github_username}`,
     source: "tscircuit.com" as const,
-    partNumber: tscircuitSnippet.name,
-    previewUrl: tscircuitSnippet.preview_url,
+    partNumber: tscircuitPackage.name,
     // Additional tscircuit-specific properties
-    code: tscircuitSnippet.code,
-    owner: tscircuitSnippet.owner_name,
+    owner: tscircuitPackage.owner_github_username,
   }
 }

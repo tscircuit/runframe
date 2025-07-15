@@ -29,6 +29,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
 } from "../ui/dropdown-menu"
 import { Button } from "../ui/button"
 import { PcbViewerWithContainerHeight } from "../PcbViewerWithContainerHeight"
@@ -38,7 +42,6 @@ import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { capitalizeFirstLetters } from "lib/utils"
 import { useErrorTelemetry } from "lib/hooks/use-error-telemetry"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
-import { version } from "../../../package.json"
 import type { CircuitJsonError } from "circuit-json"
 import { useRunnerStore } from "../RunFrame/runner-store/use-runner-store"
 import type { Object3D } from "three"
@@ -95,6 +98,19 @@ export const CircuitJsonPreview = ({
   useStyles()
 
   const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
+
+  const [evalVersions, setEvalVersions] = useState<string[]>([])
+
+  useEffect(() => {
+    fetch("https://data.jsdelivr.com/v1/package/npm/@tscircuit/eval")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data?.versions)) {
+          setEvalVersions(data.versions.slice(0, 20))
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   const circuitJsonErrors = useMemo<CircuitJsonError[] | null>(() => {
     if (!circuitJson) return null
@@ -291,20 +307,26 @@ export const CircuitJsonPreview = ({
                           )}
                       </DropdownMenuItem>
                     ))}
-                    <DropdownMenuItem
-                      disabled
-                      className="rf-opacity-60 rf-cursor-default rf-select-none"
-                    >
-                      <div className="rf-pr-2 rf-text-xs rf-text-gray-500">
-                        @tscircuit/runframe@
-                        {version
-                          .split(".")
-                          .map((part, i) =>
-                            i === 2 ? parseInt(part) + 1 : part,
-                          )
-                          .join(".")}
-                      </div>
-                    </DropdownMenuItem>
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger className="rf-text-xs">
+                        Eval Version
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuPortal>
+                        <DropdownMenuSubContent className="rf-*:text-xs">
+                          {evalVersions.map((v) => (
+                            <DropdownMenuItem
+                              key={v}
+                              onSelect={() => {
+                                ;(window as any).TSCIRCUIT_LATEST_EVAL_VERSION =
+                                  v
+                              }}
+                            >
+                              {v}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuSubContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenuSub>
                     {lastRunEvalVersion && (
                       <DropdownMenuItem
                         disabled

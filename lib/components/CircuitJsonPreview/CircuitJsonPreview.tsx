@@ -319,7 +319,8 @@ export const CircuitJsonPreview = ({
                             <DropdownMenuItem
                               key={v}
                               onSelect={() => {
-                                ;(window as any).TSCIRCUIT_LATEST_EVAL_VERSION = v
+                                ;(window as any).TSCIRCUIT_LATEST_EVAL_VERSION =
+                                  v
                                 setLastRunEvalVersion(v)
                               }}
                             >
@@ -337,7 +338,9 @@ export const CircuitJsonPreview = ({
                         @tscircuit/runframe@
                         {version
                           .split(".")
-                          .map((part, i) => (i === 2 ? parseInt(part) + 1 : part))
+                          .map((part, i) =>
+                            i === 2 ? parseInt(part) + 1 : part,
+                          )
                           .join(".")}
                       </div>
                     </DropdownMenuItem>

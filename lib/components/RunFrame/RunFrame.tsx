@@ -152,7 +152,7 @@ export const RunFrame = (props: RunFrameProps) => {
   const [renderLog, setRenderLog] = useState<RenderLog | null>(null)
   const [autoroutingLog, setAutoroutingLog] = useState<Record<string, any>>({})
   const [activeTab, setActiveTab] = useState<TabId>(
-    props.defaultActiveTab ?? "pcb",
+    props.defaultActiveTab ?? props.defaultTab ?? "pcb",
   )
   useEffect(() => {
     if (props.debug) Debug.enable("run-frame*")
@@ -452,7 +452,9 @@ export const RunFrame = (props: RunFrameProps) => {
   return (
     <CircuitJsonPreview
       code={fsMap.get(props.entrypoint ?? props.mainComponentPath)}
-      defaultActiveTab={props.defaultActiveTab}
+      defaultActiveTab={props.defaultActiveTab ?? props.defaultTab}
+      defaultTab={props.defaultTab}
+      availableTabs={props.availableTabs}
       showToggleFullScreen={props.showToggleFullScreen}
       autoroutingGraphics={autoroutingGraphics}
       autoroutingLog={autoroutingLog}

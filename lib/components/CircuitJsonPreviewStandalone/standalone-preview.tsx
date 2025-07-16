@@ -10,6 +10,8 @@ declare global {
     CIRCUIT_JSON_PREVIEW_PROPS?: {
       autoRotate3dViewerDisabled?: boolean
       defaultActiveTab?: TabId
+      defaultTab?: TabId
+      availableTabs?: TabId[]
       showRightHeaderContent?: boolean
     }
   }

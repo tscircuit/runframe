@@ -87,6 +87,16 @@ export interface RunFrameProps {
 
   defaultActiveTab?: TabId
 
+  /**
+   * Alias for defaultActiveTab
+   */
+  defaultTab?: TabId
+
+  /**
+   * Tabs to display. Defaults to all
+   */
+  availableTabs?: TabId[]
+
   evalWebWorkerBlobUrl?: string
 
   evalVersion?: string

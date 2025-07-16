@@ -44,6 +44,7 @@ import { useErrorTelemetry } from "lib/hooks/use-error-telemetry"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
 import type { CircuitJsonError } from "circuit-json"
 import { useRunnerStore } from "../RunFrame/runner-store/use-runner-store"
+import { version } from "../../../package.json"
 import type { Object3D } from "three"
 
 declare global {
@@ -98,6 +99,7 @@ export const CircuitJsonPreview = ({
   useStyles()
 
   const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
+  const setLastRunEvalVersion = useRunnerStore((s) => s.setLastRunEvalVersion)
 
   const [evalVersions, setEvalVersions] = useState<string[]>([])
 
@@ -106,7 +108,7 @@ export const CircuitJsonPreview = ({
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data?.versions)) {
-          setEvalVersions(data.versions.slice(0, 20))
+          setEvalVersions(data.versions.slice(1, 21))
         }
       })
       .catch(() => {})
@@ -317,8 +319,8 @@ export const CircuitJsonPreview = ({
                             <DropdownMenuItem
                               key={v}
                               onSelect={() => {
-                                ;(window as any).TSCIRCUIT_LATEST_EVAL_VERSION =
-                                  v
+                                ;(window as any).TSCIRCUIT_LATEST_EVAL_VERSION = v
+                                setLastRunEvalVersion(v)
                               }}
                             >
                               {v}
@@ -327,6 +329,18 @@ export const CircuitJsonPreview = ({
                         </DropdownMenuSubContent>
                       </DropdownMenuPortal>
                     </DropdownMenuSub>
+                    <DropdownMenuItem
+                      disabled
+                      className="rf-opacity-60 rf-cursor-default rf-select-none"
+                    >
+                      <div className="rf-pr-2 rf-text-xs rf-text-gray-500">
+                        @tscircuit/runframe@
+                        {version
+                          .split(".")
+                          .map((part, i) => (i === 2 ? parseInt(part) + 1 : part))
+                          .join(".")}
+                      </div>
+                    </DropdownMenuItem>
                     {lastRunEvalVersion && (
                       <DropdownMenuItem
                         disabled

@@ -161,10 +161,17 @@ export const ImportComponentDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
-      <DialogContent className="rf-max-w-3xl rf-w-full rf-max-h-[90vh] rf-overflow-y-auto rf-flex rf-flex-col">
+      <DialogContent
+        style={{
+          width: "calc(100vw - 2rem)",
+        }}
+        className="rf-rounded-sm rf-max-h-[90vh] rf-overflow-y-auto rf-flex rf-flex-col"
+      >
         <DialogHeader>
-          <DialogTitle>Import Component</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="rf-text-lg sm:rf-text-xl">
+            Import Component
+          </DialogTitle>
+          <DialogDescription className="rf-text-sm">
             Search for components from tscircuit.com or JLCPCB parts library.
           </DialogDescription>
         </DialogHeader>
@@ -175,9 +182,16 @@ export const ImportComponentDialog = ({
             setActiveTab(value as "tscircuit.com" | "jlcpcb")
           }
         >
-          <TabsList className="rf-grid rf-w-full rf-grid-cols-2">
-            <TabsTrigger value="tscircuit.com">tscircuit.com</TabsTrigger>
-            <TabsTrigger value="jlcpcb">JLCPCB Parts</TabsTrigger>
+          <TabsList className="rf-grid rf-w-full rf-grid-cols-2 rf-h-auto">
+            <TabsTrigger
+              value="tscircuit.com"
+              className="rf-text-xs sm:rf-text-sm"
+            >
+              tscircuit.com
+            </TabsTrigger>
+            <TabsTrigger value="jlcpcb" className="rf-text-xs sm:rf-text-sm">
+              JLCPCB Parts
+            </TabsTrigger>
           </TabsList>
 
           <div className="rf-flex rf-items-center rf-gap-2 rf-mt-4">
@@ -200,11 +214,15 @@ export const ImportComponentDialog = ({
             <Button
               onClick={handleSearch}
               disabled={isLoading || searchQuery.trim().length < 1}
+              className="sm:rf-px-4 rf-px-3"
             >
               {isLoading ? (
                 <Loader2 className="rf-h-4 rf-w-4 rf-animate-spin" />
               ) : (
-                "Search"
+                <>
+                  <Search className="rf-h-4 rf-w-4 sm:rf-hidden" />
+                  <span className="rf-hidden sm:rf-inline">Search</span>
+                </>
               )}
             </Button>
           </div>
@@ -215,23 +233,26 @@ export const ImportComponentDialog = ({
                 {searchResults.map((result) => (
                   <div
                     key={result.id}
-                    className={`rf-p-3 rf-flex rf-items-center rf-justify-between rf-cursor-pointer hover:rf-bg-zinc-100 ${selectedComponent?.id === result.id ? "rf-bg-zinc-100" : ""}`}
+                    className={`rf-p-3 rf-flex rf-flex-col sm:rf-flex-row rf-items-start sm:rf-items-center rf-justify-between rf-cursor-pointer hover:rf-bg-zinc-100 rf-gap-2 ${selectedComponent?.id === result.id ? "rf-bg-zinc-100" : ""}`}
                     onClick={() => setSelectedComponent(result)}
                   >
-                    <div>
-                      <div className="rf-font-medium">{result.name}</div>
-                      <div className="rf-text-sm rf-text-zinc-500">
+                    <div className="rf-flex-1 rf-min-w-0">
+                      <div className="rf-font-medium rf-text-sm rf-truncate">
+                        {result.name}
+                      </div>
+                      <div className="rf-text-xs rf-text-zinc-500 rf-break-words">
                         {result.partNumber && (
                           <span className="rf-mr-2">{result.partNumber}</span>
                         )}
                         {result.description}
                       </div>
                     </div>
-                    <div className="rf-flex rf-gap-2">
+                    <div className="rf-flex rf-gap-2 rf-flex-shrink-0 rf-w-full sm:rf-w-auto">
                       {result.source === "tscircuit.com" && (
                         <Button
                           variant="outline"
                           size="sm"
+                          className="rf-text-xs rf-w-full sm:rf-w-auto"
                           onClick={(e) => {
                             e.stopPropagation()
                             showDetails(result)
@@ -259,8 +280,12 @@ export const ImportComponentDialog = ({
           </div>
         </Tabs>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+        <DialogFooter className="rf-flex rf-flex-col sm:rf-flex-row rf-gap-2">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="rf-order-2 sm:rf-order-1"
+          >
             Cancel
           </Button>
           <Button
@@ -279,7 +304,13 @@ export const ImportComponentDialog = ({
 
       {/* Component Details Dialog */}
       <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <DialogContent className="rf-max-w-5xl rf-max-h-[90vh] rf-overflow-hidden rf-flex rf-flex-col rf-overflow-y-auto">
+        <DialogContent
+          showOverlay={false}
+          style={{
+            width: "calc(100vw - 2rem)",
+          }}
+          className="rf-max-w-5xl !rf-overflow-y-auto rf-max-h-[90vh] rf-overflow-hidden rf-flex rf-flex-col rf-rounded-sm"
+        >
           <DialogHeader className="rf-pb-4 rf-border-b">
             <div className="rf-flex rf-items-start rf-justify-between rf-gap-4">
               <div className="rf-flex-1 rf-min-w-0">
@@ -458,12 +489,12 @@ export const ImportComponentDialog = ({
             )}
           </div>
 
-          <DialogFooter className="rf-pt-4 rf-border-t rf-flex rf-justify-between rf-items-center">
-            <div className="rf-flex-1">
+          <DialogFooter className="rf-pt-4 rf-border-t rf-flex rf-flex-col sm:rf-flex-row rf-justify-between rf-items-stretch sm:rf-items-center rf-gap-2">
+            <div className="rf-flex-1 rf-order-3 sm:rf-order-1">
               <Button
                 variant="outline"
                 size="sm"
-                className="rf-gap-2"
+                className="rf-gap-2 rf-w-full sm:rf-w-auto"
                 onClick={() => {
                   const url = `https://tscircuit.com/${detailsComponent?.owner}/${detailsComponent?.name.split("/").pop()}`
                   window.open(url, "_blank")
@@ -473,8 +504,12 @@ export const ImportComponentDialog = ({
                 View on tscircuit.com
               </Button>
             </div>
-            <div className="rf-flex rf-gap-2">
-              <Button variant="outline" onClick={() => setDetailsOpen(false)}>
+            <div className="rf-flex rf-flex-col sm:rf-flex-row rf-gap-2 sm:rf-gap-3 rf-order-1 sm:rf-order-2">
+              <Button
+                variant="outline"
+                onClick={() => setDetailsOpen(false)}
+                className="rf-order-2 sm:rf-order-1"
+              >
                 Close
               </Button>
               <Button
@@ -485,7 +520,7 @@ export const ImportComponentDialog = ({
                     onClose()
                   }
                 }}
-                className="rf-bg-blue-600 hover:rf-bg-blue-700"
+                className="rf-bg-blue-600 hover:rf-bg-blue-700 rf-order-1 sm:rf-order-2"
               >
                 Import Component
               </Button>

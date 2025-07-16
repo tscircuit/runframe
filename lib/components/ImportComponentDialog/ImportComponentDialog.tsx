@@ -304,7 +304,13 @@ export const ImportComponentDialog = ({
 
       {/* Component Details Dialog */}
       <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <DialogContent className="rf-max-w-5xl rf-max-h-[90vh] rf-overflow-hidden rf-flex rf-flex-col rf-overflow-y-auto">
+        <DialogContent
+          showOverlay={false}
+          style={{
+            width: "calc(100vw - 2rem)",
+          }}
+          className="rf-max-w-5xl !rf-overflow-y-auto rf-max-h-[90vh] rf-overflow-hidden rf-flex rf-flex-col rf-rounded-sm"
+        >
           <DialogHeader className="rf-pb-4 rf-border-b">
             <div className="rf-flex rf-items-start rf-justify-between rf-gap-4">
               <div className="rf-flex-1 rf-min-w-0">
@@ -484,11 +490,11 @@ export const ImportComponentDialog = ({
           </div>
 
           <DialogFooter className="rf-pt-4 rf-border-t rf-flex rf-flex-col sm:rf-flex-row rf-justify-between rf-items-stretch sm:rf-items-center rf-gap-2">
-            <div className="rf-flex-1">
+            <div className="rf-flex-1 rf-order-3 sm:rf-order-1">
               <Button
                 variant="outline"
                 size="sm"
-                className="rf-gap-2"
+                className="rf-gap-2 rf-w-full sm:rf-w-auto"
                 onClick={() => {
                   const url = `https://tscircuit.com/${detailsComponent?.owner}/${detailsComponent?.name.split("/").pop()}`
                   window.open(url, "_blank")
@@ -498,11 +504,11 @@ export const ImportComponentDialog = ({
                 View on tscircuit.com
               </Button>
             </div>
-            <div className="rf-flex rf-gap-3 rf-order-1 sm:rf-order-2">
+            <div className="rf-flex rf-flex-col sm:rf-flex-row rf-gap-2 sm:rf-gap-3 rf-order-1 sm:rf-order-2">
               <Button
                 variant="outline"
                 onClick={() => setDetailsOpen(false)}
-                className="rf-flex-1 sm:rf-flex-none"
+                className="rf-order-2 sm:rf-order-1"
               >
                 Close
               </Button>
@@ -514,7 +520,7 @@ export const ImportComponentDialog = ({
                     onClose()
                   }
                 }}
-                className="rf-bg-blue-600 hover:rf-bg-blue-700 rf-flex-1 sm:rf-flex-none"
+                className="rf-bg-blue-600 hover:rf-bg-blue-700 rf-order-1 sm:rf-order-2"
               >
                 Import Component
               </Button>

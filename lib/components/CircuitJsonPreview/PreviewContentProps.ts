@@ -53,6 +53,16 @@ export interface PreviewContentProps {
 
   defaultActiveTab?: TabId
 
+  /**
+   * Alias for defaultActiveTab
+   */
+  defaultTab?: TabId
+
+  /**
+   * Tabs to display. Defaults to all
+   */
+  availableTabs?: TabId[]
+
   renderLog?: RenderLog | null
 
   /**

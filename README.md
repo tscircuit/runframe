@@ -30,6 +30,8 @@ circuit.add(
     onRenderingFinished={({ circuitJson }) => void}
     onRenderEvent={(event) => void}
     onError={(error) => void}
+    availableTabs={["pcb", "schematic", "cad"]}
+    defaultTab="pcb"
   />
 )
 ```

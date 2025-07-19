@@ -110,10 +110,7 @@ export const ImportComponentDialog = ({
         setSearchResults(mappedResults)
       } else {
         // Real tscircuit registry API call
-        const tscircuitComponents = await searchTscircuitComponents(
-          searchQuery,
-          10,
-        )
+        const tscircuitComponents = await searchTscircuitComponents(searchQuery)
 
         // Map tscircuit components to the format expected by the UI
         const mappedResults = tscircuitComponents.map(

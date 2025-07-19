@@ -73,4 +73,9 @@ export interface PreviewContentProps {
     name: string,
     data: { simpleRouteJson: any },
   ) => void
+
+  /**
+   * Enable selecting older @tscircuit/eval versions
+   */
+  allowSelectingVersion?: boolean
 }

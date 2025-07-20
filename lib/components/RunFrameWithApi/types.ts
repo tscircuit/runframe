@@ -128,5 +128,10 @@ declare global {
      * The version of the eval package to use
      */
     TSCIRCUIT_LATEST_EVAL_VERSION: string | null
+    /**
+     * The path to the main component that should be rendered. If not provided,
+     * the default component from the entry point will be used.
+     */
+    TSCIRCUIT_MAIN_COMPONENT_PATH?: string
   }
 }

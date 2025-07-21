@@ -1,12 +1,47 @@
 import { createRoot } from "react-dom/client"
 import { RunFrameWithApi } from "./RunFrameWithApi"
 import { RunFrameForCli } from "../RunFrameForCli/RunFrameForCli"
+import { RunFrame } from "../RunFrame/RunFrame"
 
-const root = createRoot(document.getElementById("root")!)
+const ensureRoot = () => {
+  const existing = document.getElementById("root")
+  if (existing) return existing
+  const el = document.createElement("div")
+  el.id = "root"
+  el.style.height = "100vh"
+  document.body.appendChild(el)
+  return el
+}
+
+const loadScriptsAsFsMap = () => {
+  const scripts = Array.from(
+    document.querySelectorAll<HTMLScriptElement>(
+      "script[type='tscircuit-tsx']",
+    ),
+  )
+  const fsMap = new Map<string, string>()
+  let entrypoint: string | undefined
+  scripts.forEach((script, idx) => {
+    const path =
+      script.dataset.path ||
+      script.getAttribute("data-file") ||
+      `main${idx ? idx + 1 : ""}.tsx`
+    if (!entrypoint) entrypoint = path
+    fsMap.set(path, script.textContent || "")
+  })
+  return { fsMap, entrypoint }
+}
+
+const root = createRoot(ensureRoot())
 
 // @ts-ignore
 if (window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI) {
   root.render(<RunFrameForCli />)
 } else {
-  root.render(<RunFrameWithApi />)
+  const { fsMap, entrypoint } = loadScriptsAsFsMap()
+  if (fsMap.size > 0) {
+    root.render(<RunFrame fsMap={fsMap} entrypoint={entrypoint} />)
+  } else {
+    root.render(<RunFrameWithApi />)
+  }
 }

@@ -2,19 +2,11 @@
  * tscircuit Registry API service for fetching component data from the tscircuit registry API
  */
 
-interface TscircuitSnippet {
-  snippet_id: string
-  package_release_id: string
-  unscoped_name: string
-  name: string
-  owner_name: string
-  code: string
-  description?: string
-  preview_url?: string
-}
+import type { Package } from "@tscircuit/fake-snippets/schema"
+import type { ComponentSearchResult } from "./ImportComponentDialog"
 
 interface TscircuitSearchResponse {
-  snippets: TscircuitSnippet[]
+  packages: Package[]
 }
 
 /**
@@ -25,15 +17,18 @@ interface TscircuitSearchResponse {
  */
 export const searchTscircuitComponents = async (
   query: string,
-  limit = 10,
-): Promise<TscircuitSnippet[]> => {
+): Promise<Package[]> => {
   try {
-    // Encode the query parameters
-    const encodedQuery = encodeURIComponent(query)
-
     // Make the API request
     const response = await fetch(
-      `https://registry-api.tscircuit.com/snippets/search?q=${encodedQuery}&limit=${limit}`,
+      "https://registry-api.tscircuit.com/packages/search",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: query }),
+      },
     )
 
     if (!response.ok) {
@@ -43,7 +38,7 @@ export const searchTscircuitComponents = async (
     }
 
     const data: TscircuitSearchResponse = await response.json()
-    return data.snippets || []
+    return data.packages || []
   } catch (error) {
     console.error("Error searching tscircuit components:", error)
     throw error
@@ -56,19 +51,16 @@ export const searchTscircuitComponents = async (
  * @returns Formatted component data for the UI
  */
 export const mapTscircuitSnippetToSearchResult = (
-  tscircuitSnippet: TscircuitSnippet,
-) => {
+  tscircuitSnippet: Package,
+): ComponentSearchResult => {
   return {
-    id: `tscircuit-${tscircuitSnippet.snippet_id}`,
+    id: `tscircuit-${tscircuitSnippet.package_id}`,
     name: tscircuitSnippet.unscoped_name,
     description:
       tscircuitSnippet.description ||
-      `Component by ${tscircuitSnippet.owner_name}`,
+      `Component by ${tscircuitSnippet.owner_github_username}`,
     source: "tscircuit.com" as const,
     partNumber: tscircuitSnippet.name,
-    previewUrl: tscircuitSnippet.preview_url,
-    // Additional tscircuit-specific properties
-    code: tscircuitSnippet.code,
-    owner: tscircuitSnippet.owner_name,
+    owner: String(tscircuitSnippet.owner_github_username),
   }
 }

@@ -110,10 +110,7 @@ export const ImportComponentDialog = ({
         setSearchResults(mappedResults)
       } else {
         // Real tscircuit registry API call
-        const tscircuitComponents = await searchTscircuitComponents(
-          searchQuery,
-          10,
-        )
+        const tscircuitComponents = await searchTscircuitComponents(searchQuery)
 
         // Map tscircuit components to the format expected by the UI
         const mappedResults = tscircuitComponents.map(
@@ -383,8 +380,8 @@ export const ImportComponentDialog = ({
                     value="pcb"
                     className="rf-border rf-rounded-lg rf-overflow-hidden rf-bg-gray-50"
                   >
-                    {detailsComponent?.code ? (
-                      <div className="rf-w-full rf-h-[400px] rf-bg-white rf-flex rf-items-center rf-justify-center rf-p-4">
+                    {detailsComponent?.owner && detailsComponent?.name ? (
+                      <div className="rf-w-full rf-h-fit rf-min-h-[300px] rf-bg-white rf-flex rf-items-center rf-justify-center rf-p-4">
                         <img
                           src={`https://registry-api.tscircuit.com/packages/images/${detailsComponent.owner}/${detailsComponent.name}/pcb.png`}
                           alt={`${detailsComponent.name} PCB preview`}
@@ -395,7 +392,7 @@ export const ImportComponentDialog = ({
                             const parent = target.parentElement
                             if (parent) {
                               parent.innerHTML =
-                                '<div class="rf-text-center rf-text-gray-500"><div class="rf-text-sm rf-font-medium">PCB preview not available</div><div class="rf-text-xs rf-mt-1">Image failed to load</div></div>'
+                                '<div class="rf-text-center rf-text-gray-500"><div class="rf-text-sm rf-font-medium">PCB preview not available</div><div class="rf-text-xs rf-mt-1">Preview cannot be generated</div></div>'
                             }
                           }}
                         />
@@ -418,8 +415,8 @@ export const ImportComponentDialog = ({
                     value="schematic"
                     className="rf-border rf-rounded-lg rf-overflow-hidden rf-bg-gray-50"
                   >
-                    {detailsComponent?.code ? (
-                      <div className="rf-w-full rf-h-[400px] rf-bg-white rf-flex rf-items-center rf-justify-center rf-p-4">
+                    {detailsComponent?.owner && detailsComponent?.name ? (
+                      <div className="rf-w-full rf-h-fit rf-min-h-[300px] rf-bg-white rf-flex rf-items-center rf-justify-center rf-p-4">
                         <img
                           src={`https://registry-api.tscircuit.com/packages/images/${detailsComponent.owner}/${detailsComponent.name}/schematic.png`}
                           alt={`${detailsComponent.name} schematic preview`}
@@ -430,7 +427,7 @@ export const ImportComponentDialog = ({
                             const parent = target.parentElement
                             if (parent) {
                               parent.innerHTML =
-                                '<div class="rf-text-center rf-text-gray-500"><div class="rf-text-sm rf-font-medium">Schematic preview not available</div><div class="rf-text-xs rf-mt-1">Image failed to load</div></div>'
+                                '<div class="rf-text-center rf-text-gray-500"><div class="rf-text-sm rf-font-medium">Schematic preview not available</div><div class="rf-text-xs rf-mt-1">Preview cannot be generated</div></div>'
                             }
                           }}
                         />

@@ -51,6 +51,8 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   const fsMap = useRunFrameStore((s) => s.fsMap)
   const circuitJson = useRunFrameStore((s) => s.circuitJson)
 
+  const mainComponentPath = window?.TSCIRCUIT_MAIN_COMPONENT_PATH
+
   useEffect(() => {
     loadInitialFiles()
   }, [])
@@ -85,6 +87,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       leftHeaderContent={leftHeaderContent}
       defaultToFullScreen={props.defaultToFullScreen}
       showToggleFullScreen={props.showToggleFullScreen}
+      mainComponentPath={mainComponentPath}
       onInitialRender={() => {
         debug("onInitialRender / markRenderStarted")
         markRenderStarted()

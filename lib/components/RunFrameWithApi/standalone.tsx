@@ -20,16 +20,14 @@ const loadScriptsAsFsMap = () => {
     ),
   )
   const fsMap = new Map<string, string>()
-  let entrypoint: string | undefined
   scripts.forEach((script, idx) => {
     const path =
       script.dataset.path ||
       script.getAttribute("data-file-path") ||
       `script${idx ? idx + 1 : ""}.tsx`
-    if (!entrypoint) entrypoint = path
     fsMap.set(path, script.textContent || "")
   })
-  return { fsMap, entrypoint }
+  return { fsMap }
 }
 
 const root = createRoot(ensureRoot())
@@ -38,9 +36,9 @@ const root = createRoot(ensureRoot())
 if (window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI) {
   root.render(<RunFrameForCli />)
 } else {
-  const { fsMap, entrypoint } = loadScriptsAsFsMap()
+  const { fsMap } = loadScriptsAsFsMap()
   if (fsMap.size > 0) {
-    root.render(<RunFrame fsMap={fsMap} entrypoint={entrypoint} />)
+    root.render(<RunFrame fsMap={fsMap} />)
   } else {
     root.render(<RunFrameWithApi />)
   }

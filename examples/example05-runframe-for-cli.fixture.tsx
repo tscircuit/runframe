@@ -80,6 +80,19 @@ export default () => (
           text_content: JSON.stringify({}),
         }),
       })
+      fetch("/api/files/upsert", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          file_path: "board.circuit.tsx",
+          text_content: `
+
+export default () => (
+  <board width="10mm" height="10mm">
+  </board>
+)`,
+        }),
+      })
     }, 500)
   }, [])
 

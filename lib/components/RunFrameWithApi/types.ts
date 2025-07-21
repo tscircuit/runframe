@@ -132,6 +132,6 @@ declare global {
      * The path to the main component that should be rendered. If not provided,
      * the default component from the entry point will be used.
      */
-    TSCIRCUIT_MAIN_COMPONENT_PATH?: string
+    TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH?: string
   }
 }

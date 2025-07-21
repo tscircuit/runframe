@@ -1,12 +1,13 @@
 import Debug from "debug"
 import { useEditEventController } from "lib/hooks/use-edit-event-controller"
 import { useSyncPageTitle } from "lib/hooks/use-sync-page-title"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
 import { API_BASE } from "./api-base"
 import { useRunFrameStore } from "./store"
 import { applyEditEventsToManualEditsFile } from "@tscircuit/core"
 import type { ManualEditsFile } from "@tscircuit/props"
+import { FileSelectorCombobox } from "./file-selector-combobox"
 
 const debug = Debug("run-frame:RunFrameWithApi")
 
@@ -32,6 +33,7 @@ export interface RunFrameWithApiProps {
   leftHeaderContent?: React.ReactNode
   defaultToFullScreen?: boolean
   showToggleFullScreen?: boolean
+  showFilesSwitch?: boolean
 }
 
 export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
@@ -51,12 +53,24 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   const fsMap = useRunFrameStore((s) => s.fsMap)
   const circuitJson = useRunFrameStore((s) => s.circuitJson)
 
-  const mainComponentPath = window?.TSCIRCUIT_MAIN_COMPONENT_PATH
+  const [mainComponentPath, setMainComponentPath] = useState<string>("")
 
   useEffect(() => {
-    loadInitialFiles()
+    loadInitialFiles().then(() => {
+      const files = Array.from(fsMap.keys())
+      const defaultPath = window?.TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH
+      let selected = ""
+      if (defaultPath && files.includes(defaultPath)) {
+        selected = defaultPath
+      } else {
+        const firstMatch = files.find((f) => /\.(tsx|ts|js|jsx)$/.test(f))
+        if (firstMatch) {
+          selected = firstMatch
+        }
+      }
+      setMainComponentPath(selected)
+    })
   }, [])
-
   useSyncPageTitle()
 
   const {
@@ -84,7 +98,18 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       fsMap={fsMap}
       evalVersion={props.evalVersion}
       forceLatestEvalVersion={props.forceLatestEvalVersion}
-      leftHeaderContent={leftHeaderContent}
+      leftHeaderContent={
+        <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
+          {props.leftHeaderContent}
+          <div className="rf-absolute rf-grid rf-place-items-center rf-w-screen rf-overflow-x-hidden">
+            <FileSelectorCombobox
+              currentFile={mainComponentPath}
+              files={Array.from(fsMap.keys())}
+              onFileChange={(value) => setMainComponentPath(value)}
+            />
+          </div>
+        </div>
+      }
       defaultToFullScreen={props.defaultToFullScreen}
       showToggleFullScreen={props.showToggleFullScreen}
       mainComponentPath={mainComponentPath}

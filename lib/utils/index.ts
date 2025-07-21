@@ -10,3 +10,4 @@ export const capitalizeFirstLetters = (str: string) => {
 }
 
 export { posthog } from "./posthog"
+export { getFsMapFromScripts } from "./getFsMapFromScripts"

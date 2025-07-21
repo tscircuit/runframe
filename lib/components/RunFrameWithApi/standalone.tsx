@@ -25,7 +25,7 @@ const loadScriptsAsFsMap = () => {
     const path =
       script.dataset.path ||
       script.getAttribute("data-file-path") ||
-      `main${idx ? idx + 1 : ""}.tsx`
+      `script${idx ? idx + 1 : ""}.tsx`
     if (!entrypoint) entrypoint = path
     fsMap.set(path, script.textContent || "")
   })

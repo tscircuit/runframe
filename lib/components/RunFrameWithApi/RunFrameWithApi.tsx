@@ -56,21 +56,27 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   const [mainComponentPath, setMainComponentPath] = useState<string>("")
 
   useEffect(() => {
-    loadInitialFiles().then(() => {
-      const files = Array.from(fsMap.keys())
-      const defaultPath = window?.TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH
-      let selected = ""
-      if (defaultPath && files.includes(defaultPath)) {
-        selected = defaultPath
-      } else {
-        const firstMatch = files.find((f) => /\.(tsx|ts|js|jsx)$/.test(f))
-        if (firstMatch) {
-          selected = firstMatch
-        }
-      }
-      setMainComponentPath(selected)
-    })
+    loadInitialFiles()
   }, [])
+
+  useEffect(() => {
+    const files = Array.from(fsMap.keys())
+    const defaultPath = window?.TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH
+    if (defaultPath && files.includes(defaultPath)) {
+      setMainComponentPath(defaultPath)
+    } else {
+      const firstMatch = files.find(
+        (f) =>
+          f.endsWith(".tsx") ||
+          f.endsWith(".ts") ||
+          f.endsWith(".js") ||
+          f.endsWith(".jsx"),
+      )
+      if (firstMatch) {
+        setMainComponentPath(firstMatch)
+      }
+    }
+  }, [fsMap])
   useSyncPageTitle()
 
   const {

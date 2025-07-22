@@ -2,7 +2,7 @@
   "name": "@tscircuit/runframe",
   "version": "0.0.713",
   "main": "dist/preview.js",
-    "type": "module",
+  "type": "module",
   "scripts": {
     "start": "bun run build:css && concurrently 'bun run cosmos' 'bun run build:css:watch'",
     "build": "bun run build:css && bun run build:standalone && bun run build:standalone-preview && bun run build:lib",

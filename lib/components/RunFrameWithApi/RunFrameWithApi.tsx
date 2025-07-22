@@ -112,13 +112,15 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       leftHeaderContent={
         <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
           {props.leftHeaderContent}
-          <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2">
-            <FileSelectorCombobox
-              currentFile={mainComponentPath}
-              files={Array.from(fsMap.keys())}
-              onFileChange={(value) => setMainComponentPath(value)}
-            />
-          </div>
+          {props.showFilesSwitch && (
+            <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2">
+              <FileSelectorCombobox
+                currentFile={mainComponentPath}
+                files={Array.from(fsMap.keys())}
+                onFileChange={(value) => setMainComponentPath(value)}
+              />
+            </div>
+          )}
         </div>
       }
       defaultToFullScreen={props.defaultToFullScreen}

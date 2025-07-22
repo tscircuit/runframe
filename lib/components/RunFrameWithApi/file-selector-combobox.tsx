@@ -22,9 +22,9 @@ export const FileSelectorCombobox = ({
   onFileChange: (value: string) => void
 }) => {
   const [open, setOpen] = useState(false)
-  const [value, setValue] = useState(currentFile)
+  const [file, setFile] = useState(currentFile)
   useEffect(() => {
-    setValue(currentFile)
+    setFile(currentFile)
   }, [currentFile])
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -35,7 +35,7 @@ export const FileSelectorCombobox = ({
           aria-expanded={open}
           className="rf-w-30 rf-justify-between !rf-font-normal"
         >
-          {value ? value : "Select file..."}
+          {file ? file : "Select file..."}
           <ChevronsUpDown className="rf-opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -58,19 +58,20 @@ export const FileSelectorCombobox = ({
                   <CommandItem
                     key={i}
                     value={file}
-                    onSelect={(currentValue) => {
-                      const newValue =
-                        currentValue === value ? "" : currentValue
-                      setValue(newValue)
+                    onSelect={(currentFile) => {
+                      const newFile = currentFile === file ? "" : currentFile
+                      setFile(newFile)
                       setOpen(false)
-                      onFileChange(newValue)
+                      onFileChange(newFile)
                     }}
                   >
                     {file}
                     <Check
                       className={cn(
                         "rf-ml-auto",
-                        value === file ? "rf-opacity-100" : "rf-opacity-0",
+                        file === currentFile
+                          ? "rf-opacity-100"
+                          : "rf-opacity-0",
                       )}
                     />
                   </CommandItem>

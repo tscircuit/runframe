@@ -2,36 +2,6 @@
   "name": "@tscircuit/runframe",
   "version": "0.0.713",
   "main": "dist/preview.js",
-  "main": "dist/preview.js",
-  "type": "module",
-  "version": "0.0.714",
-  "exports": {
-    ".": "./dist/preview.js",
-    "./preview": "./dist/preview.js",
-    "./runner": "./dist/runner.js",
-    "./standalone": "./dist/standalone.min.js",
-    "./standalone-preview": "./dist/standalone-preview.min.js"
-  },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "start": "bun run build:css && concurrently 'bun run cosmos' 'bun run build:css:watch'",
-    "build": "bun run build:css && bun run build:standalone && bun run build:standalone-preview && bun run build:lib",
-    "build:lib": "tsup-node lib/preview.ts lib/runner.ts --external react-query schematic-symbols lucide-react circuit-to-svg @tscircuit/props jscad-fiber --platform browser --format esm --dts",
-    "build:css": "bun run scripts/build-css.ts",
-    "build:css:watch": "chokidar 'lib/components/**/*.tsx' -c 'bun run build:css'",
-    "build:site": "cosmos-export && bun run build:iframe",
-    "build:standalone": "STANDALONE=1 vite build",
-    "build:iframe": "STANDALONE=iframe vite build && mv ./dist/lib/entrypoints/iframe.html ./dist/iframe.html && cp -f ./dist/iframe.html ./cosmos-export/iframe.html && cp -f ./dist/iframe.min.js ./cosmos-export/iframe.min.js",
-    "build:standalone-preview": "STANDALONE=preview vite build --emptyOutDir false",
-    "analyze": "source-map-explorer 'dist/standalone.min.js'",
-    "format:check": "biome format .",
-    "format": "biome format --write .",
-    "vercel-build": "bun run build:css && cosmos-export",
-    "serve:cosmos": "serve cosmos-export",
-    "pkg-pr-new-release": "bunx pkg-pr-new publish --comment=off --peerDeps"
-  },
   "devDependencies": {
     "@babel/standalone": "^7.26.10",
     "@biomejs/biome": "^1.9.4",

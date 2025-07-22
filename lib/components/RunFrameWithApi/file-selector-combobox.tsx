@@ -48,10 +48,11 @@ export const FileSelectorCombobox = ({
               {files
                 .filter(
                   (file) =>
-                    file.endsWith(".tsx") ||
-                    file.endsWith(".ts") ||
-                    file.endsWith(".jsx") ||
-                    file.endsWith(".js"),
+                    (file.endsWith(".tsx") ||
+                      file.endsWith(".ts") ||
+                      file.endsWith(".jsx") ||
+                      file.endsWith(".js")) &&
+                    !file.endsWith(".d.ts"),
                 )
                 .map((file, i) => (
                   <CommandItem

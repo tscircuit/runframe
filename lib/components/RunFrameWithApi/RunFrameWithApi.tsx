@@ -61,16 +61,21 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
 
   useEffect(() => {
     const files = Array.from(fsMap.keys())
+    if (mainComponentPath && files.includes(mainComponentPath)) {
+      // Retain current selection if it still exists
+      return
+    }
     const defaultPath = window?.TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH
     if (defaultPath && files.includes(defaultPath)) {
       setMainComponentPath(defaultPath)
     } else {
       const firstMatch = files.find(
-        (f) =>
-          f.endsWith(".tsx") ||
-          f.endsWith(".ts") ||
-          f.endsWith(".js") ||
-          f.endsWith(".jsx"),
+        (file) =>
+          (file.endsWith(".tsx") ||
+            file.endsWith(".ts") ||
+            file.endsWith(".jsx") ||
+            file.endsWith(".js")) &&
+          !file.endsWith(".d.ts"),
       )
       if (firstMatch) {
         setMainComponentPath(firstMatch)
@@ -107,7 +112,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       leftHeaderContent={
         <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
           {props.leftHeaderContent}
-          <div className="rf-absolute rf-grid rf-place-items-center rf-w-screen rf-overflow-x-hidden">
+          <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2">
             <FileSelectorCombobox
               currentFile={mainComponentPath}
               files={Array.from(fsMap.keys())}

@@ -41,7 +41,7 @@ export const FileSelectorCombobox = ({
       </PopoverTrigger>
       <PopoverContent className="rf-w-fit !rf-p-0">
         <Command>
-          <CommandInput placeholder="Search file" className="rf-h-9" />
+          <CommandInput placeholder="Search for file" className="rf-h-9" />
           <CommandList>
             <CommandEmpty>No file found.</CommandEmpty>
             <CommandGroup>

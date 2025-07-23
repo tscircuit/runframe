@@ -1,7 +1,7 @@
 import Debug from "debug"
 import { useEditEventController } from "lib/hooks/use-edit-event-controller"
 import { useSyncPageTitle } from "lib/hooks/use-sync-page-title"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
 import { API_BASE } from "./api-base"
 import { useRunFrameStore } from "./store"
@@ -53,7 +53,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   const fsMap = useRunFrameStore((s) => s.fsMap)
   const circuitJson = useRunFrameStore((s) => s.circuitJson)
 
-  const [mainComponentPath, setMainComponentPath] = useState<string>("")
+  const [componentPath, setComponentPath] = useState<string>("")
 
   useEffect(() => {
     loadInitialFiles()
@@ -61,13 +61,13 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
 
   useEffect(() => {
     const files = Array.from(fsMap.keys())
-    if (mainComponentPath && files.includes(mainComponentPath)) {
+    if (componentPath && files.includes(componentPath)) {
       // Retain current selection if it still exists
       return
     }
     const defaultPath = window?.TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH
     if (defaultPath && files.includes(defaultPath)) {
-      setMainComponentPath(defaultPath)
+      setComponentPath(defaultPath)
     } else {
       const firstMatch = files.find(
         (file) =>
@@ -78,7 +78,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
           !file.endsWith(".d.ts"),
       )
       if (firstMatch) {
-        setMainComponentPath(firstMatch)
+        setComponentPath(firstMatch)
       }
     }
   }, [fsMap])
@@ -104,6 +104,16 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     return () => stopPolling()
   }, [startPolling, stopPolling])
 
+  const componentProp = useMemo(
+    () =>
+      String(componentPath).length > 0
+        ? {
+            mainComponentPath: componentPath,
+          }
+        : {},
+    [componentPath],
+  )
+
   return (
     <RunFrame
       fsMap={fsMap}
@@ -115,9 +125,13 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
           {props.showFilesSwitch && (
             <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2">
               <FileSelectorCombobox
-                currentFile={mainComponentPath}
+                currentFile={componentPath}
                 files={Array.from(fsMap.keys())}
-                onFileChange={(value) => setMainComponentPath(value)}
+                onFileChange={(value) => {
+                  if (typeof fsMap.get(value) == "string") {
+                    setComponentPath(value)
+                  }
+                }}
               />
             </div>
           )}
@@ -125,7 +139,6 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       }
       defaultToFullScreen={props.defaultToFullScreen}
       showToggleFullScreen={props.showToggleFullScreen}
-      mainComponentPath={mainComponentPath}
       onInitialRender={() => {
         debug("onInitialRender / markRenderStarted")
         markRenderStarted()
@@ -172,6 +185,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
           }),
         })
       }}
+      {...componentProp}
     />
   )
 }

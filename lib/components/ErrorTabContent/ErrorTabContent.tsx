@@ -6,7 +6,6 @@ import { encodeFsMapToUrlHash } from "lib/utils"
 import { AutoroutingLogOptions } from "./AutoroutingLogOptions"
 import { useState, useMemo } from "react"
 import type { CircuitJsonError } from "circuit-json"
-import { encodeFsMapToUrlHash } from "lib/utils"
 
 interface UnifiedError {
   type: string
@@ -21,7 +20,6 @@ export const ErrorTabContent = ({
   autoroutingLog,
   circuitJsonErrors,
   circuitJsonWarnings,
-  fsMap,
   onReportAutoroutingLog,
   errorMessage,
   errorStack,

@@ -16,11 +16,11 @@ export type TabId =
 export interface PreviewContentProps {
   defaultToFullScreen?: boolean
   code?: string
+  fsMap?: Map<string, string> | Record<string, string>
   readOnly?: boolean
   onRunClicked?: () => void
   tsxRunTriggerCount?: number
   errorMessage?: string | null
-  fsMap?: Map<string, string>
   errorStack?: string | null
   autoroutingGraphics?: any
   circuitJson: CircuitJson | null

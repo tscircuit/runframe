@@ -2,10 +2,10 @@ import { GitHubLogoIcon } from "@radix-ui/react-icons"
 import { ClipboardIcon, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "lib/components/ui/button"
 import { createSnippetUrl } from "@tscircuit/create-snippet-url"
+import { encodeFsMapToUrlHash } from "lib/utils"
 import { AutoroutingLogOptions } from "./AutoroutingLogOptions"
 import { useState, useMemo } from "react"
 import type { CircuitJsonError } from "circuit-json"
-import { encodeFsMapToUrlHash } from "lib/utils"
 
 interface UnifiedError {
   type: string
@@ -16,10 +16,10 @@ interface UnifiedError {
 
 export const ErrorTabContent = ({
   code,
+  fsMap,
   autoroutingLog,
   circuitJsonErrors,
   circuitJsonWarnings,
-  fsMap,
   onReportAutoroutingLog,
   errorMessage,
   errorStack,
@@ -27,7 +27,7 @@ export const ErrorTabContent = ({
   evalVersion,
 }: {
   code?: string
-  fsMap?: Map<string, string>
+  fsMap?: Map<string, string> | Record<string, string>
   autoroutingLog?: Record<string, { simpleRouteJson: any }>
   isStreaming?: boolean
   circuitJsonErrors?: CircuitJsonError[] | null
@@ -267,7 +267,11 @@ export const ErrorTabContent = ({
               .slice(0, 100)
 
             const url = fsMap
-              ? encodeFsMapToUrlHash(Object.fromEntries(fsMap))
+              ? encodeFsMapToUrlHash(
+                  fsMap instanceof Map
+                    ? Object.fromEntries(fsMap.entries())
+                    : fsMap,
+                )
               : createSnippetUrl(code ?? "")
             let errorDetails = `${currentError.type}: ${currentError.message}`
             if (evalVersion) errorDetails += `\n@tscircuit/eval@${evalVersion}`

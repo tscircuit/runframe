@@ -396,7 +396,9 @@ export const CircuitJsonPreview = ({
                       )}
                       onEditEventsChanged={(editEvents) => {
                         if (onEditEvent) {
-                          editEvents.forEach((e) => onEditEvent(e))
+                          for (const e of editEvents) {
+                            onEditEvent(e)
+                          }
                         }
                       }}
                       // onEditEventsChanged={(editEvents) => {

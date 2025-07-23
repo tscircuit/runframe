@@ -275,13 +275,12 @@ export const ErrorTabContent = ({
             if (currentError.stack) errorDetails += `\n${currentError.stack}`
 
             let body = `[Package code to reproduce](${url})\n\n### Error\n\`\`\`\n${errorDetails}\n\`\`\`\n`
-
-            if (url.length > 3000 || body.length > 4000) {
+            if (body.length > 35000) {
               const truncatedMessage =
                 currentError.message.length > 500
                   ? `${currentError.message.slice(0, 500)}...`
                   : currentError.message
-              body = `### Error\n\`\`\`\n${currentError.type}: ${truncatedMessage}\n\`\`\``
+              body = `[Package code to reproduce](${url})\n\n### Error\n\`\`\`\n${currentError.type}: ${truncatedMessage}\n\`\`\``
             }
 
             const issueUrl = `https://github.com/tscircuit/tscircuit.com/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`

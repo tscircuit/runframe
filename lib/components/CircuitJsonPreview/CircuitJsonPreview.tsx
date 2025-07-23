@@ -61,6 +61,7 @@ export type { PreviewContentProps, TabId }
 
 export const CircuitJsonPreview = ({
   code,
+  fsMap,
   onRunClicked = undefined,
   errorMessage,
   errorStack,
@@ -572,6 +573,7 @@ export const CircuitJsonPreview = ({
                 circuitJson ? (
                   <ErrorTabContent
                     code={code}
+                    fsMap={fsMap}
                     circuitJsonErrors={circuitJsonErrors}
                     circuitJsonWarnings={circuitJsonWarnings}
                     errorMessage={errorMessage}

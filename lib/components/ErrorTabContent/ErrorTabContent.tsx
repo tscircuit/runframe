@@ -5,6 +5,7 @@ import { createSnippetUrl } from "@tscircuit/create-snippet-url"
 import { AutoroutingLogOptions } from "./AutoroutingLogOptions"
 import { useState, useMemo } from "react"
 import type { CircuitJsonError } from "circuit-json"
+import { encodeFsMapToUrlHash } from "lib/utils"
 
 interface UnifiedError {
   type: string
@@ -18,6 +19,7 @@ export const ErrorTabContent = ({
   autoroutingLog,
   circuitJsonErrors,
   circuitJsonWarnings,
+  fsMap,
   onReportAutoroutingLog,
   errorMessage,
   errorStack,
@@ -25,6 +27,7 @@ export const ErrorTabContent = ({
   evalVersion,
 }: {
   code?: string
+  fsMap?: Map<string, string>
   autoroutingLog?: Record<string, { simpleRouteJson: any }>
   isStreaming?: boolean
   circuitJsonErrors?: CircuitJsonError[] | null
@@ -263,20 +266,21 @@ export const ErrorTabContent = ({
               .replace(/\s+/g, " ")
               .slice(0, 100)
 
-            const url = createSnippetUrl(code ?? "")
+            const url = fsMap
+              ? encodeFsMapToUrlHash(Object.fromEntries(fsMap))
+              : createSnippetUrl(code ?? "")
             let errorDetails = `${currentError.type}: ${currentError.message}`
             if (evalVersion) errorDetails += `\n@tscircuit/eval@${evalVersion}`
             if (softwareUsedString) errorDetails += `\n${softwareUsedString}`
             if (currentError.stack) errorDetails += `\n${currentError.stack}`
 
             let body = `[Package code to reproduce](${url})\n\n### Error\n\`\`\`\n${errorDetails}\n\`\`\`\n`
-
-            if (url.length > 3000 || body.length > 4000) {
+            if (body.length > 35000) {
               const truncatedMessage =
                 currentError.message.length > 500
                   ? `${currentError.message.slice(0, 500)}...`
                   : currentError.message
-              body = `### Error\n\`\`\`\n${currentError.type}: ${truncatedMessage}\n\`\`\``
+              body = `[Package code to reproduce](${url})\n\n### Error\n\`\`\`\n${currentError.type}: ${truncatedMessage}\n\`\`\``
             }
 
             const issueUrl = `https://github.com/tscircuit/tscircuit.com/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`

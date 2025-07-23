@@ -10,3 +10,5 @@ export const capitalizeFirstLetters = (str: string) => {
 }
 
 export { posthog } from "./posthog"
+export { bytesToBase64 } from "./bytesToBase64"
+export { encodeFsMapToUrlHash } from "./encodeFsMapToUrlHash"

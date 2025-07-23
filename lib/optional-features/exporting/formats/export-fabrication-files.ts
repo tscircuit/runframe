@@ -22,8 +22,13 @@ export const exportFabricationFiles = async ({
 }) => {
   const zip = new JSZip()
 
+  // Filter out error and warning elements for gerber/drill generation
+  const filteredCircuitJson = circuitJson.filter(
+    (element) => !("error_type" in element) && !("warning_type" in element),
+  ) as any
+
   // Generate Gerber files
-  const gerberLayerCmds = convertSoupToGerberCommands(circuitJson, {
+  const gerberLayerCmds = convertSoupToGerberCommands(filteredCircuitJson, {
     flip_y_axis: false,
   })
   const gerberFileContents = stringifyGerberCommandLayers(gerberLayerCmds)
@@ -34,7 +39,7 @@ export const exportFabricationFiles = async ({
 
   // Generate Drill files
   const drillCmds = convertSoupToExcellonDrillCommands({
-    circuitJson,
+    circuitJson: filteredCircuitJson,
     is_plated: true,
     flip_y_axis: false,
   })

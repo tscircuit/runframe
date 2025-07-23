@@ -16,6 +16,7 @@ export type TabId =
 export interface PreviewContentProps {
   defaultToFullScreen?: boolean
   code?: string
+  fsMap?: Map<string, string> | Record<string, string>
   readOnly?: boolean
   onRunClicked?: () => void
   tsxRunTriggerCount?: number

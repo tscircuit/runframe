@@ -75,7 +75,7 @@
     "@tscircuit/file-server": "^0.0.24",
     "@tscircuit/footprinter": "^0.0.204",
     "@tscircuit/pcb-viewer": "^1.11.177",
-    "@tscircuit/props": "^0.0.262",
+    "@tscircuit/props": "^0.0.263",
     "@tscircuit/schematic-viewer": "2.0.24",
     "circuit-to-svg": "^0.0.173",
     "jscad-fiber": "^0.0.80",

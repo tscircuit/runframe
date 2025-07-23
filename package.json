@@ -1,8 +1,18 @@
 {
   "name": "@tscircuit/runframe",
-  "version": "0.0.713",
   "main": "dist/preview.js",
   "type": "module",
+  "version": "0.0.713",
+  "exports": {
+    ".": "./dist/preview.js",
+    "./preview": "./dist/preview.js",
+    "./runner": "./dist/runner.js",
+    "./standalone": "./dist/standalone.min.js",
+    "./standalone-preview": "./dist/standalone-preview.min.js"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "start": "bun run build:css && concurrently 'bun run cosmos' 'bun run build:css:watch'",
     "build": "bun run build:css && bun run build:standalone && bun run build:standalone-preview && bun run build:lib",
@@ -20,16 +30,6 @@
     "serve:cosmos": "serve cosmos-export",
     "pkg-pr-new-release": "bunx pkg-pr-new publish --comment=off --peerDeps"
   },
-  "exports": {
-    ".": "./dist/preview.js",
-    "./preview": "./dist/preview.js",
-    "./runner": "./dist/runner.js",
-    "./standalone": "./dist/standalone.min.js",
-    "./standalone-preview": "./dist/standalone-preview.min.js"
-  },
-  "files": [
-    "dist"
-  ],
   "devDependencies": {
     "@babel/standalone": "^7.26.10",
     "@biomejs/biome": "^1.9.4",

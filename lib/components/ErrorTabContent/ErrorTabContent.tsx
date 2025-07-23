@@ -5,6 +5,7 @@ import { createSnippetUrl } from "@tscircuit/create-snippet-url"
 import { AutoroutingLogOptions } from "./AutoroutingLogOptions"
 import { useState, useMemo } from "react"
 import type { CircuitJsonError } from "circuit-json"
+import { encodeFsMapToUrlHash } from "lib/utils"
 
 interface UnifiedError {
   type: string
@@ -18,6 +19,7 @@ export const ErrorTabContent = ({
   autoroutingLog,
   circuitJsonErrors,
   circuitJsonWarnings,
+  fsMap,
   onReportAutoroutingLog,
   errorMessage,
   errorStack,
@@ -25,6 +27,7 @@ export const ErrorTabContent = ({
   evalVersion,
 }: {
   code?: string
+  fsMap?: Map<string, string>
   autoroutingLog?: Record<string, { simpleRouteJson: any }>
   isStreaming?: boolean
   circuitJsonErrors?: CircuitJsonError[] | null
@@ -263,7 +266,9 @@ export const ErrorTabContent = ({
               .replace(/\s+/g, " ")
               .slice(0, 100)
 
-            const url = createSnippetUrl(code ?? "")
+            const url = fsMap
+              ? encodeFsMapToUrlHash(Object.fromEntries(fsMap))
+              : createSnippetUrl(code ?? "")
             let errorDetails = `${currentError.type}: ${currentError.message}`
             if (evalVersion) errorDetails += `\n@tscircuit/eval@${evalVersion}`
             if (softwareUsedString) errorDetails += `\n${softwareUsedString}`

@@ -458,6 +458,7 @@ export const RunFrame = (props: RunFrameProps) => {
   return (
     <CircuitJsonPreview
       code={fsMap.get(props.entrypoint ?? props.mainComponentPath)}
+      fsMap={fsMap}
       defaultActiveTab={props.defaultActiveTab ?? props.defaultTab}
       defaultTab={props.defaultTab}
       availableTabs={props.availableTabs}

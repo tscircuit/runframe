@@ -35,13 +35,13 @@ export const FileSelectorCombobox = ({
           aria-expanded={open}
           className="rf-w-30 rf-justify-between !rf-font-normal"
         >
-          {file ? file : "Select file..."}
+          {file ? file : "Select file"}
           <ChevronsUpDown className="rf-opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="rf-w-fit !rf-p-0">
         <Command>
-          <CommandInput placeholder="Search file..." className="rf-h-9" />
+          <CommandInput placeholder="Search file" className="rf-h-9" />
           <CommandList>
             <CommandEmpty>No file found.</CommandEmpty>
             <CommandGroup>
@@ -58,11 +58,10 @@ export const FileSelectorCombobox = ({
                   <CommandItem
                     key={i}
                     value={file}
-                    onSelect={(currentFile) => {
-                      const newFile = currentFile === file ? "" : currentFile
-                      setFile(newFile)
+                    onSelect={(file) => {
+                      setFile(file)
                       setOpen(false)
-                      onFileChange(newFile)
+                      onFileChange(file)
                     }}
                   >
                     {file}

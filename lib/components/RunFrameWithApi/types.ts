@@ -129,9 +129,9 @@ declare global {
      */
     TSCIRCUIT_LATEST_EVAL_VERSION: string | null
     /**
-     * The path to the main component that should be rendered. If not provided,
-     * the default component from the entry point will be used.
+     * The path to the default main component that should be rendered. If not provided,
+     * the first component from the files will be used.
      */
-    TSCIRCUIT_MAIN_COMPONENT_PATH?: string
+    TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH?: string
   }
 }

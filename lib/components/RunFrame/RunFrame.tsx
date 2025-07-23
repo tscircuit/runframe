@@ -374,7 +374,13 @@ export const RunFrame = (props: RunFrameProps) => {
       cancelExecutionRef.current = null
     }
     runMutex.runWithMutex(runWorker)
-  }, [props.fsMap, props.entrypoint, runCountTrigger, props.evalVersion])
+  }, [
+    props.fsMap,
+    props.entrypoint,
+    runCountTrigger,
+    props.evalVersion,
+    props.mainComponentPath,
+  ])
 
   // Updated to debounce edit events so only the last event is emitted after dragging ends
   const lastEditEventRef = useRef<any>(null)

@@ -16,6 +16,7 @@ export const RunFrameForCli = (props: {
       forceLatestEvalVersion={shouldLoadLatestEval}
       defaultToFullScreen={true}
       showToggleFullScreen={false}
+      showFilesSwitch
       leftHeaderContent={
         <div className="rf-flex rf-items-center rf-justify-between">
           <RunframeCliLeftHeader

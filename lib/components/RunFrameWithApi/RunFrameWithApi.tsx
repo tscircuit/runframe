@@ -1,12 +1,13 @@
 import Debug from "debug"
 import { useEditEventController } from "lib/hooks/use-edit-event-controller"
 import { useSyncPageTitle } from "lib/hooks/use-sync-page-title"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
 import { API_BASE } from "./api-base"
 import { useRunFrameStore } from "./store"
 import { applyEditEventsToManualEditsFile } from "@tscircuit/core"
 import type { ManualEditsFile } from "@tscircuit/props"
+import { FileSelectorCombobox } from "./file-selector-combobox"
 
 const debug = Debug("run-frame:RunFrameWithApi")
 
@@ -32,6 +33,7 @@ export interface RunFrameWithApiProps {
   leftHeaderContent?: React.ReactNode
   defaultToFullScreen?: boolean
   showToggleFullScreen?: boolean
+  showFilesSwitch?: boolean
 }
 
 export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
@@ -51,12 +53,35 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   const fsMap = useRunFrameStore((s) => s.fsMap)
   const circuitJson = useRunFrameStore((s) => s.circuitJson)
 
-  const mainComponentPath = window?.TSCIRCUIT_MAIN_COMPONENT_PATH
+  const [mainComponentPath, setMainComponentPath] = useState<string>("")
 
   useEffect(() => {
     loadInitialFiles()
   }, [])
 
+  useEffect(() => {
+    const files = Array.from(fsMap.keys())
+    if (mainComponentPath && files.includes(mainComponentPath)) {
+      // Retain current selection if it still exists
+      return
+    }
+    const defaultPath = window?.TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH
+    if (defaultPath && files.includes(defaultPath)) {
+      setMainComponentPath(defaultPath)
+    } else {
+      const firstMatch = files.find(
+        (file) =>
+          (file.endsWith(".tsx") ||
+            file.endsWith(".ts") ||
+            file.endsWith(".jsx") ||
+            file.endsWith(".js")) &&
+          !file.endsWith(".d.ts"),
+      )
+      if (firstMatch) {
+        setMainComponentPath(firstMatch)
+      }
+    }
+  }, [fsMap])
   useSyncPageTitle()
 
   const {
@@ -84,7 +109,20 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       fsMap={fsMap}
       evalVersion={props.evalVersion}
       forceLatestEvalVersion={props.forceLatestEvalVersion}
-      leftHeaderContent={leftHeaderContent}
+      leftHeaderContent={
+        <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
+          {props.leftHeaderContent}
+          {props.showFilesSwitch && (
+            <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2">
+              <FileSelectorCombobox
+                currentFile={mainComponentPath}
+                files={Array.from(fsMap.keys())}
+                onFileChange={(value) => setMainComponentPath(value)}
+              />
+            </div>
+          )}
+        </div>
+      }
       defaultToFullScreen={props.defaultToFullScreen}
       showToggleFullScreen={props.showToggleFullScreen}
       mainComponentPath={mainComponentPath}

@@ -36,7 +36,8 @@ circuit.add(
 
   if (
     typeof window !== "undefined" &&
-    window.location.origin.includes("vercel.app")
+    (!window.location.origin.includes("vercel.app") ||
+      !window.location.origin.includes(".com"))
   ) {
     return (
       <div>

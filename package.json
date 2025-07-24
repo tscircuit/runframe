@@ -42,7 +42,7 @@
     "@radix-ui/react-progress": "^1.1.2",
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-tabs": "^1.1.2",
-    "@tscircuit/3d-viewer": "^0.0.304",
+    "@tscircuit/3d-viewer": "^0.0.305",
     "@tscircuit/assembly-viewer": "^0.0.4",
     "@tscircuit/checks": "^0.0.60",
     "@tscircuit/create-snippet-url": "^0.0.8",

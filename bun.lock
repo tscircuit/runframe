@@ -34,7 +34,7 @@
         "@vitejs/plugin-react": "^4.3.4",
         "autoprefixer": "^10.4.20",
         "chokidar-cli": "^3.0.0",
-        "circuit-json": "0.0.220",
+        "circuit-json": "0.0.222",
         "circuit-json-to-bom-csv": "^0.0.7",
         "circuit-json-to-gerber": "^0.0.25",
         "circuit-json-to-pnp-csv": "^0.0.7",
@@ -856,7 +856,7 @@
 
     "chownr": ["chownr@3.0.0", "", {}, "sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g=="],
 
-    "circuit-json": ["circuit-json@0.0.220", "", { "dependencies": { "nanoid": "^5.0.7" } }, "sha512-0auRV4ZoQesJpDrJi78MsaRSI4WjxDhl1iPiYdzu8T/Hnce0elRdiE3emtElDD2L5kps5hrixQR/9CcihEM/GA=="],
+    "circuit-json": ["circuit-json@0.0.222", "", { "dependencies": { "nanoid": "^5.0.7" } }, "sha512-cSdJtxz4Zv8IT8GKm0K8uc2lkxYu6FOfLyovLmN5fnivQWZ2l5KkBOOJVpZMSY5BhyN5iUVneDnkUMReVRPbXw=="],
 
     "circuit-json-to-bom-csv": ["circuit-json-to-bom-csv@0.0.7", "", { "dependencies": { "format-si-prefix": "^0.3.2", "papaparse": "^5.4.1" }, "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-bmdNtnrATx7DpV2dTjXLkFmgvxJfY4Um/k+7lXJhkXhlY2hEf7msxBqDXQdcKYkDB9/sdqZp4iCrWqItJ6N7yQ=="],
 
@@ -2421,6 +2421,8 @@
     "chokidar-cli/yargs": ["yargs@13.3.2", "", { "dependencies": { "cliui": "^5.0.0", "find-up": "^3.0.0", "get-caller-file": "^2.0.1", "require-directory": "^2.1.1", "require-main-filename": "^2.0.0", "set-blocking": "^2.0.0", "string-width": "^3.0.0", "which-module": "^2.0.0", "y18n": "^4.0.0", "yargs-parser": "^13.1.2" } }, "sha512-AX3Zw5iPruN5ie6xGRIDgqkT+ZhnRlZMLMHAs8tg7nRruy2Nb+i5o9bwghAogtM08q1dpr2LVoS8KSTMYpWXUw=="],
 
     "circuit-json-to-connectivity-map/@tscircuit/math-utils": ["@tscircuit/math-utils@0.0.9", "", { "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-sPzfXndijet8z29X6f5vnSZddiso2tRg7m6rB+268bVj60mxnxUMD14rKuMlLn6n84fMOpD/X7pRTZUfi6M+Tg=="],
+
+    "circuit-json-to-gerber/circuit-json": ["circuit-json@0.0.220", "", { "dependencies": { "nanoid": "^5.0.7" } }, "sha512-0auRV4ZoQesJpDrJi78MsaRSI4WjxDhl1iPiYdzu8T/Hnce0elRdiE3emtElDD2L5kps5hrixQR/9CcihEM/GA=="],
 
     "circuit-json-to-gerber/transformation-matrix": ["transformation-matrix@3.0.0", "", {}, "sha512-C6NlNnD6T8JqDeY4BpGznuve4d8/JlLDZLcJbnnx7gQKoyk01+uk2XYVFjBGqvNsVxJUpUwb3WZpjpdPr+05FQ=="],
 

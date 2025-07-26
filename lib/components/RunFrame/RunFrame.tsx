@@ -67,8 +67,6 @@ const resolveEvalVersion = async (
   }
 
   return "latest"
-
-  return "latest"
 }
 
 export type { RunFrameProps }

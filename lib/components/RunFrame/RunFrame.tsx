@@ -53,15 +53,21 @@ const resolveEvalVersion = async (
   forceLatest?: boolean,
 ) => {
   if (evalVersionProp) return evalVersionProp
-  if (forceLatest) {
-    if (window.TSCIRCUIT_LATEST_EVAL_VERSION)
-      return window.TSCIRCUIT_LATEST_EVAL_VERSION
-    const latest = await fetchLatestEvalVersion()
-    if (latest) {
-      window.TSCIRCUIT_LATEST_EVAL_VERSION = latest
-      return latest
-    }
+
+  if (!forceLatest && window.TSCIRCUIT_LATEST_EVAL_VERSION) {
+    return window.TSCIRCUIT_LATEST_EVAL_VERSION
   }
+
+  const latest = await fetchLatestEvalVersion()
+  if (latest) {
+    window.TSCIRCUIT_LATEST_EVAL_VERSION = latest
+    return latest
+  }
+
+  if (window.TSCIRCUIT_LATEST_EVAL_VERSION) {
+    return window.TSCIRCUIT_LATEST_EVAL_VERSION
+  }
+
   return "latest"
 }
 

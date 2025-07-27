@@ -25,7 +25,7 @@
         "@tscircuit/footprinter": "^0.0.206",
         "@tscircuit/math-utils": "^0.0.19",
         "@tscircuit/pcb-viewer": "1.11.198",
-        "@tscircuit/props": "^0.0.268",
+        "@tscircuit/props": "^0.0.269",
         "@tscircuit/schematic-viewer": "2.0.24",
         "@types/bun": "latest",
         "@types/debug": "^4.1.12",
@@ -578,7 +578,7 @@
 
     "@tscircuit/pcb-viewer": ["@tscircuit/pcb-viewer@1.11.198", "", { "dependencies": { "@emotion/css": "^11.11.2", "@vitejs/plugin-react": "^4.5.0", "circuit-to-svg": "^0.0.166", "color": "^4.2.3", "react-supergrid": "^1.0.10", "react-toastify": "^10.0.5", "transformation-matrix": "^2.13.0", "zustand": "^4.5.2" }, "peerDependencies": { "react": "*", "tscircuit": "*" } }, "sha512-F2OLtI/Vbpe45+0k2Tp7WSwV6vWf+qnbBrdFAUxAjWCvCSTH7zyGIXHVHJEdt1bHxhInlQAMHtEG/qXCvLcjjw=="],
 
-    "@tscircuit/props": ["@tscircuit/props@0.0.268", "", { "peerDependencies": { "circuit-json": "*", "react": "*", "zod": "*" } }, "sha512-0CQiN570or6W9BY/WlBngjCPOj8LVv3VlJET99uGyzhMuj4EZiHJm9VlPevz+o1qcSePjzywpAut7xSg9KZ08g=="],
+    "@tscircuit/props": ["@tscircuit/props@0.0.269", "", { "peerDependencies": { "circuit-json": "*", "react": "*", "zod": "*" } }, "sha512-kPjGMLVSlW6kJ8iCmWhVvikam09cUJXAorddqEevQbierTngVCDEXmYDelv4A2S3oDf0ZWZpSal9XWiDNn9AlQ=="],
 
     "@tscircuit/runframe": ["@tscircuit/runframe@0.0.712", "", {}, "sha512-4njpMqbiRDaCFOMrizgzcdfckugQzh19Ch+H3YjtJQt6BN6suKGcx+CcU2dy5UC54a0A7XsUmOV1aiy2yj+nZA=="],
 
@@ -2359,6 +2359,8 @@
     "@skidding/launch-editor/chalk": ["chalk@2.4.2", "", { "dependencies": { "ansi-styles": "^3.2.1", "escape-string-regexp": "^1.0.5", "supports-color": "^5.3.0" } }, "sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ=="],
 
     "@ts-morph/common/mkdirp": ["mkdirp@3.0.1", "", { "bin": { "mkdirp": "dist/cjs/src/bin.js" } }, "sha512-+NsyUUAZDmo6YVHzL/stxSu3t9YS1iljliy3BSDrXJ/dkn1KYdmtZODGGjLcc9XLgVVpH4KshHB8XmZgMhaBXg=="],
+
+    "@tscircuit/3d-viewer/@tscircuit/props": ["@tscircuit/props@0.0.268", "", { "peerDependencies": { "circuit-json": "*", "react": "*", "zod": "*" } }, "sha512-0CQiN570or6W9BY/WlBngjCPOj8LVv3VlJET99uGyzhMuj4EZiHJm9VlPevz+o1qcSePjzywpAut7xSg9KZ08g=="],
 
     "@tscircuit/3d-viewer/jscad-fiber": ["jscad-fiber@0.0.79", "", { "dependencies": { "color": "^4.2.3", "lucide-react": "^0.456.0", "react-code-blocks": "^0.1.6", "react-reconciler": "^0.29.2" }, "peerDependencies": { "@jscad/modeling": "*", "@react-three/fiber": "*", "react": "*", "three": "*" } }, "sha512-pSj1vwBxKxW0c7xnE82nElPecKUfUMR/Gl2SHRPIqaibPvn4wxu+Pp0sB6KDLnB1nmnKa4F2queRdGDN9AeZxw=="],
 

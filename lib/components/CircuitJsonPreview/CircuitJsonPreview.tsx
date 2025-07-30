@@ -330,7 +330,7 @@ export const CircuitJsonPreview = ({
                           </div>
                         </DropdownMenuSubTrigger>
                         <DropdownMenuPortal>
-                          <DropdownMenuSubContent className="rf-*:text-xs rf-w-40">
+                          <DropdownMenuSubContent className="rf-*:text-xs rf-w-40 rf-max-h-[200px] rf-overflow-y-auto">
                             <div className="rf-p-1">
                               <Input
                                 value={evalSearch}

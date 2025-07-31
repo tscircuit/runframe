@@ -410,6 +410,11 @@ export const RunFrame = (props: RunFrameProps) => {
         // Use the current event if available, otherwise use the last in-progress event
         const eventToSend = event || lastEditEventRef.current
         props.onEditEvent?.(eventToSend)
+        
+        // Auto-render after manual edit (component movement)
+        // This triggers the same re-rendering logic as the Run button
+        incRunCountTrigger(1)
+        
         lastEditEventRef.current = null
         dragTimeout.current = null
       }, 100)

@@ -29,8 +29,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
 } from "../ui/dropdown-menu"
 import { Button } from "../ui/button"
+import { Input } from "../ui/input"
 import { PcbViewerWithContainerHeight } from "../PcbViewerWithContainerHeight"
 import { useStyles } from "lib/hooks/use-styles"
 import { useFullscreenBodyScroll } from "lib/hooks/use-fullscreen-body-scroll"
@@ -38,10 +44,10 @@ import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { capitalizeFirstLetters } from "lib/utils"
 import { useErrorTelemetry } from "lib/hooks/use-error-telemetry"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
-import { version } from "../../../package.json"
 import type { CircuitJsonError } from "circuit-json"
-import { useRunnerStore } from "../RunFrame/runner-store/use-runner-store"
+import { version } from "../../../package.json"
 import type { Object3D } from "three"
+import { useEvalVersions } from "lib/hooks/use-eval-versions"
 
 declare global {
   interface Window {
@@ -94,10 +100,18 @@ export const CircuitJsonPreview = ({
   showToggleFullScreen = true,
   defaultToFullScreen = false,
   activeEffectName,
+  allowSelectingVersion = true,
 }: PreviewContentProps) => {
   useStyles()
 
-  const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
+  const {
+    versions: evalVersions,
+    latestVersion,
+    lastRunEvalVersion,
+    search: evalSearch,
+    setSearch: setEvalSearch,
+    selectVersion: selectEvalVersion,
+  } = useEvalVersions(allowSelectingVersion)
 
   const circuitJsonErrors = useMemo<CircuitJsonError[] | null>(() => {
     if (!circuitJson) return null
@@ -329,15 +343,56 @@ export const CircuitJsonPreview = ({
                           .join(".")}
                       </div>
                     </DropdownMenuItem>
-                    {lastRunEvalVersion && (
-                      <DropdownMenuItem
-                        disabled
-                        className="rf-opacity-60 rf-cursor-default rf-select-none"
+                    {allowSelectingVersion ? (
+                      <DropdownMenuSub
+                        onOpenChange={(open) => !open && setEvalSearch("")}
                       >
-                        <div className="rf-pr-2 rf-text-xs rf-text-gray-500">
-                          @tscircuit/eval@{lastRunEvalVersion}
-                        </div>
-                      </DropdownMenuItem>
+                        <DropdownMenuSubTrigger className="rf-text-xs rf-opacity-60">
+                          <div className="rf-pr-2 rf-text-xs rf-text-gray-500">
+                            @tscircuit/eval@
+                            {lastRunEvalVersion ?? latestVersion ?? "latest"}
+                          </div>
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuPortal>
+                          <DropdownMenuSubContent className="rf-*:text-xs rf-w-40 rf-max-h-[200px] rf-overflow-y-auto">
+                            <div className="rf-p-1">
+                              <Input
+                                value={evalSearch}
+                                onChange={(e) => setEvalSearch(e.target.value)}
+                                placeholder="Search..."
+                                className="rf-h-7 rf-text-xs"
+                              />
+                            </div>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onSelect={() => selectEvalVersion(null)}
+                            >
+                              {latestVersion
+                                ? `${latestVersion} (latest)`
+                                : "latest"}
+                            </DropdownMenuItem>
+                            {evalVersions.map((v) => (
+                              <DropdownMenuItem
+                                key={v}
+                                onSelect={() => selectEvalVersion(v)}
+                              >
+                                {v}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                      </DropdownMenuSub>
+                    ) : (
+                      lastRunEvalVersion && (
+                        <DropdownMenuItem
+                          disabled
+                          className="rf-opacity-60 rf-cursor-default rf-select-none"
+                        >
+                          <div className="rf-pr-2 rf-text-xs rf-text-gray-500">
+                            @tscircuit/eval@{lastRunEvalVersion}
+                          </div>
+                        </DropdownMenuItem>
+                      )
                     )}
                   </DropdownMenuContent>
                 </DropdownMenu>

@@ -92,14 +92,27 @@ export const ErrorTabContent = ({
     return warnings
   }, [circuitJsonWarnings])
 
-  const packageUrl = useMemo(() => {
-    if (fsMap) {
-      return encodeFsMapToUrlHash(
-        fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap,
+  const fsMapStable = useMemo(() => {
+    if (!fsMap) return null
+    if (fsMap instanceof Map) {
+      const entries = Array.from(fsMap.entries()).sort(([a], [b]) =>
+        a.localeCompare(b),
       )
+      return Object.fromEntries(entries)
+    }
+    return fsMap
+  }, [
+    fsMap && fsMap instanceof Map
+      ? JSON.stringify(Array.from(fsMap.entries()).sort())
+      : fsMap,
+  ])
+
+  const packageUrl = useMemo(() => {
+    if (fsMapStable) {
+      return encodeFsMapToUrlHash(fsMapStable)
     }
     return createSnippetUrl(code ?? "")
-  }, [fsMap, code])
+  }, [fsMapStable, code])
 
   const openIssue = useCallback((title: string, body: string) => {
     const issueUrl = `https://github.com/tscircuit/tscircuit.com/issues/new?title=${encodeURIComponent(

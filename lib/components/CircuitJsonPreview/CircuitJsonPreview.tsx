@@ -212,22 +212,28 @@ export const CircuitJsonPreview = ({
             )}
             {!leftHeaderContent && <div className="rf-flex-grow" />}
             {renderLog && renderLog.progress !== 1 && !errorMessage && (
-              <div className="rf-flex rf-items-center rf-gap-2">
+              <div className="rf-flex rf-items-center rf-gap-2 rf-min-w-0 rf-max-w-xs">
                 {activeEffectName ? (
-                  <div className="rf-text-xs rf-text-gray-500">
+                  <div
+                    className="rf-text-xs rf-text-gray-500 rf-truncate rf-min-w-0"
+                    title={activeEffectName}
+                  >
                     {activeEffectName}
                   </div>
                 ) : (
                   renderLog.lastRenderEvent && (
-                    <div className="rf-text-xs rf-text-gray-500">
+                    <div
+                      className="rf-text-xs rf-text-gray-500 rf-truncate rf-min-w-0"
+                      title={renderLog.lastRenderEvent?.phase ?? ""}
+                    >
                       {renderLog.lastRenderEvent?.phase ?? ""}
                     </div>
                   )
                 )}
-                <div className="rf-w-4 rf-h-4 rf-bg-blue-500 rf-opacity-50 rf-rounded-full rf-text-white">
+                <div className="rf-w-4 rf-h-4 rf-bg-blue-500 rf-opacity-50 rf-rounded-full rf-text-white rf-flex-shrink-0">
                   <LoaderCircleIcon className="rf-w-4 rf-h-4 rf-animate-spin" />
                 </div>
-                <div className="rf-text-xs rf-font-bold rf-text-gray-700 rf-tabular-nums">
+                <div className="rf-text-xs rf-font-bold rf-text-gray-700 rf-tabular-nums rf-flex-shrink-0">
                   {((renderLog.progress ?? 0) * 100).toFixed(1)}%
                 </div>
               </div>

@@ -4,7 +4,7 @@ import { Button } from "lib/components/ui/button"
 import { createSnippetUrl } from "@tscircuit/create-snippet-url"
 import { encodeFsMapToUrlHash } from "lib/utils"
 import { AutoroutingLogOptions } from "./AutoroutingLogOptions"
-import { useState, useMemo, useCallback } from "react"
+import { useState, useMemo } from "react"
 import type { CircuitJsonError } from "circuit-json"
 
 interface UnifiedError {
@@ -92,21 +92,21 @@ export const ErrorTabContent = ({
     return warnings
   }, [circuitJsonWarnings])
 
-  const packageUrl = useMemo(() => {
+  const packageUrl = () => {
     if (fsMap) {
       return encodeFsMapToUrlHash(
         fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap,
       )
     }
     return createSnippetUrl(code ?? "")
-  }, [fsMap, code])
+  }
 
-  const openIssue = useCallback((title: string, body: string) => {
+  const openIssue = (title: string, body: string) => {
     const issueUrl = `https://github.com/tscircuit/tscircuit.com/issues/new?title=${encodeURIComponent(
       title,
     )}&body=${encodeURIComponent(body)}`
     window.open(issueUrl, "_blank")
-  }, [])
+  }
 
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0)
   const [currentWarningIndex, setCurrentWarningIndex] = useState(0)
@@ -133,10 +133,8 @@ export const ErrorTabContent = ({
             variant="outline"
             className="rf-p-1"
             onClick={() => {
-              openIssue(
-                "Issue Report",
-                `[Package code to reproduce](${packageUrl})`,
-              )
+              const url = packageUrl()
+              openIssue("Issue Report", `[Package code to reproduce](${url})`)
             }}
           >
             <GitHubLogoIcon className="rf-w-4 rf-h-4" />

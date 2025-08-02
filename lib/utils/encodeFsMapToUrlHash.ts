@@ -9,5 +9,5 @@ export function encodeFsMapToUrlHash(
   const compressedData = gzipSync(strToU8(text))
   const base64Data = bytesToBase64(compressedData)
   const typeParam = snippet_type ? `&snippet_type=${snippet_type}` : ""
-  return `${window.location.origin}/editor?${typeParam}#data:application/gzip;base64,${base64Data}`
+  return `https://tscircuit.com/editor?${typeParam}#data:application/gzip;base64,${base64Data}`
 }

@@ -94,9 +94,11 @@ export const ErrorTabContent = ({
 
   const packageUrl = () => {
     if (fsMap) {
-      return encodeFsMapToUrlHash(
-        fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap,
-      )
+      try {
+        return encodeFsMapToUrlHash(
+          fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap,
+        )
+      } catch {}
     }
     return createSnippetUrl(code ?? "")
   }

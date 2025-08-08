@@ -73,7 +73,7 @@
     "concurrently": "^9.1.2",
     "cssnano": "^7.0.6",
     "debug": "^4.4.0",
-    "easyeda": "^0.0.201",
+    "easyeda": "^0.0.217",
     "fflate": "^0.8.2",
     "jscad-fiber": "^0.0.80",
     "jszip": "^3.10.1",

@@ -44,9 +44,12 @@ const root = createRoot(ensureRoot())
 
 // This variable is dynamically modified inside build scripts in the "tscircuit"
 // repo to inject the latest CDN URL for the webworker blob
-const INJECT_TSCIRCUIT_WORKER_BLOB_URL = undefined
+const INJECT_TSCIRCUIT_WORKER_BLOB_URL =
+  "<--INJECT_TSCIRCUIT_WORKER_BLOB_URL-->"
 const runframeStandaloneProps: ComponentProps<typeof RunFrameWithApi> = {
-  workerBlobUrl: INJECT_TSCIRCUIT_WORKER_BLOB_URL,
+  workerBlobUrl: INJECT_TSCIRCUIT_WORKER_BLOB_URL.includes("<--")
+    ? undefined
+    : INJECT_TSCIRCUIT_WORKER_BLOB_URL,
 }
 ;(async () => {
   // @ts-ignore

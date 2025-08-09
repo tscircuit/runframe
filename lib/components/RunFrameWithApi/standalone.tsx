@@ -47,7 +47,9 @@ const root = createRoot(ensureRoot())
 const INJECT_TSCIRCUIT_EVAL_WEB_WORKER_BLOB_URL =
   "<--INJECT_TSCIRCUIT_EVAL_WEB_WORKER_BLOB_URL-->"
 const runframeStandaloneProps: ComponentProps<typeof RunFrameWithApi> = {
-  evalWebWorkerBlobUrl: INJECT_TSCIRCUIT_EVAL_WEB_WORKER_BLOB_URL.includes("<--")
+  evalWebWorkerBlobUrl: INJECT_TSCIRCUIT_EVAL_WEB_WORKER_BLOB_URL.includes(
+    "<--",
+  )
     ? undefined
     : INJECT_TSCIRCUIT_EVAL_WEB_WORKER_BLOB_URL,
 }

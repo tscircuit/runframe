@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client"
 import { RunFrameWithApi } from "./RunFrameWithApi"
 import { RunFrameForCli } from "../RunFrameForCli/RunFrameForCli"
 import { RunFrame } from "../RunFrame/RunFrame"
+import type { ComponentProps } from "react"
 
 const ensureRoot = () => {
   const existing = document.getElementById("root")
@@ -44,7 +45,7 @@ const root = createRoot(ensureRoot())
 // This variable is dynamically modified inside build scripts in the "tscircuit"
 // repo to inject the latest CDN URL for the webworker blob
 const INJECT_TSCIRCUIT_WORKER_BLOB_URL = undefined
-const runframeStandaloneProps: React.ComponentProps<typeof RunFrameWithApi> = {
+const runframeStandaloneProps: ComponentProps<typeof RunFrameWithApi> = {
   workerBlobUrl: INJECT_TSCIRCUIT_WORKER_BLOB_URL,
 }
 ;(async () => {

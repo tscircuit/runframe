@@ -34,7 +34,6 @@ export interface RunFrameWithApiProps {
   defaultToFullScreen?: boolean
   showToggleFullScreen?: boolean
   showFilesSwitch?: boolean
-  workerBlobUrl?: string
 }
 
 export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
@@ -120,7 +119,6 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       fsMap={fsMap}
       evalVersion={props.evalVersion}
       forceLatestEvalVersion={props.forceLatestEvalVersion}
-      evalWebWorkerBlobUrl={props.workerBlobUrl}
       leftHeaderContent={
         <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
           {props.leftHeaderContent}

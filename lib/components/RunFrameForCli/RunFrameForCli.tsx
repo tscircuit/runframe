@@ -7,13 +7,14 @@ export const RunFrameForCli = (props: {
   scenarioSelectorContent?: React.ReactNode
   workerBlobUrl?: string
 }) => {
-  const [shouldLoadLatestEval, setLoadLatestEval] = props.workerBlobUrl
-    ? false
-    : useLocalStorageState("load-latest-eval", true)
+  const [shouldLoadLatestEval, setLoadLatestEval] = useLocalStorageState(
+    "load-latest-eval",
+    true,
+  )
   return (
     <RunFrameWithApi
       debug={props.debug}
-      forceLatestEvalVersion={shouldLoadLatestEval}
+      forceLatestEvalVersion={!props.workerBlobUrl && shouldLoadLatestEval}
       defaultToFullScreen={true}
       showToggleFullScreen={false}
       workerBlobUrl={props.workerBlobUrl}
@@ -21,7 +22,7 @@ export const RunFrameForCli = (props: {
       leftHeaderContent={
         <div className="rf-flex rf-items-center rf-justify-between">
           <RunframeCliLeftHeader
-            shouldLoadLatestEval={shouldLoadLatestEval}
+            shouldLoadLatestEval={!props.workerBlobUrl && shouldLoadLatestEval}
             onChangeShouldLoadLatestEval={(newShouldLoadLatestEval) => {
               setLoadLatestEval(newShouldLoadLatestEval)
               globalThis.runFrameWorker = null

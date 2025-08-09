@@ -40,16 +40,23 @@ const loadScriptsAsFsMap = async () => {
 }
 
 const root = createRoot(ensureRoot())
+
+// This variable is dynamically modified inside build scripts in the "tscircuit"
+// repo to inject the latest CDN URL for the webworker blob
+const INJECT_TSCIRCUIT_WORKER_BLOB_URL = undefined
+const runframeStandaloneProps: React.ComponentProps<typeof RunFrameWithApi> = {
+  workerBlobUrl: INJECT_TSCIRCUIT_WORKER_BLOB_URL,
+}
 ;(async () => {
   // @ts-ignore
   if (window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI) {
-    root.render(<RunFrameForCli />)
+    root.render(<RunFrameForCli {...runframeStandaloneProps} />)
   } else {
     const { fsMap } = await loadScriptsAsFsMap()
     if (fsMap.size > 0) {
-      root.render(<RunFrame fsMap={fsMap} />)
+      root.render(<RunFrame {...runframeStandaloneProps} fsMap={fsMap} />)
     } else {
-      root.render(<RunFrameWithApi />)
+      root.render(<RunFrameWithApi {...runframeStandaloneProps} />)
     }
   }
 })()

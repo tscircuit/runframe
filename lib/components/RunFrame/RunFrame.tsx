@@ -224,20 +224,22 @@ export const RunFrame = (props: RunFrameProps) => {
         cancelled = true
       }
 
-      const evalVersion = await resolveEvalVersion(
+      const resolvedEvalVersion = await resolveEvalVersion(
         props.evalVersion,
         !globalThis.runFrameWorker && props.forceLatestEvalVersion,
       )
+      debug("resolvedEvalVersion", resolvedEvalVersion)
 
       const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
         globalThis.runFrameWorker ??
         (await createCircuitWebWorker({
-          evalVersion,
+          evalVersion: resolvedEvalVersion,
           webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
           verbose: true,
         }))
       globalThis.runFrameWorker = worker
-      setLastRunEvalVersion(evalVersion)
+      setLastRunEvalVersion(resolvedEvalVersion)
+      debug("Starting render...")
       props.onRenderStarted?.()
 
       const fsMapObj =
@@ -306,6 +308,7 @@ export const RunFrame = (props: RunFrameProps) => {
         setAutoroutingGraphics(event.debugGraphics)
       })
 
+      debug("Executing fsMap...")
       const evalResult = await worker
         .executeWithFsMap({
           entrypoint: props.entrypoint,
@@ -320,12 +323,14 @@ export const RunFrame = (props: RunFrameProps) => {
         .catch((e: any) => {
           // removing the prefix "Eval compiled js error for "./main.tsx":"
           const message: string = e.message.replace("Error: ", "")
+          debug(`eval error: ${message}`)
           props.onError?.(e)
           setError({ error: message, stack: e.stack })
           setRenderLog(null)
           console.error(e)
           return { success: false }
         })
+      debug("worker call started")
       if (!evalResult.success) {
         setIsRunning(false)
         setActiveAsyncEffects({})

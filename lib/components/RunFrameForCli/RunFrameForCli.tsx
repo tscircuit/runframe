@@ -5,17 +5,18 @@ import { RunframeCliLeftHeader } from "./LeftHeader"
 export const RunFrameForCli = (props: {
   debug?: boolean
   scenarioSelectorContent?: React.ReactNode
+  workerBlobUrl?: string
 }) => {
-  const [shouldLoadLatestEval, setLoadLatestEval] = useLocalStorageState(
-    "load-latest-eval",
-    true,
-  )
+  const [shouldLoadLatestEval, setLoadLatestEval] = props.workerBlobUrl
+    ? false
+    : useLocalStorageState("load-latest-eval", true)
   return (
     <RunFrameWithApi
       debug={props.debug}
       forceLatestEvalVersion={shouldLoadLatestEval}
       defaultToFullScreen={true}
       showToggleFullScreen={false}
+      workerBlobUrl={props.workerBlobUrl}
       showFilesSwitch
       leftHeaderContent={
         <div className="rf-flex rf-items-center rf-justify-between">

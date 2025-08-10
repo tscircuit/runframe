@@ -228,22 +228,20 @@ export const RunFrame = (props: RunFrameProps) => {
         cancelled = true
       }
 
-      const resolvedEvalVersion = await resolveEvalVersion(
+      const evalVersion = await resolveEvalVersion(
         props.evalVersion,
         !globalThis.runFrameWorker && props.forceLatestEvalVersion,
       )
-      debug("resolvedEvalVersion", resolvedEvalVersion)
 
       const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
         globalThis.runFrameWorker ??
         (await createCircuitWebWorker({
-          evalVersion: resolvedEvalVersion,
+          evalVersion,
           webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
           verbose: true,
         }))
       globalThis.runFrameWorker = worker
-      setLastRunEvalVersion(resolvedEvalVersion)
-      debug("Starting render...")
+      setLastRunEvalVersion(evalVersion)
       props.onRenderStarted?.()
 
       const fsMapObj =
@@ -312,7 +310,6 @@ export const RunFrame = (props: RunFrameProps) => {
         setAutoroutingGraphics(event.debugGraphics)
       })
 
-      debug("Executing fsMap...")
       const evalResult = await worker
         .executeWithFsMap({
           entrypoint: props.entrypoint,
@@ -327,14 +324,12 @@ export const RunFrame = (props: RunFrameProps) => {
         .catch((e: any) => {
           // removing the prefix "Eval compiled js error for "./main.tsx":"
           const message: string = e.message.replace("Error: ", "")
-          debug(`eval error: ${message}`)
           props.onError?.(e)
           setError({ error: message, stack: e.stack })
           setRenderLog(null)
           console.error(e)
           return { success: false }
         })
-      debug("worker call started")
       if (!evalResult.success) {
         setIsRunning(false)
         setActiveAsyncEffects({})
@@ -415,6 +410,11 @@ export const RunFrame = (props: RunFrameProps) => {
         // Use the current event if available, otherwise use the last in-progress event
         const eventToSend = event || lastEditEventRef.current
         props.onEditEvent?.(eventToSend)
+        
+        // Auto-render after manual edit (component movement)
+        // This triggers the same re-rendering logic as the Run button
+        incRunCountTrigger(1)
+        
         lastEditEventRef.current = null
         dragTimeout.current = null
       }, 100)

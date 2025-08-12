@@ -46,7 +46,7 @@
     "@tscircuit/assembly-viewer": "^0.0.4",
     "@tscircuit/checks": "^0.0.68",
     "@tscircuit/create-snippet-url": "^0.0.8",
-    "@tscircuit/eval": "^0.0.280",
+    "@tscircuit/eval": "^0.0.282",
     "@tscircuit/fake-snippets": "^0.0.87",
     "@tscircuit/file-server": "^0.0.24",
     "@tscircuit/footprinter": "^0.0.228",

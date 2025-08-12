@@ -41,6 +41,11 @@ export interface RunFrameProps {
   leftHeaderContent?: React.ReactNode
 
   /**
+   * Whether to show the default file menu with download options
+   */
+  showFileMenu?: boolean
+
+  /**
    * Called when the circuit JSON changes
    */
   onCircuitJsonChange?: (circuitJson: any) => void

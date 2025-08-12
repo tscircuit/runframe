@@ -19,6 +19,7 @@ export const RunFrameForCli = (props: {
       showToggleFullScreen={false}
       workerBlobUrl={props.workerBlobUrl}
       showFilesSwitch
+      showFileMenu={false}
       leftHeaderContent={
         <div className="rf-flex rf-items-center rf-justify-between">
           <RunframeCliLeftHeader

@@ -32,6 +32,7 @@ import { useRunnerStore } from "./runner-store/use-runner-store"
 import { useMutex } from "./useMutex"
 import type { ManualEditEvent } from "@tscircuit/props"
 import { registryKy } from "../../utils/get-registry-ky"
+import { RunFrameFileMenu } from "./FileMenu"
 
 const fetchLatestEvalVersion = async () => {
   try {
@@ -158,6 +159,7 @@ export const RunFrame = (props: RunFrameProps) => {
   const [activeTab, setActiveTab] = useState<TabId>(
     props.defaultActiveTab ?? props.defaultTab ?? "pcb",
   )
+  const showFileMenu = props.showFileMenu ?? true
   useEffect(() => {
     if (props.debug) Debug.enable("run-frame*")
   }, [props.debug])
@@ -532,6 +534,7 @@ export const RunFrame = (props: RunFrameProps) => {
               )}
             </div>
           )}
+          {showFileMenu && <RunFrameFileMenu />}
           {props.leftHeaderContent}
         </>
       }

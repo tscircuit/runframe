@@ -36,6 +36,7 @@ export interface RunFrameWithApiProps {
   showFilesSwitch?: boolean
   workerBlobUrl?: string
   evalWebWorkerBlobUrl?: string
+  showFileMenu?: boolean
 }
 
 export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
@@ -140,6 +141,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
           )}
         </div>
       }
+      showFileMenu={props.showFileMenu}
       defaultToFullScreen={props.defaultToFullScreen}
       showToggleFullScreen={props.showToggleFullScreen}
       onInitialRender={() => {

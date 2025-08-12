@@ -20,7 +20,7 @@ export const RunFrameFileMenu = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="rf-whitespace-nowrap rf-text-xs font-medium rf-p-2 rf-mx-1 rf-cursor-pointer rf-relative">
+        <div className="rf-inline-flex rf-items-center rf-justify-center rf-h-9 rf-rounded-lg rf-bg-zinc-100 rf-px-3 rf-mx-1 rf-text-sm rf-font-medium rf-text-zinc-500 dark:rf-bg-zinc-800 dark:rf-text-zinc-400 rf-whitespace-nowrap rf-cursor-pointer rf-relative">
           File
         </div>
       </DropdownMenuTrigger>

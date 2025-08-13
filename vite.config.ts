@@ -6,6 +6,7 @@ import { getNodeHandler } from "winterspec/adapters/node"
 import fakeRegistryBundle from "@tscircuit/fake-snippets/bundle"
 import { createDatabase } from "@tscircuit/fake-snippets"
 import ky from "ky"
+import { nodePolyfills } from "vite-plugin-node-polyfills"
 
 const registryDb = createDatabase()
 
@@ -60,7 +61,7 @@ function fakeRegistryPlugin(): Plugin {
   }
 }
 
-const plugins: any[] = [react()]
+const plugins: any[] = [react(), nodePolyfills()]
 
 if (!process.env.VERCEL && !process.env.STANDALONE) {
   plugins.push(fileServerPlugin())

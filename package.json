@@ -52,7 +52,7 @@
     "@tscircuit/footprinter": "^0.0.228",
     "@tscircuit/math-utils": "^0.0.19",
     "@tscircuit/pcb-viewer": "1.11.201",
-    "@tscircuit/props": "^0.0.282",
+    "@tscircuit/props": "^0.0.283",
     "@tscircuit/schematic-viewer": "2.0.26",
     "@types/bun": "latest",
     "@types/debug": "^4.1.12",

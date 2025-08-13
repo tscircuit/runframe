@@ -169,7 +169,7 @@ export const FileMenuLeftHeader = (props: {
               >
                 {isSaving ? "Saving..." : "Push"}
               </DropdownMenuItem>
-              
+
               {/* HACK until ordering is ready, only show in cosmos runframe */}
               {parseInt(window.location.port) > 5000 && (
                 <DropdownMenuItem
@@ -181,7 +181,7 @@ export const FileMenuLeftHeader = (props: {
                   Order
                 </DropdownMenuItem>
               )}
-              
+
               <DropdownMenuItem
                 className="rf-text-xs"
                 onSelect={() => setIsImportDialogOpen(true)}
@@ -189,7 +189,7 @@ export const FileMenuLeftHeader = (props: {
               >
                 Import
               </DropdownMenuItem>
-              
+
               <DropdownMenuItem
                 className="rf-text-xs"
                 onSelect={() => {

@@ -41,9 +41,9 @@ export interface RunFrameProps {
   leftHeaderContent?: React.ReactNode
 
   /**
-   * Whether to show the default file menu with download options
+   * Whether the run frame is embedded in a web page
    */
-  showFileMenu?: boolean
+  isWebEmbedded?: boolean
 
   /**
    * Called when the circuit JSON changes

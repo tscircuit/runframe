@@ -141,7 +141,6 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
           )}
         </div>
       }
-      showFileMenu={props.showFileMenu}
       defaultToFullScreen={props.defaultToFullScreen}
       showToggleFullScreen={props.showToggleFullScreen}
       onInitialRender={() => {

@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react"
-import { useRunFrameStore } from "../RunFrameWithApi/store"
+import { useRunFrameStore } from "./RunFrameWithApi/store"
 import type {
   FailedToSaveSnippetEvent,
   RequestToSaveSnippetEvent,
-} from "../RunFrameWithApi/types"
-import { SelectSnippetDialog } from "./SelectSnippetDialog"
-import { useEventHandler } from "./useEventHandler"
+} from "./RunFrameWithApi/types"
+import { SelectSnippetDialog } from "./RunFrameForCli/SelectSnippetDialog"
+import { useEventHandler } from "./RunFrameForCli/useEventHandler"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -15,7 +15,7 @@ import {
   DropdownMenuPortal,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
-} from "../ui/dropdown-menu"
+} from "./ui/dropdown-menu"
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -25,24 +25,25 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogCancel,
-} from "../ui/alert-dialog"
-import { Checkbox } from "../ui/checkbox"
-import { useRunnerStore } from "../RunFrame/runner-store/use-runner-store"
-import { ImportComponentDialog } from "../ImportComponentDialog"
+} from "./ui/alert-dialog"
+import { Checkbox } from "./ui/checkbox"
+import { useRunnerStore } from "./RunFrame/runner-store/use-runner-store"
+import { ImportComponentDialog } from "./ImportComponentDialog"
 import {
   availableExports,
   exportAndDownload,
 } from "lib/optional-features/exporting/export-and-download"
-import { AiReviewDialog } from "../AiReviewDialog"
+import { AiReviewDialog } from "./AiReviewDialog"
 import { hasRegistryToken } from "lib/utils/get-registry-ky"
 import { toast } from "lib/utils/toast"
 import { Toaster } from "react-hot-toast"
 import { importComponentFromJlcpcb } from "lib/optional-features/importing/import-component-from-jlcpcb"
-import { useOrderDialogCli } from "../OrderDialog/useOrderDialog"
+import { useOrderDialogCli } from "./OrderDialog/useOrderDialog"
 
-export const RunframeCliLeftHeader = (props: {
-  shouldLoadLatestEval: boolean
-  onChangeShouldLoadLatestEval: (shouldLoadLatestEval: boolean) => void
+export const FileMenuLeftHeader = (props: {
+  isWebEmbedded?: boolean
+  shouldLoadLatestEval?: boolean
+  onChangeShouldLoadLatestEval?: (shouldLoadLatestEval: boolean) => void
 }) => {
   const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
   const [snippetName, setSnippetName] = useState<string | null>(null)
@@ -158,43 +159,53 @@ export const RunframeCliLeftHeader = (props: {
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem
-            className="rf-text-xs"
-            onSelect={triggerSaveSnippet}
-            disabled={isSaving}
-          >
-            {isSaving ? "Saving..." : "Push"}
-          </DropdownMenuItem>
-          {/* HACK until ordering is ready, only show in cosmos runframe */}
-          {parseInt(window.location.port) > 5000 && (
-            <DropdownMenuItem
-              className="rf-text-xs"
-              onSelect={() => {
-                orderDialog.open()
-              }}
-            >
-              Order
-            </DropdownMenuItem>
+          {/* CLI-only menu items */}
+          {!props.isWebEmbedded && (
+            <>
+              <DropdownMenuItem
+                className="rf-text-xs"
+                onSelect={triggerSaveSnippet}
+                disabled={isSaving}
+              >
+                {isSaving ? "Saving..." : "Push"}
+              </DropdownMenuItem>
+
+              {/* HACK until ordering is ready, only show in cosmos runframe */}
+              {parseInt(window.location.port) > 5000 && (
+                <DropdownMenuItem
+                  className="rf-text-xs"
+                  onSelect={() => {
+                    orderDialog.open()
+                  }}
+                >
+                  Order
+                </DropdownMenuItem>
+              )}
+
+              <DropdownMenuItem
+                className="rf-text-xs"
+                onSelect={() => setIsImportDialogOpen(true)}
+                disabled={isSaving}
+              >
+                Import
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                className="rf-text-xs"
+                onSelect={() => {
+                  if (!hasRegistryToken()) {
+                    toast.error("Requires tscircuit token")
+                    return
+                  }
+                  setIsAiReviewDialogOpen(true)
+                }}
+              >
+                AI Review
+              </DropdownMenuItem>
+            </>
           )}
-          <DropdownMenuItem
-            className="rf-text-xs"
-            onSelect={() => setIsImportDialogOpen(true)}
-            disabled={isSaving}
-          >
-            Import
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className="rf-text-xs"
-            onSelect={() => {
-              if (!hasRegistryToken()) {
-                toast.error("Requires tscircuit token")
-                return
-              }
-              setIsAiReviewDialogOpen(true)
-            }}
-          >
-            AI Review
-          </DropdownMenuItem>
+
+          {/* Export - always available */}
           <DropdownMenuSub>
             <DropdownMenuSubTrigger
               className="rf-text-xs"
@@ -226,51 +237,55 @@ export const RunframeCliLeftHeader = (props: {
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger className="rf-text-xs">
-              Advanced
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem className="rf-flex rf-items-center rf-gap-2">
-                  <div className="rf-flex rf-items-center rf-gap-2">
-                    <Checkbox
-                      id="load-latest-eval"
-                      checked={props.shouldLoadLatestEval}
-                      onCheckedChange={(checked) => {
-                        props.onChangeShouldLoadLatestEval(checked === true)
-                      }}
-                    />
-                    <label
-                      htmlFor="load-latest-eval"
-                      className="rf-text-xs rf-cursor-pointer"
-                    >
-                      Force Latest @tscircuit/eval
-                    </label>
-                  </div>
-                </DropdownMenuItem>
-                {lastRunEvalVersion && (
+
+          {/* Advanced - CLI only */}
+          {!props.isWebEmbedded && (
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger className="rf-text-xs">
+                Advanced
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
                   <DropdownMenuItem className="rf-flex rf-items-center rf-gap-2">
                     <div className="rf-flex rf-items-center rf-gap-2">
-                      <span className="rf-text-xs">
-                        @tscircuit/eval@{lastRunEvalVersion}
-                      </span>
+                      <Checkbox
+                        id="load-latest-eval"
+                        checked={props.shouldLoadLatestEval}
+                        onCheckedChange={(checked) => {
+                          props.onChangeShouldLoadLatestEval?.(checked === true)
+                        }}
+                      />
+                      <label
+                        htmlFor="load-latest-eval"
+                        className="rf-text-xs rf-cursor-pointer"
+                      >
+                        Force Latest @tscircuit/eval
+                      </label>
                     </div>
                   </DropdownMenuItem>
-                )}
-                <DropdownMenuItem
-                  className="rf-flex rf-items-center rf-gap-2"
-                  onClick={() => {
-                    window.open("/api/admin", "_blank")
-                  }}
-                >
-                  <div className="rf-flex rf-items-center rf-gap-2">
-                    <span className="rf-text-xs">CLI Admin Panel</span>
-                  </div>
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
+                  {lastRunEvalVersion && (
+                    <DropdownMenuItem className="rf-flex rf-items-center rf-gap-2">
+                      <div className="rf-flex rf-items-center rf-gap-2">
+                        <span className="rf-text-xs">
+                          @tscircuit/eval@{lastRunEvalVersion}
+                        </span>
+                      </div>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem
+                    className="rf-flex rf-items-center rf-gap-2"
+                    onClick={() => {
+                      window.open("/api/admin", "_blank")
+                    }}
+                  >
+                    <div className="rf-flex rf-items-center rf-gap-2">
+                      <span className="rf-text-xs">CLI Admin Panel</span>
+                    </div>
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
+          )}
         </DropdownMenuContent>
 
         <AlertDialog open={isError} onOpenChange={setIsError}>

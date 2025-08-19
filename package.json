@@ -44,7 +44,7 @@
     "@radix-ui/react-tabs": "^1.1.2",
     "@tscircuit/3d-viewer": "^0.0.313",
     "@tscircuit/assembly-viewer": "^0.0.4",
-    "@tscircuit/checks": "^0.0.71",
+    "@tscircuit/checks": "^0.0.72",
     "@tscircuit/create-snippet-url": "^0.0.8",
     "@tscircuit/eval": "^0.0.286",
     "@tscircuit/fake-snippets": "^0.0.87",

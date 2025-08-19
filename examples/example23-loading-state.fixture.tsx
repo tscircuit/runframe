@@ -8,11 +8,11 @@ export default () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setFsMap({
-        "main.tsx": `
-import Resistor from "schematic-symbols/Resistor"
-
+        "index.tsx": `
 export default () => (
-  <Resistor resistance="1k" />
+  <board width="10mm" height="10mm">
+    <resistor name="R1" resistance="1k" footprint="0402" />
+  </board>
 )
         `.trim(),
       })
@@ -22,6 +22,6 @@ export default () => (
   }, [])
 
   return (
-    <RunFrame fsMap={fsMap} entrypoint="main.tsx" isLoadingFiles={isLoading} />
+    <RunFrame fsMap={fsMap} entrypoint="index.tsx" isLoadingFiles={isLoading} />
   )
 }

@@ -33,6 +33,7 @@ import { useMutex } from "./useMutex"
 import type { ManualEditEvent } from "@tscircuit/props"
 import { registryKy } from "../../utils/get-registry-ky"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
+import { useStyles } from "../../hooks/use-styles"
 
 const fetchLatestEvalVersion = async () => {
   try {
@@ -73,6 +74,8 @@ const resolveEvalVersion = async (
 export type { RunFrameProps }
 
 export const RunFrame = (props: RunFrameProps) => {
+  useStyles()
+
   const [circuitJson, setCircuitJson] = useRunFrameStore((s) => [
     s.circuitJson,
     s.setCircuitJson,

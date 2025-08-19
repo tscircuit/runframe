@@ -174,6 +174,7 @@ export const RunFrame = (props: RunFrameProps) => {
   const lastEntrypointRef = useRef<string | null>(null)
 
   useEffect(() => {
+    if (props.isLoadingFiles) return
     // Convert fsMap to object for consistent handling
     const fsMapObj =
       fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap
@@ -390,6 +391,7 @@ export const RunFrame = (props: RunFrameProps) => {
     runCountTrigger,
     props.evalVersion,
     props.mainComponentPath,
+    props.isLoadingFiles,
   ])
 
   // Updated to debounce edit events so only the last event is emitted after dragging ends
@@ -463,6 +465,15 @@ export const RunFrame = (props: RunFrameProps) => {
           alert(`Failed to report autorouting bug: ${error.message}`)
         }
       })
+  }
+
+  if (props.isLoadingFiles) {
+    return (
+      <div className="rf-flex rf-items-center rf-justify-center rf-w-full rf-h-full">
+        <Loader2 className="rf-w-8 rf-h-8 rf-animate-spin" />
+        <span className="rf-ml-2 rf-text-sm">Loading files...</span>
+      </div>
+    )
   }
 
   return (

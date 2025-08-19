@@ -57,9 +57,11 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   const circuitJson = useRunFrameStore((s) => s.circuitJson)
 
   const [componentPath, setComponentPath] = useState<string>("")
+  const [isLoadingFiles, setIsLoadingFiles] = useState(true)
 
   useEffect(() => {
-    loadInitialFiles()
+    setIsLoadingFiles(true)
+    loadInitialFiles().finally(() => setIsLoadingFiles(false))
   }, [])
 
   useEffect(() => {
@@ -120,6 +122,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   return (
     <RunFrame
       fsMap={fsMap}
+      isLoadingFiles={isLoadingFiles}
       evalVersion={props.evalVersion}
       forceLatestEvalVersion={props.forceLatestEvalVersion}
       evalWebWorkerBlobUrl={props.evalWebWorkerBlobUrl ?? props.workerBlobUrl}

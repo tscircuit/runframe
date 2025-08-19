@@ -8,6 +8,12 @@ export interface RunFrameProps {
   fsMap: Map<string, string> | Record<string, string>
 
   /**
+   * When true, indicates the file map is still loading and a loading state
+   * should be displayed instead of attempting to execute any code.
+   */
+  isLoadingFiles?: boolean
+
+  /**
    * The entry point file that will be executed first. If not provided,
    * @tscircuit/eval will infer the entrypoint
    */

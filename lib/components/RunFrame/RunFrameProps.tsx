@@ -52,6 +52,11 @@ export interface RunFrameProps {
   isWebEmbedded?: boolean
 
   /**
+   * Whether to show the file menu
+   */
+  showFileMenu?: boolean
+
+  /**
    * Called when the circuit JSON changes
    */
   onCircuitJsonChange?: (circuitJson: any) => void

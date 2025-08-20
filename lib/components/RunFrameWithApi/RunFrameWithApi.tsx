@@ -122,6 +122,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   return (
     <RunFrame
       fsMap={fsMap}
+      showFileMenu={props.showFileMenu}
       isLoadingFiles={isLoadingFiles}
       evalVersion={props.evalVersion}
       forceLatestEvalVersion={props.forceLatestEvalVersion}

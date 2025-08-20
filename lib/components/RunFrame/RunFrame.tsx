@@ -1,4 +1,4 @@
-import { createCircuitWebWorker } from "@tscircuit/eval/worker"
+import { createCircuitWebWorker } from "../../utils/createCircuitWebWorker"
 import Debug from "debug"
 import { Loader2, Play, Square } from "lucide-react"
 import { useEffect, useReducer, useRef, useState } from "react"

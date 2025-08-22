@@ -4,6 +4,16 @@ import { RunFrameForCli } from "../RunFrameForCli/RunFrameForCli"
 import { RunFrame } from "../RunFrame/RunFrame"
 import type { ComponentProps } from "react"
 
+const ensureDocumentReady = (): Promise<void> => {
+  return new Promise((resolve) => {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => resolve())
+    } else {
+      resolve()
+    }
+  })
+}
+
 const ensureRoot = () => {
   const existing = document.getElementById("root")
   if (existing) return existing
@@ -40,8 +50,6 @@ const loadScriptsAsFsMap = async () => {
   return { fsMap }
 }
 
-const root = createRoot(ensureRoot())
-
 // This variable is dynamically modified inside build scripts in the "tscircuit"
 // repo to inject the latest CDN URL for the webworker blob
 const INJECT_TSCIRCUIT_EVAL_WEB_WORKER_BLOB_URL =
@@ -58,6 +66,10 @@ const runframeStandaloneProps: ComponentProps<typeof RunFrameWithApi> = {
     : true,
 }
 ;(async () => {
+  await ensureDocumentReady()
+
+  const root = createRoot(ensureRoot())
+
   // @ts-ignore
   if (window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI) {
     root.render(<RunFrameForCli {...runframeStandaloneProps} />)

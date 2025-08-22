@@ -128,4 +128,9 @@ export interface RunFrameProps {
     name: string,
     data: { simpleRouteJson: any },
   ) => void
+
+  /**
+   * Enable fetch proxy for the web worker (useful for standalone bundles)
+   */
+  enableFetchProxy?: boolean
 }

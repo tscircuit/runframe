@@ -6,6 +6,7 @@ export const RunFrameForCli = (props: {
   debug?: boolean
   scenarioSelectorContent?: React.ReactNode
   workerBlobUrl?: string
+  enableFetchProxy?: boolean
 }) => {
   const [shouldLoadLatestEval, setLoadLatestEval] = useLocalStorageState(
     "load-latest-eval",
@@ -20,6 +21,7 @@ export const RunFrameForCli = (props: {
       workerBlobUrl={props.workerBlobUrl}
       showFilesSwitch
       showFileMenu={false}
+      enableFetchProxy={props.enableFetchProxy}
       leftHeaderContent={
         <div className="rf-flex rf-items-center rf-justify-between">
           <FileMenuLeftHeader

@@ -37,6 +37,10 @@ export interface RunFrameWithApiProps {
   workerBlobUrl?: string
   evalWebWorkerBlobUrl?: string
   showFileMenu?: boolean
+  /**
+   * Enable fetch proxy for the web worker (useful for standalone bundles)
+   */
+  enableFetchProxy?: boolean
 }
 
 export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
@@ -127,6 +131,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       evalVersion={props.evalVersion}
       forceLatestEvalVersion={props.forceLatestEvalVersion}
       evalWebWorkerBlobUrl={props.evalWebWorkerBlobUrl ?? props.workerBlobUrl}
+      enableFetchProxy={props.enableFetchProxy}
       leftHeaderContent={
         <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
           {props.leftHeaderContent}

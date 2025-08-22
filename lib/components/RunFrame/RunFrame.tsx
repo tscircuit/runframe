@@ -137,6 +137,7 @@ export const RunFrame = (props: RunFrameProps) => {
             evalVersion,
             webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
             verbose: true,
+            ...(props.enableFetchProxy && { enableFetchProxy: props.enableFetchProxy }),
           })
           if (cancelled) return
           globalThis.runFrameWorker = worker
@@ -245,6 +246,7 @@ export const RunFrame = (props: RunFrameProps) => {
           evalVersion: resolvedEvalVersion,
           webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
           verbose: true,
+          ...(props.enableFetchProxy && { enableFetchProxy: props.enableFetchProxy }),
         }))
       globalThis.runFrameWorker = worker
       setLastRunEvalVersion(resolvedEvalVersion)

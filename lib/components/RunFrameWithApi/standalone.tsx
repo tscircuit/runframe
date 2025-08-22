@@ -52,6 +52,7 @@ const runframeStandaloneProps: ComponentProps<typeof RunFrameWithApi> = {
   )
     ? undefined
     : INJECT_TSCIRCUIT_EVAL_WEB_WORKER_BLOB_URL,
+  enableFetchProxy: true,
 }
 ;(async () => {
   // @ts-ignore

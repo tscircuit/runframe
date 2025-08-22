@@ -46,12 +46,16 @@ const root = createRoot(ensureRoot())
 // repo to inject the latest CDN URL for the webworker blob
 const INJECT_TSCIRCUIT_EVAL_WEB_WORKER_BLOB_URL =
   "<--INJECT_TSCIRCUIT_EVAL_WEB_WORKER_BLOB_URL-->"
+const INJECT_ENABLE_FETCH_PROXY = "<--INJECT_ENABLE_FETCH_PROXY-->"
 const runframeStandaloneProps: ComponentProps<typeof RunFrameWithApi> = {
   evalWebWorkerBlobUrl: INJECT_TSCIRCUIT_EVAL_WEB_WORKER_BLOB_URL.includes(
     "<--",
   )
     ? undefined
     : INJECT_TSCIRCUIT_EVAL_WEB_WORKER_BLOB_URL,
+  enableFetchProxy: INJECT_ENABLE_FETCH_PROXY.includes("<--")
+    ? undefined
+    : true,
 }
 ;(async () => {
   // @ts-ignore

@@ -101,5 +101,8 @@
     "tsup": "^8.3.5",
     "vite": "^6.0.3",
     "yargs": "^17.7.2"
+  },
+  "dependencies": {
+    "@tscircuit/runframe": "^0.0.828"
   }
 }

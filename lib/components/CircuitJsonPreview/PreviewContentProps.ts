@@ -89,4 +89,14 @@ export interface PreviewContentProps {
    * Enable selecting older @tscircuit/eval versions
    */
   allowSelectingVersion?: boolean
+
+  /**
+   * Whether to show the file menu
+   */
+  showFileMenu?: boolean
+
+  /**
+   * Whether the preview is being embedded in a web page
+   */
+  isWebEmbedded?: boolean
 }

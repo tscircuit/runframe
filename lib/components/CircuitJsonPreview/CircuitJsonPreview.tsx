@@ -48,6 +48,7 @@ import type { CircuitJsonError } from "circuit-json"
 import { version } from "../../../package.json"
 import type { Object3D } from "three"
 import { useEvalVersions } from "lib/hooks/use-eval-versions"
+import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 
 declare global {
   interface Window {
@@ -101,6 +102,8 @@ export const CircuitJsonPreview = ({
   defaultToFullScreen = false,
   activeEffectName,
   allowSelectingVersion = true,
+  showFileMenu = false,
+  isWebEmbedded = false,
 }: PreviewContentProps) => {
   useStyles()
 
@@ -206,11 +209,18 @@ export const CircuitJsonPreview = ({
             )}
           >
             {leftHeaderContent}
-            {leftHeaderContent && <div className="rf-flex-grow" />}
-            {!leftHeaderContent && isRunningCode && (
+            {showFileMenu && !leftHeaderContent && (
+              <FileMenuLeftHeader isWebEmbedded={isWebEmbedded} />
+            )}
+            {(leftHeaderContent || showFileMenu) && (
+              <div className="rf-flex-grow" />
+            )}
+            {!leftHeaderContent && !showFileMenu && isRunningCode && (
               <Loader2 className="rf-w-4 rf-h-4 rf-animate-spin" />
             )}
-            {!leftHeaderContent && <div className="rf-flex-grow" />}
+            {!leftHeaderContent && !showFileMenu && (
+              <div className="rf-flex-grow" />
+            )}
             {renderLog && renderLog.progress !== 1 && !errorMessage && (
               <div className="rf-flex rf-items-center rf-gap-2 rf-min-w-0 rf-max-w-xs">
                 {activeEffectName ? (

@@ -37,7 +37,7 @@ import { AiReviewDialog } from "./AiReviewDialog"
 import { hasRegistryToken } from "lib/utils/get-registry-ky"
 import { toast } from "lib/utils/toast"
 import { Toaster } from "react-hot-toast"
-import { importComponentFromJlcpcb } from "lib/optional-features/importing/import-component-from-jlcpcb"
+import { handleImportComponentFromJlcpcb } from "lib/optional-features/importing/import-component-from-jlcpcb"
 import { useOrderDialogCli } from "./OrderDialog/useOrderDialog"
 
 export const FileMenuLeftHeader = (props: {
@@ -333,7 +333,7 @@ export const FileMenuLeftHeader = (props: {
                 // TODO wait on event indicating the package was successfully installed
                 throw new Error("Not implemented")
               } else if (component.source === "jlcpcb") {
-                const { filePath } = await importComponentFromJlcpcb(
+                const { filePath } = await handleImportComponentFromJlcpcb(
                   component.partNumber!,
                 )
 

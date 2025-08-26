@@ -2,7 +2,10 @@ import { fetchEasyEDAComponent, convertRawEasyToTsx } from "easyeda/browser"
 import { API_BASE } from "lib/components/RunFrameWithApi/api-base"
 import ky from "ky"
 
-export const importComponentFromJlcpcb = async (jlcpcbPartNumber: string) => {
+export const importComponentFromJlcpcb = async (
+  jlcpcbPartNumber: string,
+  { headers }: { headers?: Record<string, string> } = {},
+) => {
   const component = await fetchEasyEDAComponent(jlcpcbPartNumber, {
     // @ts-ignore
     fetch: (url, options: any) => {
@@ -16,12 +19,21 @@ export const importComponentFromJlcpcb = async (jlcpcbPartNumber: string) => {
           "X-Sender-Referer": options?.headers?.referer ?? "",
           "X-Sender-User-Agent": options?.headers?.userAgent ?? "",
           "X-Sender-Cookie": options?.headers?.cookie ?? "",
+          ...headers,
         },
       })
     },
   })
 
   const tsx = await convertRawEasyToTsx(component)
+
+  return tsx
+}
+
+export const handleImportComponentFromJlcpcb = async (
+  jlcpcbPartNumber: string,
+) => {
+  const tsx = await importComponentFromJlcpcb(jlcpcbPartNumber)
 
   const fileName = tsx.match(/export const (\w+) = .*/)?.[1]
 

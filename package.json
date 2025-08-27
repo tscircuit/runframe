@@ -2,7 +2,7 @@
   "name": "@tscircuit/runframe",
   "main": "dist/preview.js",
   "type": "module",
-  "version": "0.0.835",
+  "version": "0.0.836",
   "exports": {
     ".": "./dist/preview.js",
     "./preview": "./dist/preview.js",
@@ -63,7 +63,7 @@
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.20",
     "chokidar-cli": "^3.0.0",
-    "circuit-json": "0.0.232",
+    "circuit-json": "0.0.233",
     "circuit-json-to-bom-csv": "^0.0.7",
     "circuit-json-to-gerber": "^0.0.30",
     "circuit-json-to-pnp-csv": "^0.0.7",

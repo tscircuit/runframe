@@ -101,7 +101,6 @@
     "tailwindcss-animate": "^1.0.7",
     "tsup": "^8.3.5",
     "vite": "^7.1.2",
-    "vite-plugin-node-polyfills": "^0.24.0",
     "yargs": "^17.7.2"
   }
 }

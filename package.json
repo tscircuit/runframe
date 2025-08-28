@@ -65,7 +65,7 @@
     "circuit-json-to-bom-csv": "^0.0.7",
     "circuit-json-to-gerber": "^0.0.30",
     "circuit-json-to-pnp-csv": "^0.0.7",
-    "circuit-to-svg": "^0.0.177",
+    "circuit-to-svg": "^0.0.178",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

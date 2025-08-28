@@ -17,6 +17,9 @@ import {
   searchTscircuitComponents,
   mapTscircuitSnippetToSearchResult,
 } from "./tscircuit-registry-api"
+import { useRunFrameStore } from "../RunFrameWithApi/store"
+import { importComponentFromJlcpcb } from "lib/optional-features/importing/import-component-from-jlcpcb"
+import { toast } from "lib/utils/toast"
 
 export interface ComponentSearchResult {
   id: string
@@ -41,13 +44,13 @@ interface TscircuitPackageDetails {
 interface ImportComponentDialogProps {
   isOpen: boolean
   onClose: () => void
-  onImport: (component: ComponentSearchResult) => void
+  proxyRequestHeaders?: Record<string, string>
 }
 
 export const ImportComponentDialog = ({
   isOpen,
   onClose,
-  onImport,
+  proxyRequestHeaders,
 }: ImportComponentDialogProps) => {
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<ComponentSearchResult[]>(
@@ -69,6 +72,42 @@ export const ImportComponentDialog = ({
   const [previewActiveTab, setPreviewActiveTab] = useState<"pcb" | "schematic">(
     "pcb",
   )
+
+  const pushEvent = useRunFrameStore((s) => s.pushEvent)
+
+  const handleImport = (component: ComponentSearchResult) => {
+    toast.promise(
+      async () => {
+        if (component.source === "tscircuit.com") {
+          await pushEvent({
+            event_type: "INSTALL_PACKAGE",
+            full_package_name: `@tsci/${component.owner}.${component.name}`,
+          })
+
+          // TODO wait on event indicating the package was successfully installed
+          throw new Error("Not implemented")
+        } else if (component.source === "jlcpcb") {
+          const { filePath } = await importComponentFromJlcpcb(
+            component.partNumber!,
+            { headers: proxyRequestHeaders },
+          )
+
+          return { filePath }
+        }
+      },
+      {
+        loading: `Importing component: "${component.name}"`,
+        error: (error: Error) => {
+          console.error("IMPORT ERROR", error)
+          return `Error importing component: "${component.name}": ${error.toString()}`
+        },
+        success: (data: any) =>
+          data?.filePath
+            ? `Imported to "${data.filePath}"`
+            : "Import Successful",
+      },
+    )
+  }
 
   // Fetch package details with AI description
   const fetchPackageDetails = async (owner: string, name: string) => {
@@ -288,7 +327,7 @@ export const ImportComponentDialog = ({
           <Button
             onClick={() => {
               if (selectedComponent) {
-                onImport(selectedComponent)
+                handleImport(selectedComponent)
                 onClose()
               }
             }}
@@ -513,7 +552,7 @@ export const ImportComponentDialog = ({
                 onClick={() => {
                   setDetailsOpen(false)
                   if (detailsComponent) {
-                    onImport(detailsComponent)
+                    handleImport(detailsComponent)
                     onClose()
                   }
                 }}

@@ -37,7 +37,6 @@ import { AiReviewDialog } from "./AiReviewDialog"
 import { hasRegistryToken } from "lib/utils/get-registry-ky"
 import { toast } from "lib/utils/toast"
 import { Toaster } from "react-hot-toast"
-import { importComponentFromJlcpcb } from "lib/optional-features/importing/import-component-from-jlcpcb"
 import { useOrderDialogCli } from "./OrderDialog/useOrderDialog"
 
 export const FileMenuLeftHeader = (props: {
@@ -321,38 +320,6 @@ export const FileMenuLeftHeader = (props: {
       <ImportComponentDialog
         isOpen={isImportDialogOpen}
         onClose={() => setIsImportDialogOpen(false)}
-        onImport={async (component) => {
-          toast.promise(
-            async () => {
-              if (component.source === "tscircuit.com") {
-                await pushEvent({
-                  event_type: "INSTALL_PACKAGE",
-                  full_package_name: `@tsci/${component.owner}.${component.name}`,
-                })
-
-                // TODO wait on event indicating the package was successfully installed
-                throw new Error("Not implemented")
-              } else if (component.source === "jlcpcb") {
-                const { filePath } = await importComponentFromJlcpcb(
-                  component.partNumber!,
-                )
-
-                return { filePath }
-              }
-            },
-            {
-              loading: `Importing component: "${component.name}"`,
-              error: (error: Error) => {
-                console.error("IMPORT ERROR", error)
-                return `Error importing component: "${component.name}": ${error.toString()}`
-              },
-              success: (data: any) =>
-                data?.filePath
-                  ? `Imported to "${data.filePath}"`
-                  : "Import Successful",
-            },
-          )
-        }}
       />
       <AiReviewDialog
         isOpen={isAiReviewDialogOpen}

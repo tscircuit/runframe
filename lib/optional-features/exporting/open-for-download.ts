@@ -37,13 +37,13 @@ export const openForDownload = async (
 
   // If we're in an iframe, use the new tab approach for JSON and ZIP files
   if (inIframe) {
-    // For JSON files, create a nice formatted view
+    // For JSON files
     if (mimeType === "application/json" && typeof content === "string") {
       openJsonInNewTabForDownload(content, fileName)
       return
     }
 
-    // For ZIP files, create a file listing view
+    // For ZIP files
     if (
       content instanceof Blob &&
       (fileName.endsWith(".zip") || mimeType === "application/zip")

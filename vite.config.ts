@@ -122,6 +122,7 @@ export default defineConfig({
   define: {
     process: {
       env: {},
+      version: "",
     },
   },
   root: ".",

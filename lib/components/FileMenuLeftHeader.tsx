@@ -146,7 +146,7 @@ export const FileMenuLeftHeader = (props: {
   }
 
   const storeCircuitJson = useRunFrameStore((state) => state.circuitJson)
-  const circuitJson = props.circuitJson || storeCircuitJson
+  const circuitJson = storeCircuitJson ?? props.circuitJson
 
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
   const [isAiReviewDialogOpen, setIsAiReviewDialogOpen] = useState(false)

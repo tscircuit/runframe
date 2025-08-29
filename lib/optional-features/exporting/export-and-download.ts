@@ -29,7 +29,7 @@ export const exportAndDownload = async ({
     return
   }
   if (exportName === "Circuit JSON") {
-    await openForDownload(JSON.stringify(circuitJson, null, 2), {
+    openForDownload(JSON.stringify(circuitJson, null, 2), {
       fileName: `${projectName}.circuit.json`,
       mimeType: "application/json",
     })

@@ -58,7 +58,7 @@ export const exportFabricationFiles = async ({
   // Generate and download the zip file
   const zipBlob = await zip.generateAsync({ type: "blob" })
 
-  await openForDownload(zipBlob, {
+  openForDownload(zipBlob, {
     fileName: `${projectName}_fabrication_files.zip`,
   })
 }

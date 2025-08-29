@@ -43,6 +43,7 @@ export const FileMenuLeftHeader = (props: {
   isWebEmbedded?: boolean
   shouldLoadLatestEval?: boolean
   onChangeShouldLoadLatestEval?: (shouldLoadLatestEval: boolean) => void
+  circuitJson?: any
 }) => {
   const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
   const [snippetName, setSnippetName] = useState<string | null>(null)
@@ -144,7 +145,8 @@ export const FileMenuLeftHeader = (props: {
     } as RequestToSaveSnippetEvent)
   }
 
-  const circuitJson = useRunFrameStore((state) => state.circuitJson)
+  const storeCircuitJson = useRunFrameStore((state) => state.circuitJson)
+  const circuitJson = props.circuitJson || storeCircuitJson
 
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
   const [isAiReviewDialogOpen, setIsAiReviewDialogOpen] = useState(false)

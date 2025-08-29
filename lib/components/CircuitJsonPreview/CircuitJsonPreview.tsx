@@ -210,7 +210,10 @@ export const CircuitJsonPreview = ({
           >
             {leftHeaderContent}
             {showFileMenu && !leftHeaderContent && (
-              <FileMenuLeftHeader isWebEmbedded={isWebEmbedded} />
+              <FileMenuLeftHeader
+                isWebEmbedded={isWebEmbedded}
+                circuitJson={circuitJson}
+              />
             )}
             {(leftHeaderContent || showFileMenu) && (
               <div className="rf-flex-grow" />

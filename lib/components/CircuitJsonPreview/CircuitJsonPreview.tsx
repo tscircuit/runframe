@@ -546,6 +546,7 @@ export const CircuitJsonPreview = ({
                 >
                   {circuitJson ? (
                     <SchematicViewer
+                      spiceSimulationEnabled
                       circuitJson={circuitJson}
                       containerStyle={{
                         height: "100%",

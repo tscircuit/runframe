@@ -24,7 +24,7 @@
         "@tscircuit/file-server": "^0.0.24",
         "@tscircuit/footprinter": "^0.0.233",
         "@tscircuit/math-utils": "^0.0.19",
-        "@tscircuit/pcb-viewer": "1.11.207",
+        "@tscircuit/pcb-viewer": "1.11.210",
         "@tscircuit/props": "^0.0.290",
         "@tscircuit/schematic-trace-solver": "^0.0.23",
         "@tscircuit/schematic-viewer": "2.0.30",
@@ -561,7 +561,7 @@
 
     "@tscircuit/mm": ["@tscircuit/mm@0.0.8", "", { "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-nl7nxE7AhARbKuobflI0LUzoir7+wJyvwfPw6bzA/O0Q3YTcH3vBkU/Of+V/fp6ht+AofiCXj7YAH9E446138Q=="],
 
-    "@tscircuit/pcb-viewer": ["@tscircuit/pcb-viewer@1.11.207", "", { "dependencies": { "@emotion/css": "^11.11.2", "@vitejs/plugin-react": "^4.5.0", "circuit-to-svg": "^0.0.166", "color": "^4.2.3", "react-supergrid": "^1.0.10", "react-toastify": "^10.0.5", "transformation-matrix": "^2.13.0", "zustand": "^4.5.2" }, "peerDependencies": { "react": "*", "tscircuit": "*" } }, "sha512-LcFZdj3JRVOGKxkKJK6Rr7mWElH/Ez0SBGZfeb9iWci+v0JY6jtMZKwxAB0CnXOPeHBgaVUc6LOe90szIP7E2A=="],
+    "@tscircuit/pcb-viewer": ["@tscircuit/pcb-viewer@1.11.210", "", { "dependencies": { "@emotion/css": "^11.11.2", "@vitejs/plugin-react": "^5.0.2", "circuit-to-svg": "^0.0.166", "color": "^4.2.3", "react-supergrid": "^1.0.10", "react-toastify": "^10.0.5", "transformation-matrix": "^2.13.0", "zustand": "^4.5.2" }, "peerDependencies": { "react": "*", "tscircuit": "*" } }, "sha512-xEmJinACIDPYGO7Dn9T4D8SB2aC4cDbY+M5jO0PFYgi1MGMrRe9hwB/2RMcL4rhtR9MUakPXqicYIf3LzJhfyw=="],
 
     "@tscircuit/props": ["@tscircuit/props@0.0.290", "", { "peerDependencies": { "circuit-json": "*", "react": "*", "zod": "*" } }, "sha512-9nAeTxk2yytqY6E3koL/ygdPmOIO3bqENFjoSB+UORYB/yprKM/vFoXBQT0ZpkZKEMigu+n26MLxxGz3fdYZmw=="],
 
@@ -2283,7 +2283,7 @@
 
     "@tscircuit/fake-snippets/schematic-symbols": ["schematic-symbols@0.0.155", "", { "peerDependencies": { "typescript": "^5.5.4" } }, "sha512-pRPKsHr5ubsk4htLW4xRczKadREhf07S20FXTwKPsWqszlrfYiIPwazosJuDdTyIKy9KQ5yER8p6OP767S1k9Q=="],
 
-    "@tscircuit/pcb-viewer/@vitejs/plugin-react": ["@vitejs/plugin-react@4.7.0", "", { "dependencies": { "@babel/core": "^7.28.0", "@babel/plugin-transform-react-jsx-self": "^7.27.1", "@babel/plugin-transform-react-jsx-source": "^7.27.1", "@rolldown/pluginutils": "1.0.0-beta.27", "@types/babel__core": "^7.20.5", "react-refresh": "^0.17.0" }, "peerDependencies": { "vite": "^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0" } }, "sha512-gUu9hwfWvvEDBBmgtAowQCojwZmJ5mcLn3aufeCsitijs3+f2NsrPtlAWIR6OPiqljl96GVCUbLe0HyqIpVaoA=="],
+    "@tscircuit/pcb-viewer/@vitejs/plugin-react": ["@vitejs/plugin-react@5.0.2", "", { "dependencies": { "@babel/core": "^7.28.3", "@babel/plugin-transform-react-jsx-self": "^7.27.1", "@babel/plugin-transform-react-jsx-source": "^7.27.1", "@rolldown/pluginutils": "1.0.0-beta.34", "@types/babel__core": "^7.20.5", "react-refresh": "^0.17.0" }, "peerDependencies": { "vite": "^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0" } }, "sha512-tmyFgixPZCx2+e6VO9TNITWcCQl8+Nl/E8YbAyPVv85QCc7/A3JrdfG2A8gIzvVhWuzMOVrFW1aReaNxrI6tbw=="],
 
     "@tscircuit/pcb-viewer/circuit-to-svg": ["circuit-to-svg@0.0.166", "", { "dependencies": { "@types/node": "^22.5.5", "bun-types": "^1.1.40", "svgson": "^5.3.1", "transformation-matrix": "^2.16.1" }, "peerDependencies": { "@tscircuit/circuit-json-util": "*", "@tscircuit/footprinter": "*", "circuit-json": "*", "schematic-symbols": "*" } }, "sha512-yyNbFq18y8ZMP2fYNtA3HmARYWRt38S+ThZu1LuNaSlnHl4g9iYwH5unNoXD9a23cgBDiOtytescdP7fSm6TFg=="],
 
@@ -2559,7 +2559,7 @@
 
     "@tscircuit/fake-snippets/react-dom/scheduler": ["scheduler@0.23.2", "", { "dependencies": { "loose-envify": "^1.1.0" } }, "sha512-UOShsPwz7NrMUqhR6t0hWjFduvOzbtv7toDH1/hIrfRNIDBnnBWd0CwJTGvTpngVlmwGCdP9/Zl/tVrDqcuYzQ=="],
 
-    "@tscircuit/pcb-viewer/@vitejs/plugin-react/@rolldown/pluginutils": ["@rolldown/pluginutils@1.0.0-beta.27", "", {}, "sha512-+d0F4MKMCbeVUJwG96uQ4SgAznZNSq93I3V+9NHA4OpvqG8mRCpGdKmK8l/dl02h2CCDHwW2FqilnTyDcAnqjA=="],
+    "@tscircuit/pcb-viewer/@vitejs/plugin-react/@rolldown/pluginutils": ["@rolldown/pluginutils@1.0.0-beta.34", "", {}, "sha512-LyAREkZHP5pMom7c24meKmJCdhf2hEyvam2q0unr3or9ydwDL+DJ8chTF6Av/RFPb3rH8UFBdMzO5MxTZW97oA=="],
 
     "@vercel/nft/glob/minimatch": ["minimatch@3.1.2", "", { "dependencies": { "brace-expansion": "^1.1.7" } }, "sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw=="],
 

@@ -77,7 +77,7 @@ export const ImportComponentDialog = ({
 
   const pushEvent = useRunFrameStore((s) => s.pushEvent)
 
-  const handleImport = onImport ?? (component: ComponentSearchResult) => {
+  const handleImport = onImport ? onImport :  (component: ComponentSearchResult) => {
     toast.promise(
       async () => {
         if (component.source === "tscircuit.com") {

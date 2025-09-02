@@ -45,12 +45,14 @@ interface ImportComponentDialogProps {
   isOpen: boolean
   onClose: () => void
   proxyRequestHeaders?: Record<string, string>
+  onImport?: (component: ComponentSearchResult) => void
 }
 
 export const ImportComponentDialog = ({
   isOpen,
   onClose,
   proxyRequestHeaders,
+  onImport,
 }: ImportComponentDialogProps) => {
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<ComponentSearchResult[]>(
@@ -75,39 +77,41 @@ export const ImportComponentDialog = ({
 
   const pushEvent = useRunFrameStore((s) => s.pushEvent)
 
-  const handleImport = (component: ComponentSearchResult) => {
-    toast.promise(
-      async () => {
-        if (component.source === "tscircuit.com") {
-          await pushEvent({
-            event_type: "INSTALL_PACKAGE",
-            full_package_name: `@tsci/${component.owner}.${component.name}`,
-          })
+  const handleImport = onImport
+    ? (component: ComponentSearchResult) => onImport(component)
+    : (component: ComponentSearchResult) => {
+        toast.promise(
+          async () => {
+            if (component.source === "tscircuit.com") {
+              await pushEvent({
+                event_type: "INSTALL_PACKAGE",
+                full_package_name: `@tsci/${component.owner}.${component.name}`,
+              })
 
-          // TODO wait on event indicating the package was successfully installed
-          throw new Error("Not implemented")
-        } else if (component.source === "jlcpcb") {
-          const { filePath } = await importComponentFromJlcpcb(
-            component.partNumber!,
-            { headers: proxyRequestHeaders },
-          )
+              // TODO wait on event indicating the package was successfully installed
+              throw new Error("Not implemented")
+            } else if (component.source === "jlcpcb") {
+              const { filePath } = await importComponentFromJlcpcb(
+                component.partNumber!,
+                { headers: proxyRequestHeaders },
+              )
 
-          return { filePath }
-        }
-      },
-      {
-        loading: `Importing component: "${component.name}"`,
-        error: (error: Error) => {
-          console.error("IMPORT ERROR", error)
-          return `Error importing component: "${component.name}": ${error.toString()}`
-        },
-        success: (data: any) =>
-          data?.filePath
-            ? `Imported to "${data.filePath}"`
-            : "Import Successful",
-      },
-    )
-  }
+              return { filePath }
+            }
+          },
+          {
+            loading: `Importing component: "${component.name}"`,
+            error: (error: Error) => {
+              console.error("IMPORT ERROR", error)
+              return `Error importing component: "${component.name}": ${error.toString()}`
+            },
+            success: (data: any) =>
+              data?.filePath
+                ? `Imported to "${data.filePath}"`
+                : "Import Successful",
+          },
+        )
+      }
 
   // Fetch package details with AI description
   const fetchPackageDetails = async (owner: string, name: string) => {

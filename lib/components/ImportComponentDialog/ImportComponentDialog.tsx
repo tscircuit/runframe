@@ -45,12 +45,14 @@ interface ImportComponentDialogProps {
   isOpen: boolean
   onClose: () => void
   proxyRequestHeaders?: Record<string, string>
+  onImport?: (component: ComponentSearchResult) => void
 }
 
 export const ImportComponentDialog = ({
   isOpen,
   onClose,
   proxyRequestHeaders,
+  onImport
 }: ImportComponentDialogProps) => {
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<ComponentSearchResult[]>(
@@ -75,7 +77,7 @@ export const ImportComponentDialog = ({
 
   const pushEvent = useRunFrameStore((s) => s.pushEvent)
 
-  const handleImport = (component: ComponentSearchResult) => {
+  const handleImport = onImport ?? (component: ComponentSearchResult) => {
     toast.promise(
       async () => {
         if (component.source === "tscircuit.com") {

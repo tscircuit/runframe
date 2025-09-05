@@ -67,7 +67,7 @@
     "circuit-json-to-bom-csv": "^0.0.7",
     "circuit-json-to-gerber": "^0.0.30",
     "circuit-json-to-pnp-csv": "^0.0.7",
-    "circuit-to-svg": "^0.0.180",
+    "circuit-to-svg": "^0.0.182",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "comlink": "^4.4.2",
@@ -98,7 +98,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
-    "tscircuit": "^0.0.606",
+    "tscircuit": "^0.0.619",
     "tsup": "^8.3.5",
     "vite": "^7.1.2",
     "yargs": "^17.7.2"

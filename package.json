@@ -65,7 +65,7 @@
     "chokidar-cli": "^3.0.0",
     "circuit-json": "0.0.242",
     "circuit-json-to-bom-csv": "^0.0.7",
-    "circuit-json-to-gerber": "^0.0.30",
+    "circuit-json-to-gerber": "^0.0.31",
     "circuit-json-to-pnp-csv": "^0.0.7",
     "circuit-to-svg": "^0.0.182",
     "class-variance-authority": "^0.7.1",

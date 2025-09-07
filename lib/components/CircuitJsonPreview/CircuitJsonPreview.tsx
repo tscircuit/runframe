@@ -317,7 +317,7 @@ export const CircuitJsonPreview = ({
                       )}
                     </div>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="rf-*:text-xs">
+                  <DropdownMenuContent className="rf-*:text-xs rf-z-[101]">
                     {dropdownMenuItems
                       .filter(
                         (item) =>

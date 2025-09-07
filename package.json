@@ -49,7 +49,7 @@
     "@tscircuit/eval": "^0.0.299",
     "@tscircuit/fake-snippets": "^0.0.87",
     "@tscircuit/file-server": "^0.0.24",
-    "@tscircuit/footprinter": "^0.0.234",
+    "@tscircuit/footprinter": "^0.0.236",
     "@tscircuit/math-utils": "^0.0.21",
     "@tscircuit/pcb-viewer": "1.11.211",
     "@tscircuit/props": "^0.0.298",

@@ -198,7 +198,7 @@ export const RunFrame = (props: RunFrameProps) => {
     }
 
     const wasTriggeredByRunButton =
-      props.showRunButton && runCountTrigger !== lastRunCountTriggerRef.current
+      runCountTrigger !== lastRunCountTriggerRef.current
     if (lastFsMapRef.current && circuitJson) {
       const changes = getChangesBetweenFsMaps(lastFsMapRef.current, fsMap)
 

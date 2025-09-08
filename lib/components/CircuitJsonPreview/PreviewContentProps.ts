@@ -99,4 +99,9 @@ export interface PreviewContentProps {
    * Whether the preview is being embedded in a web page
    */
   isWebEmbedded?: boolean
+
+  /**
+   * Callback to rerun render with debug options
+   */
+  onRerunWithDebug?: (debugOption: string) => void
 }

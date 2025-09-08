@@ -587,6 +587,20 @@ export const RunFrame = (props: RunFrameProps) => {
       onEditEvent={handleEditEvent}
       editEvents={props.editEvents}
       defaultToFullScreen={props.defaultToFullScreen}
+      onRerunWithDebug={(debugOption) => {
+        // Set the debug environment variable
+        if (debugOption && debugOption.trim()) {
+          process.env.DEBUG = debugOption
+          // For client-side, also set it on window
+          if (typeof window !== 'undefined') {
+            (window as any).process = (window as any).process || {}
+            ;(window as any).process.env = (window as any).process.env || {}
+            ;(window as any).process.env.DEBUG = debugOption
+          }
+        }
+        // Trigger a rerun
+        incRunCountTrigger(1)
+      }}
     />
   )
 }

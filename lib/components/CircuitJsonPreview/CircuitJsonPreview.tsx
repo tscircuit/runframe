@@ -104,6 +104,7 @@ export const CircuitJsonPreview = ({
   allowSelectingVersion = true,
   showFileMenu = false,
   isWebEmbedded = false,
+  onRerunWithDebug,
 }: PreviewContentProps) => {
   useStyles()
 
@@ -669,7 +670,7 @@ export const CircuitJsonPreview = ({
           {showRenderLogTab &&
             (!availableTabs || availableTabs.includes("render_log")) && (
               <TabsContent value="render_log">
-                <RenderLogViewer renderLog={renderLog} />
+                <RenderLogViewer renderLog={renderLog} onRerunWithDebug={onRerunWithDebug} />
               </TabsContent>
             )}
         </Tabs>

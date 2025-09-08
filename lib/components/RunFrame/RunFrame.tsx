@@ -108,6 +108,7 @@ export const RunFrame = (props: RunFrameProps) => {
       }
     >
   >({})
+  const [currentDebugOption, setCurrentDebugOption] = useState<string>("")
 
   const activeEffectName = Object.values(activeAsyncEffects).sort(
     (a, b) => a.startTime - b.startTime,
@@ -228,7 +229,7 @@ export const RunFrame = (props: RunFrameProps) => {
       setError(null)
       setRenderLog(null)
       setActiveAsyncEffects({})
-      const renderLog: RenderLog = { progress: 0 }
+      const renderLog: RenderLog = { progress: 0, debugOutputs: [] }
       let cancelled = false
 
       // Store cleanup function in ref to be called when execution is stopped
@@ -254,6 +255,12 @@ export const RunFrame = (props: RunFrameProps) => {
         }))
       globalThis.runFrameWorker = worker
       setLastRunEvalVersion(resolvedEvalVersion)
+
+      // Enable debug mode if a debug option is set
+      if (currentDebugOption?.trim()) {
+        worker.enableDebug(currentDebugOption.replace("DEBUG=", ""))
+      }
+
       debug("Starting render...")
       props.onRenderStarted?.()
 
@@ -326,9 +333,9 @@ export const RunFrame = (props: RunFrameProps) => {
       worker.on("debug:logOutput", (event: any) => {
         renderLog.debugOutputs = renderLog.debugOutputs ?? []
         renderLog.debugOutputs.push({
-          type: event.type,
+          type: "debug",
           name: event.name,
-          content: event.content
+          content: event.content,
         })
         if (!cancelled) {
           setRenderLog({ ...renderLog })
@@ -403,6 +410,7 @@ export const RunFrame = (props: RunFrameProps) => {
       }
       setIsRunning(false)
       setActiveAsyncEffects({})
+      setCurrentDebugOption("") // Clear debug option after render completes
       cancelExecutionRef.current = null
     }
     runMutex.runWithMutex(runWorker)
@@ -413,6 +421,7 @@ export const RunFrame = (props: RunFrameProps) => {
     props.evalVersion,
     props.mainComponentPath,
     props.isLoadingFiles,
+    currentDebugOption,
   ])
 
   // Updated to debounce edit events so only the last event is emitted after dragging ends
@@ -600,16 +609,8 @@ export const RunFrame = (props: RunFrameProps) => {
       editEvents={props.editEvents}
       defaultToFullScreen={props.defaultToFullScreen}
       onRerunWithDebug={(debugOption) => {
-        // Set the debug environment variable
-        if (debugOption && debugOption.trim()) {
-          process.env.DEBUG = debugOption
-          // For client-side, also set it on window
-          if (typeof window !== 'undefined') {
-            (window as any).process = (window as any).process || {}
-            ;(window as any).process.env = (window as any).process.env || {}
-            ;(window as any).process.env.DEBUG = debugOption
-          }
-        }
+        // Set the current debug option state
+        setCurrentDebugOption(debugOption || "")
         // Trigger a rerun
         incRunCountTrigger(1)
       }}

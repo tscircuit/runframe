@@ -108,6 +108,7 @@ export const RunFrame = (props: RunFrameProps) => {
       }
     >
   >({})
+  const [currentDebugOption, setCurrentDebugOption] = useState<string>("")
 
   const activeEffectName = Object.values(activeAsyncEffects).sort(
     (a, b) => a.startTime - b.startTime,
@@ -197,7 +198,7 @@ export const RunFrame = (props: RunFrameProps) => {
     }
 
     const wasTriggeredByRunButton =
-      props.showRunButton && runCountTrigger !== lastRunCountTriggerRef.current
+      runCountTrigger !== lastRunCountTriggerRef.current
     if (lastFsMapRef.current && circuitJson) {
       const changes = getChangesBetweenFsMaps(lastFsMapRef.current, fsMap)
 
@@ -228,7 +229,7 @@ export const RunFrame = (props: RunFrameProps) => {
       setError(null)
       setRenderLog(null)
       setActiveAsyncEffects({})
-      const renderLog: RenderLog = { progress: 0 }
+      const renderLog: RenderLog = { progress: 0, debugOutputs: [] }
       let cancelled = false
 
       // Store cleanup function in ref to be called when execution is stopped
@@ -254,6 +255,12 @@ export const RunFrame = (props: RunFrameProps) => {
         }))
       globalThis.runFrameWorker = worker
       setLastRunEvalVersion(resolvedEvalVersion)
+
+      // Enable debug mode if a debug option is set
+      if (currentDebugOption?.trim()) {
+        worker.enableDebug(currentDebugOption.replace("DEBUG=", ""))
+      }
+
       debug("Starting render...")
       props.onRenderStarted?.()
 
@@ -321,6 +328,18 @@ export const RunFrame = (props: RunFrameProps) => {
 
       worker.on("autorouting:progress", (event: any) => {
         setAutoroutingGraphics(event.debugGraphics)
+      })
+
+      worker.on("debug:logOutput", (event: any) => {
+        renderLog.debugOutputs = renderLog.debugOutputs ?? []
+        renderLog.debugOutputs.push({
+          type: "debug",
+          name: event.name,
+          content: event.content,
+        })
+        if (!cancelled) {
+          setRenderLog({ ...renderLog })
+        }
       })
 
       debug("Executing fsMap...")
@@ -391,6 +410,7 @@ export const RunFrame = (props: RunFrameProps) => {
       }
       setIsRunning(false)
       setActiveAsyncEffects({})
+      setCurrentDebugOption("") // Clear debug option after render completes
       cancelExecutionRef.current = null
     }
     runMutex.runWithMutex(runWorker)
@@ -401,6 +421,7 @@ export const RunFrame = (props: RunFrameProps) => {
     props.evalVersion,
     props.mainComponentPath,
     props.isLoadingFiles,
+    currentDebugOption,
   ])
 
   // Updated to debounce edit events so only the last event is emitted after dragging ends
@@ -587,6 +608,12 @@ export const RunFrame = (props: RunFrameProps) => {
       onEditEvent={handleEditEvent}
       editEvents={props.editEvents}
       defaultToFullScreen={props.defaultToFullScreen}
+      onRerunWithDebug={(debugOption) => {
+        // Set the current debug option state
+        setCurrentDebugOption(debugOption || "")
+        // Trigger a rerun
+        incRunCountTrigger(1)
+      }}
     />
   )
 }

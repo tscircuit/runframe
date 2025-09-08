@@ -7,7 +7,7 @@ import { Button } from "../ui/button"
 export const RenderLogViewer = ({
   renderLog,
   onRerunWithDebug,
-}: { 
+}: {
   renderLog?: RenderLog | null
   onRerunWithDebug?: (debugOption: string) => void
 }) => {
@@ -18,9 +18,18 @@ export const RenderLogViewer = ({
 
   const debugOptions = [
     { value: "", label: "None" },
-    { value: "DEBUG=Group_doInitialSchematicTraceRender", label: "DEBUG=Group_doInitialSchematicTraceRender" },
-    { value: "DEBUG=Group_doInitialSchematicLayoutMatchpack", label: "DEBUG=Group_doInitialSchematicLayoutMatchpack" },
-    { value: "DEBUG=Group_doInitialPcbLayoutPack", label: "DEBUG=Group_doInitialPcbLayoutPack" },
+    {
+      value: "DEBUG=Group_doInitialSchematicTraceRender",
+      label: "DEBUG=Group_doInitialSchematicTraceRender",
+    },
+    {
+      value: "DEBUG=Group_doInitialSchematicLayoutMatchpack",
+      label: "DEBUG=Group_doInitialSchematicLayoutMatchpack",
+    },
+    {
+      value: "DEBUG=Group_doInitialPcbLayoutPack",
+      label: "DEBUG=Group_doInitialPcbLayoutPack",
+    },
   ]
 
   if (!renderLog)
@@ -29,7 +38,7 @@ export const RenderLogViewer = ({
         <div className="rf-mb-4">
           No render log, make sure this tab is open when you render
         </div>
-{onRerunWithDebug && (
+        {onRerunWithDebug && (
           <div className="rf-flex rf-gap-2 rf-items-center">
             <select
               value={selectedDebugOption}
@@ -76,7 +85,7 @@ export const RenderLogViewer = ({
       <div className="rf-flex rf-justify-between rf-items-center rf-mb-4">
         <div>Render Logs</div>
         <div className="rf-flex rf-gap-4 rf-items-center">
-{onRerunWithDebug && (
+          {onRerunWithDebug && (
             <div className="rf-flex rf-gap-2 rf-items-center">
               <select
                 value={selectedDebugOption}
@@ -102,22 +111,28 @@ export const RenderLogViewer = ({
             <select
               onChange={(e) => {
                 if (e.target.value) {
-                  const debugOutput = renderLog?.debugOutputs?.find(output => output.name === e.target.value);
+                  const debugOutput = renderLog?.debugOutputs?.find(
+                    (output) => output.name === e.target.value,
+                  )
                   if (debugOutput) {
-                    const blob = new Blob([debugOutput.content], { type: 'text/plain' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `debug-${debugOutput.name}.txt`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
+                    const blob = new Blob([debugOutput.content], {
+                      type: "text/plain",
+                    })
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement("a")
+                    a.href = url
+                    a.download = `debug-${debugOutput.name}.txt`
+                    document.body.appendChild(a)
+                    a.click()
+                    document.body.removeChild(a)
+                    URL.revokeObjectURL(url)
                   }
-                  e.target.value = "";
+                  e.target.value = ""
                 }
               }}
-              disabled={!renderLog?.debugOutputs || renderLog.debugOutputs.length === 0}
+              disabled={
+                !renderLog?.debugOutputs || renderLog.debugOutputs.length === 0
+              }
               className="rf-px-3 rf-py-1 rf-border rf-rounded rf-text-xs rf-bg-white disabled:rf-opacity-50 disabled:rf-cursor-not-allowed"
             >
               <option value="">Download Debug Output</option>

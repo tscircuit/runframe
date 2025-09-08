@@ -670,7 +670,10 @@ export const CircuitJsonPreview = ({
           {showRenderLogTab &&
             (!availableTabs || availableTabs.includes("render_log")) && (
               <TabsContent value="render_log">
-                <RenderLogViewer renderLog={renderLog} onRerunWithDebug={onRerunWithDebug} />
+                <RenderLogViewer
+                  renderLog={renderLog}
+                  onRerunWithDebug={onRerunWithDebug}
+                />
               </TabsContent>
             )}
         </Tabs>

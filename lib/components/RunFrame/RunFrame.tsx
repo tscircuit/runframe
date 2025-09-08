@@ -323,6 +323,18 @@ export const RunFrame = (props: RunFrameProps) => {
         setAutoroutingGraphics(event.debugGraphics)
       })
 
+      worker.on("debug:logOutput", (event: any) => {
+        renderLog.debugOutputs = renderLog.debugOutputs ?? []
+        renderLog.debugOutputs.push({
+          type: event.type,
+          name: event.name,
+          content: event.content
+        })
+        if (!cancelled) {
+          setRenderLog({ ...renderLog })
+        }
+      })
+
       debug("Executing fsMap...")
       const evalResult = await worker
         .executeWithFsMap({

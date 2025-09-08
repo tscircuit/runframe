@@ -21,4 +21,10 @@ export interface RenderLog {
 
   // Not sure if we can do this because of async
   phaseTimings?: Record<string, number>
+
+  debugOutputs?: Array<{
+    type: string
+    name: string
+    content: string
+  }>
 }

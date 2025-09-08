@@ -98,6 +98,37 @@ export const RenderLogViewer = ({
               </Button>
             </div>
           )}
+          {renderLog?.debugOutputs && renderLog.debugOutputs.length > 0 && (
+            <div className="rf-flex rf-gap-2 rf-items-center">
+              <select
+                onChange={(e) => {
+                  if (e.target.value) {
+                    const debugOutput = renderLog.debugOutputs?.find(output => output.name === e.target.value);
+                    if (debugOutput) {
+                      const blob = new Blob([debugOutput.content], { type: 'text/plain' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `debug-${debugOutput.name}.txt`;
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                    }
+                    e.target.value = "";
+                  }
+                }}
+                className="rf-px-3 rf-py-1 rf-border rf-rounded rf-text-xs rf-bg-white"
+              >
+                <option value="">Download Debug Output</option>
+                {renderLog.debugOutputs.map((output) => (
+                  <option key={output.name} value={output.name}>
+                    {output.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <div className="rf-flex rf-text-xs rf-items-center">
             <div className="rf-mr-2">Sort by:</div>
             <select

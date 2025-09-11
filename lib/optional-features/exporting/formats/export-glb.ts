@@ -9,8 +9,10 @@ export const exportGlb = async ({
   circuitJson: CircuitJson
   projectName?: string
 }) => {
-  const glbBuffer = await convertCircuitJsonToGltf(circuitJson, { format: "glb" })
-  const blob = glbBuffer instanceof Blob ? glbBuffer : new Blob([glbBuffer], { type: "model/gltf-binary" })
+  const glbBuffer = (await convertCircuitJsonToGltf(circuitJson, {
+    format: "glb",
+  })) as ArrayBuffer
+  const blob = new Blob([glbBuffer], { type: "model/gltf-binary" })
   openForDownload(blob, {
     fileName: `${projectName}.glb`,
   })

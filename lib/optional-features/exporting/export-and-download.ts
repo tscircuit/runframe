@@ -1,13 +1,14 @@
 import type { CircuitJson } from "circuit-json"
 import { exportFabricationFiles } from "./formats/export-fabrication-files"
 import { openForDownload } from "./open-for-download"
+import { exportGlb } from "./formats/export-glb"
 
 export const availableExports = [
   { extension: "json", name: "Circuit JSON" },
   { extension: "zip", name: "Fabrication Files" },
+  { extension: "glb", name: "GLB (Binary GLTF)" },
   // { extension: "svg", name: "SVG" },
   // { extension: "dsn", name: "Specctra DSN" },
-  // { extension: "glb", name: "GLB (Binary GLTF)" },
   // { extension: "kicad_mod", name: "KiCad Module" },
   // { extension: "kicad_project", name: "KiCad Project" },
   // { extension: "gbr", name: "Gerbers" },
@@ -33,6 +34,10 @@ export const exportAndDownload = async ({
       fileName: `${projectName}.circuit.json`,
       mimeType: "application/json",
     })
+    return
+  }
+  if (exportName === "GLB (Binary GLTF)") {
+    await exportGlb({ circuitJson, projectName })
     return
   }
   throw new Error(`Unsupported export type: "${exportName}"`)

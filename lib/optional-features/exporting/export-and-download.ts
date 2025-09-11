@@ -23,21 +23,23 @@ export const exportAndDownload = async ({
 }: {
   exportName: ExportName
   circuitJson: CircuitJson
-  projectName: string
+  projectName?: string
 }) => {
+  const safeProjectName = projectName || "Untitled"
+
   if (exportName === "Fabrication Files") {
-    exportFabricationFiles({ circuitJson, projectName })
+    exportFabricationFiles({ circuitJson, projectName: safeProjectName })
     return
   }
   if (exportName === "Circuit JSON") {
     openForDownload(JSON.stringify(circuitJson, null, 2), {
-      fileName: `${projectName}.circuit.json`,
+      fileName: `${safeProjectName}.circuit.json`,
       mimeType: "application/json",
     })
     return
   }
   if (exportName === "GLB (Binary GLTF)") {
-    await exportGlb({ circuitJson, projectName })
+    await exportGlb({ circuitJson, projectName: safeProjectName })
     return
   }
   throw new Error(`Unsupported export type: "${exportName}"`)

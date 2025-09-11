@@ -1,0 +1,15 @@
+[
+  {
+    "type": "board",
+    "name": "B1",
+    "width": 10,
+    "height": 10
+  },
+  {
+    "type": "pcb_component",
+    "name": "R1",
+    "footprint": "0402",
+    "center": { "x": 5, "y": 5 },
+    "layer": "top"
+  }
+]

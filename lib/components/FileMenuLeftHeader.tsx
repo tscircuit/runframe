@@ -332,7 +332,10 @@ export const FileMenuLeftHeader = (props: {
         position="top-center"
         reverseOrder={false}
         containerStyle={{ zIndex: 100000 }}
-        toastOptions={{ style: { zIndex: 100000 } }}
+        toastOptions={{
+          className: "rf-break-all",
+          style: { zIndex: 100000 },
+        }}
       />
       <orderDialog.OrderDialog
         isOpen={orderDialog.isOpen}

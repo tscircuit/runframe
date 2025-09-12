@@ -128,4 +128,7 @@ export default defineConfig({
   root: ".",
   publicDir: "public",
   build,
+  optimizeDeps: {
+    exclude: ["@resvg/resvg-js-darwin-arm64"],
+  },
 })

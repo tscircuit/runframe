@@ -102,7 +102,17 @@ export const ImportComponentDialog = ({
 
               return { filePath }
             } else if (component.source === "kicad") {
-              throw new Error("Not implemented")
+              const footprint = component.partNumber!;
+              navigator.clipboard.writeText(footprint).then(
+                () => {
+                  toast.success(`Footprint copied to clipboard: ${footprint}`)
+                },
+                (err) => {
+                  console.error("Failed to copy footprint: ", err)
+                  toast.error("Could not copy footprint to clipboard.")
+                },
+              )
+              return
             }
           },
           {

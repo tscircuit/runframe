@@ -37,7 +37,7 @@ const fetchKicadFiles = async (): Promise<string[]> => {
  */
 export const searchKicadComponents = async (
   query: string,
-  limit = 50,
+  limit: number,
 ): Promise<string[]> => {
   const allFiles = await fetchKicadFiles()
   if (!query) return allFiles.slice(0, limit)
@@ -59,17 +59,17 @@ export const searchKicadComponents = async (
 export const mapKicadComponentToSearchResult = (
   kicadFilePath: string,
 ): ComponentSearchResult => {
-  const parts = kicadFilePath.split("/")
-  const libraryPart = parts[0] || ""
-  const filePart = parts[1] || ""
+  const [libraryPart = "", filePart = ""] = kicadFilePath.split("/")
 
   const name = filePart.replace(".kicad_mod", "")
   const library = libraryPart.replace(".pretty", "")
+  const footprint = `${library}/${name}`
 
   return {
     id: `kicad-${kicadFilePath}`,
     name: name,
     description: `Library: ${library}`,
     source: "kicad",
+    partNumber: footprint,
   }
 }

@@ -61,14 +61,15 @@ export const mapKicadComponentToSearchResult = (
 ): ComponentSearchResult => {
   const [libraryPart = "", filePart = ""] = kicadFilePath.split("/")
 
-  const name = filePart.replace(".kicad_mod", "")
+  let name = filePart.replace(".kicad_mod", "")
   const library = libraryPart.replace(".pretty", "")
   const footprint = `${library}/${name}`
+
+  if (name.length > 50) {name = `${name.slice(0, 50 - 3)}...`}
 
   return {
     id: `kicad-${kicadFilePath}`,
     name: name,
-    description: `Library: ${library}`,
     source: "kicad",
     partNumber: footprint,
   }

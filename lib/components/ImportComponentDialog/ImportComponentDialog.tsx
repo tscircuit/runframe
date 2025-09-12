@@ -103,16 +103,10 @@ export const ImportComponentDialog = ({
               return { filePath }
             } else if (component.source === "kicad") {
               const footprint = component.partNumber!;
-              navigator.clipboard.writeText(footprint).then(
-                () => {
-                  toast.success(`Footprint copied to clipboard: ${footprint}`)
-                },
-                (err) => {
-                  console.error("Failed to copy footprint: ", err)
-                  toast.error("Could not copy footprint to clipboard.")
-                },
-              )
-              return
+              if(footprint) {
+                navigator.clipboard.writeText(footprint);
+                return { footprint: footprint}
+              }
             }
           },
           {
@@ -122,9 +116,11 @@ export const ImportComponentDialog = ({
               return `Error importing component: "${component.name}": ${error.toString()}`
             },
             success: (data: any) =>
-              data?.filePath
-                ? `Imported to "${data.filePath}"`
-                : "Import Successful",
+              data?.footprint ? 
+              `Footprint "${data.footprint}" to clipboard` 
+              : data?.filePath ?
+              `Imported to "${data.filePath}"`
+              : "Import Successful",
           },
         )
       }

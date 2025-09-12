@@ -1,6 +1,6 @@
 import type { CircuitJson } from "circuit-json"
-import { convertCircuitJsonToGltf } from "circuit-json-to-gltf"
 import { openForDownload } from "../open-for-download"
+import { convertCircuitJsonToGltf } from "circuit-json-to-gltf"
 
 export const exportGlb = async ({
   circuitJson,
@@ -9,13 +9,26 @@ export const exportGlb = async ({
   circuitJson: CircuitJson
   projectName: string
 }) => {
-  const glbArrayBuffer = (await convertCircuitJsonToGltf(circuitJson, {
-    format: "glb",
-  })) as ArrayBuffer
+  let blob: Blob
+  try {
+    // Use lower texture resolution for better performance and compatibility
+    const glbArrayBuffer = (await convertCircuitJsonToGltf(circuitJson, {
+      format: "glb",
+      boardTextureResolution: 512,
+    })) as ArrayBuffer
 
-  const blob = new Blob([glbArrayBuffer], {
-    type: "model/gltf-binary",
-  })
+    // Ensure we have a valid ArrayBuffer before creating the blob
+    if (!glbArrayBuffer || !(glbArrayBuffer instanceof ArrayBuffer)) {
+      throw new Error("Invalid GLB data returned from converter")
+    }
+
+    blob = new Blob([glbArrayBuffer], {
+      type: "model/gltf-binary",
+    })
+  } catch (error) {
+    console.error("GLB Export Error:", error)
+    return
+  }
 
   openForDownload(blob, {
     fileName: `${projectName}.glb`,

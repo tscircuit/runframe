@@ -127,5 +127,21 @@ export default defineConfig({
   },
   root: ".",
   publicDir: "public",
-  build,
+  build: {
+    ...build,
+    rollupOptions: {
+      external: [
+        "@resvg/resvg-js",
+        "@resvg/resvg-js-darwin-arm64",
+        "@resvg/resvg-wasm",
+      ],
+    },
+  },
+  optimizeDeps: {
+    exclude: [
+      "@resvg/resvg-js",
+      "@resvg/resvg-js-darwin-arm64",
+      "@resvg/resvg-wasm",
+    ],
+  },
 })

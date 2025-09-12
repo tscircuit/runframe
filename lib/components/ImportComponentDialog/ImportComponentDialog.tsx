@@ -14,6 +14,10 @@ import { Loader2, Search, ExternalLink } from "lucide-react"
 import { Input } from "../ui/input"
 import { searchJLCComponents, mapJLCComponentToSearchResult } from "./jlc-api"
 import {
+  searchKicadComponents,
+  mapKicadComponentToSearchResult,
+} from "./kicad-api"
+import {
   searchTscircuitComponents,
   mapTscircuitSnippetToSearchResult,
 } from "./tscircuit-registry-api"
@@ -25,7 +29,7 @@ export interface ComponentSearchResult {
   id: string
   name: string
   description?: string
-  source: "tscircuit.com" | "jlcpcb"
+  source: "tscircuit.com" | "jlcpcb" | "kicad"
   partNumber?: string
   // Additional JLC-specific properties
   package?: string
@@ -62,9 +66,9 @@ export const ImportComponentDialog = ({
   const [isLoading, setIsLoading] = useState(false)
   const [selectedComponent, setSelectedComponent] =
     useState<ComponentSearchResult | null>(null)
-  const [activeTab, setActiveTab] = useState<"tscircuit.com" | "jlcpcb">(
-    "tscircuit.com",
-  )
+  const [activeTab, setActiveTab] = useState<
+    "tscircuit.com" | "jlcpcb" | "kicad"
+  >("tscircuit.com")
   const [detailsOpen, setDetailsOpen] = useState(false)
   const [detailsComponent, setDetailsComponent] =
     useState<ComponentSearchResult | null>(null)
@@ -97,6 +101,8 @@ export const ImportComponentDialog = ({
               )
 
               return { filePath }
+            } else if (component.source === "kicad") {
+              throw new Error("Not implemented")
             }
           },
           {
@@ -151,13 +157,19 @@ export const ImportComponentDialog = ({
         // Map JLC components to the format expected by the UI
         const mappedResults = jlcComponents.map(mapJLCComponentToSearchResult)
         setSearchResults(mappedResults)
-      } else {
+      } else if (activeTab === "tscircuit.com") {
         // Real tscircuit registry API call
         const tscircuitComponents = await searchTscircuitComponents(searchQuery)
 
         // Map tscircuit components to the format expected by the UI
         const mappedResults = tscircuitComponents.map(
           mapTscircuitSnippetToSearchResult,
+        )
+        setSearchResults(mappedResults)
+      } else if (activeTab === "kicad") {
+        const kicadComponents = await searchKicadComponents(searchQuery, 10)
+        const mappedResults = kicadComponents.map(
+          mapKicadComponentToSearchResult,
         )
         setSearchResults(mappedResults)
       }
@@ -219,10 +231,10 @@ export const ImportComponentDialog = ({
         <Tabs
           value={activeTab}
           onValueChange={(value) =>
-            setActiveTab(value as "tscircuit.com" | "jlcpcb")
+            setActiveTab(value as "tscircuit.com" | "jlcpcb" | "kicad")
           }
         >
-          <TabsList className="rf-grid rf-w-full rf-grid-cols-2 rf-h-auto">
+          <TabsList className="rf-grid rf-w-full rf-grid-cols-3 rf-h-auto">
             <TabsTrigger
               value="tscircuit.com"
               className="rf-text-xs sm:rf-text-sm"
@@ -231,6 +243,9 @@ export const ImportComponentDialog = ({
             </TabsTrigger>
             <TabsTrigger value="jlcpcb" className="rf-text-xs sm:rf-text-sm">
               JLCPCB Parts
+            </TabsTrigger>
+            <TabsTrigger value="kicad" className="rf-text-xs sm:rf-text-sm">
+              KiCad Library
             </TabsTrigger>
           </TabsList>
 
@@ -241,7 +256,9 @@ export const ImportComponentDialog = ({
                 placeholder={
                   activeTab === "tscircuit.com"
                     ? "Search components..."
-                    : "Search JLCPCB parts (e.g. C14663)..."
+                    : activeTab === "jlcpcb"
+                      ? "Search JLCPCB parts (e.g. C14663)..."
+                      : "Search KiCad libraries..."
                 }
                 className="rf-pl-8"
                 spellCheck={false}

@@ -242,7 +242,7 @@ export const ImportComponentDialog = ({
             setActiveTab(value as "tscircuit.com" | "jlcpcb" | "kicad")
           }
         >
-          <TabsList className="rf-grid rf-w-full rf-grid-cols-3 rf-h-auto">
+          <TabsList className="rf-grid rf-w-full rf-grid-cols-1 sm:rf-grid-cols-3 rf-h-auto">
             <TabsTrigger
               value="tscircuit.com"
               className="rf-text-xs sm:rf-text-sm"

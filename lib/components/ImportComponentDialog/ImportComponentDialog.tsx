@@ -17,6 +17,11 @@ import {
   searchTscircuitComponents,
   mapTscircuitSnippetToSearchResult,
 } from "./tscircuit-registry-api"
+import {
+  searchKicadFootprints,
+  mapKicadFootprintToSearchResult,
+} from "./kicad-api"
+import { CircuitJsonPreview } from "../CircuitJsonPreview/CircuitJsonPreview"
 import { useRunFrameStore } from "../RunFrameWithApi/store"
 import { importComponentFromJlcpcb } from "lib/optional-features/importing/import-component-from-jlcpcb"
 import { toast } from "lib/utils/toast"
@@ -25,7 +30,7 @@ export interface ComponentSearchResult {
   id: string
   name: string
   description?: string
-  source: "tscircuit.com" | "jlcpcb"
+  source: "tscircuit.com" | "jlcpcb" | "kicad"
   partNumber?: string
   // Additional JLC-specific properties
   package?: string
@@ -33,6 +38,7 @@ export interface ComponentSearchResult {
   // Additional tscircuit-specific properties
   code?: string
   owner?: string
+  circuitJson?: import("circuit-json").CircuitJson
 }
 
 interface TscircuitPackageDetails {
@@ -62,7 +68,7 @@ export const ImportComponentDialog = ({
   const [isLoading, setIsLoading] = useState(false)
   const [selectedComponent, setSelectedComponent] =
     useState<ComponentSearchResult | null>(null)
-  const [activeTab, setActiveTab] = useState<"tscircuit.com" | "jlcpcb">(
+  const [activeTab, setActiveTab] = useState<"tscircuit.com" | "jlcpcb" | "kicad">(
     "tscircuit.com",
   )
   const [detailsOpen, setDetailsOpen] = useState(false)
@@ -79,7 +85,26 @@ export const ImportComponentDialog = ({
 
   const handleImport = onImport
     ? (component: ComponentSearchResult) => onImport(component)
-    : (component: ComponentSearchResult) => {
+    : async (component: ComponentSearchResult) => {
+        if (component.source === "kicad") {
+          try {
+            const footprintString = `footprint="/${component.name}"`
+            await navigator.clipboard.writeText(footprintString)
+            toast({
+              title: "Footprint copied to clipboard",
+              description: `Use: ${footprintString}`,
+            })
+          } catch (error) {
+            console.error("Failed to copy footprint:", error)
+            toast({
+              title: "Failed to copy footprint",
+              description: "Please copy manually: footprint=\"/Resistor_SMD:R_0402_1005Metric\"",
+              variant: "destructive",
+            })
+          }
+          return
+        }
+
         toast.promise(
           async () => {
             if (component.source === "tscircuit.com") {
@@ -138,12 +163,21 @@ export const ImportComponentDialog = ({
 
     setIsLoading(true)
 
-    // Determine search type based on query format
-    // If query starts with C and followed by numbers, assume it's a JLC part number
-    const isJlcPartNumber = /^C\d+/.test(searchQuery)
-
     try {
-      if (activeTab === "jlcpcb") {
+      if (activeTab === "kicad") {
+        const kicadResults = await searchKicadFootprints(searchQuery, 20)
+        // Map to ComponentSearchResult but keep circuitJson for previews
+        const mappedResults = kicadResults.map(footprint => ({
+          ...mapKicadFootprintToSearchResult(footprint),
+          circuitJson: footprint.circuitJson,
+          source: "kicad" as const,
+        }))
+        setSearchResults(mappedResults)
+      } else if (activeTab === "jlcpcb") {
+        // Determine search type based on query format
+        // If query starts with C and followed by numbers, assume it's a JLC part number
+        const isJlcPartNumber = /^C\d+/.test(searchQuery)
+
         // Real JLCPCB API call
         const query = isJlcPartNumber ? searchQuery.substring(1) : searchQuery // Remove 'C' prefix if it's a part number
         const jlcComponents = await searchJLCComponents(query, 10)
@@ -212,17 +246,17 @@ export const ImportComponentDialog = ({
             Import Component
           </DialogTitle>
           <DialogDescription className="rf-text-sm">
-            Search for components from tscircuit.com or JLCPCB parts library.
+            Search for components from tscircuit.com, JLCPCB parts library, or KiCad footprints.
           </DialogDescription>
         </DialogHeader>
 
         <Tabs
           value={activeTab}
           onValueChange={(value) =>
-            setActiveTab(value as "tscircuit.com" | "jlcpcb")
+            setActiveTab(value as "tscircuit.com" | "jlcpcb" | "kicad")
           }
         >
-          <TabsList className="rf-grid rf-w-full rf-grid-cols-2 rf-h-auto">
+          <TabsList className="rf-grid rf-w-full rf-grid-cols-3 rf-h-auto">
             <TabsTrigger
               value="tscircuit.com"
               className="rf-text-xs sm:rf-text-sm"
@@ -232,6 +266,9 @@ export const ImportComponentDialog = ({
             <TabsTrigger value="jlcpcb" className="rf-text-xs sm:rf-text-sm">
               JLCPCB Parts
             </TabsTrigger>
+            <TabsTrigger value="kicad" className="rf-text-xs sm:rf-text-sm">
+              KiCad
+            </TabsTrigger>
           </TabsList>
 
           <div className="rf-flex rf-items-center rf-gap-2 rf-mt-4">
@@ -239,7 +276,9 @@ export const ImportComponentDialog = ({
               <Search className="rf-absolute rf-left-2 rf-top-2.5 rf-h-4 rf-w-4 rf-text-muted-foreground" />
               <Input
                 placeholder={
-                  activeTab === "tscircuit.com"
+                  activeTab === "kicad"
+                    ? "Search KiCad footprints (e.g. resistor, led)..."
+                    : activeTab === "tscircuit.com"
                     ? "Search components..."
                     : "Search JLCPCB parts (e.g. C14663)..."
                 }
@@ -301,6 +340,19 @@ export const ImportComponentDialog = ({
                           See Details
                         </Button>
                       )}
+                      {result.source === "kicad" && result.circuitJson && (
+                        <div className="rf-w-16 rf-h-12 rf-border rf-rounded rf-overflow-hidden">
+                          <CircuitJsonPreview
+                            circuitJson={result.circuitJson}
+                            className="rf-w-full rf-h-full"
+                            availableTabs={["pcb"]}
+                            defaultActiveTab="pcb"
+                            showFileMenu={false}
+                            showRightHeaderContent={false}
+                            showImportAndFormatButtons={false}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -308,12 +360,14 @@ export const ImportComponentDialog = ({
             ) : isLoading ? (
               <div className="rf-p-8 rf-text-center rf-text-zinc-500">
                 <Loader2 className="rf-h-8 rf-w-8 rf-animate-spin rf-mx-auto rf-mb-2" />
-                <p>Searching...</p>
+                <p>Searching {activeTab === "kicad" ? "KiCad footprints..." : "..."}</p>
               </div>
             ) : (
               <div className="rf-p-8 rf-text-center rf-text-zinc-500">
                 {hasSearched
                   ? "No results found"
+                  : activeTab === "kicad"
+                  ? "Enter a search term to find KiCad footprints"
                   : "Enter a search term to find components"}
               </div>
             )}
@@ -337,7 +391,7 @@ export const ImportComponentDialog = ({
             }}
             disabled={!selectedComponent}
           >
-            Import Component
+            {selectedComponent?.source === "kicad" ? "Copy Footprint" : "Import Component"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -355,15 +409,19 @@ export const ImportComponentDialog = ({
             <div className="rf-flex rf-items-start rf-justify-between rf-gap-4">
               <div className="rf-flex-1 rf-min-w-0">
                 <DialogTitle className="rf-text-xl rf-font-semibold rf-truncate">
-                  <a
-                    href={`https://tscircuit.com/${detailsComponent?.owner}/${detailsComponent?.name}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rf-text-black hover:rf-underline"
-                  >
-                    {detailsComponent?.name?.split("/").pop() ||
-                      detailsComponent?.name}
-                  </a>
+                  {detailsComponent?.source === "kicad" ? (
+                    detailsComponent?.name
+                  ) : (
+                    <a
+                      href={`https://tscircuit.com/${detailsComponent?.owner}/${detailsComponent?.name}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rf-text-black hover:rf-underline"
+                    >
+                      {detailsComponent?.name?.split("/").pop() ||
+                        detailsComponent?.name}
+                    </a>
+                  )}
                 </DialogTitle>
               </div>
             </div>
@@ -373,7 +431,16 @@ export const ImportComponentDialog = ({
             {/* Component Information */}
             <div>
               <div className="rf-space-y-3">
-                {detailsComponent?.owner && (
+                {detailsComponent?.source === "kicad" ? (
+                  <div>
+                    <label className="rf-text-xs rf-font-medium rf-text-gray-500 rf-uppercase rf-tracking-wide">
+                      Source
+                    </label>
+                    <div className="rf-mt-1 rf-text-sm rf-font-medium rf-text-blue-600">
+                      KiCad Footprint Library
+                    </div>
+                  </div>
+                ) : detailsComponent?.owner ? (
                   <div>
                     <label className="rf-text-xs rf-font-medium rf-text-gray-500 rf-uppercase rf-tracking-wide">
                       Created by
@@ -389,7 +456,7 @@ export const ImportComponentDialog = ({
                       </a>
                     </div>
                   </div>
-                )}
+                ) : null}
               </div>
             </div>
 
@@ -423,7 +490,18 @@ export const ImportComponentDialog = ({
                     value="pcb"
                     className="rf-border rf-rounded-lg rf-overflow-hidden rf-bg-gray-50"
                   >
-                    {detailsComponent?.owner && detailsComponent?.name ? (
+                    {detailsComponent?.source === "kicad" && detailsComponent.circuitJson ? (
+                      <div className="rf-w-full rf-h-[400px] rf-bg-white">
+                        <CircuitJsonPreview
+                          circuitJson={detailsComponent.circuitJson}
+                          availableTabs={["pcb"]}
+                          defaultActiveTab="pcb"
+                          showFileMenu={false}
+                          showRightHeaderContent={false}
+                          showImportAndFormatButtons={false}
+                        />
+                      </div>
+                    ) : detailsComponent?.owner && detailsComponent?.name ? (
                       <div className="rf-w-full rf-h-fit rf-min-h-[300px] rf-bg-white rf-flex rf-items-center rf-justify-center rf-p-4">
                         <img
                           src={`https://registry-api.tscircuit.com/packages/images/${detailsComponent.owner}/${detailsComponent.name}/pcb.png`}
@@ -458,7 +536,18 @@ export const ImportComponentDialog = ({
                     value="schematic"
                     className="rf-border rf-rounded-lg rf-overflow-hidden rf-bg-gray-50"
                   >
-                    {detailsComponent?.owner && detailsComponent?.name ? (
+                    {detailsComponent?.source === "kicad" ? (
+                      <div className="rf-h-[400px] rf-flex rf-items-center rf-justify-center rf-text-gray-500">
+                        <div className="rf-text-center">
+                          <div className="rf-text-sm rf-font-medium">
+                            Schematic preview not available for KiCad footprints
+                          </div>
+                          <div className="rf-text-xs rf-mt-1">
+                            Only PCB view is supported
+                          </div>
+                        </div>
+                      </div>
+                    ) : detailsComponent?.owner && detailsComponent?.name ? (
                       <div className="rf-w-full rf-h-fit rf-min-h-[300px] rf-bg-white rf-flex rf-items-center rf-justify-center rf-p-4">
                         <img
                           src={`https://registry-api.tscircuit.com/packages/images/${detailsComponent.owner}/${detailsComponent.name}/schematic.png`}
@@ -531,18 +620,20 @@ export const ImportComponentDialog = ({
 
           <DialogFooter className="rf-pt-4 rf-border-t rf-flex rf-flex-col sm:rf-flex-row rf-justify-between rf-items-stretch sm:rf-items-center rf-gap-2">
             <div className="rf-flex-1 rf-order-3 sm:rf-order-1">
-              <Button
-                variant="outline"
-                size="sm"
-                className="rf-gap-2 rf-w-full sm:rf-w-auto"
-                onClick={() => {
-                  const url = `https://tscircuit.com/${detailsComponent?.owner}/${detailsComponent?.name.split("/").pop()}`
-                  window.open(url, "_blank")
-                }}
-              >
-                <ExternalLink className="rf-h-4 rf-w-4" />
-                View on tscircuit.com
-              </Button>
+              {detailsComponent?.source === "kicad" ? null : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rf-gap-2 rf-w-full sm:rf-w-auto"
+                  onClick={() => {
+                    const url = `https://tscircuit.com/${detailsComponent?.owner}/${detailsComponent?.name.split("/").pop()}`
+                    window.open(url, "_blank")
+                  }}
+                >
+                  <ExternalLink className="rf-h-4 rf-w-4" />
+                  View on tscircuit.com
+                </Button>
+              )}
             </div>
             <div className="rf-flex rf-flex-col sm:rf-flex-row rf-gap-2 sm:rf-gap-3 rf-order-1 sm:rf-order-2">
               <Button
@@ -562,7 +653,7 @@ export const ImportComponentDialog = ({
                 }}
                 className="rf-bg-blue-600 hover:rf-bg-blue-700 rf-order-1 sm:rf-order-2"
               >
-                Import Component
+                {detailsComponent?.source === "kicad" ? "Copy Footprint" : "Import Component"}
               </Button>
             </div>
           </DialogFooter>

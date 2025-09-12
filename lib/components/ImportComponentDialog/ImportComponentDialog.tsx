@@ -309,7 +309,7 @@ export const ImportComponentDialog = ({
                       <div className="rf-font-medium rf-text-sm rf-truncate">
                         {result.name}
                       </div>
-                      <div className="rf-text-xs rf-text-zinc-500 rf-whitespace-normal rf-break-all">
+                      <div className="rf-text-xs rf-text-zinc-500 rf-truncate">
                         {result.partNumber && (
                           <span className="rf-mr-2">{result.partNumber}</span>
                         )}

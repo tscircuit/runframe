@@ -40,13 +40,15 @@ export const searchKicadFootprints = async (
 export const mapKicadFootprintToSearchResult = (
   footprintPath: string,
 ): ComponentSearchResult => {
-  const footprintString = `kicad:${footprintPath
+  const cleanedFootprint = footprintPath
     .replace(".pretty/", ":")
-    .replace(".kicad_mod", "")}`
+    .replace(".kicad_mod", "")
+  const footprintString = `kicad:${cleanedFootprint}`
+
   return {
     id: `kicad-${footprintPath}`,
     name: footprintString,
-    description: footprintPath,
+    description: cleanedFootprint,
     source: "kicad",
   }
 }

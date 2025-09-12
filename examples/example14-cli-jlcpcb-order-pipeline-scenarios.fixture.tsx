@@ -4,6 +4,10 @@ import { useEventHandler } from "lib/components/RunFrameForCli/useEventHandler"
 import { useRunFrameStore } from "lib/components/RunFrameWithApi/store"
 import { useEffect, useState } from "react"
 import { DebugEventsTable } from "./utils/DebugEventsTable"
+import {
+  isLocalApiServerAvailable,
+  getApiNotAvailableMessage,
+} from "lib/utils/api-server-utils"
 
 export default () => {
   const recentEvents = useRunFrameStore((state) => state.recentEvents)
@@ -121,19 +125,8 @@ export default () => (
     }, 500)
   }, [])
 
-  if (
-    typeof window !== "undefined" &&
-    window.location.origin.includes("vercel.app")
-  ) {
-    return (
-      <div>
-        <h1>RunFrame with API</h1>
-        <p>
-          We don't currently deploy the API to vercel, try locally! The vite
-          plugin will automatically load it.
-        </p>
-      </div>
-    )
+  if (!isLocalApiServerAvailable()) {
+    return getApiNotAvailableMessage()
   }
 
   return (

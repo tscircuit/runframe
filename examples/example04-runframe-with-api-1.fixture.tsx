@@ -1,6 +1,6 @@
 import { RunFrameWithApi } from "lib/components/RunFrameWithApi/RunFrameWithApi"
 import { useState, useEffect } from "react"
-import { isFileApiAccessible } from "./utils/isFileApiAccessible.ts";
+import { isFileApiAccessible } from "./utils/isFileApiAccessible.ts"
 
 export default () => {
   useEffect(() => {

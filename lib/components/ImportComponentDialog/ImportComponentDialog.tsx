@@ -98,13 +98,12 @@ export const ImportComponentDialog = ({
             console.error("Failed to copy footprint:", error)
             toast({
               title: "Failed to copy footprint",
-              description: "Please copy manually: footprint=\"/Resistor_SMD:R_0402_1005Metric\"",
+              description: `Please copy manually: footprint="/${component.name}"`,
               variant: "destructive",
             })
           }
           return
         }
-
         toast.promise(
           async () => {
             if (component.source === "tscircuit.com") {

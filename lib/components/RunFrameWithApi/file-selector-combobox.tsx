@@ -29,15 +29,14 @@ export const FileSelectorCombobox = ({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
+        <button
+          type="button"
+          className="rf-inline-flex rf-h-10 rf-w-30 rf-items-center rf-justify-between rf-whitespace-nowrap rf-rounded-md rf-border rf-border-input rf-bg-background rf-px-3 rf-py-2 rf-text-sm rf-ring-offset-background rf-placeholder:rf-text-muted-foreground focus:rf-outline-none focus:rf-ring-2 focus:rf-ring-ring focus:rf-ring-offset-2 disabled:rf-cursor-not-allowed disabled:rf-opacity-50 [&>span]:rf-line-clamp-1"
           aria-expanded={open}
-          className="rf-w-30 rf-justify-between !rf-font-normal"
         >
           {file ? file : "Select file"}
           <ChevronsUpDown className="rf-opacity-50" />
-        </Button>
+        </button>
       </PopoverTrigger>
       <PopoverContent className="rf-w-fit !rf-p-0">
         <Command>
@@ -51,7 +50,8 @@ export const FileSelectorCombobox = ({
                     (file.endsWith(".tsx") ||
                       file.endsWith(".ts") ||
                       file.endsWith(".jsx") ||
-                      file.endsWith(".js")) &&
+                      file.endsWith(".js") ||
+                      file.endsWith(".json")) &&
                     !file.endsWith(".d.ts"),
                 )
                 .map((file, i) => (

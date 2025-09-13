@@ -8,6 +8,7 @@ import { useRunFrameStore } from "./store"
 import { applyEditEventsToManualEditsFile } from "@tscircuit/core"
 import type { ManualEditsFile } from "@tscircuit/props"
 import { FileSelectorCombobox } from "./file-selector-combobox"
+import { EnhancedFileSelectorCombobox } from "./enhanced-file-selector-combobox"
 
 const debug = Debug("run-frame:RunFrameWithApi")
 
@@ -34,6 +35,7 @@ export interface RunFrameWithApiProps {
   defaultToFullScreen?: boolean
   showToggleFullScreen?: boolean
   showFilesSwitch?: boolean
+  useEnhancedFileSelector?: boolean
   workerBlobUrl?: string
   evalWebWorkerBlobUrl?: string
   showFileMenu?: boolean
@@ -137,15 +139,27 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
           {props.leftHeaderContent}
           {props.showFilesSwitch && (
             <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2">
-              <FileSelectorCombobox
-                currentFile={componentPath}
-                files={Array.from(fsMap.keys())}
-                onFileChange={(value) => {
-                  if (typeof fsMap.get(value) === "string") {
-                    setComponentPath(value)
-                  }
-                }}
-              />
+              {props.useEnhancedFileSelector ? (
+                <EnhancedFileSelectorCombobox
+                  currentFile={componentPath}
+                  files={Array.from(fsMap.keys())}
+                  onFileChange={(value) => {
+                    if (typeof fsMap.get(value) === "string") {
+                      setComponentPath(value)
+                    }
+                  }}
+                />
+              ) : (
+                <FileSelectorCombobox
+                  currentFile={componentPath}
+                  files={Array.from(fsMap.keys())}
+                  onFileChange={(value) => {
+                    if (typeof fsMap.get(value) === "string") {
+                      setComponentPath(value)
+                    }
+                  }}
+                />
+              )}
             </div>
           )}
         </div>

@@ -34,6 +34,7 @@ import type { ManualEditEvent } from "@tscircuit/props"
 import { registryKy } from "../../utils/get-registry-ky"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 import { useStyles } from "../../hooks/use-styles"
+import { API_BASE } from "../RunFrameWithApi/api-base"
 
 const fetchLatestEvalVersion = async () => {
   try {
@@ -137,6 +138,9 @@ export const RunFrame = (props: RunFrameProps) => {
           const worker = await createCircuitWebWorker({
             evalVersion,
             webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
+            platform: {
+              projectBaseUrl: `${API_BASE}/files/static`,
+            },
             verbose: true,
             ...(props.enableFetchProxy && {
               enableFetchProxy: props.enableFetchProxy,
@@ -249,6 +253,9 @@ export const RunFrame = (props: RunFrameProps) => {
           evalVersion: resolvedEvalVersion,
           webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
           verbose: true,
+          platform: {
+            projectBaseUrl: `${API_BASE}/files/static`,
+          },
           ...(props.enableFetchProxy && {
             enableFetchProxy: props.enableFetchProxy,
           }),

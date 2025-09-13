@@ -15,9 +15,9 @@ import {
   Check,
   ChevronRight,
   ChevronDown,
-  Folder,
-  File,
-  ArrowUp,
+  FolderOpen,
+  FileCode,
+  ChevronLeft,
 } from "lucide-react"
 import { cn } from "lib/utils"
 
@@ -137,7 +137,11 @@ export const EnhancedFileSelectorCombobox = ({
     })
   }
 
-  const navigateToParent = () => {
+  const navigateToDirectory = (path: string) => {
+    setCurrentDirectory(path)
+  }
+
+  const navigateUp = () => {
     if (currentDirectory) {
       const parentDir = currentDirectory.includes("/")
         ? currentDirectory.substring(0, currentDirectory.lastIndexOf("/"))
@@ -146,82 +150,80 @@ export const EnhancedFileSelectorCombobox = ({
     }
   }
 
+  // Enhanced UI/UX for folder/file rendering
   const renderFileNode = (node: FileNode, depth = 0): React.ReactNode => {
     const isExpanded = expandedFolders.has(node.path)
     const isCurrentFile = node.path === currentFile
-    const isInCurrentDir =
-      currentDirectory === "" ||
-      node.path.startsWith(`${currentDirectory}/`) ||
-      node.path === currentDirectory
 
-    // If we're showing current directory content, filter accordingly
-    if (currentDirectory && !isInCurrentDir && node.type === "file") {
-      return null
-    }
-
-    if (node.type === "folder") {
-      return (
-        <div key={node.path}>
+    return (
+      <div key={node.path} style={{ paddingLeft: depth * 12 }}>
+        {node.type === "folder" ? (
           <CommandItem
             value={node.path}
             onSelect={() => toggleFolder(node.path)}
-            className="rf-cursor-pointer"
-            style={{ paddingLeft: `${depth * 12 + 8}px` }}
+            className="group flex items-center cursor-pointer hover:bg-zinc-100 rounded px-2 py-1"
           >
             {isExpanded ? (
-              <ChevronDown className="rf-h-4 rf-w-4" />
+              <ChevronDown className="h-3.5 w-3.5 text-zinc-500" />
             ) : (
-              <ChevronRight className="rf-h-4 rf-w-4" />
+              <ChevronRight className="h-3.5 w-3.5 text-zinc-400" />
             )}
-            <Folder className="rf-h-4 rf-w-4 rf-mr-2" />
-            <span className="rf-font-medium">{node.name}</span>
+            <FolderOpen className="h-4 w-4 text-amber-600 ml-1" />
+            <span className="ml-2 font-medium">{node.name}</span>
           </CommandItem>
-          {isExpanded && node.children && (
-            <div>
-              {node.children.map((child) => renderFileNode(child, depth + 1))}
-            </div>
-          )}
-        </div>
-      )
-    } else {
-      return (
-        <CommandItem
-          key={node.path}
-          value={node.path}
-          onSelect={(file) => {
-            setFile(file)
-            setOpen(false)
-            onFileChange(file)
-          }}
-          style={{ paddingLeft: `${depth * 12 + 8}px` }}
-        >
-          <File className="rf-h-4 rf-w-4 rf-mr-2" />
-          <span
+        ) : (
+          <CommandItem
+            value={node.path}
+            onSelect={() => {
+              setFile(node.path)
+              setOpen(false)
+              onFileChange(node.path)
+            }}
             className={cn(
-              isCurrentFile ? "rf-font-semibold" : "rf-font-normal",
+              "flex items-center cursor-pointer hover:bg-zinc-100 rounded px-2 py-1",
+              isCurrentFile && "bg-blue-50 font-semibold",
             )}
           >
-            {node.name}
-          </span>
-          <Check
-            className={cn(
-              "rf-ml-auto",
-              isCurrentFile ? "rf-opacity-100" : "rf-opacity-0",
+            <FileCode className="h-4 w-4 text-blue-600" />
+            <span className="ml-2">{node.name}</span>
+            {isCurrentFile && (
+              <Check className="ml-auto h-3.5 w-3.5 text-blue-600" />
             )}
-          />
-        </CommandItem>
-      )
-    }
+          </CommandItem>
+        )}
+        {node.type === "folder" && isExpanded && node.children && (
+          <div>
+            {node.children.map((child) => renderFileNode(child, depth + 1))}
+          </div>
+        )}
+      </div>
+    )
   }
 
   const fileTree = buildFileTree(files)
-  const currentDirFiles = currentDirectory
-    ? fileTree.filter(
-        (node) =>
-          node.path === currentDirectory ||
-          node.path.startsWith(`${currentDirectory}/`),
-      )
-    : fileTree
+
+  // Get all nodes in the current directory
+  const currentDirFiles = fileTree.filter((node) => {
+    // For root directory
+    if (currentDirectory === "") {
+      const isAtRoot = !node.path.includes("/")
+      return isAtRoot
+    }
+
+    // For subdirectories
+    const nodeDir = node.path.includes("/")
+      ? node.path.substring(0, node.path.lastIndexOf("/"))
+      : ""
+
+    // Show if:
+    // 1. It's a direct child of current directory, or
+    // 2. It's a folder that matches the current directory path
+    const isDirectChild = nodeDir === currentDirectory
+    const isCurrentDirFolder =
+      node.type === "folder" && node.path === currentDirectory
+
+    return isDirectChild || isCurrentDirFolder
+  })
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -241,37 +243,71 @@ export const EnhancedFileSelectorCombobox = ({
           <CommandList>
             <CommandEmpty>No file found.</CommandEmpty>
 
-            {/* Current Directory Header */}
-            {currentDirectory && (
-              <>
-                <CommandGroup>
-                  <div className="rf-px-2 rf-py-1.5 rf-text-xs rf-font-medium rf-text-zinc-500 rf-border-b rf-border-zinc-200">
-                    <div className="rf-flex rf-items-center rf-gap-2">
-                      <span>Current Directory:</span>
-                      <span className="rf-font-mono rf-text-zinc-700">
-                        {currentDirectory || "/"}
+            {/* Breadcrumb Navigation */}
+            <CommandGroup>
+              <div className="rf-px-3 rf-py-2 rf-text-xs rf-bg-zinc-50 rf-border-b rf-border-zinc-200">
+                <div className="rf-flex rf-items-center rf-gap-1 rf-flex-wrap rf-min-h-6">
+                  <div className="rf-flex-1 rf-flex rf-items-center rf-flex-wrap rf-gap-1">
+                    <button
+                      onClick={() => navigateToDirectory("")}
+                      className={cn(
+                        "rf-flex rf-items-center rf-gap-1 rf-px-2 rf-py-1 rf-rounded hover:rf-bg-zinc-100",
+                        !currentDirectory && "rf-bg-zinc-100 rf-font-medium",
+                      )}
+                    >
+                      <FolderOpen className="rf-h-3 rf-w-3 rf-text-zinc-600" />
+                    </button>
+
+                    {currentDirectory
+                      .split("/")
+                      .filter(Boolean)
+                      .map((part, index, parts) => {
+                        const path = parts.slice(0, index + 1).join("/")
+                        return (
+                          <div key={path} className="rf-flex rf-items-center">
+                            <ChevronRight className="rf-h-3 rf-w-3 rf-mx-1 rf-text-zinc-400" />
+                            <button
+                              onClick={() => navigateToDirectory(path)}
+                              className={cn(
+                                "rf-px-2 rf-py-1 rf-rounded hover:rf-bg-zinc-100 hover:rf-underline rf-text-zinc-700",
+                                path === currentDirectory
+                                  ? "rf-bg-zinc-100 rf-font-medium"
+                                  : "",
+                              )}
+                            >
+                              {part}
+                            </button>
+                          </div>
+                        )
+                      })}
+
+                    {!currentDirectory && (
+                      <span className="rf-px-2 rf-py-1 rf-text-zinc-500">
+                        /
                       </span>
-                    </div>
+                    )}
                   </div>
-                </CommandGroup>
-                <CommandSeparator />
-              </>
-            )}
 
-            {/* Parent Directory Navigation */}
-            {currentDirectory && (
-              <CommandGroup>
-                <CommandItem
-                  onSelect={navigateToParent}
-                  className="rf-cursor-pointer rf-text-zinc-600"
-                >
-                  <ArrowUp className="rf-h-4 rf-w-4 rf-mr-2" />
-                  <span className="rf-font-medium">Go to Parent Directory</span>
-                </CommandItem>
-              </CommandGroup>
-            )}
+                  {currentDirectory && (
+                    <button
+                      onClick={navigateUp}
+                      className="rf-p-1 rf-rounded-full hover:rf-bg-zinc-100 rf-text-zinc-500 hover:rf-text-zinc-700"
+                      title="Go up one level"
+                    >
+                      <ChevronLeft className="rf-h-3.5 rf-w-3.5" />
+                    </button>
+                  )}
+                </div>
 
-            {/* File Tree */}
+                {currentDirectory && (
+                  <div className="rf-mt-1 rf-text-xs rf-text-zinc-500 rf-font-mono">
+                    {currentDirectory}/
+                  </div>
+                )}
+              </div>
+            </CommandGroup>
+
+            {/* Current Directory Files */}
             <CommandGroup>
               {currentDirFiles.map((node) => renderFileNode(node))}
             </CommandGroup>

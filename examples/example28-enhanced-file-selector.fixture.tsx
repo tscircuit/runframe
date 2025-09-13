@@ -57,18 +57,17 @@ export default () => {
         body: JSON.stringify({}),
       })
 
-      // Create a comprehensive nested file structure for testing
+      // Create a simple file structure similar to example05 but with different components
       const filesToCreate = [
-        // Root level files
         {
           path: "main.tsx",
           content: `import manualEdits from "./manual-edits.json"
 
 export default () => (
-  <board width="10mm" height="10mm" manualEdits={manualEdits}>
-    <resistor name="R1" resistance="1k" footprint="0402" />
-    <capacitor name="C1" capacitance="1uF" footprint="0603" pcbX={4} />
-    <trace from=".R1 .pin1" to=".C1 .pin1" />
+  <board width="15mm" height="15mm" manualEdits={manualEdits}>
+    <led name="LED1" color="red" pcbX={2} pcbY={2} />
+    <resistor name="R1" resistance="220" footprint="0603" pcbX={5} pcbY={2} />
+    <trace from=".LED1 .pin1" to=".R1 .pin1" />
   </board>
 )`,
         },
@@ -77,27 +76,32 @@ export default () => (
           content: JSON.stringify({}),
         },
         {
-          path: "config.ts",
-          content: `export const config = {
-  version: "1.0.0",
-  debug: true
-}`,
+          path: "board.circuit.tsx",
+          content: `export default () => (
+  <board width="20mm" height="20mm">
+    <capacitor name="C1" capacitance="10uF" footprint="0805" pcbX={3} pcbY={3} />
+    <diode name="D1" footprint="SOD123" pcbX={6} pcbY={3} />
+    <trace from=".C1 .pin1" to=".D1 .pin1" />
+  </board>
+)`,
         },
         {
           path: "index.tsx",
-          content: `// Alternative entrypoint
-export default () => (
-  <board width="5mm" height="5mm">
-    <resistor name="R1" resistance="2k" footprint="0603" />
+          content: `export default () => (
+  <board width="12mm" height="12mm">
+    <transistor name="Q1" footprint="TO-92" pcbX={4} pcbY={4} />
+    <resistor name="R1" resistance="1k" footprint="0402" pcbX={7} pcbY={4} />
+    <trace from=".Q1 .pin1" to=".R1 .pin1" />
   </board>
 )`,
         },
         {
           path: "entrypoint.tsx",
-          content: `// Another entrypoint option
-export default () => (
-  <board width="8mm" height="8mm">
-    <capacitor name="C1" capacitance="2uF" footprint="0805" />
+          content: `export default () => (
+  <board width="18mm" height="18mm">
+    <ic name="U1" footprint="DIP-8" pcbX={2} pcbY={2} />
+    <capacitor name="C1" capacitance="100nF" footprint="0603" pcbX={5} pcbY={2} />
+    <trace from=".U1 .pin1" to=".C1 .pin1" />
   </board>
 )`,
         },
@@ -107,373 +111,25 @@ export default () => (
         },
         {
           path: "app.tsx",
-          content: `// App component
-export default () => (
-  <board width="12mm" height="12mm">
-    <led name="LED1" color="red" />
+          content: `export default () => (
+  <board width="25mm" height="25mm">
+    <led name="LED1" color="blue" pcbX={3} pcbY={3} />
+    <led name="LED2" color="green" pcbX={6} pcbY={3} />
+    <resistor name="R1" resistance="330" footprint="0805" pcbX={9} pcbY={3} />
+    <trace from=".LED1 .pin1" to=".R1 .pin1" />
+    <trace from=".LED2 .pin1" to=".R1 .pin1" />
   </board>
 )`,
         },
         {
           path: "src/index.tsx",
-          content: `// Nested index file
-export default () => (
-  <board width="6mm" height="6mm">
-    <resistor name="R1" resistance="3k" footprint="0402" />
+          content: `export default () => (
+  <board width="8mm" height="8mm">
+    <crystal name="XTAL1" frequency="16MHz" footprint="HC49" pcbX={2} pcbY={2} />
+    <capacitor name="C1" capacitance="22pF" footprint="0603" pcbX={4} pcbY={2} />
+    <trace from=".XTAL1 .pin1" to=".C1 .pin1" />
   </board>
 )`,
-        },
-
-        // Components directory
-        {
-          path: "components/Button.tsx",
-          content: `export const Button = ({ children, onClick }) => (
-  <button onClick={onClick} className="btn">
-    {children}
-  </button>
-)`,
-        },
-        {
-          path: "components/Input.tsx",
-          content: `export const Input = ({ value, onChange, placeholder }) => (
-  <input 
-    value={value} 
-    onChange={onChange} 
-    placeholder={placeholder}
-    className="input"
-  />
-)`,
-        },
-        {
-          path: "components/Modal.tsx",
-          content: `export const Modal = ({ isOpen, onClose, children }) => (
-  isOpen ? (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
-        {children}
-      </div>
-    </div>
-  ) : null
-)`,
-        },
-
-        // Components/forms subdirectory
-        {
-          path: "components/forms/LoginForm.tsx",
-          content: `import { Button } from "../Button"
-import { Input } from "../Input"
-
-export const LoginForm = () => (
-  <form>
-    <Input placeholder="Email" />
-    <Input placeholder="Password" type="password" />
-    <Button>Login</Button>
-  </form>
-)`,
-        },
-        {
-          path: "components/forms/RegisterForm.tsx",
-          content: `import { Button } from "../Button"
-import { Input } from "../Input"
-
-export const RegisterForm = () => (
-  <form>
-    <Input placeholder="Name" />
-    <Input placeholder="Email" />
-    <Input placeholder="Password" type="password" />
-    <Button>Register</Button>
-  </form>
-)`,
-        },
-        {
-          path: "components/forms/ContactForm.tsx",
-          content: `import { Button } from "../Button"
-import { Input } from "../Input"
-
-export const ContactForm = () => (
-  <form>
-    <Input placeholder="Name" />
-    <Input placeholder="Email" />
-    <Input placeholder="Message" />
-    <Button>Send</Button>
-  </form>
-)`,
-        },
-
-        // Components/ui subdirectory
-        {
-          path: "components/ui/Card.tsx",
-          content: `export const Card = ({ children, className }) => (
-  <div className={\`card \${className || ''}\`}>
-    {children}
-  </div>
-)`,
-        },
-        {
-          path: "components/ui/Header.tsx",
-          content: `export const Header = ({ title, subtitle }) => (
-  <header>
-    <h1>{title}</h1>
-    {subtitle && <p>{subtitle}</p>}
-  </header>
-)`,
-        },
-        {
-          path: "components/ui/Footer.tsx",
-          content: `export const Footer = () => (
-  <footer>
-    <p>&copy; 2024 My App</p>
-  </footer>
-)`,
-        },
-
-        // Utils directory
-        {
-          path: "utils/helpers.ts",
-          content: `export const formatDate = (date: Date) => {
-  return date.toLocaleDateString()
-}
-
-export const capitalize = (str: string) => {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}`,
-        },
-        {
-          path: "utils/constants.ts",
-          content: `export const API_BASE_URL = 'https://api.example.com'
-export const MAX_RETRIES = 3
-export const TIMEOUT = 5000`,
-        },
-        {
-          path: "utils/validation.ts",
-          content: `export const isValidEmail = (email: string) => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-}
-
-export const isValidPassword = (password: string) => {
-  return password.length >= 8
-}`,
-        },
-
-        // Utils/api subdirectory
-        {
-          path: "utils/api/client.ts",
-          content: `export class ApiClient {
-  private baseUrl: string
-  
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl
-  }
-  
-  async get(endpoint: string) {
-    const response = await fetch(\`\${this.baseUrl}\${endpoint}\`)
-    return response.json()
-  }
-}`,
-        },
-        {
-          path: "utils/api/endpoints.ts",
-          content: `export const endpoints = {
-  users: '/users',
-  posts: '/posts',
-  comments: '/comments'
-}`,
-        },
-
-        // Hooks directory
-        {
-          path: "hooks/useLocalStorage.ts",
-          content: `import { useState, useEffect } from 'react'
-
-export const useLocalStorage = (key: string, initialValue: any) => {
-  const [value, setValue] = useState(() => {
-    const item = window.localStorage.getItem(key)
-    return item ? JSON.parse(item) : initialValue
-  })
-
-  useEffect(() => {
-    window.localStorage.setItem(key, JSON.stringify(value))
-  }, [key, value])
-
-  return [value, setValue]
-}`,
-        },
-        {
-          path: "hooks/useApi.ts",
-          content: `import { useState, useEffect } from 'react'
-
-export const useApi = (url: string) => {
-  const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-
-  useEffect(() => {
-    fetch(url)
-      .then(res => res.json())
-      .then(data => {
-        setData(data)
-        setLoading(false)
-      })
-      .catch(err => {
-        setError(err)
-        setLoading(false)
-      })
-  }, [url])
-
-  return { data, loading, error }
-}`,
-        },
-
-        // Types directory
-        {
-          path: "types/index.ts",
-          content: `export interface User {
-  id: string
-  name: string
-  email: string
-}
-
-export interface Post {
-  id: string
-  title: string
-  content: string
-  authorId: string
-}`,
-        },
-        {
-          path: "types/api.ts",
-          content: `export interface ApiResponse<T> {
-  data: T
-  success: boolean
-  message?: string
-}
-
-export interface PaginatedResponse<T> extends ApiResponse<T[]> {
-  pagination: {
-    page: number
-    limit: number
-    total: number
-  }
-}`,
-        },
-
-        // Styles directory
-        {
-          path: "styles/globals.css",
-          content: `* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}`,
-        },
-        {
-          path: "styles/components.css",
-          content: `.btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}`,
-        },
-
-        // Tests directory
-        {
-          path: "tests/Button.test.tsx",
-          content: `import { render, screen } from '@testing-library/react'
-import { Button } from '../components/Button'
-
-test('renders button with text', () => {
-  render(<Button>Click me</Button>)
-  expect(screen.getByText('Click me')).toBeInTheDocument()
-})`,
-        },
-        {
-          path: "tests/Input.test.tsx",
-          content: `import { render, screen } from '@testing-library/react'
-import { Input } from '../components/Input'
-
-test('renders input with placeholder', () => {
-  render(<Input placeholder="Enter text" />)
-  expect(screen.getByPlaceholderText('Enter text')).toBeInTheDocument()
-})`,
-        },
-
-        // Tests/utils subdirectory
-        {
-          path: "tests/utils/helpers.test.ts",
-          content: `import { formatDate, capitalize } from '../../utils/helpers'
-
-test('formatDate formats date correctly', () => {
-  const date = new Date('2024-01-01')
-  expect(formatDate(date)).toBe('1/1/2024')
-})
-
-test('capitalize capitalizes first letter', () => {
-  expect(capitalize('hello')).toBe('Hello')
-})`,
-        },
-
-        // Assets directory
-        {
-          path: "assets/images/logo.png",
-          content: "fake-png-data",
-        },
-        {
-          path: "assets/images/hero.jpg",
-          content: "fake-jpg-data",
-        },
-        {
-          path: "assets/icons/arrow.svg",
-          content: "<svg>...</svg>",
-        },
-
-        // Docs directory
-        {
-          path: "docs/README.md",
-          content: `# My Project
-
-This is a comprehensive project structure for testing the enhanced file selector.
-
-## Features
-- Nested folder structure
-- Multiple file types
-- Organized by functionality`,
-        },
-        {
-          path: "docs/API.md",
-          content: `# API Documentation
-
-## Endpoints
-- GET /users
-- POST /users
-- GET /posts`,
-        },
-
-        // Config directory
-        {
-          path: "config/database.ts",
-          content: `export const databaseConfig = {
-  host: 'localhost',
-  port: 5432,
-  name: 'myapp'
-}`,
-        },
-        {
-          path: "config/redis.ts",
-          content: `export const redisConfig = {
-  host: 'localhost',
-  port: 6379
-}`,
         },
       ]
 
@@ -510,7 +166,6 @@ This is a comprehensive project structure for testing the enhanced file selector
         showFilesSwitch={true}
         useEnhancedFileSelector={true}
       />
-      <DebugEventsTable />
     </>
   )
 }

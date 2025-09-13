@@ -178,7 +178,7 @@ export const searchKicadFootprints = async (query: string, limit: number = 20): 
 
     const filtered = MOCK_KICAD_FOOTPRINTS.filter(footprint =>
       footprint.name.toLowerCase().includes(query.toLowerCase()) ||
-      footprint.description!.toLowerCase().includes(query.toLowerCase())
+      footprint.description?.toLowerCase().includes(query.toLowerCase())
     ).slice(0, limit);
 
     return filtered;

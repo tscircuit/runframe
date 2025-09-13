@@ -60,8 +60,8 @@ export default () => {
       // Create a simple file structure similar to example05 but with different components
       const filesToCreate = [
         {
-          path: "main.tsx",
-          content: `import manualEdits from "./manual-edits.json"
+          path: "boards/board1.tsx",
+          content: `
 
 export default () => (
   <board width="15mm" height="15mm" manualEdits={manualEdits}>
@@ -71,12 +71,9 @@ export default () => (
   </board>
 )`,
         },
+
         {
-          path: "manual-edits.json",
-          content: JSON.stringify({}),
-        },
-        {
-          path: "board.circuit.tsx",
+          path: "boards/board2.tsx",
           content: `export default () => (
   <board width="20mm" height="20mm">
     <capacitor name="C1" capacitance="10uF" footprint="0805" pcbX={3} pcbY={3} />
@@ -86,7 +83,7 @@ export default () => (
 )`,
         },
         {
-          path: "index.tsx",
+          path: "components/component1.tsx",
           content: `export default () => (
   <board width="12mm" height="12mm">
     <transistor name="Q1" footprint="TO-92" pcbX={4} pcbY={4} />
@@ -96,7 +93,7 @@ export default () => (
 )`,
         },
         {
-          path: "entrypoint.tsx",
+          path: "components/component2.tsx",
           content: `export default () => (
   <board width="18mm" height="18mm">
     <ic name="U1" footprint="DIP-8" pcbX={2} pcbY={2} />
@@ -106,11 +103,7 @@ export default () => (
 )`,
         },
         {
-          path: "manual-edit.json",
-          content: JSON.stringify({ alternative: true }),
-        },
-        {
-          path: "app.tsx",
+          path: "boards/board3.tsx",
           content: `export default () => (
   <board width="25mm" height="25mm">
     <led name="LED1" color="blue" pcbX={3} pcbY={3} />
@@ -122,7 +115,7 @@ export default () => (
 )`,
         },
         {
-          path: "src/index.tsx",
+          path: "boards/board4.tsx",
           content: `export default () => (
   <board width="8mm" height="8mm">
     <crystal name="XTAL1" frequency="16MHz" footprint="HC49" pcbX={2} pcbY={2} />

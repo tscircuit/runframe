@@ -16,6 +16,11 @@ import type {
 
 const debug = Debug.extend("store")
 
+const isCodeFile = (path: string) => {
+  const ext = path.split(".").pop()?.toLowerCase()
+  return ext === "ts" || ext === "js" || ext === "tsx" || ext === "json"
+}
+
 async function upsertFileApi(
   path: FilePath,
   content: FileContent,
@@ -55,8 +60,12 @@ async function getInitialFilesApi(): Promise<Map<FilePath, FileContent>> {
   const fileMap = new Map<FilePath, FileContent>()
 
   for (const file of file_list) {
-    const fullFile = await getFileApi(file.file_path)
-    fileMap.set(file.file_path, fullFile.text_content)
+    if (isCodeFile(file.file_path)) {
+      const fullFile = await getFileApi(file.file_path)
+      fileMap.set(file.file_path, fullFile.text_content)
+    } else {
+      fileMap.set(file.file_path, "__STATIC_ASSET__")
+    }
   }
 
   return fileMap
@@ -84,8 +93,11 @@ export const useRunFrameStore = create<RunFrameState>()(
       upsertFile: async (path, content) => {
         try {
           const file = await upsertFileApi(path, content)
+          const fileContent = isCodeFile(file.file_path)
+            ? file.text_content
+            : "__STATIC_ASSET__"
           set((state) => ({
-            fsMap: new Map(state.fsMap).set(file.file_path, file.text_content),
+            fsMap: new Map(state.fsMap).set(file.file_path, fileContent),
           }))
         } catch (error) {
           set({ error: error as Error })
@@ -95,8 +107,11 @@ export const useRunFrameStore = create<RunFrameState>()(
       getFile: async (path) => {
         try {
           const file = await getFileApi(path)
+          const fileContent = isCodeFile(file.file_path)
+            ? file.text_content
+            : "__STATIC_ASSET__"
           set((state) => ({
-            fsMap: new Map(state.fsMap).set(file.file_path, file.text_content),
+            fsMap: new Map(state.fsMap).set(file.file_path, fileContent),
           }))
         } catch (error) {
           set({ error: error as Error })
@@ -129,15 +144,19 @@ export const useRunFrameStore = create<RunFrameState>()(
               const updates = new Map(state.fsMap)
               for (const event of events) {
                 if (event.event_type === "FILE_UPDATED") {
-                  const file = await getFileApi(event.file_path)
-                  // Don't update the manual edits file if we're the ones who changed it
-                  if (
-                    event.file_path === "manual_edits.json" &&
-                    Date.now() - state.lastManualEditsChangeSentAt < 1000
-                  ) {
-                    continue
+                  if (isCodeFile(event.file_path)) {
+                    const file = await getFileApi(event.file_path)
+                    // Don't update the manual edits file if we're the ones who changed it
+                    if (
+                      event.file_path === "manual_edits.json" &&
+                      Date.now() - state.lastManualEditsChangeSentAt < 1000
+                    ) {
+                      continue
+                    }
+                    updates.set(file.file_path, file.text_content)
+                  } else {
+                    updates.set(event.file_path, "__STATIC_ASSET__")
                   }
-                  updates.set(file.file_path, file.text_content)
                 }
               }
 

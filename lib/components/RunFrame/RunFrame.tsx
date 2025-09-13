@@ -138,6 +138,9 @@ export const RunFrame = (props: RunFrameProps) => {
           const worker = await createCircuitWebWorker({
             evalVersion,
             webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
+            platform: {
+              projectBaseUrl: `${API_BASE}/files/static`,
+            },
             verbose: true,
             ...(props.enableFetchProxy && {
               enableFetchProxy: props.enableFetchProxy,

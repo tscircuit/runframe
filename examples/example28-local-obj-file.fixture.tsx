@@ -31,33 +31,36 @@ export default () => {
         "https://modelcdn.tscircuit.com/easyeda_models/download?uuid=a1e5e433dfbd402f854a03c19c373fbf&pn=C7428714",
       )
       const modelData = await modelResponse.arrayBuffer()
-      const modelBase64 = btoa(
-        String.fromCharCode(...new Uint8Array(modelData)),
-      )
+      const uint8Array = new Uint8Array(modelData)
+      let binaryString = ""
+      for (let i = 0; i < uint8Array.length; i++) {
+        binaryString += String.fromCharCode(uint8Array[i])
+      }
+      const modelBase64 = btoa(binaryString)
 
       await fetch("/api/files/upsert", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           file_path: "model.obj",
-          binary_content: modelBase64,
+          binary_content_b64: modelBase64,
         }),
       })
 
-      fetch("/api/files/upsert", {
+      await fetch("/api/files/upsert", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           file_path: "main.tsx",
           text_content: `
+import objUrl from "./model.obj"
+
 export default () => (
   <board width="20mm" height="15mm">
     <chip 
       name="U1" 
-      footprint="QFN-16"
-      pcbX={10}
-      pcbY={7.5}
-      cadModel={{objUrl: "./model.obj"}}
+      footprint="soic8"
+      cadModel={{ objUrl }}
     />
   </board>
 )`,
@@ -78,10 +81,5 @@ export default () => (
     )
   }
 
-  return (
-    <>
-      <RunFrameForCli debug />
-      <DebugEventsTable />
-    </>
-  )
+  return <RunFrameForCli debug />
 }

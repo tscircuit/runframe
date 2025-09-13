@@ -1,5 +1,6 @@
 import { RunFrameWithApi } from "lib/components/RunFrameWithApi/RunFrameWithApi"
 import { useState, useEffect } from "react"
+import { isFileApiAccessible } from "./utils/isFileApiAccessible.ts"
 
 export default () => {
   useEffect(() => {
@@ -46,10 +47,7 @@ export default () => (
     }, 500)
   }, [])
 
-  if (
-    typeof window !== "undefined" &&
-    window.location.origin.includes("vercel.app")
-  ) {
+  if (!isFileApiAccessible()) {
     return (
       <div>
         <h1>RunFrame with API</h1>

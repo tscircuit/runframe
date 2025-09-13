@@ -4,6 +4,7 @@ import { useRunFrameStore } from "lib/components/RunFrameWithApi/store"
 import { useState, useEffect } from "react"
 import { DebugEventsTable } from "./utils/DebugEventsTable"
 import { useEventHandler } from "lib/components/RunFrameForCli/useEventHandler"
+import { isFileApiAccessible } from "./utils/isFileApiAccessible.ts"
 
 export default () => {
   const recentEvents = useRunFrameStore((state) => state.recentEvents)
@@ -96,11 +97,7 @@ export default () => (
     }, 500)
   }, [])
 
-  if (
-    typeof window !== "undefined" &&
-    (!window.location.origin.includes("vercel.app") ||
-      !window.location.origin.includes(".com"))
-  ) {
+  if (!isFileApiAccessible()) {
     return (
       <div>
         <h1>RunFrame with API</h1>

@@ -201,7 +201,8 @@ export const FileSelectorCombobox = ({
   }
 
   const currentFolderFiles = getCurrentFolderFiles(files, currentFile)
-  const relevantCurrentFolderFiles = currentFolderFiles.filter(isRelevantSourceFile)
+  const relevantCurrentFolderFiles =
+    currentFolderFiles.filter(isRelevantSourceFile)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

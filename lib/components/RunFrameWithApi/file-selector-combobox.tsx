@@ -20,14 +20,6 @@ interface FileTreeItem {
   depth: number
 }
 
-interface FileTreeItem {
-  name: string
-  fullPath: string
-  isFolder: boolean
-  children?: FileTreeItem[]
-  depth: number
-}
-
 const buildFileTree = (files: string[]): FileTreeItem[] => {
   const tree: FileTreeItem[] = []
   const folderMap = new Map<string, FileTreeItem>()

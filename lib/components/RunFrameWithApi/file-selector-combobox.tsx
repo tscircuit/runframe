@@ -20,19 +20,21 @@ interface FileTreeItem {
   depth: number
 }
 
+const isRelevantSourceFile = (file: string): boolean => {
+  return (
+    (file.endsWith(".tsx") ||
+      file.endsWith(".ts") ||
+      file.endsWith(".jsx") ||
+      file.endsWith(".js")) &&
+    !file.endsWith(".d.ts")
+  )
+}
+
 const buildFileTree = (files: string[]): FileTreeItem[] => {
   const tree: FileTreeItem[] = []
-  const folderMap = new Map<string, FileTreeItem>()
 
   // Filter to only include relevant files
-  const relevantFiles = files.filter(
-    (file) =>
-      (file.endsWith(".tsx") ||
-        file.endsWith(".ts") ||
-        file.endsWith(".jsx") ||
-        file.endsWith(".js")) &&
-      !file.endsWith(".d.ts"),
-  )
+  const relevantFiles = files.filter(isRelevantSourceFile)
 
   for (const filePath of relevantFiles) {
     const pathParts = filePath.split("/")
@@ -57,10 +59,6 @@ const buildFileTree = (files: string[]): FileTreeItem[] => {
 
         currentLevel.push(newItem)
         existingItem = newItem
-
-        if (!isLastPart) {
-          folderMap.set(currentPath, newItem)
-        }
       }
 
       if (!isLastPart && existingItem.children) {
@@ -203,14 +201,7 @@ export const FileSelectorCombobox = ({
   }
 
   const currentFolderFiles = getCurrentFolderFiles(files, currentFile)
-  const relevantCurrentFolderFiles = currentFolderFiles.filter(
-    (file) =>
-      (file.endsWith(".tsx") ||
-        file.endsWith(".ts") ||
-        file.endsWith(".jsx") ||
-        file.endsWith(".js")) &&
-      !file.endsWith(".d.ts"),
-  )
+  const relevantCurrentFolderFiles = currentFolderFiles.filter(isRelevantSourceFile)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

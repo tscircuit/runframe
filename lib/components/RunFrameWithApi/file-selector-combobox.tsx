@@ -120,7 +120,6 @@ export const FileSelectorCombobox = ({
     const tree = buildFileTree(files)
     setFileTree(tree)
 
-    // Auto-expand folders containing the current file
     if (currentFile) {
       const pathParts = currentFile.split("/")
       const newExpanded = new Set<string>()
@@ -239,8 +238,6 @@ export const FileSelectorCombobox = ({
           <CommandInput placeholder="Search for file" className="rf-h-9" />
           <CommandList>
             <CommandEmpty>No file found.</CommandEmpty>
-
-            {/* Current Folder Files - Priority Section */}
             {relevantCurrentFolderFiles.length > 0 &&
               currentFile.includes("/") && (
                 <CommandGroup heading="Current Folder">
@@ -273,8 +270,6 @@ export const FileSelectorCombobox = ({
                   })}
                 </CommandGroup>
               )}
-
-            {/* All Files - Hierarchical View */}
             <CommandGroup heading="All Files">
               {renderFileTreeItems(fileTree)}
             </CommandGroup>

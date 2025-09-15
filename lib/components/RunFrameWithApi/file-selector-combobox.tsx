@@ -164,7 +164,7 @@ export const FileSelectorCombobox = ({
           >
             <div
               className="rf-flex rf-items-center rf-gap-2"
-              style={{ paddingLeft: `${item.depth * 12}px` }}
+              style={{ paddingLeft: `${item.depth * 8}px` }}
             >
               {isExpanded ? (
                 <FolderOpen className="rf-w-4 rf-h-4 rf-text-blue-500" />
@@ -192,7 +192,7 @@ export const FileSelectorCombobox = ({
           >
             <div
               className="rf-flex rf-items-center rf-gap-2 rf-w-full"
-              style={{ paddingLeft: `${item.depth * 12}px` }}
+              style={{ paddingLeft: `${item.depth * 8}px` }}
             >
               <File className="rf-w-4 rf-h-4 rf-text-gray-500" />
               <span className="rf-text-sm">{item.name}</span>
@@ -236,7 +236,7 @@ export const FileSelectorCombobox = ({
           <ChevronsUpDown className="rf-opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="rf-w-80 !rf-p-0">
+      <PopoverContent className="rf-w-64 !rf-p-0">
         <Command>
           <CommandInput placeholder="Search for file" className="rf-h-9" />
           <CommandList>

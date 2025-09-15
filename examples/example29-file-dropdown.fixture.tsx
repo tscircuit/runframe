@@ -56,7 +56,7 @@ import { PowerSupply } from "./components/power/PowerSupply"
 import { LedMatrix } from "./components/display/LedMatrix"
 
 export default () => (
-  <board width="50mm" height="40mm">
+  <board width="80mm" height="60mm">
     <BoardWithComponents />
     <PowerSupply />
     <LedMatrix />
@@ -67,8 +67,8 @@ export default () => (
           file_path: "config.ts",
           text_content: `
 export const boardConfig = {
-  width: "50mm",
-  height: "40mm",
+  width: "80mm",
+  height: "60mm",
   layers: 4
 }
 
@@ -133,19 +133,8 @@ export const PowerSupply = () => (
           text_content: `
 export const VoltageRegulator = () => (
   <>
-    <chip 
-      name="U1" 
-      footprint="SOT23-5"
-      pinLabels={{
-        1: "VIN",
-        2: "GND", 
-        3: "EN",
-        4: "VOUT",
-        5: "FB"
-      }}
-      pcbX={20}
-      pcbY={20}
-    />
+    <resistor name="R_FB1" resistance="10k" footprint="0402" pcbX={20} pcbY={20} />
+    <resistor name="R_FB2" resistance="3.3k" footprint="0402" pcbX={22} pcbY={20} />
     <capacitor name="C_IN" capacitance="10uF" footprint="0805" pcbX={15} pcbY={20} />
     <capacitor name="C_OUT" capacitance="22uF" footprint="0805" pcbX={25} pcbY={20} />
   </>
@@ -155,13 +144,10 @@ export const VoltageRegulator = () => (
           file_path: "components/power/PowerConnector.tsx",
           text_content: `
 export const PowerConnector = () => (
-  <chip 
-    name="J1"
-    footprint="JST_PH_2"
-    pinLabels={{
-      1: "VCC",
-      2: "GND"
-    }}
+  <resistor 
+    name="R_PULL"
+    resistance="10k"
+    footprint="0402"
     pcbX={2}
     pcbY={20}
   />
@@ -185,16 +171,10 @@ export const LedMatrix = () => (
           file_path: "components/display/drivers/LedDriver.tsx",
           text_content: `
 export const LedDriver = () => (
-  <chip 
-    name="U2"
-    footprint="TQFP32"
-    pinLabels={{
-      1: "VCC",
-      2: "GND",
-      3: "SDA",
-      4: "SCL",
-      5: "ADDR"
-    }}
+  <resistor 
+    name="R_LED"
+    resistance="220"
+    footprint="0603"
     pcbX={30}
     pcbY={10}
   />
@@ -204,22 +184,12 @@ export const LedDriver = () => (
           file_path: "components/display/connectors/MatrixConnector.tsx",
           text_content: `
 export const MatrixConnector = () => (
-  <chip 
-    name="J2"
-    footprint="HEADER_2x8"
-    pinLabels={{
-      1: "ROW1", 2: "COL1",
-      3: "ROW2", 4: "COL2", 
-      5: "ROW3", 6: "COL3",
-      7: "ROW4", 8: "COL4",
-      9: "ROW5", 10: "COL5",
-      11: "ROW6", 12: "COL6",
-      13: "ROW7", 14: "COL7",
-      15: "ROW8", 16: "COL8"
-    }}
-    pcbX={35}
-    pcbY={10}
-  />
+  <>
+    <resistor name="R_ROW1" resistance="1k" footprint="0402" pcbX={35} pcbY={10} />
+    <resistor name="R_ROW2" resistance="1k" footprint="0402" pcbX={37} pcbY={10} />
+    <resistor name="R_COL1" resistance="1k" footprint="0402" pcbX={35} pcbY={12} />
+    <resistor name="R_COL2" resistance="1k" footprint="0402" pcbX={37} pcbY={12} />
+  </>
 )`,
         },
 

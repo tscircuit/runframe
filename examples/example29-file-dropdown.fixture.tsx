@@ -1,9 +1,9 @@
-import { RunFrame } from "lib/components/RunFrame/RunFrame";
-import { FileSelectorCombobox } from "lib/components/RunFrameWithApi/file-selector-combobox";
-import React, { useState } from "react";
+import { RunFrame } from "lib/components/RunFrame/RunFrame"
+import { FileSelectorCombobox } from "lib/components/RunFrameWithApi/file-selector-combobox"
+import React, { useState } from "react"
 
 export default () => {
-  const [currentFile, setCurrentFile] = useState("main.tsx");
+  const [currentFile, setCurrentFile] = useState("main.tsx")
 
   const fsMap = {
     "main.tsx": `
@@ -182,9 +182,9 @@ describe("Full Board Integration", () => {
     expect(true).toBe(true)
   })
 })`,
-  };
+  }
 
-  const files = Object.keys(fsMap);
+  const files = Object.keys(fsMap)
 
   return (
     <RunFrame
@@ -197,11 +197,11 @@ describe("Full Board Integration", () => {
             currentFile={currentFile}
             files={files}
             onFileChange={(value) => {
-              setCurrentFile(value);
+              setCurrentFile(value)
             }}
           />
         </div>
       }
     />
-  );
-};
+  )
+}

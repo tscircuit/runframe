@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
-import { Button } from "../ui/button";
+import { cn } from "lib/utils"
+import { Check, ChevronsUpDown, File, Folder, FolderOpen } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Button } from "../ui/button"
 import {
   Command,
   CommandEmpty,
@@ -7,30 +9,28 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "../ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { ChevronsUpDown, Check, Folder, FolderOpen, File } from "lucide-react";
-import { cn } from "lib/utils";
+} from "../ui/command"
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 
 interface FileTreeItem {
-  name: string;
-  fullPath: string;
-  isFolder: boolean;
-  children?: FileTreeItem[];
-  depth: number;
+  name: string
+  fullPath: string
+  isFolder: boolean
+  children?: FileTreeItem[]
+  depth: number
 }
 
 interface FileTreeItem {
-  name: string;
-  fullPath: string;
-  isFolder: boolean;
-  children?: FileTreeItem[];
-  depth: number;
+  name: string
+  fullPath: string
+  isFolder: boolean
+  children?: FileTreeItem[]
+  depth: number
 }
 
 const buildFileTree = (files: string[]): FileTreeItem[] => {
-  const tree: FileTreeItem[] = [];
-  const folderMap = new Map<string, FileTreeItem>();
+  const tree: FileTreeItem[] = []
+  const folderMap = new Map<string, FileTreeItem>()
 
   // Filter to only include relevant files
   const relevantFiles = files.filter(
@@ -39,20 +39,20 @@ const buildFileTree = (files: string[]): FileTreeItem[] => {
         file.endsWith(".ts") ||
         file.endsWith(".jsx") ||
         file.endsWith(".js")) &&
-      !file.endsWith(".d.ts")
-  );
+      !file.endsWith(".d.ts"),
+  )
 
   for (const filePath of relevantFiles) {
-    const pathParts = filePath.split("/");
-    let currentLevel = tree;
-    let currentPath = "";
+    const pathParts = filePath.split("/")
+    let currentLevel = tree
+    let currentPath = ""
 
     for (let i = 0; i < pathParts.length; i++) {
-      const part = pathParts[i];
-      const isLastPart = i === pathParts.length - 1;
-      currentPath = currentPath ? `${currentPath}/${part}` : part;
+      const part = pathParts[i]
+      const isLastPart = i === pathParts.length - 1
+      currentPath = currentPath ? `${currentPath}/${part}` : part
 
-      let existingItem = currentLevel.find((item) => item.name === part);
+      let existingItem = currentLevel.find((item) => item.name === part)
 
       if (!existingItem) {
         const newItem: FileTreeItem = {
@@ -61,100 +61,98 @@ const buildFileTree = (files: string[]): FileTreeItem[] => {
           isFolder: !isLastPart,
           children: isLastPart ? undefined : [],
           depth: i,
-        };
+        }
 
-        currentLevel.push(newItem);
-        existingItem = newItem;
+        currentLevel.push(newItem)
+        existingItem = newItem
 
         if (!isLastPart) {
-          folderMap.set(currentPath, newItem);
+          folderMap.set(currentPath, newItem)
         }
       }
 
       if (!isLastPart && existingItem.children) {
-        currentLevel = existingItem.children;
+        currentLevel = existingItem.children
       }
     }
   }
 
-  return tree;
-};
+  return tree
+}
 
 const getCurrentFolderFiles = (
   files: string[],
-  currentFile: string
+  currentFile: string,
 ): string[] => {
-  if (!currentFile) return [];
+  if (!currentFile) return []
 
   const currentFolder = currentFile.includes("/")
     ? currentFile.substring(0, currentFile.lastIndexOf("/"))
-    : "";
+    : ""
 
   return files.filter((file) => {
     const fileFolder = file.includes("/")
       ? file.substring(0, file.lastIndexOf("/"))
-      : "";
-    return fileFolder === currentFolder;
-  });
-};
+      : ""
+    return fileFolder === currentFolder
+  })
+}
 
 export const FileSelectorCombobox = ({
   files,
   onFileChange,
   currentFile,
 }: {
-  files: string[];
-  currentFile: string;
-  onFileChange: (value: string) => void;
+  files: string[]
+  currentFile: string
+  onFileChange: (value: string) => void
 }) => {
-  const [open, setOpen] = useState(false);
-  const [file, setFile] = useState(currentFile);
-  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
-    new Set()
-  );
-  const [fileTree, setFileTree] = useState<FileTreeItem[]>([]);
+  const [open, setOpen] = useState(false)
+  const [file, setFile] = useState(currentFile)
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set())
+  const [fileTree, setFileTree] = useState<FileTreeItem[]>([])
 
   useEffect(() => {
-    setFile(currentFile);
-  }, [currentFile]);
+    setFile(currentFile)
+  }, [currentFile])
 
   useEffect(() => {
-    const tree = buildFileTree(files);
-    setFileTree(tree);
+    const tree = buildFileTree(files)
+    setFileTree(tree)
 
     // Auto-expand folders containing the current file
     if (currentFile) {
-      const pathParts = currentFile.split("/");
-      const newExpanded = new Set<string>();
-      let currentPath = "";
+      const pathParts = currentFile.split("/")
+      const newExpanded = new Set<string>()
+      let currentPath = ""
 
       for (let i = 0; i < pathParts.length - 1; i++) {
         currentPath = currentPath
           ? `${currentPath}/${pathParts[i]}`
-          : pathParts[i];
-        newExpanded.add(currentPath);
+          : pathParts[i]
+        newExpanded.add(currentPath)
       }
 
-      setExpandedFolders(newExpanded);
+      setExpandedFolders(newExpanded)
     }
-  }, [files, currentFile]);
+  }, [files, currentFile])
 
   const toggleFolder = (folderPath: string) => {
-    const newExpanded = new Set(expandedFolders);
+    const newExpanded = new Set(expandedFolders)
     if (newExpanded.has(folderPath)) {
-      newExpanded.delete(folderPath);
+      newExpanded.delete(folderPath)
     } else {
-      newExpanded.add(folderPath);
+      newExpanded.add(folderPath)
     }
-    setExpandedFolders(newExpanded);
-  };
+    setExpandedFolders(newExpanded)
+  }
 
   const renderFileTreeItems = (items: FileTreeItem[]): React.ReactNode[] => {
-    const result: React.ReactNode[] = [];
+    const result: React.ReactNode[] = []
 
     for (const item of items) {
       if (item.isFolder) {
-        const isExpanded = expandedFolders.has(item.fullPath);
+        const isExpanded = expandedFolders.has(item.fullPath)
         result.push(
           <CommandItem
             key={item.fullPath}
@@ -173,11 +171,11 @@ export const FileSelectorCombobox = ({
               )}
               <span className="rf-text-sm rf-font-medium">{item.name}</span>
             </div>
-          </CommandItem>
-        );
+          </CommandItem>,
+        )
 
         if (isExpanded && item.children) {
-          result.push(...renderFileTreeItems(item.children));
+          result.push(...renderFileTreeItems(item.children))
         }
       } else {
         result.push(
@@ -185,9 +183,9 @@ export const FileSelectorCombobox = ({
             key={item.fullPath}
             value={item.fullPath}
             onSelect={(selectedPath) => {
-              setFile(selectedPath);
-              setOpen(false);
-              onFileChange(selectedPath);
+              setFile(selectedPath)
+              setOpen(false)
+              onFileChange(selectedPath)
             }}
           >
             <div
@@ -201,27 +199,27 @@ export const FileSelectorCombobox = ({
                   "rf-ml-auto rf-w-4 rf-h-4",
                   item.fullPath === currentFile
                     ? "rf-opacity-100"
-                    : "rf-opacity-0"
+                    : "rf-opacity-0",
                 )}
               />
             </div>
-          </CommandItem>
-        );
+          </CommandItem>,
+        )
       }
     }
 
-    return result;
-  };
+    return result
+  }
 
-  const currentFolderFiles = getCurrentFolderFiles(files, currentFile);
+  const currentFolderFiles = getCurrentFolderFiles(files, currentFile)
   const relevantCurrentFolderFiles = currentFolderFiles.filter(
     (file) =>
       (file.endsWith(".tsx") ||
         file.endsWith(".ts") ||
         file.endsWith(".jsx") ||
         file.endsWith(".js")) &&
-      !file.endsWith(".d.ts")
-  );
+      !file.endsWith(".d.ts"),
+  )
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -247,15 +245,15 @@ export const FileSelectorCombobox = ({
               currentFile.includes("/") && (
                 <CommandGroup heading="Current Folder">
                   {relevantCurrentFolderFiles.map((filePath, i) => {
-                    const fileName = filePath.split("/").pop() || filePath;
+                    const fileName = filePath.split("/").pop() || filePath
                     return (
                       <CommandItem
                         key={`current-${i}`}
                         value={filePath}
                         onSelect={(file) => {
-                          setFile(file);
-                          setOpen(false);
-                          onFileChange(file);
+                          setFile(file)
+                          setOpen(false)
+                          onFileChange(file)
                         }}
                       >
                         <div className="rf-flex rf-items-center rf-gap-2 rf-w-full">
@@ -266,12 +264,12 @@ export const FileSelectorCombobox = ({
                               "rf-ml-auto rf-w-4 rf-h-4",
                               filePath === currentFile
                                 ? "rf-opacity-100"
-                                : "rf-opacity-0"
+                                : "rf-opacity-0",
                             )}
                           />
                         </div>
                       </CommandItem>
-                    );
+                    )
                   })}
                 </CommandGroup>
               )}
@@ -284,5 +282,5 @@ export const FileSelectorCombobox = ({
         </Command>
       </PopoverContent>
     </Popover>
-  );
-};
+  )
+}

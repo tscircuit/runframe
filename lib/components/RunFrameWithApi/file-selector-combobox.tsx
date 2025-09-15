@@ -233,7 +233,7 @@ export const FileSelectorCombobox = ({
           <ChevronsUpDown className="rf-opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="rf-w-64 !rf-p-0">
+      <PopoverContent className="rf-w-fit !rf-p-0">
         <Command>
           <CommandInput placeholder="Search for file" className="rf-h-9" />
           <CommandList>

@@ -253,7 +253,7 @@ export const ImportComponentDialog = ({
               JLCPCB Parts
             </TabsTrigger>
             <TabsTrigger value="kicad" className="rf-text-xs sm:rf-text-sm">
-              Kicad
+              KiCad
             </TabsTrigger>
           </TabsList>
 
@@ -265,7 +265,7 @@ export const ImportComponentDialog = ({
                   activeTab === "tscircuit.com"
                     ? "Search components..."
                     : activeTab === "kicad"
-                      ? "Search Kicad footprints..."
+                      ? "Search KiCad footprints..."
                       : "Search JLCPCB parts (e.g. C14663)..."
                 }
                 className="rf-pl-8"

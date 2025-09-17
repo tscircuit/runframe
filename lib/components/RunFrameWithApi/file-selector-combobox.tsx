@@ -33,9 +33,11 @@ export const FileSelectorCombobox = ({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="rf-w-30 rf-justify-between !rf-font-normal"
+          className="rf-w-auto rf-min-w-0 rf-justify-between !rf-font-normal rf-max-w-[60vw] rf-sm:rf-max-w-[50vw] rf-md:rf-max-w-[40vw] rf-lg:rf-max-w-[30vw]"
         >
-          {file ? file : "Select file"}
+          <span className="rf-truncate rf-text-ellipsis rf-overflow-hidden rf-max-w-full">
+            {file ? file : "Select file"}
+          </span>
           <ChevronsUpDown className="rf-opacity-50" />
         </Button>
       </PopoverTrigger>

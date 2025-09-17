@@ -158,7 +158,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
         <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
           {props.leftHeaderContent}
           {props.showFilesSwitch && (
-            <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2">
+            <div className="rf-flex-1 rf-flex rf-justify-center rf-min-w-0">
               <FileSelectorCombobox
                 currentFile={componentPath}
                 files={Array.from(fsMap.keys())}

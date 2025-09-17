@@ -274,7 +274,7 @@ export const EnhancedFileSelectorCombobox = ({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="rf-w-30 rf-justify-between !rf-font-normal"
+            className="rf-w-32 rf-justify-between !rf-font-normal"
           >
             {file ? file.split("/").pop() : "Select file"}
             <ChevronsUpDown className="rf-opacity-50" />

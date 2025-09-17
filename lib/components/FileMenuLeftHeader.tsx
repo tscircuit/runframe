@@ -28,7 +28,7 @@ import {
 } from "./ui/alert-dialog"
 import { Checkbox } from "./ui/checkbox"
 import { useRunnerStore } from "./RunFrame/runner-store/use-runner-store"
-import { ImportComponentDialog } from "./ImportComponentDialog"
+import { ImportComponentDialogForCli } from "./ImportComponentDialog2"
 import {
   availableExports,
   exportAndDownload,
@@ -319,7 +319,7 @@ export const FileMenuLeftHeader = (props: {
           isOpen={isSelectSnippetDialogOpen}
         />
       </DropdownMenu>
-      <ImportComponentDialog
+      <ImportComponentDialogForCli
         isOpen={isImportDialogOpen}
         onClose={() => setIsImportDialogOpen(false)}
       />

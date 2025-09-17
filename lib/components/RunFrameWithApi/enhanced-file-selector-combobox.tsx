@@ -280,7 +280,14 @@ export const EnhancedFileSelectorCombobox = ({
             <ChevronsUpDown className="rf-opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="rf-w-fit rf-min-w-64 rf-max-w-96 !rf-p-0 !rf-overflow-x-auto">
+        <PopoverContent
+          className={cn(
+            "!rf-p-0 !rf-overflow-x-auto",
+            isSearching
+              ? "rf-w-fit rf-min-w-96 rf-max-w-[600px]"
+              : "rf-w-80 rf-min-w-80 rf-max-w-96",
+          )}
+        >
           <Command shouldFilter={false}>
             <CommandInput
               placeholder="Search for file"
@@ -340,7 +347,9 @@ export const EnhancedFileSelectorCombobox = ({
                           key={fileNode.path}
                           value={fileNode.path}
                           onSelect={() => selectFile(fileNode.path, index)}
-                          className="rf-font-medium"
+                          className={cn(
+                            fileNode.path === currentFile && "rf-font-medium",
+                          )}
                         >
                           <span className="rf-mr-2">
                             {getFileIcon(fileNode.name)}
@@ -409,18 +418,18 @@ export const EnhancedFileSelectorCombobox = ({
                                   setOpen(false)
                                   onFileChange(file.path)
                                 }}
-                                className="rf-font-medium"
+                                className={cn(
+                                  file.path === currentFile && "rf-font-medium",
+                                )}
                               >
                                 <span className="rf-mr-2">
                                   {getFileIcon(file.fileName)}
                                 </span>
-                                <div className="rf-flex rf-flex-col">
+                                <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
                                   <span>{file.fileName}</span>
-                                  {currentFolder && (
-                                    <span className="rf-text-xs rf-text-muted-foreground">
-                                      in current folder
-                                    </span>
-                                  )}
+                                  <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate">
+                                    {currentFolder || "/"}
+                                  </span>
                                 </div>
                                 <Check
                                   className={cn(
@@ -448,15 +457,20 @@ export const EnhancedFileSelectorCombobox = ({
                                 setOpen(false)
                                 onFileChange(file.path)
                               }}
-                              className="rf-font-medium"
+                              className={cn(
+                                file.path === currentFile && "rf-font-medium",
+                              )}
                             >
                               <span className="rf-mr-2">
                                 {getFileIcon(file.fileName)}
                               </span>
-                              <div className="rf-flex rf-flex-col">
+                              <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
                                 <span>{file.fileName}</span>
-                                <span className="rf-text-xs rf-text-muted-foreground">
-                                  {file.path}
+                                <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate">
+                                  {file.path.substring(
+                                    0,
+                                    file.path.lastIndexOf("/"),
+                                  ) || "/"}
                                 </span>
                               </div>
                               <Check

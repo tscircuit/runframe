@@ -39,7 +39,7 @@
         "chokidar-cli": "^3.0.0",
         "circuit-json": "0.0.260",
         "circuit-json-to-bom-csv": "^0.0.7",
-        "circuit-json-to-gerber": "^0.0.31",
+        "circuit-json-to-gerber": "^0.0.33",
         "circuit-json-to-gltf": "^0.0.7",
         "circuit-json-to-pnp-csv": "^0.0.7",
         "circuit-to-svg": "^0.0.191",
@@ -872,7 +872,7 @@
 
     "circuit-json-to-connectivity-map": ["circuit-json-to-connectivity-map@0.0.22", "", { "dependencies": { "@tscircuit/math-utils": "^0.0.9" }, "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-HN8DiISjZZLTglGEkYNRpKeQ/DMG4dDo5j4Hck0UGSJbpux9aFwtJOGszMf06Inh/gu5oKBrpZJIeWxaNacKUg=="],
 
-    "circuit-json-to-gerber": ["circuit-json-to-gerber@0.0.31", "", { "dependencies": { "@tscircuit/alphabet": "^0.0.2", "fast-json-stable-stringify": "^2.1.0", "transformation-matrix": "^3.0.0" }, "peerDependencies": { "tscircuit": "*", "typescript": "^5.0.0" }, "bin": { "circuit-to-gerber": "dist/cli.js" } }, "sha512-4sODUaqeWyP/0meBo4T/23GRtNdi3ku4mXh08X6VZzEWaTso645pmhjHm1SWnB476lqiNSM00Oe8m5La0zeC/g=="],
+    "circuit-json-to-gerber": ["circuit-json-to-gerber@0.0.33", "", { "dependencies": { "@tscircuit/alphabet": "^0.0.2", "fast-json-stable-stringify": "^2.1.0", "transformation-matrix": "^3.0.0" }, "peerDependencies": { "tscircuit": "*", "typescript": "^5.0.0" }, "bin": { "circuit-to-gerber": "dist/cli.js" } }, "sha512-if8zyzbEDEBzFhnyjN8GV92AFhhafvrFlx+K8XIrsX/4DyfLU7RaTW+PwWu4+eMzkBWoP++Fz890POknP4yx0w=="],
 
     "circuit-json-to-gltf": ["circuit-json-to-gltf@0.0.7", "", { "peerDependencies": { "@resvg/resvg-js": "2", "@resvg/resvg-wasm": "2", "@tscircuit/circuit-json-util": "*", "circuit-json": "*", "circuit-to-svg": "*", "typescript": "^5" }, "optionalPeers": ["@resvg/resvg-wasm"] }, "sha512-MbTAxzqgcfKho0veYceEM2LamAmIqax1rG2cnR6MhnEowDLFPO8Sd2qoXStqDbWADXQpIglJ0NdICTu8igUvFg=="],
 

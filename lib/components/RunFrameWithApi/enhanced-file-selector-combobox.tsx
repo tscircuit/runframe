@@ -284,7 +284,7 @@ export const EnhancedFileSelectorCombobox = ({
         </PopoverTrigger>
         <PopoverContent
           className={cn(
-            "!rf-p-0 !rf-overflow-x-auto",
+            "!rf-p-0 !rf-overflow-x-auto !rf-z-[200]",
             isSearching
               ? "rf-w-fit rf-min-w-96 rf-max-w-[900px]"
               : "rf-w-80 rf-min-w-80 rf-max-w-96",

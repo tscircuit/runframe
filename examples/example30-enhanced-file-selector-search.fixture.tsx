@@ -1,7 +1,9 @@
 import { useState } from "react"
 import { EnhancedFileSelectorCombobox } from "lib/components/RunFrameWithApi/enhanced-file-selector-combobox"
+import { useStyles } from "lib/hooks/use-styles"
 
 export default () => {
+  useStyles()
   const [currentFile, setCurrentFile] = useState("app.tsx")
 
   // Mock file structure with various path lengths to test dynamic width
@@ -36,12 +38,20 @@ export default () => {
         </h1>
       </div>
 
-      <div className="rf-border rf-rounded-lg rf-p-6 rf-bg-muted/20">
-        <EnhancedFileSelectorCombobox
-          files={mockFiles}
-          currentFile={currentFile}
-          onFileChange={setCurrentFile}
-        />
+      <div className="rf-border rf-rounded-lg rf-p-6 rf-bg-gray-50 rf-flex rf-justify-center">
+        <div className="rf-w-fit">
+          <EnhancedFileSelectorCombobox
+            files={mockFiles}
+            currentFile={currentFile}
+            onFileChange={setCurrentFile}
+          />
+        </div>
+      </div>
+
+      <div className="rf-mt-4 rf-text-sm rf-text-gray-600">
+        <p>
+          <strong>Current file:</strong> {currentFile}
+        </p>
       </div>
     </div>
   )

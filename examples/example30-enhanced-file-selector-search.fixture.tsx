@@ -12,17 +12,15 @@ export default () => {
     "index.ts",
     "components/Button.tsx",
     "components/ui/Select.tsx",
+    "pages/About.tsx",
+    "features/dashboard/components/widgets/charts/LineChart.tsx",
+    "lib/utils/helpers/data-processing/validators/EmailValidator.ts",
+    "pages/Home.tsx",
+    "styles/globals.css",
+    "features/authentication/components/LoginForm.tsx",
+    "config/database.ts",
     "components/ui/forms/Input.tsx",
     "lib/utils/helpers/data-processing/formatters/DateFormatter.tsx",
-    "lib/utils/helpers/data-processing/validators/EmailValidator.ts",
-    "features/authentication/components/LoginForm.tsx",
-    "features/dashboard/components/widgets/charts/LineChart.tsx",
-    "services/api/endpoints/users/authentication/oauth/providers/GoogleOAuthProvider.ts",
-    "pages/Home.tsx",
-    "pages/About.tsx",
-    "styles/globals.css",
-    "config/database.ts",
-    "utils/constants.ts",
     "hooks/useAuth.ts",
     "types/User.ts",
     "middleware/auth.ts",
@@ -31,13 +29,7 @@ export default () => {
   ]
 
   return (
-    <div className="rf-h-screen rf-flex rf-flex-col rf-p-8">
-      <div className="rf-mb-4">
-        <h1 className="rf-text-xl rf-font-bold rf-mb-2">
-          Enhanced File Selector Test
-        </h1>
-      </div>
-
+    <div className="rf-h-screen rf-flex rf-flex-col rf-p-2">
       <div className="rf-border rf-rounded-lg rf-p-6 rf-bg-gray-50 rf-flex rf-justify-center">
         <div className="rf-w-fit">
           <EnhancedFileSelectorCombobox
@@ -48,7 +40,7 @@ export default () => {
         </div>
       </div>
 
-      <div className="rf-mt-4 rf-text-sm rf-text-gray-600">
+      <div className="rf-mt-4 rf-text-xl rf-text-gray-600">
         <p>
           <strong>Current file:</strong> {currentFile}
         </p>

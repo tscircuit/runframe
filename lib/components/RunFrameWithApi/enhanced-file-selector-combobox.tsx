@@ -259,6 +259,25 @@ export const EnhancedFileSelectorCombobox = ({
   const shortDisplayPath =
     displayPath.length > 25 ? "..." + displayPath.slice(-22) : displayPath
 
+  // Calculate dynamic width based on path length
+  const getDropdownWidth = () => {
+    if (isSearching) {
+      return "rf-w-fit rf-min-w-96 rf-max-w-[900px]"
+    }
+
+    const pathLength = displayPath.length
+    const estimatedTextWidth = pathLength * 8
+    const baseContentWidth = 280
+    if (estimatedTextWidth > baseContentWidth + 120) {
+      return "rf-w-96 rf-min-w-96 rf-max-w-[600px]"
+    } else if (estimatedTextWidth > baseContentWidth + 40) {
+      return "rf-w-[22rem] rf-min-w-80 rf-max-w-96"
+    } else {
+      // Default size
+      return "rf-w-80 rf-min-w-80 rf-max-w-96"
+    }
+  }
+
   return (
     <div className="rf-flex rf-items-center rf-gap-1">
       {/* Main selector */}
@@ -285,9 +304,7 @@ export const EnhancedFileSelectorCombobox = ({
         <PopoverContent
           className={cn(
             "!rf-p-0 !rf-overflow-x-auto !rf-z-[200]",
-            isSearching
-              ? "rf-w-fit rf-min-w-96 rf-max-w-[900px]"
-              : "rf-w-80 rf-min-w-80 rf-max-w-96",
+            getDropdownWidth(),
           )}
         >
           <Command shouldFilter={false}>
@@ -300,10 +317,10 @@ export const EnhancedFileSelectorCombobox = ({
 
             {/* Directory Header */}
             <div className="rf-px-3 rf-py-2 rf-border-t rf-border-b rf-border-gray-200 rf-bg-slate-50">
-              <div className="rf-flex rf-items-center rf-text-xs rf-text-slate-600">
+              <div className="rf-flex rf-items-center rf-text-xs rf-text-slate-600 rf-min-w-0">
                 <button
                   onClick={() => navigateToFolder("")}
-                  className="rf-text-blue-600 hover:rf-text-blue-800 rf-underline rf-cursor-pointer rf-bg-transparent rf-border-none rf-p-0"
+                  className="rf-text-blue-600 hover:rf-text-blue-800 rf-underline rf-cursor-pointer rf-bg-transparent rf-border-none rf-p-0 rf-flex-shrink-0"
                 >
                   root
                 </button>
@@ -315,15 +332,18 @@ export const EnhancedFileSelectorCombobox = ({
                     return (
                       <span
                         key={pathToSegment}
-                        className="rf-flex rf-items-center"
+                        className="rf-flex rf-items-center rf-min-w-0"
                       >
-                        <span className="rf-mx-1">/</span>
+                        <span className="rf-mx-1 rf-flex-shrink-0">/</span>
                         {index === array.length - 1 ? (
-                          <span className="rf-text-slate-800">{segment}</span>
+                          <span className="rf-text-slate-800" title={segment}>
+                            {segment}
+                          </span>
                         ) : (
                           <button
                             onClick={() => navigateToFolder(pathToSegment)}
                             className="rf-text-blue-600 hover:rf-text-blue-800 rf-underline rf-cursor-pointer rf-bg-transparent rf-border-none rf-p-0"
+                            title={segment}
                           >
                             {segment}
                           </button>

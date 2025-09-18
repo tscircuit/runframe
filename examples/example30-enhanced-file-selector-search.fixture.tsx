@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { EnhancedFileSelectorCombobox } from "lib/components/RunFrameWithApi/enhanced-file-selector-combobox"
+import { EnhancedFileSelectorCombobox } from "lib/components/RunFrameWithApi/EnhancedFileSelectorCombobox"
 import { useStyles } from "lib/hooks/use-styles"
 
 export default () => {

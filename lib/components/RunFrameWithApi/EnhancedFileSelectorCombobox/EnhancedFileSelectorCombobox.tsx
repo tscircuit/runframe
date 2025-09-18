@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Button } from "../ui/button"
+import { Button } from "../../ui/button"
 import {
   Command,
   CommandEmpty,
@@ -7,8 +7,8 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "../ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
+} from "../../ui/command"
+import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover"
 import {
   ChevronsUpDown,
   Check,
@@ -20,54 +20,11 @@ import {
   Folder,
 } from "lucide-react"
 import { cn } from "lib/utils"
-
-const commandGroupHeadingStyles =
-  "[&>[cmdk-group-heading]]:rf-px-3 [&>[cmdk-group-heading]]:rf-py-2 [&>[cmdk-group-heading]]:rf-text-xs [&>[cmdk-group-heading]]:rf-font-medium [&>[cmdk-group-heading]]:rf-text-muted-foreground [&>[cmdk-group-heading]]:rf-border-b [&>[cmdk-group-heading]]:rf-border-gray-200 [&>[cmdk-group-heading]]:rf-mb-1"
-
-interface FileNode {
-  name: string
-  path: string
-  type: "file" | "folder"
-  children?: FileNode[]
-}
-
-function parseFilesToTree(files: string[]): FileNode[] {
-  const root: FileNode[] = []
-  const nodeMap = new Map<string, FileNode>()
-
-  // Create root node
-  nodeMap.set("", { name: "", path: "", type: "folder", children: root })
-
-  for (const filePath of files) {
-    const parts = filePath.split("/")
-    let currentPath = ""
-
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i]
-      const parentPath = currentPath
-      currentPath = currentPath ? `${currentPath}/${part}` : part
-
-      if (!nodeMap.has(currentPath)) {
-        const isFile = i === parts.length - 1
-        const node: FileNode = {
-          name: part,
-          path: currentPath,
-          type: isFile ? "file" : "folder",
-          children: isFile ? undefined : [],
-        }
-
-        nodeMap.set(currentPath, node)
-
-        const parent = nodeMap.get(parentPath)
-        if (parent && parent.children) {
-          parent.children.push(node)
-        }
-      }
-    }
-  }
-
-  return root
-}
+import {
+  parseFilesToTree,
+  getCurrentFolderContents,
+  type FileNode,
+} from "./parseFilesToTree"
 
 function getFileIcon(fileName: string) {
   if (fileName.endsWith(".tsx") || fileName.endsWith(".jsx")) {
@@ -80,44 +37,6 @@ function getFileIcon(fileName: string) {
     return <FileText className="rf-h-4 rf-w-4 rf-text-gray-600" />
   }
   return <File className="rf-h-4 rf-w-4 rf-text-gray-500" />
-}
-
-function findNode(nodes: FileNode[], path: string): FileNode | null {
-  for (const node of nodes) {
-    if (node.path === path) return node
-    if (node.children) {
-      const found = findNode(node.children, path)
-      if (found) return found
-    }
-  }
-  return null
-}
-
-function getCurrentFolderContents(
-  tree: FileNode[],
-  currentFolder: string,
-): { files: FileNode[]; folders: FileNode[] } {
-  let targetNode: FileNode | null
-
-  if (!currentFolder) {
-    // Root level
-    targetNode = { name: "", path: "", type: "folder", children: tree }
-  } else {
-    targetNode = findNode(tree, currentFolder)
-  }
-
-  if (!targetNode || !targetNode.children) {
-    return { files: [], folders: [] }
-  }
-
-  const files = targetNode.children.filter((node) => node.type === "file")
-  const folders = targetNode.children.filter((node) => node.type === "folder")
-
-  // Sort files first, then folders, both alphabetically
-  files.sort((a, b) => a.name.localeCompare(b.name))
-  folders.sort((a, b) => a.name.localeCompare(b.name))
-
-  return { files, folders }
 }
 
 export const EnhancedFileSelectorCombobox = ({

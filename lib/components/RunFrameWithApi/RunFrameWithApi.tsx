@@ -8,7 +8,7 @@ import { useRunFrameStore } from "./store"
 import { applyEditEventsToManualEditsFile } from "@tscircuit/core"
 import type { ManualEditsFile } from "@tscircuit/props"
 import { FileSelectorCombobox } from "./file-selector-combobox"
-import { EnhancedFileSelectorCombobox } from "./enhanced-file-selector-combobox"
+import { EnhancedFileSelectorCombobox } from "./EnhancedFileSelectorCombobox"
 
 const debug = Debug("run-frame:RunFrameWithApi")
 

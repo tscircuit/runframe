@@ -255,12 +255,7 @@ describe('PowerModule', () => {
       </div>
 
       <div className="rf-flex-1">
-        <RunFrameWithApi
-          debug
-          showFilesSwitch
-          showFileMenu
-          useEnhancedFileSelector
-        />
+        <RunFrameWithApi debug showFilesSwitch showFileMenu />
       </div>
 
       <div className="rf-max-h-48 rf-overflow-auto rf-border-t">

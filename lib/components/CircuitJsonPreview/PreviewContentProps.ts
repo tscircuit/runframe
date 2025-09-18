@@ -7,6 +7,7 @@ export type TabId =
   | "pcb"
   | "schematic"
   | "assembly"
+  | "pinout"
   | "cad"
   | "bom"
   | "circuit_json"

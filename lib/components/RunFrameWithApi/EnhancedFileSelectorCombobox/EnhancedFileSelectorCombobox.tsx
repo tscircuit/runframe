@@ -180,21 +180,28 @@ export const EnhancedFileSelectorCombobox = ({
 
   // Calculate dynamic width based on path length
   const getDropdownWidth = () => {
-    if (isSearching) {
-      return "rf-w-fit rf-min-w-96 rf-max-w-[900px]"
-    }
-
     const pathLength = displayPath.length
     const estimatedTextWidth = pathLength * 8
     const baseContentWidth = 280
+    let widthClass: string
+    let normalClasses: string
     if (estimatedTextWidth > baseContentWidth + 120) {
-      return "rf-w-96 rf-min-w-96 rf-max-w-[600px]"
+      widthClass = "rf-w-96"
+      normalClasses = "rf-w-96 rf-min-w-96 rf-max-w-[600px]"
     } else if (estimatedTextWidth > baseContentWidth + 40) {
-      return "rf-w-[22rem] rf-min-w-80 rf-max-w-96"
+      widthClass = "rf-w-[22rem]"
+      normalClasses = "rf-w-[22rem] rf-min-w-80 rf-max-w-96"
     } else {
-      // Default size
-      return "rf-w-80 rf-min-w-80 rf-max-w-96"
+      widthClass = "rf-w-80"
+      normalClasses = "rf-w-80 rf-min-w-80 rf-max-w-96"
     }
+
+    if (isSearching) {
+      const minWidthClass = widthClass.replace("rf-w-", "rf-min-w-")
+      return `rf-w-fit ${minWidthClass} rf-max-w-[900px]`
+    }
+
+    return normalClasses
   }
 
   return (

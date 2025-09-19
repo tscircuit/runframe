@@ -46,7 +46,6 @@ export const RunFrameStaticBuildViewer = (
     let selectedPath = currentCircuitJsonPath
 
     if (!selectedPath || !circuitJsonFiles[selectedPath]) {
-      // Prioritize index files first, then main files
       selectedPath = guessEntrypoint(availableFiles) ?? availableFiles[0]
       setCurrentCircuitJsonPath(selectedPath)
     }

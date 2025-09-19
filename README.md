@@ -57,6 +57,23 @@ const App = () => (
 )
 ```
 
+### Using RunFrameStaticBuildViewer for Prebuilt Circuit JSON
+
+For displaying prebuilt circuit JSON files without code execution:
+
+```tsx
+import { RunFrameStaticBuildViewer } from "@tscircuit/runframe"
+
+const App = () => (
+  <RunFrameStaticBuildViewer
+    circuitJsonFiles={{
+      "main.circuit.json": [...],
+      "components/sensor.circuit.json": [...]
+    }}
+  />
+)
+```
+
 The CircuitJsonPreview component provides:
 
 - PCB view with interactive component placement

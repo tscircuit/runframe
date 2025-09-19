@@ -105,6 +105,7 @@ export const CircuitJsonPreview = ({
   allowSelectingVersion = true,
   showFileMenu = false,
   isWebEmbedded = false,
+  projectName,
   onRerunWithDebug,
 }: PreviewContentProps) => {
   useStyles()
@@ -215,6 +216,7 @@ export const CircuitJsonPreview = ({
               <FileMenuLeftHeader
                 isWebEmbedded={isWebEmbedded}
                 circuitJson={circuitJson}
+                projectName={projectName}
               />
             )}
             {(leftHeaderContent || showFileMenu) && (

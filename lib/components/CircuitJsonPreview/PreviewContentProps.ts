@@ -102,6 +102,11 @@ export interface PreviewContentProps {
   isWebEmbedded?: boolean
 
   /**
+   * Project name to use for exports
+   */
+  projectName?: string
+
+  /**
    * Callback to rerun render with debug options
    */
   onRerunWithDebug?: (debugOption: string) => void

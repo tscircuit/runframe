@@ -1,35 +1,8 @@
-import { renderToCircuitJson } from "lib/dev/render-to-circuit-json"
 import {
   RunFrameStaticBuildViewer,
   type CircuitJsonFileReference,
 } from "../lib/components/RunFrameStaticBuildViewer/RunFrameStaticBuildViewer"
 import type { CircuitJson } from "circuit-json"
-
-const sampleCircuitJson1: CircuitJson = renderToCircuitJson(
-  <board width="10mm" height="10mm">
-    <resistor name="R1" schX={-1} resistance="1k" footprint="0402" />
-    <resistor name="R2" schX={1} resistance="1k" footprint="0402" />
-  </board>,
-)
-
-const sampleCircuitJson2: CircuitJson = renderToCircuitJson(
-  <board width="10mm" height="10mm"></board>,
-)
-const sampleCircuitJson3: CircuitJson = renderToCircuitJson(
-  <board width="10mm" height="10mm">
-    <group name="wow">
-      <resistor resistance="1k" footprint="0402" name="R1" />
-      <capacitor capacitance="1000pF" footprint="0402" name="C1" />
-      <trace from=".R1 > .pin1" to=".C1 > .pin1" />
-    </group>
-  </board>,
-)
-const circuitJsonFiles = {
-  "main.circuit.tsx": sampleCircuitJson1,
-  "index.circuit.tsx": sampleCircuitJson3,
-  "components/blank.circuit.tsx": sampleCircuitJson2,
-  "examples/group.circuit.tsx": sampleCircuitJson3,
-}
 
 const circuitJsonFileAssets: CircuitJsonFileReference[] = [
   {
@@ -71,7 +44,8 @@ const mockFetchFile = async (
 }
 export const basic = () => (
   <RunFrameStaticBuildViewer
-    circuitJsonFiles={circuitJsonFiles}
+    files={circuitJsonFileAssetsExternal}
+    onFetchFile={mockFetchFile}
     projectName="test-project"
     defaultToFullScreen={false}
     showToggleFullScreen={true}
@@ -79,18 +53,16 @@ export const basic = () => (
 )
 
 export const emptyFiles = () => (
-  <RunFrameStaticBuildViewer
-    circuitJsonFiles={{}}
-    projectName="empty-project"
-  />
+  <RunFrameStaticBuildViewer files={[]} projectName="empty-project" />
 )
 
 export const fullFledge = () => (
   <RunFrameStaticBuildViewer
-    circuitJsonFiles={circuitJsonFiles}
-    projectName="empty-project"
+    files={circuitJsonFileAssetsExternal}
+    onFetchFile={mockFetchFile}
+    projectName="full-featured-project"
     debug={true}
-    initialCircuitPath="d"
+    initialCircuitPath="index.tsx"
     onCircuitJsonPathChange={(c) => {
       console.info(c)
     }}
@@ -130,15 +102,11 @@ export const lazyLoadingWithoutCustomFetch = () => (
   />
 )
 
-export const lazyLoadingEmptyFiles = () => (
-  <RunFrameStaticBuildViewer files={[]} projectName="empty-lazy-project" />
-)
-
-export const mixedApiUsage = () => (
+export const largeProjectExample = () => (
   <RunFrameStaticBuildViewer
-    circuitJsonFiles={circuitJsonFiles}
-    files={circuitJsonFileAssetsExternal}
-    projectName="mixed-api-project"
+    files={[...circuitJsonFileAssets, ...circuitJsonFileAssetsExternal]}
+    onFetchFile={mockFetchFile}
+    projectName="large-project"
     defaultToFullScreen={false}
     showToggleFullScreen={true}
   />
@@ -151,6 +119,5 @@ export default {
   lazyLoadingBasic,
   lazyLoadingWithInitialFile,
   lazyLoadingWithoutCustomFetch,
-  lazyLoadingEmptyFiles,
-  mixedApiUsage,
+  largeProjectExample,
 }

@@ -14,8 +14,7 @@ export interface CircuitJsonFileReference {
 
 export interface RunFrameStaticBuildViewerProps {
   debug?: boolean
-  circuitJsonFiles?: Record<string, CircuitJson>
-  files?: CircuitJsonFileReference[]
+  files: CircuitJsonFileReference[]
   onFetchFile?: (fileRef: CircuitJsonFileReference) => Promise<CircuitJson>
   initialCircuitPath?: string
   onCircuitJsonPathChange?: (path: string) => void
@@ -41,12 +40,8 @@ export const RunFrameStaticBuildViewer = (
   const [fileCache, setFileCache] = useState<Record<string, CircuitJson>>({})
   const [loadingFiles, setLoadingFiles] = useState<Set<string>>(new Set())
 
-  const circuitJsonFiles = props.circuitJsonFiles ?? {}
-  const fileReferences = props.files ?? []
-  const availableFiles = [
-    ...Object.keys(circuitJsonFiles),
-    ...fileReferences.map((f) => f.filePath),
-  ]
+  const fileReferences = props.files
+  const availableFiles = fileReferences.map((f) => f.filePath)
 
   const defaultFetchFile = useCallback(
     async (fileRef: CircuitJsonFileReference): Promise<CircuitJson> => {
@@ -71,12 +66,6 @@ export const RunFrameStaticBuildViewer = (
   const loadCircuitJsonFile = useCallback(
     async (filePath: string) => {
       if (loadingFiles.has(filePath)) return
-
-      if (circuitJsonFiles[filePath]) {
-        setCircuitJson(circuitJsonFiles[filePath])
-        props.onCircuitJsonPathChange?.(filePath)
-        return
-      }
 
       if (fileCache[filePath]) {
         setCircuitJson(fileCache[filePath])
@@ -111,7 +100,6 @@ export const RunFrameStaticBuildViewer = (
       }
     },
     [
-      circuitJsonFiles,
       fileReferences,
       fileCache,
       loadingFiles,

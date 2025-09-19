@@ -77,9 +77,9 @@ export const TscircuitPackageDetailsDialog = ({
         <div className="rf-flex-1 rf-overflow-y-auto rf-py-4 rf-space-y-6">
           {ownerUsername ? (
             <div>
-              <label className="rf-text-xs rf-font-medium rf-text-gray-500 rf-uppercase rf-tracking-wide">
+              <span className="rf-text-xs rf-font-medium rf-text-gray-500 rf-uppercase rf-tracking-wide">
                 Created by
-              </label>
+              </span>
               <div className="rf-mt-1 rf-text-sm rf-font-medium">
                 {ownerUrl ? (
                   <a
@@ -99,7 +99,12 @@ export const TscircuitPackageDetailsDialog = ({
 
           <div>
             <h3 className="rf-text-lg rf-font-semibold rf-mb-4">Preview</h3>
-            <Tabs value={previewTab} onValueChange={onPreviewTabChange}>
+            <Tabs
+              value={previewTab}
+              onValueChange={(value) =>
+                onPreviewTabChange(value as "pcb" | "schematic")
+              }
+            >
               <TabsList className="rf-inline-flex rf-h-9 rf-items-center rf-justify-center rf-rounded-lg rf-bg-zinc-100 rf-p-1 rf-text-zinc-500 dark:rf-bg-zinc-800 dark:rf-text-zinc-400">
                 <TabsTrigger value="pcb">PCB</TabsTrigger>
                 <TabsTrigger value="schematic">Schematic</TabsTrigger>

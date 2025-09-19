@@ -11,7 +11,6 @@ const circuitJsonConfig: FileSelectorConfig = {
   },
   placeholder: "Select circuit",
   searchPlaceholder: "Search for circuit file",
-  showNavigation: false,
   emptyMessage: "No circuit files found in this directory.",
 }
 

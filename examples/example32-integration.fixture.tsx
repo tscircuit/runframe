@@ -254,7 +254,9 @@ const circuitDatabase = {
 class CircuitAPIService {
   private circuits: Record<string, any> = circuitDatabase
 
-  async getCircuitList(): Promise<Array<{ filename: string; name: string; description: string; complexity: string }>> {
+  async getCircuitList(): Promise<
+    Array<{ filename: string; name: string; description: string; complexity: string }>
+  > {
     await new Promise((resolve) => setTimeout(resolve, 300))
     return Object.entries(this.circuits).map(([filename, circuit]) => ({
       filename,
@@ -332,7 +334,9 @@ const ScenarioSelector: React.FC<{
 
 const FullIntegrationExample = () => {
   const [circuitFiles, setCircuitFiles] = useState<Record<string, any>>({})
-  const [circuitList, setCircuitList] = useState<Array<{ filename: string; name: string; description: string; complexity: string }>>([])
+  const [circuitList, setCircuitList] = useState<
+    Array<{ filename: string; name: string; description: string; complexity: string }>
+  >([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedFile, setSelectedFile] = useState<string>("")
@@ -475,8 +479,8 @@ const FullIntegrationExample = () => {
           
           {exportStatus && (
             <div className={`px-4 py-2 rounded-lg text-sm font-medium ${
-              exportStatus.includes('Successfully') 
-                ? 'bg-green-100 text-green-800' 
+              exportStatus.includes('Successfully')
+                ? 'bg-green-100 text-green-800'
                 : 'bg-red-100 text-red-800'
             }`}>
               {exportStatus}
@@ -514,13 +518,13 @@ const FullIntegrationExample = () => {
       <div className="bg-white border-t border-gray-200 px-6 py-3">
         <div className="flex items-center justify-between text-sm text-gray-600">
           <div>
-            Selected: {circuitList.find(c => c.filename === selectedFile)?.name || 'None'}
+            Selected: {circuitList.find((c) => c.filename === selectedFile)?.name || 'None'}
           </div>
           <div>
             Total Components: {circuitFiles[selectedFile]?.pcb_components?.length || 0}
           </div>
           <div>
-            Complexity: {circuitList.find(c => c.filename === selectedFile)?.complexity || 'Unknown'}
+            Complexity: {circuitList.find((c) => c.filename === selectedFile)?.complexity || 'Unknown'}
           </div>
         </div>
       </div>

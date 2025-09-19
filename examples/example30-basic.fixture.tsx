@@ -48,7 +48,7 @@ const circuitFiles: Record<string, CircuitJson> = {
       min_trace_thickness: 0.1,
       display_name: "LED",
     },
-  ]
+  ],
 }
 
 export default () => (

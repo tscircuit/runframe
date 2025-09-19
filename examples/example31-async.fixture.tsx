@@ -70,8 +70,8 @@ const mockCircuitAPI = {
           ],
         },
       ],
-    }
-  }
+    },
+  },
 }
 
 const AsyncCircuitViewer = () => {

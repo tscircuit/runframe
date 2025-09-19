@@ -24,7 +24,7 @@ export const StaticBuildFileMenu = (props: StaticBuildFileMenuProps) => {
     onCustomAction,
     exportFormats = availableExports,
     showExport = true,
-    className
+    className,
   } = props
 
   const handleExport = (format: { extension: string; name: string }) => {
@@ -52,23 +52,23 @@ export const StaticBuildFileMenu = (props: StaticBuildFileMenuProps) => {
   }
 
   return (
-    <div className={cn('flex items-center', className)}>
+    <div className={cn("flex items-center", className)}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            variant='ghost'
-            size='sm'
+            variant="ghost"
+            size="sm"
             disabled={disabled}
-            className='h-8 px-2 text-sm'
+            className="h-8 px-2 text-sm"
           >
-            <FileText className='h-4 w-4 mr-2' />
+            <FileText className="h-4 w-4 mr-2" />
             File
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align='start' className='w-48'>
+        <DropdownMenuContent align="start" className="w-48">
           {showExport && circuitJson && (
             <>
-              <div className='px-2 py-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300'>
+              <div className="px-2 py-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300">
                 Export
               </div>
               {exportFormats.map((format) => (
@@ -101,7 +101,7 @@ export const StaticBuildFileMenu = (props: StaticBuildFileMenuProps) => {
           )}
 
           {currentFile && (
-            <div className='px-2 py-1.5 text-xs text-gray-500 dark:text-gray-400'>
+            <div className="px-2 py-1.5 text-xs text-gray-500 dark:text-gray-400">
               Current: {currentFile}
             </div>
           )}

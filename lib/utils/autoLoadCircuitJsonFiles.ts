@@ -17,18 +17,18 @@ export interface CircuitJsonLoadResult {
 
 export async function circuitJsonFileLoader(
   config: CircuitJsonFileLoaderConfig = {},
-  files?: Record<string, CircuitJson>
+  files?: Record<string, CircuitJson>,
 ): Promise<CircuitJsonLoadResult> {
   const {
     baseUrl = "",
     defaultFilename = "circuit.json",
     isAsync = false,
-    headers = {}
+    headers = {},
   } = config
 
   try {
     let availableFiles: string[] = []
-    
+
     if (isAsync && baseUrl) {
       availableFiles = [defaultFilename]
     } else if (files) {
@@ -41,8 +41,8 @@ export async function circuitJsonFileLoader(
       throw new Error("No circuit JSON files available")
     }
 
-    const selectedFile = availableFiles.includes(defaultFilename) 
-      ? defaultFilename 
+    const selectedFile = availableFiles.includes(defaultFilename)
+      ? defaultFilename
       : availableFiles[0]
 
     let circuitJson: CircuitJson | null = null
@@ -50,11 +50,11 @@ export async function circuitJsonFileLoader(
     if (isAsync && baseUrl) {
       const fileUrl = `${baseUrl}/${selectedFile}`
       const response = await fetch(fileUrl, { headers })
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch ${fileUrl}: ${response.statusText}`)
       }
-      
+
       circuitJson = await response.json()
     } else if (files) {
       circuitJson = files[selectedFile] || null
@@ -65,7 +65,7 @@ export async function circuitJsonFileLoader(
       availableFiles,
       selectedFile,
       isLoading: false,
-      error: null
+      error: null,
     }
   } catch (error) {
     return {
@@ -73,13 +73,15 @@ export async function circuitJsonFileLoader(
       availableFiles: Object.keys(files || {}),
       selectedFile: defaultFilename,
       isLoading: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred"
+      error: error instanceof Error ? error.message : "Unknown error occurred",
     }
   }
 }
 
 export async function autoLoadCircuitJsonFiles(
-  config: CircuitJsonFileLoaderConfig & { files?: Record<string, CircuitJson> } = {}
+  config: CircuitJsonFileLoaderConfig & {
+    files?: Record<string, CircuitJson>
+  } = {},
 ): Promise<CircuitJsonLoadResult> {
   const { files, ...loaderConfig } = config
   return circuitJsonFileLoader(loaderConfig, files)
@@ -87,17 +89,17 @@ export async function autoLoadCircuitJsonFiles(
 
 export function loadCircuitJsonFilesSync(
   files: Record<string, CircuitJson>,
-  defaultFilename: string = "circuit.json"
+  defaultFilename: string = "circuit.json",
 ): CircuitJsonLoadResult {
   try {
     const availableFiles = Object.keys(files)
-    
+
     if (availableFiles.length === 0) {
       throw new Error("No circuit JSON files provided")
     }
 
-    const selectedFile = availableFiles.includes(defaultFilename) 
-      ? defaultFilename 
+    const selectedFile = availableFiles.includes(defaultFilename)
+      ? defaultFilename
       : availableFiles[0]
 
     const circuitJson = files[selectedFile] || null
@@ -107,7 +109,7 @@ export function loadCircuitJsonFilesSync(
       availableFiles,
       selectedFile,
       isLoading: false,
-      error: null
+      error: null,
     }
   } catch (error) {
     return {
@@ -115,7 +117,7 @@ export function loadCircuitJsonFilesSync(
       availableFiles: Object.keys(files),
       selectedFile: defaultFilename,
       isLoading: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred"
+      error: error instanceof Error ? error.message : "Unknown error occurred",
     }
   }
 }

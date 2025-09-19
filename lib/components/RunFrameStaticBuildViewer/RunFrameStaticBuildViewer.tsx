@@ -27,7 +27,7 @@ export const RunFrameStaticBuildViewer = (
     showFileSelector = true,
     showFileMenu = true,
     exportFormats = ["json", "zip", "glb"],
-    className
+    className,
   } = props
 
   const [circuitJson, setCircuitJson] = useState<CircuitJson | null>(null)

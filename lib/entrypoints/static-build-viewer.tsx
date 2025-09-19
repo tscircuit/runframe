@@ -41,15 +41,15 @@ function StaticBuildViewerApp() {
 
   if (!isConfigured) {
     return (
-      <div style={{ 
-        width: "100%", 
-        height: "100vh", 
-        display: "flex", 
-        alignItems: "center", 
+      <div style={{
+        width: "100%",
+        height: "100vh",
+        display: "flex",
+        alignItems: "center",
         justifyContent: "center",
         flexDirection: "column",
         fontFamily: "system-ui, -apple-system, sans-serif",
-        color: "#666"
+        color: "#666",
       }}>
         <div style={{ fontSize: "18px", marginBottom: "16px" }}>
           Static Build Viewer
@@ -81,7 +81,7 @@ function StaticBuildViewerApp() {
             type: "static_build_viewer_loaded",
             circuitJson: circuitJson,
             filename,
-            buildDirectoryUrl: buildDirectoryUrl
+            buildDirectoryUrl: buildDirectoryUrl,
           }, "*")
         }
       }}

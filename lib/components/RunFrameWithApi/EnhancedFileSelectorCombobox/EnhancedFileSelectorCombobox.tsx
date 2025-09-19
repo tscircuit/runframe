@@ -18,6 +18,7 @@ import {
   FileText,
   Code,
   Folder,
+  Zap,
 } from "lucide-react"
 import { cn } from "lib/utils"
 import {
@@ -26,7 +27,16 @@ import {
   type FileNode,
 } from "./parseFilesToTree"
 
-function getFileIcon(fileName: string) {
+export interface FileSelectorConfig {
+  fileFilter?: (filename: string) => boolean
+  getDisplayName?: (filename: string) => string
+  placeholder?: string
+  searchPlaceholder?: string
+  showNavigation?: boolean
+  emptyMessage?: string
+}
+
+const defaultFileIcon = (fileName: string) => {
   if (fileName.endsWith(".tsx") || fileName.endsWith(".jsx")) {
     return <Code className="rf-h-4 rf-w-4 rf-text-blue-500" />
   }
@@ -39,14 +49,30 @@ function getFileIcon(fileName: string) {
   return <File className="rf-h-4 rf-w-4 rf-text-gray-500" />
 }
 
+const defaultFileFilter = (filename: string) => {
+  return (
+    (filename.endsWith(".tsx") ||
+      filename.endsWith(".ts") ||
+      filename.endsWith(".jsx") ||
+      filename.endsWith(".js")) &&
+    !filename.endsWith(".d.ts")
+  )
+}
+
+const defaultDisplayName = (filename: string) => {
+  return filename.split("/").pop() || ""
+}
+
 export const EnhancedFileSelectorCombobox = ({
   files,
   onFileChange,
   currentFile,
+  config = {},
 }: {
   files: string[]
   currentFile: string
   onFileChange: (value: string) => void
+  config?: FileSelectorConfig
 }) => {
   const [open, setOpen] = useState(false)
   const [file, setFile] = useState(currentFile)
@@ -54,18 +80,20 @@ export const EnhancedFileSelectorCombobox = ({
   const [currentFileIndex, setCurrentFileIndex] = useState(0)
   const [searchValue, setSearchValue] = useState("")
 
+  const {
+    fileFilter = defaultFileFilter,
+    getDisplayName = defaultDisplayName,
+    placeholder = "Select file",
+    searchPlaceholder = "Search for file",
+    showNavigation = false,
+    emptyMessage = "No files found in this directory.",
+  } = config
+
   useEffect(() => {
     setFile(currentFile)
   }, [currentFile])
 
-  const filteredFiles = files.filter(
-    (file) =>
-      (file.endsWith(".tsx") ||
-        file.endsWith(".ts") ||
-        file.endsWith(".jsx") ||
-        file.endsWith(".js")) &&
-      !file.endsWith(".d.ts"),
-  )
+  const filteredFiles = files.filter(fileFilter)
 
   const fileTree = parseFilesToTree(filteredFiles)
   const { files: currentFiles, folders: currentFolders } =
@@ -116,9 +144,12 @@ export const EnhancedFileSelectorCombobox = ({
   const isSearching = searchValue.trim().length > 0
 
   const canGoBack = currentFolder !== ""
-  const canGoLeft = currentFiles.length > 0 && currentFileIndex > 0
+  const canGoLeft =
+    showNavigation && currentFiles.length > 0 && currentFileIndex > 0
   const canGoRight =
-    currentFiles.length > 0 && currentFileIndex < currentFiles.length - 1
+    showNavigation &&
+    currentFiles.length > 0 &&
+    currentFileIndex < currentFiles.length - 1
 
   const navigateToFolder = (folderPath: string) => {
     setCurrentFolder(folderPath)
@@ -199,7 +230,18 @@ export const EnhancedFileSelectorCombobox = ({
 
   return (
     <div className="rf-flex rf-items-center rf-gap-1">
-      {/* Main selector */}
+      {showNavigation && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rf-h-8 rf-w-8"
+          onClick={goLeft}
+          disabled={!canGoLeft}
+        >
+          <ChevronLeft className="rf-h-4 rf-w-4" />
+        </Button>
+      )}
+
       <Popover
         open={open}
         onOpenChange={(newOpen) => {
@@ -212,10 +254,10 @@ export const EnhancedFileSelectorCombobox = ({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="rf-w-fit rf-min-w-32 rf-max-w-64 rf-justify-center rf-items-center rf-gap-1 !rf-font-normal rf-min-w-0"
+            className="rf-w-fit rf-min-w-32 rf-max-w-64 rf-justify-center rf-items-center rf-gap-1 !rf-font-normal"
           >
             <span className="rf-truncate rf-text-left">
-              {file ? file.split("/").pop() : "Select file"}
+              {file ? getDisplayName(file) : placeholder}
             </span>
             <ChevronsUpDown className="rf-opacity-50 rf-flex-shrink-0" />
           </Button>
@@ -228,7 +270,7 @@ export const EnhancedFileSelectorCombobox = ({
         >
           <Command shouldFilter={false}>
             <CommandInput
-              placeholder="Search for file"
+              placeholder={searchPlaceholder}
               className="rf-h-9 rf-w-full"
               value={searchValue}
               onValueChange={setSearchValue}
@@ -276,7 +318,7 @@ export const EnhancedFileSelectorCombobox = ({
             <CommandList className="rf-max-h-[70vh] rf-overflow-y-auto">
               {!isSearching ? (
                 <>
-                  <CommandEmpty>No files found in this directory.</CommandEmpty>
+                  <CommandEmpty>{emptyMessage}</CommandEmpty>
 
                   {/* Current Directory Files */}
                   {currentFiles.length > 0 && (
@@ -293,9 +335,9 @@ export const EnhancedFileSelectorCombobox = ({
                           )}
                         >
                           <span className="rf-mr-2">
-                            {getFileIcon(fileNode.name)}
+                            {defaultFileIcon(fileNode.name)}
                           </span>
-                          {fileNode.name}
+                          {getDisplayName(fileNode.name)}
                           <Check
                             className={cn(
                               "rf-ml-auto rf-h-4 rf-w-4",
@@ -364,11 +406,11 @@ export const EnhancedFileSelectorCombobox = ({
                                 )}
                               >
                                 <span className="rf-mr-2">
-                                  {getFileIcon(file.fileName)}
+                                  {defaultFileIcon(file.fileName)}
                                 </span>
                                 <div className="rf-flex rf-items-center rf-justify-between rf-w-full rf-min-w-0">
                                   <span className="rf-truncate">
-                                    {file.fileName}
+                                    {getDisplayName(file.fileName)}
                                   </span>
                                   <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-flex-shrink-0">
                                     {currentFolder || "/"}
@@ -405,11 +447,11 @@ export const EnhancedFileSelectorCombobox = ({
                               )}
                             >
                               <span className="rf-mr-2">
-                                {getFileIcon(file.fileName)}
+                                {defaultFileIcon(file.fileName)}
                               </span>
                               <div className="rf-flex rf-items-center rf-justify-between rf-w-full rf-min-w-0">
                                 <span className="rf-truncate">
-                                  {file.fileName}
+                                  {getDisplayName(file.fileName)}
                                 </span>
                                 <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-flex-shrink-0">
                                   {file.path.substring(
@@ -438,6 +480,18 @@ export const EnhancedFileSelectorCombobox = ({
           </Command>
         </PopoverContent>
       </Popover>
+
+      {showNavigation && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rf-h-8 rf-w-8"
+          onClick={goRight}
+          disabled={!canGoRight}
+        >
+          <ChevronRight className="rf-h-4 rf-w-4" />
+        </Button>
+      )}
     </div>
   )
 }

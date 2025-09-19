@@ -94,7 +94,12 @@ export const RunFrameStaticBuildViewer = (
 
   if (error) {
     return (
-      <div className={cn("flex flex-col items-center justify-center h-full p-4", className)}>
+      <div
+        className={cn(
+          "flex flex-col items-center justify-center h-full p-4",
+          className,
+        )}
+      >
         <div className="text-center max-w-md">
           <h3 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">
             Failed to Load Circuit Files
@@ -114,7 +119,12 @@ export const RunFrameStaticBuildViewer = (
 
   if (!circuitJson) {
     return (
-      <div className={cn("flex flex-col items-center justify-center h-full p-4", className)}>
+      <div
+        className={cn(
+          "flex flex-col items-center justify-center h-full p-4",
+          className,
+        )}
+      >
         <div className="text-center max-w-md">
           <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-400 mb-2">
             No Circuit Data Available

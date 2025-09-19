@@ -283,7 +283,7 @@ class CircuitAPIService {
   async exportCircuit(filename: string, format: string): Promise<Blob> {
     await new Promise((resolve) => setTimeout(resolve, 500))
     const circuit = this.circuits[filename]
-    
+
     switch (format) {
       case "json":
         return new Blob([JSON.stringify(circuit, null, 2)], {
@@ -494,7 +494,6 @@ const FullIntegrationExample = () => {
               {circuitList.length} circuits available • {selectedScenario} mode
             </p>
           </div>
-          
           {exportStatus && (
             <div className={`px-4 py-2 rounded-lg text-sm font-medium ${
               exportStatus.includes('Successfully')
@@ -504,7 +503,6 @@ const FullIntegrationExample = () => {
               {exportStatus}
             </div>
           )}
-          
           {isExporting && (
             <div className="flex items-center gap-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>

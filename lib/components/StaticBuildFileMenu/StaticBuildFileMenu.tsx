@@ -14,23 +14,6 @@ import {
 } from "lib/optional-features/exporting/export-and-download"
 import type { StaticBuildFileMenuProps } from "./StaticBuildFileMenuProps"
 
-/**
- * A reusable file menu component for static build viewers.
- * 
- * This component provides a standardized "File" menu with export functionality
- * and customizable actions for static circuit JSON viewers. It follows the
- * established patterns in the runframe codebase.
- * 
- * @example
- * ```tsx
- * <StaticBuildFileMenu
- *   circuitJson={currentCircuitJson}
- *   currentFile={selectedFile}
- *   onExport={(format, filename) => console.log(`Exporting ${filename} as ${format}`)}
- *   showExport={true}
- * />
- * ```
- */
 export const StaticBuildFileMenu = (props: StaticBuildFileMenuProps) => {
   const {
     circuitJson,
@@ -47,14 +30,12 @@ export const StaticBuildFileMenu = (props: StaticBuildFileMenuProps) => {
   const handleExport = (format: string) => {
     if (!circuitJson || !currentFile) return
 
-    // Generate filename based on current file and format
-    const baseFilename = currentFile.replace(/\.[^/.]+$/, "") // Remove extension
+    const baseFilename = currentFile.replace(/\.[^/.]+$/, "")
     const exportFilename = `${baseFilename}.${format}`
 
     if (onExport) {
       onExport(format, exportFilename)
     } else {
-      // Default export behavior
       exportAndDownload({
         circuitJson,
         exportFormat: format as any,
@@ -82,7 +63,6 @@ export const StaticBuildFileMenu = (props: StaticBuildFileMenuProps) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-48">
-          {/* Export Section */}
           {showExport && circuitJson && (
             <>
               <div className="px-2 py-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300">
@@ -103,7 +83,6 @@ export const StaticBuildFileMenu = (props: StaticBuildFileMenuProps) => {
             </>
           )}
 
-          {/* Custom Menu Items */}
           {customMenuItems && (
             <>
               {customMenuItems}
@@ -111,7 +90,6 @@ export const StaticBuildFileMenu = (props: StaticBuildFileMenuProps) => {
             </>
           )}
 
-          {/* File Info */}
           {currentFile && (
             <div className="px-2 py-1.5 text-xs text-gray-500 dark:text-gray-400">
               Current: {currentFile}

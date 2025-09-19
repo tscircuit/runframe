@@ -1,14 +1,12 @@
 # RunFrame Integration Guide
 
-This guide provides comprehensive instructions for integrating the RunFrameStaticBuildViewer component into your applications.
+This guide provides instructions for integrating the RunFrameStaticBuildViewer component into your applications.
 
 ## Overview
 
-The RunFrameStaticBuildViewer is a production-ready React component designed for viewing static circuit JSON files. It provides a clean, modular interface with support for multiple file selection, export functionality, and customizable UI elements.
+The RunFrameStaticBuildViewer is a React component for viewing static circuit JSON files with support for multiple file selection, export functionality, and customizable UI.
 
 ## Prerequisites
-
-Before integrating RunFrameStaticBuildViewer, ensure your project meets these requirements:
 
 ### Dependencies
 
@@ -24,8 +22,6 @@ Before integrating RunFrameStaticBuildViewer, ensure your project meets these re
 
 ### TypeScript Configuration
 
-Ensure your `tsconfig.json` includes:
-
 ```json
 {
   "compilerOptions": {
@@ -37,32 +33,6 @@ Ensure your `tsconfig.json` includes:
 }
 ```
 
-## Installation
-
-### From Source
-
-If you're working with the runframe source code:
-
-```bash
-# Clone the repository
-git clone <runframe-repo-url>
-cd runframe
-
-# Install dependencies
-npm install
-
-# Build the project
-npm run build
-```
-
-### As a Package
-
-When runframe is published as a package:
-
-```bash
-npm install runframe
-```
-
 ## Quick Start
 
 ### Basic Integration
@@ -72,7 +42,6 @@ import { RunFrameStaticBuildViewer } from "runframe"
 import type { CircuitJson } from "circuit-json"
 
 function App() {
-  // Your circuit JSON data
   const circuitFiles: Record<string, CircuitJson> = {
     "circuit.json": yourCircuitData,
     "board.json": yourBoardData,
@@ -93,14 +62,11 @@ function App() {
 
 ### 1. Static File Loading
 
-For applications with pre-loaded circuit data:
-
 ```tsx
 import { RunFrameStaticBuildViewer } from "runframe"
 import { loadCircuitJsonFilesSync } from "runframe/utils"
 
 function StaticCircuitViewer() {
-  // Load circuit files from your data source
   const circuitFiles = loadCircuitJsonFilesSync({
     "circuit.json": fetchCircuitData(),
     "schematic.json": fetchSchematicData(),
@@ -110,7 +76,6 @@ function StaticCircuitViewer() {
     <RunFrameStaticBuildViewer
       circuitJsonFiles={circuitFiles}
       onFileChange={(filename, circuitJson) => {
-        // Handle file changes
         console.log(`Loaded ${filename}`)
       }}
     />
@@ -119,8 +84,6 @@ function StaticCircuitViewer() {
 ```
 
 ### 2. Dynamic Loading with State Management
-
-For applications that need to manage circuit state:
 
 ```tsx
 import { useState, useCallback } from "react"
@@ -154,7 +117,6 @@ function DynamicCircuitViewer() {
       defaultFilename={selectedFile}
       onFileChange={(filename, circuitJson) => {
         setSelectedFile(filename)
-        // Update application state
       }}
     />
   )
@@ -162,8 +124,6 @@ function DynamicCircuitViewer() {
 ```
 
 ### 3. Custom UI Integration
-
-For applications requiring custom UI elements:
 
 ```tsx
 import { RunFrameStaticBuildViewer } from "runframe"
@@ -194,7 +154,6 @@ function CustomCircuitViewer() {
           showFileSelector={true}
           showFileMenu={true}
           onExport={(format, filename) => {
-            // Handle custom export logic
             handleExport(format, filename)
           }}
         />
@@ -204,47 +163,7 @@ function CustomCircuitViewer() {
 }
 ```
 
-### 4. Multi-Panel Layout
-
-For complex applications with multiple panels:
-
-```tsx
-import { RunFrameStaticBuildViewer } from "runframe"
-
-function MultiPanelCircuitEditor() {
-  return (
-    <div className="flex h-screen">
-      {/* Left Sidebar */}
-      <div className="w-64 bg-gray-50 border-r p-4">
-        <h2 className="font-semibold mb-4">Components</h2>
-        {/* Component list */}
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex">
-        {/* Circuit Viewer */}
-        <div className="flex-1">
-          <RunFrameStaticBuildViewer
-            circuitJsonFiles={circuitFiles}
-            showFileSelector={false}
-            className="h-full"
-          />
-        </div>
-
-        {/* Properties Panel */}
-        <div className="w-80 bg-gray-50 border-l p-4">
-          <h2 className="font-semibold mb-4">Properties</h2>
-          {/* Properties editor */}
-        </div>
-      </div>
-    </div>
-  )
-}
-```
-
-## Advanced Integration
-
-### Custom Export Handlers
+### 4. Custom Export Handlers
 
 ```tsx
 function AdvancedCircuitViewer() {
@@ -267,7 +186,6 @@ function AdvancedCircuitViewer() {
       }
     } catch (error) {
       console.error(`Export failed for ${format}:`, error)
-      // Show error to user
     }
   }, [circuitFiles])
 
@@ -280,24 +198,6 @@ function AdvancedCircuitViewer() {
   )
 }
 ```
-
-### Error Boundaries and Loading States
-
-```tsx
-import { ErrorBoundary } from "react-error-boundary"
-
-function CircuitViewerWithErrorHandling() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-          <p>Loading circuit viewer...</p>
-        </div>
-      </div>
     )
   }
 

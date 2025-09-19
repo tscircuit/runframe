@@ -6,7 +6,6 @@ export default () => {
   useStyles()
   const [currentFile, setCurrentFile] = useState("app.tsx")
 
-  // Mock file structure with various path lengths to test dynamic width
   const mockFiles = [
     "app.tsx",
     "index.ts",

@@ -2,7 +2,6 @@ import { RunFrameStaticBuildViewer } from "lib/components/RunFrameStaticBuildVie
 import { autoLoadCircuitJsonFiles } from "lib/utils/autoLoadCircuitJsonFiles"
 import React, { useState, useEffect, useCallback, useMemo } from "react"
 
-// Mock circuit database with multiple complex circuits
 const circuitDatabase = {
   "amplifier-circuit.json": {
     name: "Audio Amplifier",
@@ -228,7 +227,6 @@ const circuitDatabase = {
   },
 }
 
-// Mock API service for circuit management
 class CircuitAPIService {
   private circuits: Record<string, any> = circuitDatabase
 
@@ -259,10 +257,8 @@ class CircuitAPIService {
       case "json":
         return new Blob([JSON.stringify(circuit, null, 2)], { type: "application/json" })
       case "zip":
-        // Mock ZIP export
         return new Blob([`Mock ZIP content for ${filename}`], { type: "application/zip" })
       case "glb":
-        // Mock GLB export
         return new Blob([`Mock GLB content for ${filename}`], { type: "model/gltf-binary" })
       default:
         throw new Error(`Unsupported export format: ${format}`)
@@ -270,7 +266,6 @@ class CircuitAPIService {
   }
 }
 
-// Custom scenario selector component
 const ScenarioSelector: React.FC<{
   onScenarioChange: (scenario: string) => void
   currentScenario: string
@@ -305,7 +300,6 @@ const ScenarioSelector: React.FC<{
   )
 }
 
-// Main integration component
 const FullIntegrationExample = () => {
   const [circuitFiles, setCircuitFiles] = useState<Record<string, any>>({})
   const [circuitList, setCircuitList] = useState<Array<{ filename: string; name: string; description: string; complexity: string }>>([])
@@ -318,17 +312,14 @@ const FullIntegrationExample = () => {
 
   const apiService = useMemo(() => new CircuitAPIService(), [])
 
-  // Load circuit data
   const loadCircuits = useCallback(async () => {
     try {
       setIsLoading(true)
       setError(null)
       
-      // Get circuit list
       const list = await apiService.getCircuitList()
       setCircuitList(list)
       
-      // Load all circuit data
       const circuitPromises = list.map(async (item) => {
         const data = await apiService.getCircuit(item.filename)
         return { filename: item.filename, data }
@@ -356,24 +347,11 @@ const FullIntegrationExample = () => {
     loadCircuits()
   }, [loadCircuits])
 
-  // Event handlers
   const handleFileChange = useCallback((filename: string, circuitJson: any) => {
-    console.log(`File changed to: ${filename}`, circuitJson)
     setSelectedFile(filename)
-    
-    // Analytics or tracking could go here
-    if (window.gtag) {
-      window.gtag('event', 'circuit_file_change', {
-        event_category: 'circuit_viewer',
-        event_label: filename,
-      })
-    }
   }, [])
 
   const handleCircuitLoaded = useCallback((circuitJson: any, filename: string) => {
-    console.log(`Circuit loaded: ${filename}`, circuitJson)
-    
-    // Update document title or other UI elements
     const circuitName = circuitJson.name || filename
     document.title = `${circuitName} - Circuit Viewer`
   }, [])
@@ -385,7 +363,6 @@ const FullIntegrationExample = () => {
       
       const blob = await apiService.exportCircuit(filename, format)
       
-      // Create download link
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -409,32 +386,14 @@ const FullIntegrationExample = () => {
 
   const handleScenarioChange = useCallback((scenario: string) => {
     setSelectedScenario(scenario)
-    console.log(`Scenario changed to: ${scenario}`)
-    
-    // Scenario-specific logic could go here
-    switch (scenario) {
-      case "analysis":
-        console.log("Entering analysis mode")
-        break
-      case "simulation":
-        console.log("Starting simulation")
-        break
-      case "manufacturing":
-        console.log("Preparing manufacturing view")
-        break
-      default:
-        console.log("Default view mode")
-    }
   }, [])
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="text-center">
           <div className="relative">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <div className="absolute inset-0 rounded-full h-16 w-16 border-t-2 border-indigo-500 animate-ping"></div>
           </div>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">Loading Circuit Library</h3>
           <p className="text-gray-600">Preparing your circuit design environment...</p>
@@ -448,7 +407,6 @@ const FullIntegrationExample = () => {
     )
   }
 
-  // Error state
   if (error) {
     return (
       <div className="flex items-center justify-center h-full bg-red-50">
@@ -467,7 +425,6 @@ const FullIntegrationExample = () => {
     )
   }
 
-  // Custom scenario selector content
   const scenarioSelectorContent = (
     <ScenarioSelector
       onScenarioChange={handleScenarioChange}
@@ -477,7 +434,6 @@ const FullIntegrationExample = () => {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
@@ -487,7 +443,6 @@ const FullIntegrationExample = () => {
             </p>
           </div>
           
-          {/* Export status indicator */}
           {exportStatus && (
             <div className={`px-4 py-2 rounded-lg text-sm font-medium ${
               exportStatus.includes('Successfully') 
@@ -498,7 +453,6 @@ const FullIntegrationExample = () => {
             </div>
           )}
           
-          {/* Export progress */}
           {isExporting && (
             <div className="flex items-center gap-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
@@ -508,7 +462,6 @@ const FullIntegrationExample = () => {
         </div>
       </div>
 
-      {/* Main content */}
       <div className="flex-1 bg-gray-50">
         <RunFrameStaticBuildViewer
           circuitJsonFiles={circuitFiles}
@@ -528,7 +481,6 @@ const FullIntegrationExample = () => {
         />
       </div>
 
-      {/* Footer */}
       <div className="bg-white border-t border-gray-200 px-6 py-3">
         <div className="flex items-center justify-between text-sm text-gray-600">
           <div>

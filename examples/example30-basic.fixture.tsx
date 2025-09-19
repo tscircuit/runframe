@@ -1,7 +1,6 @@
 import { RunFrameStaticBuildViewer } from "lib/components/RunFrameStaticBuildViewer"
 import React from "react"
 
-// Example circuit JSON data for static loading
 const exampleCircuitJson = {
   lb: {
     R1: {
@@ -57,7 +56,6 @@ const exampleCircuitJson = {
   ],
 }
 
-// Multiple circuit files for demonstration
 const circuitFiles = {
   "basic-resistor-capacitor.json": exampleCircuitJson,
   "simple-circuit.json": {

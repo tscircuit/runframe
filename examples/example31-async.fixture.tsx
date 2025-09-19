@@ -2,10 +2,8 @@ import { RunFrameStaticBuildViewer } from "lib/components/RunFrameStaticBuildVie
 import { autoLoadCircuitJsonFiles } from "lib/utils/autoLoadCircuitJsonFiles"
 import React, { useState, useEffect, useCallback } from "react"
 
-// Mock API function to simulate async circuit data loading
 const mockCircuitAPI = {
   async fetchCircuitList(): Promise<string[]> {
-    // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000))
     return [
       "async-circuit-1.json",
@@ -15,10 +13,8 @@ const mockCircuitAPI = {
   },
 
   async fetchCircuitData(filename: string): Promise<any> {
-    // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 500))
     
-    // Mock circuit data based on filename
     const circuitNumber = filename.match(/(\d+)/)?.[0] || "1"
     
     return {
@@ -78,23 +74,19 @@ const mockCircuitAPI = {
   }
 }
 
-// Async Circuit Viewer Component
 const AsyncCircuitViewer = () => {
   const [circuitFiles, setCircuitFiles] = useState<Record<string, any>>({})
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedFilename, setSelectedFilename] = useState<string>("")
 
-  // Load circuit files asynchronously
   const loadCircuitFiles = useCallback(async () => {
     try {
       setIsLoading(true)
       setError(null)
       
-      // Get list of available circuits
       const circuitList = await mockCircuitAPI.fetchCircuitList()
       
-      // Load all circuit data in parallel
       const circuitPromises = circuitList.map(async (filename) => {
         const data = await mockCircuitAPI.fetchCircuitData(filename)
         return { filename, data }
@@ -102,7 +94,6 @@ const AsyncCircuitViewer = () => {
       
       const loadedCircuits = await Promise.all(circuitPromises)
       
-      // Convert to record format
       const circuitRecord: Record<string, any> = {}
       loadedCircuits.forEach(({ filename, data }) => {
         circuitRecord[filename] = data
@@ -119,32 +110,24 @@ const AsyncCircuitViewer = () => {
     }
   }, [])
 
-  // Load circuits on component mount
   useEffect(() => {
     loadCircuitFiles()
   }, [loadCircuitFiles])
 
-  // Handle file changes
   const handleFileChange = useCallback((filename: string, circuitJson: any) => {
     console.log(`File changed to: ${filename}`, circuitJson)
     setSelectedFilename(filename)
-    // Here you could update app state, trigger analytics, etc.
   }, [])
 
-  // Handle circuit loaded events
   const handleCircuitLoaded = useCallback((circuitJson: any, filename: string) => {
     console.log(`Circuit loaded: ${filename}`, circuitJson)
-    // Here you could update UI, show notifications, etc.
   }, [])
 
-  // Handle export events
   const handleExport = useCallback((format: string, filename: string) => {
     console.log(`Exporting ${filename} as ${format}`)
-    // Here you would implement actual export logic
     alert(`Exporting ${filename} as ${format} format`)
   }, [])
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full bg-gray-50">
@@ -157,7 +140,6 @@ const AsyncCircuitViewer = () => {
     )
   }
 
-  // Error state
   if (error) {
     return (
       <div className="flex items-center justify-center h-full bg-red-50">
@@ -176,7 +158,6 @@ const AsyncCircuitViewer = () => {
     )
   }
 
-  // Empty state
   if (Object.keys(circuitFiles).length === 0) {
     return (
       <div className="flex items-center justify-center h-full bg-gray-50">

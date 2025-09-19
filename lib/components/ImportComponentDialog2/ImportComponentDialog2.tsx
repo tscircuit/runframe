@@ -118,12 +118,12 @@ export const ImportComponentDialog2 = ({
     setImportErrorMessage(null)
   }, [selectedSearchResult])
 
-  const resetAllSearches = () => {
+  const resetAllSearches = React.useCallback(() => {
     resetTscircuitSearch()
     resetJlcpcbSearch()
     resetKicadSearch()
     setSelectedSearchResult(null)
-  }
+  }, [resetJlcpcbSearch, resetKicadSearch, resetTscircuitSearch])
 
   React.useEffect(() => {
     if (!isOpen) {

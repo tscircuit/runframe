@@ -342,7 +342,7 @@ export const EnhancedFileSelectorCombobox = ({
                                 </span>
                                 <div className="rf-flex rf-items-center rf-w-full rf-min-w-0">
                                   <span className="rf-truncate rf-flex-1">
-                                     {getDisplayName(file.fileName)}
+                                    {getDisplayName(file.fileName)}
                                   </span>
                                   <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[120px]">
                                     {currentFolder || "/"}
@@ -378,7 +378,7 @@ export const EnhancedFileSelectorCombobox = ({
                               </span>
                               <div className="rf-flex rf-items-center rf-w-full rf-min-w-0">
                                 <span className="rf-truncate rf-flex-1">
-                                 {getDisplayName(file.fileName)}
+                                  {getDisplayName(file.fileName)}
                                 </span>
                                 <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[120px]">
                                   {file.path.substring(

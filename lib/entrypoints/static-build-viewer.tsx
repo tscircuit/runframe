@@ -68,18 +68,19 @@ function StaticBuildViewerApp() {
 
   return (
     <RunFrameStaticBuildViewer
-      buildDirectoryUrl={buildDirectoryUrl}
+      circuitJsonFiles={{}} // This will need to be loaded from buildDirectoryUrl
       debug={window.location.search.includes("debug")}
       defaultActiveTab="pcb"
       defaultToFullScreen={false}
       showToggleFullScreen={true}
-      onCircuitJsonLoaded={(circuitJson) => {
+      onCircuitJsonLoaded={(circuitJson, filename) => {
         console.log("Static build circuit JSON loaded:", circuitJson)
         // Notify parent window if embedded
         if (window.parent !== window) {
           window.parent.postMessage({
             type: "static_build_viewer_loaded",
             circuitJson: circuitJson,
+            filename,
             buildDirectoryUrl: buildDirectoryUrl
           }, "*")
         }

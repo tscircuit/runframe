@@ -27,19 +27,19 @@ export const StaticBuildFileMenu = (props: StaticBuildFileMenuProps) => {
     className
   } = props
 
-  const handleExport = (format: string) => {
+  const handleExport = (format: { extension: string, name: string }) => {
     if (!circuitJson || !currentFile) return
 
     const baseFilename = currentFile.replace(/\.[^/.]+$/, "")
-    const exportFilename = `${baseFilename}.${format}`
+    const exportFilename = `${baseFilename}.${format.extension}`
 
     if (onExport) {
-      onExport(format, exportFilename)
+      onExport(format.extension, exportFilename)
     } else {
       exportAndDownload({
         circuitJson,
-        exportFormat: format as any,
-        filename: exportFilename,
+        exportName: format.name as "Circuit JSON" | "Fabrication Files" | "GLB (Binary GLTF)",
+        projectName: baseFilename,
       })
     }
   }
@@ -70,13 +70,15 @@ export const StaticBuildFileMenu = (props: StaticBuildFileMenuProps) => {
               </div>
               {exportFormats.map((format) => (
                 <DropdownMenuItem
-                  key={format}
-                  onClick={() => handleExport(format)}
+                  key={typeof format === 'string' ? format : format.extension}
+                  onClick={() => handleExport(typeof format === 'string' 
+                    ? { extension: format, name: format.toUpperCase() } 
+                    : format)}
                   disabled={!circuitJson}
                   className="flex items-center gap-2"
                 >
                   <Download className="h-4 w-4" />
-                  Export as {format.toUpperCase()}
+                  Export as {typeof format === 'string' ? format.toUpperCase() : format.name}
                 </DropdownMenuItem>
               ))}
               <DropdownMenuSeparator />

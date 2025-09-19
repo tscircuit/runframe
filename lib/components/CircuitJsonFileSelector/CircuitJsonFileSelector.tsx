@@ -35,9 +35,6 @@ export const CircuitJsonFileSelector = (props: CircuitJsonFileSelectorProps) => 
         files={files}
         currentFile={selectedFile}
         onFileChange={onFileChange}
-        placeholder={placeholder}
-        disabled={disabled}
-        className="min-w-[200px]"
       />
       
       {suffixContent}

@@ -154,11 +154,11 @@ export const RunFrameStaticBuildViewer = (props: RunFrameStaticBuildViewerProps)
       <div className="flex-1 overflow-hidden">
         <CircuitJsonPreview
           circuitJson={circuitJson}
-          debug={debug}
-          activeTab={activeTab}
+          defaultActiveTab={activeTab}
           onActiveTabChange={setActiveTab}
           defaultToFullScreen={defaultToFullScreen}
           showToggleFullScreen={showToggleFullScreen}
+          showSchematicDebugGrid={debug}
         />
       </div>
     </div>

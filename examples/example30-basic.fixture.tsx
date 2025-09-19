@@ -1,77 +1,48 @@
 import { RunFrameStaticBuildViewer } from "lib/components/RunFrameStaticBuildViewer"
 import React from "react"
+import type { CircuitJson } from "circuit-json"
 
-const exampleCircuitJson = {
-  lb: {
-    R1: {
-      type: "resistor",
-      resistance: "1k",
-      name: "R1",
-      pcb_x: 0,
-      pcb_y: 0,
-      pin0: { x: 0, y: 0 },
-      pin1: { x: 2.54, y: 0 },
-    },
-    C1: {
-      type: "capacitor",
-      capacitance: "1uF",
-      name: "C1",
-      pcb_x: 5,
-      pcb_y: 0,
-      pin0: { x: 5, y: 0 },
-      pin1: { x: 7.54, y: 0 },
-    },
-  },
-  circuit_connections: [
-    {
-      from: { component: "R1", port: "pin1" },
-      to: { component: "C1", port: "pin0" },
-    },
-  ],
-  pcb_components: [
-    {
-      name: "R1",
-      pcb_x: 0,
-      pcb_y: 0,
-      rotation: 0,
-      footprint: "0402",
-    },
-    {
-      name: "C1",
-      pcb_x: 5,
-      pcb_y: 0,
-      rotation: 0,
-      footprint: "0603",
-    },
-  ],
-  pcb_traces: [
-    {
-      from: { component: "R1", port: "pin1" },
-      to: { component: "C1", port: "pin0" },
-      route: [
-        { x: 2.54, y: 0 },
-        { x: 5, y: 0 },
-      ],
-    },
-  ],
-}
+const exampleCircuitJson: CircuitJson = [{
+  type: "source_trace" as const,
+  source_trace_id: "R1",
+  connected_source_port_ids: ["pin0", "pin1"],
+  connected_source_net_ids: [],
+  subcircuit_id: "main",
+  max_length: 10,
+  min_trace_thickness: 0.1,
+  display_name: "Resistor R1"
+}, {
+  type: "source_trace" as const,
+  source_trace_id: "C1",
+  connected_source_port_ids: ["pin0", "pin1"],
+  connected_source_net_ids: [],
+  subcircuit_id: "main",
+  max_length: 10,
+  min_trace_thickness: 0.1,
+  display_name: "Capacitor C1"
+}, {
+  type: "source_trace" as const,
+  source_trace_id: "connection1",
+  connected_source_port_ids: ["R1.pin1", "C1.pin0"],
+  connected_source_net_ids: ["net1"],
+  subcircuit_id: "main",
+  max_length: 10,
+  min_trace_thickness: 0.1,
+  display_name: "Connection"
+}]
 
-const circuitFiles = {
+const circuitFiles: Record<string, CircuitJson> = {
   "basic-resistor-capacitor.json": exampleCircuitJson,
-  "simple-circuit.json": {
-    ...exampleCircuitJson,
-    lb: {
-      ...exampleCircuitJson.lb,
-      LED1: {
-        type: "led",
-        name: "LED1",
-        pcb_x: 10,
-        pcb_y: 0,
-        pin0: { x: 10, y: 0 },
-        pin1: { x: 12.54, y: 0 },
-      },
-    },
-  },
+  "simple-circuit.json": [{
+    type: "source_trace" as const,
+    source_trace_id: "LED1",
+    connected_source_port_ids: ["pin0", "pin1"],
+    connected_source_net_ids: ["net1"],
+    subcircuit_id: "main",
+    max_length: 10,
+    min_trace_thickness: 0.1,
+    display_name: "LED"
+  }]
 }
 
 export default () => (

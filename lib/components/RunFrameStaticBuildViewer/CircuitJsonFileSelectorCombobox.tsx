@@ -5,10 +5,6 @@ import {
 
 const circuitJsonConfig: FileSelectorConfig = {
   fileFilter: () => true,
-  getDisplayName: (filePath: string) => {
-    const fileName = filePath.split("/").pop() || ""
-    return fileName.replace(/\.circuit\.json$/, "").replace(/\.json$/, "")
-  },
   placeholder: "Select circuit",
   searchPlaceholder: "Search for circuit file",
   emptyMessage: "No circuit files found in this directory.",

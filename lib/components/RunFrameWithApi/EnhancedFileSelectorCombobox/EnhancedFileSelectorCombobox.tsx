@@ -18,7 +18,6 @@ import {
   FileText,
   Code,
   Folder,
-  Zap,
 } from "lucide-react"
 import { cn } from "lib/utils"
 import {
@@ -32,7 +31,6 @@ export interface FileSelectorConfig {
   getDisplayName?: (filename: string) => string
   placeholder?: string
   searchPlaceholder?: string
-  showNavigation?: boolean
   emptyMessage?: string
 }
 
@@ -85,7 +83,6 @@ export const EnhancedFileSelectorCombobox = ({
     getDisplayName = defaultDisplayName,
     placeholder = "Select file",
     searchPlaceholder = "Search for file",
-    showNavigation = false,
     emptyMessage = "No files found in this directory.",
   } = config
 
@@ -142,48 +139,9 @@ export const EnhancedFileSelectorCombobox = ({
 
   const searchResults = getSearchResults()
   const isSearching = searchValue.trim().length > 0
-
-  const canGoBack = currentFolder !== ""
-  const canGoLeft =
-    showNavigation && currentFiles.length > 0 && currentFileIndex > 0
-  const canGoRight =
-    showNavigation &&
-    currentFiles.length > 0 &&
-    currentFileIndex < currentFiles.length - 1
-
   const navigateToFolder = (folderPath: string) => {
     setCurrentFolder(folderPath)
     setCurrentFileIndex(0)
-  }
-
-  const goBack = () => {
-    if (currentFolder) {
-      const parentPath = currentFolder.includes("/")
-        ? currentFolder.substring(0, currentFolder.lastIndexOf("/"))
-        : ""
-      setCurrentFolder(parentPath)
-      setCurrentFileIndex(0)
-    }
-  }
-
-  const goLeft = () => {
-    if (canGoLeft) {
-      const newIndex = currentFileIndex - 1
-      setCurrentFileIndex(newIndex)
-      const selectedFile = currentFiles[newIndex]
-      setFile(selectedFile.path)
-      onFileChange(selectedFile.path)
-    }
-  }
-
-  const goRight = () => {
-    if (canGoRight) {
-      const newIndex = currentFileIndex + 1
-      setCurrentFileIndex(newIndex)
-      const selectedFile = currentFiles[newIndex]
-      setFile(selectedFile.path)
-      onFileChange(selectedFile.path)
-    }
   }
 
   const selectFile = (filePath: string, index: number) => {
@@ -193,7 +151,6 @@ export const EnhancedFileSelectorCombobox = ({
     onFileChange(filePath)
   }
 
-  // Update current file index when folder changes
   useEffect(() => {
     if (currentFiles.length > 0) {
       const fileInCurrentFolder = currentFiles.findIndex(
@@ -230,18 +187,6 @@ export const EnhancedFileSelectorCombobox = ({
 
   return (
     <div className="rf-flex rf-items-center rf-gap-1">
-      {showNavigation && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rf-h-8 rf-w-8"
-          onClick={goLeft}
-          disabled={!canGoLeft}
-        >
-          <ChevronLeft className="rf-h-4 rf-w-4" />
-        </Button>
-      )}
-
       <Popover
         open={open}
         onOpenChange={(newOpen) => {
@@ -480,18 +425,6 @@ export const EnhancedFileSelectorCombobox = ({
           </Command>
         </PopoverContent>
       </Popover>
-
-      {showNavigation && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rf-h-8 rf-w-8"
-          onClick={goRight}
-          disabled={!canGoRight}
-        >
-          <ChevronRight className="rf-h-4 rf-w-4" />
-        </Button>
-      )}
     </div>
   )
 }

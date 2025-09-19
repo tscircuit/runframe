@@ -1,5 +1,8 @@
 import { renderToCircuitJson } from "lib/dev/render-to-circuit-json"
-import { RunFrameStaticBuildViewer } from "../lib/components/RunFrameStaticBuildViewer/RunFrameStaticBuildViewer"
+import {
+  RunFrameStaticBuildViewer,
+  type CircuitJsonFileReference,
+} from "../lib/components/RunFrameStaticBuildViewer/RunFrameStaticBuildViewer"
 import type { CircuitJson } from "circuit-json"
 
 const sampleCircuitJson1: CircuitJson = renderToCircuitJson(
@@ -28,6 +31,44 @@ const circuitJsonFiles = {
   "examples/group.circuit.tsx": sampleCircuitJson3,
 }
 
+const circuitJsonFileAssets: CircuitJsonFileReference[] = [
+  {
+    filePath: "index.circuit.tsx",
+    fileStaticAssetUrl:
+      "https://api.tscircuit.com/package_files/get?file_path=dist/circuit.json&package_release_id=73d16b85-e199-4700-b8cf-825725d6aaef",
+  },
+  {
+    filePath: "main.circuit.tsx",
+    fileStaticAssetUrl:
+      "https://api.tscircuit.com/package_files/get?file_path=dist/circuit.json&package_release_id=28a58d52-d924-4583-a53c-8f90b74219b6",
+  },
+  {
+    filePath: "example/circuit.tsx",
+    fileStaticAssetUrl:
+      "https://api.tscircuit.com/package_files/get?file_path=dist/circuit.json&package_release_id=8b90619f-14ef-4c5a-89f1-2476566c08a5",
+  },
+]
+
+const circuitJsonFileAssetsExternal: CircuitJsonFileReference[] = [
+  {
+    filePath: "index.tsx",
+    fileStaticAssetUrl:
+      "https://raw.githubusercontent.com/tscircuit/circuitjson.com/94fa2b7635fd82b5e9b54de13b5a2f11b58b0611/assets/usb-c-flashlight.json",
+  },
+  {
+    filePath: "circuit.tsx",
+    fileStaticAssetUrl:
+      "https://raw.githubusercontent.com/tscircuit/3d-viewer/c7bc63e5a678e71ba99b4831d32e665e98b43bc4/stories/assets/left-flashlight-board.json",
+  },
+]
+
+const mockFetchFile = async (
+  fileRef: CircuitJsonFileReference,
+): Promise<CircuitJson> => {
+  const res = await fetch(String(fileRef.fileStaticAssetUrl))
+  const resJson = await res.json()
+  return JSON.parse(resJson.package_file.content_text)
+}
 export const basic = () => (
   <RunFrameStaticBuildViewer
     circuitJsonFiles={circuitJsonFiles}
@@ -59,8 +100,57 @@ export const fullFledge = () => (
   />
 )
 
+export const lazyLoadingBasic = () => (
+  <RunFrameStaticBuildViewer
+    files={circuitJsonFileAssets}
+    onFetchFile={mockFetchFile}
+    projectName="lazy-loading-project"
+    defaultToFullScreen={false}
+    showToggleFullScreen={true}
+  />
+)
+
+export const lazyLoadingWithInitialFile = () => (
+  <RunFrameStaticBuildViewer
+    files={circuitJsonFileAssets}
+    onFetchFile={mockFetchFile}
+    initialCircuitPath="example/circuit.tsx"
+    projectName="lazy-loading-project"
+    defaultToFullScreen={false}
+    showToggleFullScreen={true}
+  />
+)
+
+export const lazyLoadingWithoutCustomFetch = () => (
+  <RunFrameStaticBuildViewer
+    files={circuitJsonFileAssetsExternal}
+    projectName="lazy-loading-default-fetch"
+    defaultToFullScreen={false}
+    showToggleFullScreen={true}
+  />
+)
+
+export const lazyLoadingEmptyFiles = () => (
+  <RunFrameStaticBuildViewer files={[]} projectName="empty-lazy-project" />
+)
+
+export const mixedApiUsage = () => (
+  <RunFrameStaticBuildViewer
+    circuitJsonFiles={circuitJsonFiles}
+    files={circuitJsonFileAssetsExternal}
+    projectName="mixed-api-project"
+    defaultToFullScreen={false}
+    showToggleFullScreen={true}
+  />
+)
+
 export default {
   basic,
   emptyFiles,
   fullFledge,
+  lazyLoadingBasic,
+  lazyLoadingWithInitialFile,
+  lazyLoadingWithoutCustomFetch,
+  lazyLoadingEmptyFiles,
+  mixedApiUsage,
 }

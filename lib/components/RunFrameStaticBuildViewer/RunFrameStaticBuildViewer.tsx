@@ -1,15 +1,22 @@
 import { useCallback, useEffect, useState } from "react"
 import { CircuitJsonPreview } from "../CircuitJsonPreview/CircuitJsonPreview"
 import { CircuitJsonFileSelectorCombobox } from "./CircuitJsonFileSelectorCombobox"
-import { LoadingSkeleton } from "../ui/LoadingSkeleton"
 import { useStyles } from "../../hooks/use-styles"
 import type { CircuitJson } from "circuit-json"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 import { guessEntrypoint } from "lib/runner"
+import { ErrorBoundary } from "react-error-boundary"
+
+export interface CircuitJsonFileReference {
+  filePath: string
+  fileStaticAssetUrl: string
+}
 
 export interface RunFrameStaticBuildViewerProps {
   debug?: boolean
   circuitJsonFiles?: Record<string, CircuitJson>
+  files?: CircuitJsonFileReference[]
+  onFetchFile?: (fileRef: CircuitJsonFileReference) => Promise<CircuitJson>
   initialCircuitPath?: string
   onCircuitJsonPathChange?: (path: string) => void
   defaultToFullScreen?: boolean
@@ -30,53 +37,111 @@ export const RunFrameStaticBuildViewer = (
   )
 
   const [circuitJson, setCircuitJson] = useState<CircuitJson | null>(null)
-  const [isLoadingFiles, setIsLoadingFiles] = useState(true)
+  const [isLoadingCurrentFile, setIsLoadingCurrentFile] = useState(false)
+  const [fileCache, setFileCache] = useState<Record<string, CircuitJson>>({})
+  const [loadingFiles, setLoadingFiles] = useState<Set<string>>(new Set())
 
   const circuitJsonFiles = props.circuitJsonFiles ?? {}
-  const availableFiles = Object.keys(circuitJsonFiles)
+  const fileReferences = props.files ?? []
+  const availableFiles =
+    fileReferences.length > 0
+      ? fileReferences.map((f) => f.filePath)
+      : Object.keys(circuitJsonFiles)
+
+  const defaultFetchFile = useCallback(
+    async (fileRef: CircuitJsonFileReference): Promise<CircuitJson> => {
+      if (!fileRef.fileStaticAssetUrl) {
+        throw new Error(
+          `No fileStaticAssetUrl provided for ${fileRef.filePath}`,
+        )
+      }
+
+      const response = await fetch(fileRef.fileStaticAssetUrl)
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch ${fileRef.filePath}: ${response.statusText}`,
+        )
+      }
+
+      return await response.json()
+    },
+    [],
+  )
+
+  const loadCircuitJsonFile = useCallback(
+    async (filePath: string) => {
+      if (loadingFiles.has(filePath)) return
+
+      if (circuitJsonFiles[filePath]) {
+        setCircuitJson(circuitJsonFiles[filePath])
+        props.onCircuitJsonPathChange?.(filePath)
+        return
+      }
+
+      if (fileCache[filePath]) {
+        setCircuitJson(fileCache[filePath])
+        props.onCircuitJsonPathChange?.(filePath)
+        return
+      }
+
+      setLoadingFiles((prev) => new Set(prev).add(filePath))
+      setIsLoadingCurrentFile(true)
+
+      try {
+        const fileRef = fileReferences.find((f) => f.filePath === filePath)
+        if (!fileRef) {
+          throw new Error(`File reference not found for ${filePath}`)
+        }
+
+        const fetchFn = props.onFetchFile || defaultFetchFile
+        const circuitJsonData = await fetchFn(fileRef)
+
+        setFileCache((prev) => ({ ...prev, [filePath]: circuitJsonData }))
+        setCircuitJson(circuitJsonData)
+        props.onCircuitJsonPathChange?.(filePath)
+      } catch (error) {
+        console.error(`Failed to load circuit JSON file ${filePath}:`, error)
+      } finally {
+        setLoadingFiles((prev) => {
+          const newSet = new Set(prev)
+          newSet.delete(filePath)
+          return newSet
+        })
+        setIsLoadingCurrentFile(false)
+      }
+    },
+    [
+      circuitJsonFiles,
+      fileReferences,
+      fileCache,
+      loadingFiles,
+      props.onFetchFile,
+      props.onCircuitJsonPathChange,
+      defaultFetchFile,
+    ],
+  )
 
   useEffect(() => {
-    setIsLoadingFiles(true)
-
-    if (availableFiles.length === 0) {
-      setIsLoadingFiles(false)
-      return
-    }
+    if (availableFiles.length === 0) return
 
     let selectedPath = currentCircuitJsonPath
 
-    if (!selectedPath || !circuitJsonFiles[selectedPath]) {
+    if (!selectedPath || !availableFiles.includes(selectedPath)) {
       selectedPath = guessEntrypoint(availableFiles) ?? availableFiles[0]
       setCurrentCircuitJsonPath(selectedPath)
+      return
     }
+  }, [availableFiles, currentCircuitJsonPath])
 
-    if (selectedPath && circuitJsonFiles[selectedPath]) {
-      setCircuitJson(circuitJsonFiles[selectedPath])
-      props.onCircuitJsonPathChange?.(selectedPath)
+  useEffect(() => {
+    if (currentCircuitJsonPath && availableFiles.length > 0) {
+      loadCircuitJsonFile(currentCircuitJsonPath)
     }
+  }, [currentCircuitJsonPath])
 
-    setIsLoadingFiles(false)
-  }, [
-    circuitJsonFiles,
-    currentCircuitJsonPath,
-    availableFiles,
-    props.onCircuitJsonPathChange,
-  ])
-
-  const handleFileChange = useCallback(
-    (newPath: string) => {
-      setCurrentCircuitJsonPath(newPath)
-      if (circuitJsonFiles[newPath]) {
-        setCircuitJson(circuitJsonFiles[newPath])
-        props.onCircuitJsonPathChange?.(newPath)
-      }
-    },
-    [circuitJsonFiles, props.onCircuitJsonPathChange],
-  )
-
-  if (isLoadingFiles) {
-    return <LoadingSkeleton message="Loading circuit files..." />
-  }
+  const handleFileChange = useCallback((newPath: string) => {
+    setCurrentCircuitJsonPath(newPath)
+  }, [])
 
   if (availableFiles.length === 0) {
     return (
@@ -94,33 +159,50 @@ export const RunFrameStaticBuildViewer = (
   }
 
   return (
-    <CircuitJsonPreview
-      circuitJson={circuitJson}
-      defaultToFullScreen={props.defaultToFullScreen}
-      showToggleFullScreen={props.showToggleFullScreen}
-      showFileMenu={false}
-      isWebEmbedded={false}
-      projectName={props.projectName}
-      leftHeaderContent={
-        <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
-          {(props.showFileMenu ?? true) && (
-            <FileMenuLeftHeader
-              isWebEmbedded={false}
-              circuitJson={circuitJson}
-              projectName={props.projectName}
-            />
-          )}
-          {availableFiles.length > 1 && (
-            <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2">
-              <CircuitJsonFileSelectorCombobox
-                currentFile={currentCircuitJsonPath}
-                files={availableFiles}
-                onFileChange={handleFileChange}
-              />
-            </div>
-          )}
+    <ErrorBoundary
+      fallbackRender={({ error }: { error: Error }) => (
+        <div className="rf-mt-4 rf-mx-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200">
+          <div className="rf-p-4">
+            <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-3">
+              Error loading Circuit JSON Preview
+            </h3>
+            <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600 rf-mt-2">
+              {error.message}
+            </p>
+          </div>
         </div>
-      }
-    />
+      )}
+    >
+      <CircuitJsonPreview
+        circuitJson={circuitJson}
+        defaultToFullScreen={props.defaultToFullScreen}
+        showToggleFullScreen={props.showToggleFullScreen}
+        showFileMenu={false}
+        isWebEmbedded={false}
+        projectName={props.projectName}
+        leftHeaderContent={
+          <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
+            {(props.showFileMenu ?? true) && (
+              <FileMenuLeftHeader
+                isWebEmbedded={false}
+                circuitJson={circuitJson}
+                projectName={props.projectName}
+              />
+            )}
+            {availableFiles.length > 1 && (
+              <div
+                className={`rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2 rf-flex rf-items-center rf-gap-2 ${isLoadingCurrentFile ? "rf-opacity-50" : ""}`}
+              >
+                <CircuitJsonFileSelectorCombobox
+                  currentFile={currentCircuitJsonPath}
+                  files={availableFiles}
+                  onFileChange={handleFileChange}
+                />
+              </div>
+            )}
+          </div>
+        }
+      />
+    </ErrorBoundary>
   )
 }

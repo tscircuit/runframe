@@ -72,41 +72,41 @@ export const fullFledge = () => (
   />
 )
 
-export const lazyLoadingBasic = () => (
+export const LoadingBasic = () => (
   <RunFrameStaticBuildViewer
     files={circuitJsonFileAssets}
     onFetchFile={mockFetchFile}
-    projectName="lazy-loading-project"
+    projectName="project"
     defaultToFullScreen={false}
     showToggleFullScreen={true}
   />
 )
 
-export const lazyLoadingWithInitialFile = () => (
+export const LoadingWithInitialFile = () => (
   <RunFrameStaticBuildViewer
     files={circuitJsonFileAssets}
     onFetchFile={mockFetchFile}
     initialCircuitPath="example/circuit.tsx"
-    projectName="lazy-loading-project"
+    projectName="project"
     defaultToFullScreen={false}
     showToggleFullScreen={true}
   />
 )
 
-export const lazyLoadingWithoutCustomFetch = () => (
+export const LoadingWithoutCustomFetch = () => (
   <RunFrameStaticBuildViewer
     files={circuitJsonFileAssetsExternal}
-    projectName="lazy-loading-default-fetch"
+    projectName="loading-default-fetch"
     defaultToFullScreen={false}
     showToggleFullScreen={true}
   />
 )
 
-export const largeProjectExample = () => (
+export const ProjectExample = () => (
   <RunFrameStaticBuildViewer
     files={[...circuitJsonFileAssets, ...circuitJsonFileAssetsExternal]}
     onFetchFile={mockFetchFile}
-    projectName="large-project"
+    projectName="project"
     defaultToFullScreen={false}
     showToggleFullScreen={true}
   />
@@ -116,8 +116,8 @@ export default {
   wErrorHandler,
   emptyFiles,
   fullFledge,
-  lazyLoadingBasic,
-  lazyLoadingWithInitialFile,
-  lazyLoadingWithoutCustomFetch,
-  largeProjectExample,
+  LoadingBasic,
+  LoadingWithInitialFile,
+  LoadingWithoutCustomFetch,
+  ProjectExample,
 }

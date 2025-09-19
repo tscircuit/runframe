@@ -9,7 +9,7 @@ export const useTscircuitPackageDetails = () => {
     setIsLoading(true)
     try {
       const response = await fetch(
-        `https://registry-api.tscircuit.com/packages/get?name=${encodeURIComponent(`${owner}/${name}`)}`,
+        `https://api.tscircuit.com/packages/get?name=${encodeURIComponent(`${owner}/${name}`)}`,
       )
 
       if (!response.ok) {
@@ -17,7 +17,9 @@ export const useTscircuitPackageDetails = () => {
       }
 
       const data = await response.json()
-      setDetails((data as { package?: TscircuitPackageDetails }).package ?? null)
+      setDetails(
+        (data as { package?: TscircuitPackageDetails }).package ?? null,
+      )
     } catch (error) {
       console.error("Failed to fetch package details", error)
       setDetails(null)

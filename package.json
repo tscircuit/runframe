@@ -105,5 +105,8 @@
     "tsup": "^8.3.5",
     "vite": "^7.1.2",
     "yargs": "^17.7.2"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.1.13"
   }
 }

@@ -1,6 +1,6 @@
 import fs from "node:fs"
 import postcss from "postcss"
-import tailwindcss from "tailwindcss"
+import tailwindcss from "@tailwindcss/postcss"
 import autoprefixer from "autoprefixer"
 import cssnano from "cssnano"
 import tailwindConfig from "../tailwind.config"
@@ -19,7 +19,7 @@ async function buildCss() {
 `
 
   const result = await postcss([
-    tailwindcss(tailwindConfig),
+    tailwindcss,
     autoprefixer,
     cssnano,
   ]).process(css, {

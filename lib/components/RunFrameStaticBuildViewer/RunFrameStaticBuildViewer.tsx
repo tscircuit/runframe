@@ -10,7 +10,9 @@ import type { RunFrameStaticBuildViewerProps } from "./RunFrameStaticBuildViewer
 import type { CircuitJson } from "circuit-json"
 import type { TabId } from "../CircuitJsonPreview/PreviewContentProps"
 
-export const RunFrameStaticBuildViewer = (props: RunFrameStaticBuildViewerProps) => {
+export const RunFrameStaticBuildViewer = (
+  props: RunFrameStaticBuildViewerProps,
+) => {
   const {
     circuitJsonFiles,
     defaultFilename = "circuit.json",
@@ -51,21 +53,26 @@ export const RunFrameStaticBuildViewer = (props: RunFrameStaticBuildViewerProps)
         onCircuitJsonLoaded?.(result.circuitJson, result.selectedFile)
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load circuit files")
+      setError(
+        err instanceof Error ? err.message : "Failed to load circuit files",
+      )
     } finally {
       setIsLoading(false)
     }
   }, [circuitJsonFiles, defaultFilename, onCircuitJsonLoaded])
 
-  const handleFileChange = useCallback((filename: string) => {
-    const newCircuitJson = circuitJsonFiles[filename]
-    
-    setSelectedFile(filename)
-    setCircuitJson(newCircuitJson)
-    
-    onFileChange?.(filename, newCircuitJson)
-    onCircuitJsonLoaded?.(newCircuitJson, filename)
-  }, [circuitJsonFiles, onFileChange, onCircuitJsonLoaded])
+  const handleFileChange = useCallback(
+    (filename: string) => {
+      const newCircuitJson = circuitJsonFiles[filename]
+
+      setSelectedFile(filename)
+      setCircuitJson(newCircuitJson)
+
+      onFileChange?.(filename, newCircuitJson)
+      onCircuitJsonLoaded?.(newCircuitJson, filename)
+    },
+    [circuitJsonFiles, onFileChange, onCircuitJsonLoaded],
+  )
 
   const handleExport = useCallback((format: string, filename: string) => {
     onExport?.(format, filename)

@@ -4,19 +4,19 @@ import React, { useState, useEffect, useCallback } from "react"
 
 const mockCircuitAPI = {
   async fetchCircuitList(): Promise<string[]> {
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000))
     return [
       "async-circuit-1.json",
-      "async-circuit-2.json", 
-      "async-circuit-3.json"
+      "async-circuit-2.json",
+      "async-circuit-3.json",
     ]
   },
 
   async fetchCircuitData(filename: string): Promise<any> {
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
+    await new Promise((resolve) => setTimeout(resolve, 500))
+
     const circuitNumber = filename.match(/(\d+)/)?.[0] || "1"
-    
+
     return {
       lb: {
         [`R${circuitNumber}`]: {
@@ -119,9 +119,12 @@ const AsyncCircuitViewer = () => {
     setSelectedFilename(filename)
   }, [])
 
-  const handleCircuitLoaded = useCallback((circuitJson: any, filename: string) => {
-    console.log(`Circuit loaded: ${filename}`, circuitJson)
-  }, [])
+  const handleCircuitLoaded = useCallback(
+    (circuitJson: any, filename: string) => {
+      console.log(`Circuit loaded: ${filename}`, circuitJson)
+    },
+    [],
+  )
 
   const handleExport = useCallback((format: string, filename: string) => {
     console.log(`Exporting ${filename} as ${format}`)

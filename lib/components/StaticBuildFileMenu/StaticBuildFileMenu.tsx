@@ -27,7 +27,7 @@ export const StaticBuildFileMenu = (props: StaticBuildFileMenuProps) => {
     className
   } = props
 
-  const handleExport = (format: { extension: string, name: string }) => {
+  const handleExport = (format: { extension: string; name: string }) => {
     if (!circuitJson || !currentFile) return
 
     const baseFilename = currentFile.replace(/\.[^/.]+$/, "")
@@ -38,7 +38,10 @@ export const StaticBuildFileMenu = (props: StaticBuildFileMenuProps) => {
     } else {
       exportAndDownload({
         circuitJson,
-        exportName: format.name as "Circuit JSON" | "Fabrication Files" | "GLB (Binary GLTF)",
+        exportName: format.name as
+          | "Circuit JSON"
+          | "Fabrication Files"
+          | "GLB (Binary GLTF)",
         projectName: baseFilename,
       })
     }
@@ -49,36 +52,41 @@ export const StaticBuildFileMenu = (props: StaticBuildFileMenuProps) => {
   }
 
   return (
-    <div className={cn("flex items-center", className)}>
+    <div className={cn('flex items-center', className)}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            variant="ghost"
-            size="sm"
+            variant='ghost'
+            size='sm'
             disabled={disabled}
-            className="h-8 px-2 text-sm"
+            className='h-8 px-2 text-sm'
           >
-            <FileText className="h-4 w-4 mr-2" />
+            <FileText className='h-4 w-4 mr-2' />
             File
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-48">
+        <DropdownMenuContent align='start' className='w-48'>
           {showExport && circuitJson && (
             <>
-              <div className="px-2 py-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <div className='px-2 py-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300'>
                 Export
               </div>
               {exportFormats.map((format) => (
                 <DropdownMenuItem
-                  key={typeof format === 'string' ? format : format.extension}
-                  onClick={() => handleExport(typeof format === 'string' 
-                    ? { extension: format, name: format.toUpperCase() } 
-                    : format)}
+                  key={typeof format === "string" ? format : format.extension}
+                  onClick={() =>
+                    handleExport(
+                      typeof format === "string"
+                        ? { extension: format, name: format.toUpperCase() }
+                        : format,
+                    )
+                  }
                   disabled={!circuitJson}
                   className="flex items-center gap-2"
                 >
                   <Download className="h-4 w-4" />
-                  Export as {typeof format === 'string' ? format.toUpperCase() : format.name}
+                  Export as{" "}
+                  {typeof format === "string" ? format.toUpperCase() : format.name}
                 </DropdownMenuItem>
               ))}
               <DropdownMenuSeparator />
@@ -93,7 +101,7 @@ export const StaticBuildFileMenu = (props: StaticBuildFileMenuProps) => {
           )}
 
           {currentFile && (
-            <div className="px-2 py-1.5 text-xs text-gray-500 dark:text-gray-400">
+            <div className='px-2 py-1.5 text-xs text-gray-500 dark:text-gray-400'>
               Current: {currentFile}
             </div>
           )}

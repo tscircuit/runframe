@@ -115,10 +115,7 @@ if (process.env.STANDALONE === "preview") {
 if (process.env.STANDALONE === "static-build-viewer") {
   build = {
     lib: {
-      entry: resolve(
-        __dirname,
-        "lib/entrypoints/static-build-viewer.html",
-      ),
+      entry: resolve(__dirname, "lib/entrypoints/static-build-viewer.html"),
       name: "static-build-viewer",
       fileName: (format) => `static-build-viewer.min.js`,
       formats: ["umd"],

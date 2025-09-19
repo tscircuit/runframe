@@ -3,7 +3,9 @@ import { EnhancedFileSelectorCombobox } from "../RunFrameWithApi/EnhancedFileSel
 import { cn } from "lib/utils"
 import type { CircuitJsonFileSelectorProps } from "./CircuitJsonFileSelectorProps"
 
-export const CircuitJsonFileSelector = (props: CircuitJsonFileSelectorProps) => {
+export const CircuitJsonFileSelector = (
+  props: CircuitJsonFileSelectorProps,
+) => {
   const {
     files,
     selectedFile,
@@ -14,7 +16,7 @@ export const CircuitJsonFileSelector = (props: CircuitJsonFileSelectorProps) => 
     disabled = false,
     prefixContent,
     suffixContent,
-    showWhenSingleFile = false
+    showWhenSingleFile = false,
   } = props
 
   if (files.length <= 1 && !showWhenSingleFile) {
@@ -24,21 +26,21 @@ export const CircuitJsonFileSelector = (props: CircuitJsonFileSelectorProps) => 
   return (
     <div className={cn("flex items-center gap-2", className)}>
       {prefixContent}
-      
+
       {label && (
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           {label}:
         </span>
       )}
-      
+
       <EnhancedFileSelectorCombobox
         files={files}
         currentFile={selectedFile}
         onFileChange={onFileChange}
       />
-      
+
       {suffixContent}
-      
+
       <FileJson className="h-4 w-4 text-gray-500 dark:text-gray-400" />
     </div>
   )

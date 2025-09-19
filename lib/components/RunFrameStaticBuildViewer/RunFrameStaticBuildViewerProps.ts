@@ -4,9 +4,14 @@ import type { ReactNode } from "react"
 
 export interface RunFrameStaticBuildViewerProps {
   /**
-   * URL or path to the directory containing prebuilt circuit JSON files
+   * Map of file paths to circuit JSON objects for multiple file support
    */
-  buildDirectoryUrl: string
+  circuitJsonFsMap: Map<string, CircuitJson>
+  
+  /**
+   * Default filename to load initially (defaults to "circuit.json")
+   */
+  defaultFilename?: string
   
   /**
    * Optional debug mode
@@ -36,5 +41,10 @@ export interface RunFrameStaticBuildViewerProps {
   /**
    * Callback when circuit JSON is loaded
    */
-  onCircuitJsonLoaded?: (circuitJson: CircuitJson) => void
+  onCircuitJsonLoaded?: (circuitJson: CircuitJson, filename: string) => void
+  
+  /**
+   * Callback when file selection changes
+   */
+  onFileChange?: (filename: string, circuitJson: CircuitJson) => void
 }

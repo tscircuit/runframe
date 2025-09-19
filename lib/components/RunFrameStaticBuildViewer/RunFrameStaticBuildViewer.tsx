@@ -65,15 +65,19 @@ export const RunFrameStaticBuildViewer = (
 
   const loadCircuitJsonFile = useCallback(
     async (filePath: string) => {
-      if (loadingFiles.has(filePath)) return
-
       if (fileCache[filePath]) {
         setCircuitJson(fileCache[filePath])
         props.onCircuitJsonPathChange?.(filePath)
         return
       }
 
-      setLoadingFiles((prev) => new Set(prev).add(filePath))
+      const wasAlreadyLoading = loadingFiles.has(filePath)
+      if (wasAlreadyLoading) return
+
+      setLoadingFiles((prev) => {
+        if (prev.has(filePath)) return prev
+        return new Set(prev).add(filePath)
+      })
       setIsLoadingCurrentFile(true)
 
       try {
@@ -117,15 +121,12 @@ export const RunFrameStaticBuildViewer = (
     if (!selectedPath || !availableFiles.includes(selectedPath)) {
       selectedPath = guessEntrypoint(availableFiles) ?? availableFiles[0]
       setCurrentCircuitJsonPath(selectedPath)
-      return
     }
-  }, [availableFiles, currentCircuitJsonPath])
 
-  useEffect(() => {
-    if (currentCircuitJsonPath && availableFiles.length > 0) {
-      loadCircuitJsonFile(currentCircuitJsonPath)
+    if (selectedPath && availableFiles.includes(selectedPath)) {
+      loadCircuitJsonFile(selectedPath)
     }
-  }, [currentCircuitJsonPath])
+  }, [availableFiles, currentCircuitJsonPath, loadCircuitJsonFile])
 
   const handleFileChange = useCallback((newPath: string) => {
     setCurrentCircuitJsonPath(newPath)

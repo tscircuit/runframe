@@ -57,15 +57,38 @@ const App = () => (
 )
 ```
 
-The CircuitJsonPreview component provides:
+### Using RunFrameStaticBuildViewer for Lazy-Loaded Circuit JSON
 
-- PCB view with interactive component placement
-- Schematic view
-- Assembly view
-- 3D view
-- Bill of Materials (BOM) table
-- Circuit JSON viewer
-- Error display
+For displaying circuit JSON files that are fetched on-demand without code execution:
+
+```tsx
+import { RunFrameStaticBuildViewer } from "@tscircuit/runframe"
+
+const App = () => (
+  <RunFrameStaticBuildViewer
+    files={[
+      {
+        filePath: "main.circuit.json",
+        fileStaticAssetUrl: "https://api.example.com/circuits/main.json"
+      },
+      {
+        filePath: "components/sensor.circuit.json", 
+        fileStaticAssetUrl: "https://api.example.com/circuits/sensor.json"
+      }
+    ]}
+    // Optional: Custom fetch function for authentication, caching, etc.
+    onFetchFile={async (fileRef) => {
+      const response = await fetch(fileRef.fileStaticAssetUrl, {
+        headers: { Authorization: 'Bearer token' }
+      })
+      return response.json()
+    }}
+    projectName="My Project"
+    defaultToFullScreen={false}
+    showToggleFullScreen={true}
+  />
+)
+```
 
 ### Providing the Blob URL (to avoid loading webworker from CDN)
 

@@ -26,7 +26,15 @@ import {
   type FileNode,
 } from "./parseFilesToTree"
 
-function getFileIcon(fileName: string) {
+export interface FileSelectorConfig {
+  fileFilter?: (filename: string) => boolean
+  getDisplayName?: (filename: string) => string
+  placeholder?: string
+  searchPlaceholder?: string
+  emptyMessage?: string
+}
+
+const defaultFileIcon = (fileName: string) => {
   if (fileName.endsWith(".tsx") || fileName.endsWith(".jsx")) {
     return <Code className="rf-h-4 rf-w-4 rf-text-blue-500" />
   }
@@ -39,14 +47,30 @@ function getFileIcon(fileName: string) {
   return <File className="rf-h-4 rf-w-4 rf-text-gray-500" />
 }
 
+const defaultFileFilter = (filename: string) => {
+  return (
+    (filename.endsWith(".tsx") ||
+      filename.endsWith(".ts") ||
+      filename.endsWith(".jsx") ||
+      filename.endsWith(".js")) &&
+    !filename.endsWith(".d.ts")
+  )
+}
+
+const defaultDisplayName = (filename: string) => {
+  return filename.split("/").pop() || ""
+}
+
 export const EnhancedFileSelectorCombobox = ({
   files,
   onFileChange,
   currentFile,
+  config = {},
 }: {
   files: string[]
   currentFile: string
   onFileChange: (value: string) => void
+  config?: FileSelectorConfig
 }) => {
   const [open, setOpen] = useState(false)
   const [file, setFile] = useState(currentFile)
@@ -54,27 +78,19 @@ export const EnhancedFileSelectorCombobox = ({
   const [currentFileIndex, setCurrentFileIndex] = useState(0)
   const [searchValue, setSearchValue] = useState("")
 
+  const {
+    fileFilter = defaultFileFilter,
+    getDisplayName = defaultDisplayName,
+    placeholder = "Select file",
+    searchPlaceholder = "Search for file",
+    emptyMessage = "No files found in this directory.",
+  } = config
+
   useEffect(() => {
     setFile(currentFile)
   }, [currentFile])
 
-  const filteredFiles = files.filter((file) => {
-    const fileName = file.split("/").pop() ?? ""
-    const lowerCaseFileName = fileName.toLowerCase()
-    const isScriptFile =
-      file.endsWith(".tsx") ||
-      file.endsWith(".ts") ||
-      file.endsWith(".jsx") ||
-      file.endsWith(".js")
-
-    if (!isScriptFile || file.endsWith(".d.ts")) return false
-
-    if (lowerCaseFileName.startsWith("test.tsx")) {
-      return false
-    }
-
-    return true
-  })
+  const filteredFiles = files.filter(fileFilter)
 
   const fileTree = parseFilesToTree(filteredFiles)
   const { files: currentFiles, folders: currentFolders } =
@@ -123,45 +139,9 @@ export const EnhancedFileSelectorCombobox = ({
 
   const searchResults = getSearchResults()
   const isSearching = searchValue.trim().length > 0
-
-  const canGoBack = currentFolder !== ""
-  const canGoLeft = currentFiles.length > 0 && currentFileIndex > 0
-  const canGoRight =
-    currentFiles.length > 0 && currentFileIndex < currentFiles.length - 1
-
   const navigateToFolder = (folderPath: string) => {
     setCurrentFolder(folderPath)
     setCurrentFileIndex(0)
-  }
-
-  const goBack = () => {
-    if (currentFolder) {
-      const parentPath = currentFolder.includes("/")
-        ? currentFolder.substring(0, currentFolder.lastIndexOf("/"))
-        : ""
-      setCurrentFolder(parentPath)
-      setCurrentFileIndex(0)
-    }
-  }
-
-  const goLeft = () => {
-    if (canGoLeft) {
-      const newIndex = currentFileIndex - 1
-      setCurrentFileIndex(newIndex)
-      const selectedFile = currentFiles[newIndex]
-      setFile(selectedFile.path)
-      onFileChange(selectedFile.path)
-    }
-  }
-
-  const goRight = () => {
-    if (canGoRight) {
-      const newIndex = currentFileIndex + 1
-      setCurrentFileIndex(newIndex)
-      const selectedFile = currentFiles[newIndex]
-      setFile(selectedFile.path)
-      onFileChange(selectedFile.path)
-    }
   }
 
   const selectFile = (filePath: string, index: number) => {
@@ -171,7 +151,6 @@ export const EnhancedFileSelectorCombobox = ({
     onFileChange(filePath)
   }
 
-  // Update current file index when folder changes
   useEffect(() => {
     if (currentFiles.length > 0) {
       const fileInCurrentFolder = currentFiles.findIndex(
@@ -192,7 +171,6 @@ export const EnhancedFileSelectorCombobox = ({
 
   return (
     <div className="rf-flex rf-items-center rf-gap-1">
-      {/* Main selector */}
       <Popover
         open={open}
         onOpenChange={(newOpen) => {
@@ -205,10 +183,10 @@ export const EnhancedFileSelectorCombobox = ({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="rf-w-fit rf-min-w-32 rf-max-w-64 rf-justify-center rf-items-center rf-gap-1 !rf-font-normal rf-min-w-0"
+            className="rf-w-fit rf-min-w-32 rf-max-w-64 rf-justify-center rf-items-center rf-gap-1 !rf-font-normal"
           >
             <span className="rf-truncate rf-text-left">
-              {file ? file.split("/").pop() : "Select file"}
+              {file ? getDisplayName(file) : placeholder}
             </span>
             <ChevronsUpDown className="rf-opacity-50 rf-flex-shrink-0" />
           </Button>
@@ -221,7 +199,7 @@ export const EnhancedFileSelectorCombobox = ({
         >
           <Command shouldFilter={false}>
             <CommandInput
-              placeholder="Search for file"
+              placeholder={searchPlaceholder}
               className="rf-h-9 rf-w-full"
               value={searchValue}
               onValueChange={setSearchValue}
@@ -272,7 +250,7 @@ export const EnhancedFileSelectorCombobox = ({
             <CommandList className="rf-max-h-[70vh] rf-overflow-y-auto">
               {!isSearching ? (
                 <>
-                  <CommandEmpty>No files found in this directory.</CommandEmpty>
+                  <CommandEmpty>{emptyMessage}</CommandEmpty>
 
                   {/* Current Directory Files */}
                   {currentFiles.length > 0 && (
@@ -289,9 +267,9 @@ export const EnhancedFileSelectorCombobox = ({
                           )}
                         >
                           <span className="rf-mr-2">
-                            {getFileIcon(fileNode.name)}
+                            {defaultFileIcon(fileNode.name)}
                           </span>
-                          {fileNode.name}
+                          {getDisplayName(fileNode.name)}
                           <Check
                             className={cn(
                               "rf-ml-auto rf-h-4 rf-w-4",
@@ -360,11 +338,11 @@ export const EnhancedFileSelectorCombobox = ({
                                 )}
                               >
                                 <span className="rf-mr-2">
-                                  {getFileIcon(file.fileName)}
+                                  {defaultFileIcon(file.fileName)}
                                 </span>
                                 <div className="rf-flex rf-items-center rf-w-full rf-min-w-0">
                                   <span className="rf-truncate rf-flex-1">
-                                    {file.fileName}
+                                    {getDisplayName(file.fileName)}
                                   </span>
                                   <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[120px]">
                                     {currentFolder || "/"}
@@ -396,11 +374,11 @@ export const EnhancedFileSelectorCombobox = ({
                               )}
                             >
                               <span className="rf-mr-2">
-                                {getFileIcon(file.fileName)}
+                                {defaultFileIcon(file.fileName)}
                               </span>
                               <div className="rf-flex rf-items-center rf-w-full rf-min-w-0">
                                 <span className="rf-truncate rf-flex-1">
-                                  {file.fileName}
+                                  {getDisplayName(file.fileName)}
                                 </span>
                                 <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[120px]">
                                   {file.path.substring(

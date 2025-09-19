@@ -447,12 +447,22 @@ const FullIntegrationExample = () => {
           <div className="relative">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">Loading Circuit Library</h3>
-          <p className="text-gray-600">Preparing your circuit design environment...</p>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            Loading Circuit Library
+          </h3>
+          <p className="text-gray-600">
+            Preparing your circuit design environment...
+          </p>
           <div className="mt-4 flex justify-center gap-2">
             <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
-            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+            <div
+              className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"
+              style={{ animationDelay: "0.1s" }}
+            ></div>
+            <div
+              className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"
+              style={{ animationDelay: "0.2s" }}
+            ></div>
           </div>
         </div>
       </div>
@@ -464,7 +474,9 @@ const FullIntegrationExample = () => {
       <div className="flex items-center justify-center h-full bg-red-50">
         <div className="text-center max-w-md">
           <div className="text-red-600 text-6xl mb-4">⚠️</div>
-          <h3 className="text-xl font-semibold text-red-900 mb-2">Failed to Load Circuits</h3>
+          <h3 className="text-xl font-semibold text-red-900 mb-2">
+            Failed to Load Circuits
+          </h3>
           <p className="text-red-700 mb-6">{error}</p>
           <button
             onClick={loadCircuits}
@@ -489,17 +501,21 @@ const FullIntegrationExample = () => {
       <div className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Circuit Design Studio</h1>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Circuit Design Studio
+            </h1>
             <p className="text-gray-600 text-sm mt-1">
               {circuitList.length} circuits available • {selectedScenario} mode
             </p>
           </div>
           {exportStatus && (
-            <div className={`px-4 py-2 rounded-lg text-sm font-medium ${
-              exportStatus.includes('Successfully')
-                ? 'bg-green-100 text-green-800'
-                : 'bg-red-100 text-red-800'
-            }`}>
+            <div
+              className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                exportStatus.includes("Successfully")
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
+              }`}
+            >
               {exportStatus}
             </div>
           )}
@@ -534,13 +550,18 @@ const FullIntegrationExample = () => {
       <div className="bg-white border-t border-gray-200 px-6 py-3">
         <div className="flex items-center justify-between text-sm text-gray-600">
           <div>
-            Selected: {circuitList.find((c) => c.filename === selectedFile)?.name || 'None'}
+            Selected:{" "}
+            {circuitList.find((c) => c.filename === selectedFile)?.name ||
+              "None"}
           </div>
           <div>
-            Total Components: {circuitFiles[selectedFile]?.pcb_components?.length || 0}
+            Total Components:{" "}
+            {circuitFiles[selectedFile]?.pcb_components?.length || 0}
           </div>
           <div>
-            Complexity: {circuitList.find((c) => c.filename === selectedFile)?.complexity || 'Unknown'}
+            Complexity:{" "}
+            {circuitList.find((c) => c.filename === selectedFile)?.complexity ||
+              "Unknown"}
           </div>
         </div>
       </div>

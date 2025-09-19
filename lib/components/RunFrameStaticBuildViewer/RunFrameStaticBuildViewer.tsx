@@ -39,6 +39,7 @@ export const RunFrameStaticBuildViewer = (
   const [isLoadingCurrentFile, setIsLoadingCurrentFile] = useState(false)
   const [fileCache, setFileCache] = useState<Record<string, CircuitJson>>({})
   const [loadingFiles, setLoadingFiles] = useState<Set<string>>(new Set())
+  const [failedFiles, setFailedFiles] = useState<Set<string>>(new Set())
 
   const fileReferences = props.files
   const availableFiles = fileReferences.map((f) => f.filePath)
@@ -71,14 +72,19 @@ export const RunFrameStaticBuildViewer = (
         return
       }
 
-      const wasAlreadyLoading = loadingFiles.has(filePath)
-      if (wasAlreadyLoading) return
+      if (failedFiles.has(filePath)) {
+        console.warn(`Skipping failed file: ${filePath}`)
+        setCircuitJson(null)
+        return
+      }
 
-      setLoadingFiles((prev) => {
-        if (prev.has(filePath)) return prev
-        return new Set(prev).add(filePath)
-      })
+      if (loadingFiles.has(filePath)) {
+        return
+      }
+
+      setLoadingFiles((prev) => new Set(prev).add(filePath))
       setIsLoadingCurrentFile(true)
+      setCircuitJson(null)
 
       try {
         const fileRef = fileReferences.find((f) => f.filePath === filePath)
@@ -92,8 +98,16 @@ export const RunFrameStaticBuildViewer = (
         setFileCache((prev) => ({ ...prev, [filePath]: circuitJsonData }))
         setCircuitJson(circuitJsonData)
         props.onCircuitJsonPathChange?.(filePath)
+
+        setFailedFiles((prev) => {
+          const newSet = new Set(prev)
+          newSet.delete(filePath)
+          return newSet
+        })
       } catch (error) {
         console.error(`Failed to load circuit JSON file ${filePath}:`, error)
+        setFailedFiles((prev) => new Set(prev).add(filePath))
+        setCircuitJson(null)
       } finally {
         setLoadingFiles((prev) => {
           const newSet = new Set(prev)
@@ -107,6 +121,7 @@ export const RunFrameStaticBuildViewer = (
       fileReferences,
       fileCache,
       loadingFiles,
+      failedFiles,
       props.onFetchFile,
       props.onCircuitJsonPathChange,
       defaultFetchFile,
@@ -132,6 +147,18 @@ export const RunFrameStaticBuildViewer = (
     setCurrentCircuitJsonPath(newPath)
   }, [])
 
+  const retryFailedFile = useCallback(
+    (filePath: string) => {
+      setFailedFiles((prev) => {
+        const newSet = new Set(prev)
+        newSet.delete(filePath)
+        return newSet
+      })
+      loadCircuitJsonFile(filePath)
+    },
+    [loadCircuitJsonFile],
+  )
+
   if (availableFiles.length === 0) {
     return (
       <div className="rf-flex rf-flex-col rf-w-full rf-h-full rf-items-center rf-justify-center">
@@ -146,6 +173,8 @@ export const RunFrameStaticBuildViewer = (
       </div>
     )
   }
+
+  const currentFileFailed = failedFiles.has(currentCircuitJsonPath)
 
   return (
     <ErrorBoundary
@@ -162,26 +191,18 @@ export const RunFrameStaticBuildViewer = (
         </div>
       )}
     >
-      <CircuitJsonPreview
-        circuitJson={circuitJson}
-        defaultToFullScreen={props.defaultToFullScreen}
-        showToggleFullScreen={props.showToggleFullScreen}
-        showFileMenu={false}
-        isWebEmbedded={false}
-        projectName={props.projectName}
-        leftHeaderContent={
-          <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
+      {currentFileFailed ? (
+        <div className="rf-w-full rf-h-full rf-flex rf-flex-col">
+          <div className="rf-flex rf-items-center rf-justify-between rf-w-full rf-p-4 rf-border-b rf-border-gray-200">
             {(props.showFileMenu ?? true) && (
               <FileMenuLeftHeader
                 isWebEmbedded={false}
-                circuitJson={circuitJson}
+                circuitJson={null}
                 projectName={props.projectName}
               />
             )}
             {availableFiles.length > 1 && (
-              <div
-                className={`rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2 rf-flex rf-items-center rf-gap-2 ${isLoadingCurrentFile ? "rf-opacity-50" : ""}`}
-              >
+              <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2 rf-flex rf-items-center rf-gap-2">
                 <CircuitJsonFileSelectorCombobox
                   currentFile={currentCircuitJsonPath}
                   files={availableFiles}
@@ -190,8 +211,62 @@ export const RunFrameStaticBuildViewer = (
               </div>
             )}
           </div>
-        }
-      />
+          <div className="rf-flex-1 rf-flex rf-items-center rf-justify-center">
+            <div className="rf-text-center rf-p-8">
+              <h3 className="rf-text-lg rf-font-semibold rf-text-red-600 rf-mb-2">
+                Failed to Load Circuit File
+              </h3>
+              <p className="rf-text-sm rf-text-gray-600 rf-mb-4">
+                Could not load: {currentCircuitJsonPath}
+              </p>
+              <div className="rf-flex rf-flex-col rf-items-center rf-gap-2">
+                <button
+                  onClick={() => retryFailedFile(currentCircuitJsonPath)}
+                  className="rf-px-4 rf-py-2 rf-bg-blue-500 rf-text-white rf-rounded rf-hover:bg-blue-600"
+                >
+                  Retry
+                </button>
+                {availableFiles.length > 1 && (
+                  <p className="rf-text-xs rf-text-gray-500">
+                    Or select a different file from the dropdown above
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <CircuitJsonPreview
+          circuitJson={circuitJson}
+          defaultToFullScreen={props.defaultToFullScreen}
+          showToggleFullScreen={props.showToggleFullScreen}
+          showFileMenu={false}
+          isWebEmbedded={false}
+          projectName={props.projectName}
+          leftHeaderContent={
+            <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
+              {(props.showFileMenu ?? true) && (
+                <FileMenuLeftHeader
+                  isWebEmbedded={false}
+                  circuitJson={circuitJson}
+                  projectName={props.projectName}
+                />
+              )}
+              {availableFiles.length > 1 && (
+                <div
+                  className={`rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2 rf-flex rf-items-center rf-gap-2 ${isLoadingCurrentFile ? "rf-opacity-50" : ""}`}
+                >
+                  <CircuitJsonFileSelectorCombobox
+                    currentFile={currentCircuitJsonPath}
+                    files={availableFiles}
+                    onFileChange={handleFileChange}
+                  />
+                </div>
+              )}
+            </div>
+          }
+        />
+      )}
     </ErrorBoundary>
   )
 }

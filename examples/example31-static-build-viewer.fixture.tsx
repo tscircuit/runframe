@@ -42,9 +42,9 @@ const mockFetchFile = async (
   const resJson = await res.json()
   return JSON.parse(resJson.package_file.content_text)
 }
-export const basic = () => (
+export const wErrorHandler = () => (
   <RunFrameStaticBuildViewer
-    files={circuitJsonFileAssetsExternal}
+    files={[circuitJsonFileAssets[0], circuitJsonFileAssetsExternal[0]]}
     onFetchFile={mockFetchFile}
     projectName="test-project"
     defaultToFullScreen={false}
@@ -58,7 +58,7 @@ export const emptyFiles = () => (
 
 export const fullFledge = () => (
   <RunFrameStaticBuildViewer
-    files={circuitJsonFileAssetsExternal}
+    files={circuitJsonFileAssets}
     onFetchFile={mockFetchFile}
     projectName="full-featured-project"
     debug={true}
@@ -113,7 +113,7 @@ export const largeProjectExample = () => (
 )
 
 export default {
-  basic,
+  wErrorHandler,
   emptyFiles,
   fullFledge,
   lazyLoadingBasic,

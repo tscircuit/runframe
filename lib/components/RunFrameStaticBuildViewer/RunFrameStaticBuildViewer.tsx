@@ -141,7 +141,7 @@ export const RunFrameStaticBuildViewer = (
     if (selectedPath && availableFiles.includes(selectedPath)) {
       loadCircuitJsonFile(selectedPath)
     }
-  }, [availableFiles, currentCircuitJsonPath])
+  }, [currentCircuitJsonPath])
 
   const handleFileChange = useCallback((newPath: string) => {
     setCurrentCircuitJsonPath(newPath)

@@ -70,17 +70,26 @@ const circuitDatabase = {
       {
         from: { component: "R1", port: "pin1" },
         to: { component: "Q1", port: "pin0" },
-        route: [{ x: 7.54, y: 5 }, { x: 10, y: 10 }],
+        route: [
+          { x: 7.54, y: 5 },
+          { x: 10, y: 10 },
+        ],
       },
       {
         from: { component: "Q1", port: "pin1" },
         to: { component: "R2", port: "pin0" },
-        route: [{ x: 12, y: 12 }, { x: 15, y: 15 }],
+        route: [
+          { x: 12, y: 12 },
+          { x: 15, y: 15 },
+        ],
       },
       {
         from: { component: "Q1", port: "pin2" },
         to: { component: "C1", port: "pin0" },
-        route: [{ x: 8, y: 12 }, { x: 20, y: 10 }],
+        route: [
+          { x: 8, y: 12 },
+          { x: 20, y: 10 },
+        ],
       },
     ],
   },
@@ -164,22 +173,34 @@ const circuitDatabase = {
       {
         from: { component: "C1", port: "pin1" },
         to: { component: "U1", port: "pin0" },
-        route: [{ x: 7.54, y: 15 }, { x: 15, y: 15 }],
+        route: [
+          { x: 7.54, y: 15 },
+          { x: 15, y: 15 },
+        ],
       },
       {
         from: { component: "U1", port: "pin1" },
         to: { component: "C2", port: "pin0" },
-        route: [{ x: 17, y: 15 }, { x: 25, y: 15 }],
+        route: [
+          { x: 17, y: 15 },
+          { x: 25, y: 15 },
+        ],
       },
       {
         from: { component: "U1", port: "pin2" },
         to: { component: "R1", port: "pin0" },
-        route: [{ x: 19, y: 15 }, { x: 30, y: 20 }],
+        route: [
+          { x: 19, y: 15 },
+          { x: 30, y: 20 },
+        ],
       },
       {
         from: { component: "R1", port: "pin1" },
         to: { component: "LED1", port: "pin0" },
-        route: [{ x: 32.54, y: 20 }, { x: 35, y: 20 }],
+        route: [
+          { x: 32.54, y: 20 },
+          { x: 35, y: 20 },
+        ],
       },
     ],
   },
@@ -221,7 +242,10 @@ const circuitDatabase = {
       {
         from: { component: "R1", port: "pin1" },
         to: { component: "C1", port: "pin0" },
-        route: [{ x: 12.54, y: 10 }, { x: 15, y: 15 }],
+        route: [
+          { x: 12.54, y: 10 },
+          { x: 15, y: 15 },
+        ],
       },
     ],
   },
@@ -231,7 +255,7 @@ class CircuitAPIService {
   private circuits: Record<string, any> = circuitDatabase
 
   async getCircuitList(): Promise<Array<{ filename: string; name: string; description: string; complexity: string }>> {
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise((resolve) => setTimeout(resolve, 300))
     return Object.entries(this.circuits).map(([filename, circuit]) => ({
       filename,
       name: circuit.name,
@@ -241,7 +265,7 @@ class CircuitAPIService {
   }
 
   async getCircuit(filename: string): Promise<any> {
-    await new Promise(resolve => setTimeout(resolve, 200))
+    await new Promise((resolve) => setTimeout(resolve, 200))
     const circuit = this.circuits[filename]
     if (!circuit) {
       throw new Error(`Circuit not found: ${filename}`)
@@ -250,16 +274,22 @@ class CircuitAPIService {
   }
 
   async exportCircuit(filename: string, format: string): Promise<Blob> {
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
     const circuit = this.circuits[filename]
     
     switch (format) {
       case "json":
-        return new Blob([JSON.stringify(circuit, null, 2)], { type: "application/json" })
+        return new Blob([JSON.stringify(circuit, null, 2)], {
+          type: "application/json",
+        })
       case "zip":
-        return new Blob([`Mock ZIP content for ${filename}`], { type: "application/zip" })
+        return new Blob([`Mock ZIP content for ${filename}`], {
+          type: "application/zip",
+        })
       case "glb":
-        return new Blob([`Mock GLB content for ${filename}`], { type: "model/gltf-binary" })
+        return new Blob([`Mock GLB content for ${filename}`], {
+          type: "model/gltf-binary",
+        })
       default:
         throw new Error(`Unsupported export format: ${format}`)
     }

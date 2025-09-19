@@ -2,192 +2,202 @@ import { useCallback, useEffect, useState } from "react"
 import { Loader2 } from "lucide-react"
 import { CircuitJsonPreview } from "../CircuitJsonPreview/CircuitJsonPreview"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
-import { EnhancedFileSelectorCombobox } from "../RunFrameWithApi/EnhancedFileSelectorCombobox/EnhancedFileSelectorCombobox"
+import { CircuitJsonFileSelector } from "../CircuitJsonFileSelector"
+import { StaticBuildFileMenu } from "../StaticBuildFileMenu"
+import { loadCircuitJsonFilesSync } from "lib/utils/autoLoadCircuitJsonFiles"
 import { cn } from "lib/utils"
 import type { RunFrameStaticBuildViewerProps } from "./RunFrameStaticBuildViewerProps"
 import type { CircuitJson } from "circuit-json"
 import type { TabId } from "../CircuitJsonPreview/PreviewContentProps"
 
+/**
+ * A production-ready static viewer for circuit JSON files.
+ * 
+ * This component provides a clean, reusable interface for viewing circuit JSON files
+ * with support for multiple file selection, export functionality, and customizable
+ * UI elements. It follows the established patterns in the runframe codebase.
+ * 
+ * @example
+ * ```tsx
+ * <RunFrameStaticBuildViewer
+ *   circuitJsonFiles={{
+ *     "circuit.json": circuitData1,
+ *     "board.json": circuitData2
+ *   }}
+ *   defaultFilename="circuit.json"
+ *   onFileChange={(filename, circuitJson) => console.log(`Loaded ${filename}`)}
+ * />
+ * ```
+ */
 export const RunFrameStaticBuildViewer = (props: RunFrameStaticBuildViewerProps) => {
+  const {
+    circuitJsonFiles,
+    defaultFilename = "circuit.json",
+    debug = false,
+    scenarioSelectorContent,
+    defaultActiveTab = "pcb",
+    defaultToFullScreen = false,
+    showToggleFullScreen = true,
+    onCircuitJsonLoaded,
+    onFileChange,
+    onExport,
+    showFileSelector = true,
+    showFileMenu = true,
+    exportFormats = ["json", "zip", "glb"],
+    className
+  } = props
+
+  // State management
   const [circuitJson, setCircuitJson] = useState<CircuitJson | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<TabId>(
-    props.defaultActiveTab ?? "pcb"
-  )
-  const [selectedFile, setSelectedFile] = useState<string>(
-    props.defaultFilename ?? "circuit.json"
-  )
+  const [activeTab, setActiveTab] = useState<TabId>(defaultActiveTab)
+  const [selectedFile, setSelectedFile] = useState<string>(defaultFilename)
   const [availableFiles, setAvailableFiles] = useState<string[]>([])
 
+  // Load initial circuit JSON
   useEffect(() => {
-    const loadInitialCircuitJson = () => {
-      try {
-        setIsLoading(true)
-        setError(null)
-        
-        // Extract available files from the circuitJsonFsMap
-        const files = Array.from(props.circuitJsonFsMap.keys())
-        setAvailableFiles(files)
-        
-        // Determine the initial file to load
-        const initialFile = props.defaultFilename ?? "circuit.json"
-        const fileToLoad = files.includes(initialFile) ? initialFile : files[0]
-        
-        if (!fileToLoad) {
-          throw new Error("No circuit JSON files available")
-        }
-        
-        setSelectedFile(fileToLoad)
-        const json = props.circuitJsonFsMap.get(fileToLoad)
-        
-        if (!json) {
-          throw new Error(`Circuit JSON not found for file: ${fileToLoad}`)
-        }
-        
-        if (!Array.isArray(json)) {
-          throw new Error(`Invalid circuit JSON in file ${fileToLoad}: expected an array`)
-        }
-        
-        setCircuitJson(json)
-        props.onCircuitJsonLoaded?.(json, fileToLoad)
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Unknown error occurred"
-        setError(errorMessage)
-        console.error("Failed to load circuit JSON:", err)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadInitialCircuitJson()
-  }, [props.circuitJsonFsMap, props.defaultFilename, props.onCircuitJsonLoaded])
-
-  const handleFileChange = useCallback((filename: string) => {
     try {
-      const json = props.circuitJsonFsMap.get(filename)
+      setIsLoading(true)
+      setError(null)
       
-      if (!json) {
-        throw new Error(`Circuit JSON not found for file: ${filename}`)
+      // Use the synchronous loader for static files
+      const result = loadCircuitJsonFilesSync(circuitJsonFiles, defaultFilename)
+      
+      setCircuitJson(result.circuitJson)
+      setSelectedFile(result.selectedFile)
+      setAvailableFiles(result.availableFiles)
+      setError(result.error)
+      
+      // Trigger callback if circuit JSON was loaded successfully
+      if (result.circuitJson && !result.error) {
+        onCircuitJsonLoaded?.(result.circuitJson, result.selectedFile)
       }
-      
-      if (!Array.isArray(json)) {
-        throw new Error(`Invalid circuit JSON in file ${filename}: expected an array`)
-      }
-      
-      setSelectedFile(filename)
-      setCircuitJson(json)
-      props.onFileChange?.(filename, json)
-      props.onCircuitJsonLoaded?.(json, filename)
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Unknown error occurred"
-      setError(errorMessage)
-      console.error(`Failed to load circuit JSON from file ${filename}:`, err)
+      setError(err instanceof Error ? err.message : "Failed to load circuit files")
+    } finally {
+      setIsLoading(false)
     }
-  }, [props.circuitJsonFsMap, props.onFileChange, props.onCircuitJsonLoaded])
+  }, [circuitJsonFiles, defaultFilename, onCircuitJsonLoaded])
 
-  const handleActiveTabChange = useCallback((tab: TabId) => {
-    setActiveTab(tab)
-  }, [])
+  // Handle file selection changes
+  const handleFileChange = useCallback((filename: string) => {
+    const newCircuitJson = circuitJsonFiles[filename]
+    
+    setSelectedFile(filename)
+    setCircuitJson(newCircuitJson)
+    
+    // Trigger callbacks
+    onFileChange?.(filename, newCircuitJson)
+    onCircuitJsonLoaded?.(newCircuitJson, filename)
+  }, [circuitJsonFiles, onFileChange, onCircuitJsonLoaded])
 
+  // Handle export actions
+  const handleExport = useCallback((format: string, filename: string) => {
+    onExport?.(format, filename)
+  }, [onExport])
+
+  // Loading state
   if (isLoading) {
     return (
-      <div className="rf-flex rf-flex-col rf-w-full rf-h-full">
-        <div className="rf-flex rf-items-center rf-gap-4 rf-p-2 rf-border-b">
-          <div className="rf-w-20 rf-h-9 rf-bg-gray-200 dark:rf-bg-gray-700 rf-rounded-md rf-animate-pulse" />
-          <div className="rf-flex rf-gap-6 rf-ml-auto">
-            {["PCB", "Schematic", "3D"].map((_, i) => (
-              <div
-                key={i}
-                className="rf-h-6 rf-w-20 rf-bg-gray-200 dark:rf-bg-gray-700 rf-rounded rf-animate-pulse"
-              />
-            ))}
-          </div>
-        </div>
-        <div className="rf-flex-1 rf-p-4">
-          <div className="rf-w-full rf-h-full rf-rounded-lg rf-bg-gray-100 dark:rf-bg-gray-800 rf-animate-pulse rf-flex rf-items-center rf-justify-center">
-            <div className="rf-flex rf-flex-col rf-items-center rf-gap-4">
-              <Loader2 className="rf-w-8 rf-h-8 rf-animate-spin rf-text-gray-400" />
-              <div className="rf-text-sm rf-text-gray-400 dark:rf-text-gray-500">
-                Loading prebuilt circuit...
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className={cn("flex items-center justify-center h-full", className)}>
+        <Loader2 className="h-8 w-8 animate-spin text-gray-500 dark:text-gray-400" />
+        <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
+          Loading circuit files...
+        </span>
       </div>
     )
   }
 
+  // Error state
   if (error) {
     return (
-      <div className="rf-flex rf-flex-col rf-w-full rf-h-full">
-        <div className="rf-flex rf-items-center rf-gap-4 rf-p-2 rf-border-b">
-          <div className="rf-text-sm rf-font-medium rf-text-red-600">
-            Error Loading Circuit
-          </div>
-        </div>
-        <div className="rf-flex-1 rf-p-4">
-          <div className="rf-w-full rf-h-full rf-rounded-lg rf-bg-red-50 dark:rf-bg-red-900/20 rf-flex rf-items-center rf-justify-center">
-            <div className="rf-flex rf-flex-col rf-items-center rf-gap-4 rf-text-center">
-              <div className="rf-text-lg rf-font-medium rf-text-red-800 dark:rf-text-red-200">
-                Failed to load circuit data
-              </div>
-              <div className="rf-text-sm rf-text-red-600 dark:rf-text-red-300 max-w-md">
-                {error}
-              </div>
-              <div className="rf-text-xs rf-text-red-500 dark:rf-text-red-400">
-                Available files: {availableFiles.join(", ") || "None"}
-              </div>
+      <div className={cn("flex flex-col items-center justify-center h-full p-4", className)}>
+        <div className="text-center max-w-md">
+          <h3 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">
+            Failed to Load Circuit Files
+          </h3>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+            {error}
+          </p>
+          {availableFiles.length > 0 && (
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Available files: {availableFiles.join(", ")}
             </div>
-          </div>
+          )}
         </div>
       </div>
     )
   }
 
-  return (
-    <CircuitJsonPreview
-      circuitJson={circuitJson}
-      defaultActiveTab={props.defaultActiveTab}
-      defaultToFullScreen={props.defaultToFullScreen}
-      showToggleFullScreen={props.showToggleFullScreen}
-      leftHeaderContent={
-        <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
-          <div className="rf-flex rf-items-center rf-gap-4">
-            <FileMenuLeftHeader
-              isWebEmbedded={true}
-              circuitJson={circuitJson}
-            />
-            {availableFiles.length > 1 && (
-              <div className="rf-flex rf-items-center rf-gap-2">
-                <span className="rf-text-sm rf-text-gray-600 dark:rf-text-gray-400">
-                  File:
-                </span>
-                <EnhancedFileSelectorCombobox
-                  files={availableFiles}
-                  currentFile={selectedFile}
-                  onFileChange={handleFileChange}
-                />
-              </div>
-            )}
-          </div>
-          {props.scenarioSelectorContent}
+  // No circuit data
+  if (!circuitJson) {
+    return (
+      <div className={cn("flex flex-col items-center justify-center h-full p-4", className)}>
+        <div className="text-center max-w-md">
+          <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-400 mb-2">
+            No Circuit Data Available
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Please provide circuit JSON files to display.
+          </p>
         </div>
-      }
-      onActiveTabChange={handleActiveTabChange}
-      showFileMenu={false}
-      showRightHeaderContent={true}
-      showCodeTab={false}
-      showJsonTab={true}
-      showRenderLogTab={false}
-      readOnly={true}
-      isRunningCode={false}
-      hasCodeChangedSinceLastRun={false}
-      availableTabs={["pcb", "schematic", "cad", "assembly", "pinout", "bom", "circuit_json"]}
-      className={cn(
-        "rf-h-full",
-        props.defaultToFullScreen && "rf-fixed rf-top-0 rf-left-0 rf-w-full rf-h-full rf-bg-white rf-overflow-hidden"
-      )}
-    />
+      </div>
+    )
+  }
+
+  // Main component render
+  return (
+    <div className={cn("flex flex-col h-full", className)}>
+      {/* Header Section */}
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-4">
+          {/* File Menu */}
+          {showFileMenu && (
+            <StaticBuildFileMenu
+              circuitJson={circuitJson}
+              currentFile={selectedFile}
+              onExport={handleExport}
+              exportFormats={exportFormats}
+            />
+          )}
+          
+          {/* File Selector */}
+          {showFileSelector && (
+            <CircuitJsonFileSelector
+              files={availableFiles}
+              selectedFile={selectedFile}
+              onFileChange={handleFileChange}
+              label="Circuit File"
+              placeholder="Search circuit files..."
+            />
+          )}
+        </div>
+        
+        {/* Right side content */}
+        <div className="flex items-center gap-4">
+          {/* Scenario Selector Content */}
+          {scenarioSelectorContent}
+          
+          {/* File Menu Header (for additional functionality) */}
+          <FileMenuLeftHeader
+            circuitJson={circuitJson}
+            isWebEmbedded={false}
+          />
+        </div>
+      </div>
+      
+      {/* Main Content */}
+      <div className="flex-1 overflow-hidden">
+        <CircuitJsonPreview
+          circuitJson={circuitJson}
+          debug={debug}
+          activeTab={activeTab}
+          onActiveTabChange={setActiveTab}
+          defaultToFullScreen={defaultToFullScreen}
+          showToggleFullScreen={showToggleFullScreen}
+        />
+      </div>
+    </div>
   )
 }

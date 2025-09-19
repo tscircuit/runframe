@@ -1,8 +1,10 @@
 import * as React from "react"
 import { ImportComponentDialog2 } from "./ImportComponentDialog2"
 import type {
-  ComponentSearchResult,
   ImportComponentDialog2Props,
+  JlcpcbComponentTsxLoadedPayload,
+  KicadStringSelectedPayload,
+  TscircuitPackageSelectedPayload,
 } from "./types"
 import { useRunFrameStore } from "../RunFrameWithApi/store"
 import { toast } from "lib/utils/toast"
@@ -26,77 +28,61 @@ export const ImportComponentDialogForCli = (props: CliImportDialogProps) => {
   const pushEvent = useRunFrameStore((state) => state.pushEvent)
   const upsertFile = useRunFrameStore((state) => state.upsertFile)
 
-  const handleTscircuitPackageSelected = React.useCallback(
-    async ({
-      component,
-      fullPackageName,
-    }: {
-      component: ComponentSearchResult
-      fullPackageName: string
-    }) => {
-      await toast.promise(
-        pushEvent({
-          event_type: "INSTALL_PACKAGE",
-          full_package_name: fullPackageName,
-        }),
-        {
-          loading: `Requesting install for "${component.name}"`,
-          success: `Install requested for "${component.name}"`,
-          error: (error) =>
-            `Failed to request install: ${
-              error instanceof Error ? error.message : String(error)
-            }`,
-        },
-      )
+  const handleTscircuitPackageSelected = async ({
+    result,
+    fullPackageName,
+  }: TscircuitPackageSelectedPayload) => {
+    const packageName = result.package.unscoped_name
+    const displayName = packageName ?? result.package.name
 
-      // TODO wait on event indicating the package was successfully installed
-      throw new Error("Not implemented")
-    },
-    [pushEvent],
-  )
-
-  const handleKicadStringSelected = React.useCallback(
-    async ({
-      component,
-      footprint,
-    }: {
-      component: ComponentSearchResult
-      footprint: string
-    }) => {
-      await toast.promise(navigator.clipboard.writeText(footprint), {
-        loading: `Copying "${footprint}"`,
-        success: `Copied "${footprint}" to clipboard`,
+    await toast.promise(
+      pushEvent({
+        event_type: "INSTALL_PACKAGE",
+        full_package_name: fullPackageName,
+      }),
+      {
+        loading: `Requesting install for "${displayName}"`,
+        success: `Install requested for "${displayName}"`,
         error: (error) =>
-          `Failed to copy footprint: ${
+          `Failed to request install: ${
             error instanceof Error ? error.message : String(error)
           }`,
-      })
-    },
-    [],
-  )
+      },
+    )
 
-  const handleJlcpcbComponentTsxLoaded = React.useCallback(
-    async ({
-      component,
-      tsx,
-    }: {
-      component: ComponentSearchResult
-      tsx: string
-    }) => {
-      const componentName = extractComponentName(tsx)
-      const filePath = `imports/${componentName}.tsx`
+    // TODO wait on event indicating the package was successfully installed
+    throw new Error("Not implemented")
+  }
 
-      await toast.promise(upsertFile(filePath, tsx), {
-        loading: `Importing ${component.partNumber ?? component.name}`,
-        success: `Imported to "${filePath}"`,
-        error: (error) =>
-          `Failed to import component: ${
-            error instanceof Error ? error.message : String(error)
-          }`,
-      })
-    },
-    [upsertFile],
-  )
+  const handleKicadStringSelected = async ({
+    footprint,
+  }: KicadStringSelectedPayload) => {
+    await toast.promise(navigator.clipboard.writeText(footprint), {
+      loading: `Copying "${footprint}"`,
+      success: `Copied "${footprint}" to clipboard`,
+      error: (error) =>
+        `Failed to copy footprint: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+    })
+  }
+
+  const handleJlcpcbComponentTsxLoaded = async ({
+    result,
+    tsx,
+  }: JlcpcbComponentTsxLoadedPayload) => {
+    const componentName = extractComponentName(tsx)
+    const filePath = `imports/${componentName}.tsx`
+
+    await toast.promise(upsertFile(filePath, tsx), {
+      loading: `Importing ${result.component.partNumber}`,
+      success: `Imported to "${filePath}"`,
+      error: (error) =>
+        `Failed to import component: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+    })
+  }
 
   return (
     <ImportComponentDialog2

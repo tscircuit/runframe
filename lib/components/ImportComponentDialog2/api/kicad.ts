@@ -1,5 +1,5 @@
 import Fuse from "fuse.js"
-import type { ComponentSearchResult } from "../types"
+import type { KicadFootprintSummary } from "../types"
 
 let footprintsCache: string[] | null = null
 let footprintsPromise: Promise<string[]> | null = null
@@ -9,7 +9,9 @@ const ensureFootprints = async (): Promise<string[]> => {
   if (footprintsCache) return footprintsCache
   if (footprintsPromise) return footprintsPromise
 
-  footprintsPromise = fetch("https://kicad-mod-cache.tscircuit.com/kicad_files.json")
+  footprintsPromise = fetch(
+    "https://kicad-mod-cache.tscircuit.com/kicad_files.json",
+  )
     .then((response) => response.json())
     .then((footprints) => {
       footprintsCache = footprints
@@ -34,18 +36,17 @@ export const searchKicadFootprints = async (
     .map((result) => result.item)
 }
 
-export const mapKicadFootprintToSearchResult = (
+export const mapKicadFootprintToSummary = (
   footprintPath: string,
-): ComponentSearchResult => {
+): KicadFootprintSummary => {
   const cleanedFootprint = footprintPath
     .replace(".pretty/", ":")
     .replace(".kicad_mod", "")
   const footprintString = `kicad:${cleanedFootprint}`
 
   return {
-    id: `kicad-${footprintPath}`,
-    name: footprintString,
+    path: footprintPath,
+    qualifiedName: footprintString,
     description: cleanedFootprint,
-    source: "kicad",
   }
 }

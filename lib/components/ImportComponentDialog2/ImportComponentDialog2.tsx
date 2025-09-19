@@ -15,13 +15,16 @@ import { loadJlcpcbComponentTsx } from "./api/jlcpcb"
 import { SearchBar } from "./components/SearchBar"
 import { SearchResultsList } from "./components/SearchResultsList"
 import { TscircuitPackageDetailsDialog } from "./components/TscircuitPackageDetailsDialog"
-import { useComponentSearch } from "./hooks/useComponentSearch"
 import { useTscircuitPackageDetails } from "./hooks/useTscircuitPackageDetails"
 import type {
-  ComponentSearchResult,
   ImportComponentDialog2Props,
+  ImportComponentDialogSearchResult,
+  TscircuitPackageSearchResult,
   ImportSource,
 } from "./types"
+import { useTscircuitPackageSearch } from "./hooks/useTscircuitPackageSearch"
+import { useJlcpcbComponentSearch } from "./hooks/useJlcpcbComponentSearch"
+import { useKicadFootprintSearch } from "./hooks/useKicadFootprintSearch"
 
 const computeAvailableSources = ({
   onTscircuitPackageSelected,
@@ -43,7 +46,7 @@ const computeAvailableSources = ({
 export const ImportComponentDialog2 = ({
   isOpen,
   onClose,
-  proxyRequestHeaders,
+  jlcpcbProxyRequestHeaders,
   onKicadStringSelected,
   onTscircuitPackageSelected,
   onJlcpcbComponentTsxLoaded,
@@ -67,18 +70,33 @@ export const ImportComponentDialog2 = ({
     availableSources[0] ?? "tscircuit.com",
   )
 
+  const [searchQuery, setSearchQuery] = React.useState("")
+  const [selectedSearchResult, setSelectedSearchResult] =
+    React.useState<ImportComponentDialogSearchResult | null>(null)
   const {
-    query: searchQuery,
-    setQuery: setSearchQuery,
-    results: searchResults,
-    selectedResult: selectedSearchResult,
-    setSelectedResult: setSelectedSearchResult,
-    isLoading: isComponentSearchLoading,
-    hasSearched: hasExecutedComponentSearch,
-    error: componentSearchError,
-    performSearch: runComponentSearch,
-    resetResults: resetComponentSearch,
-  } = useComponentSearch(activeSource)
+    results: tscircuitResults,
+    isSearching: isTscircuitSearching,
+    error: tscircuitError,
+    hasSearched: hasTscircuitSearched,
+    search: searchTscircuit,
+    reset: resetTscircuitSearch,
+  } = useTscircuitPackageSearch()
+  const {
+    results: jlcpcbResults,
+    isSearching: isJlcpcbSearching,
+    error: jlcpcbError,
+    hasSearched: hasJlcpcbSearched,
+    search: searchJlcpcb,
+    reset: resetJlcpcbSearch,
+  } = useJlcpcbComponentSearch()
+  const {
+    results: kicadResults,
+    isSearching: isKicadSearching,
+    error: kicadError,
+    hasSearched: hasKicadSearched,
+    search: searchKicad,
+    reset: resetKicadSearch,
+  } = useKicadFootprintSearch()
   const {
     details: packageDetails,
     isLoading: isPackageDetailsLoading,
@@ -86,7 +104,7 @@ export const ImportComponentDialog2 = ({
     reset: resetPackageDetails,
   } = useTscircuitPackageDetails()
   const [componentForDetails, setComponentForDetails] =
-    React.useState<ComponentSearchResult | null>(null)
+    React.useState<TscircuitPackageSearchResult | null>(null)
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false)
   const [detailsPreviewTab, setDetailsPreviewTab] = React.useState<
     "pcb" | "schematic"
@@ -100,119 +118,158 @@ export const ImportComponentDialog2 = ({
     setImportErrorMessage(null)
   }, [selectedSearchResult])
 
+  const resetAllSearches = () => {
+    resetTscircuitSearch()
+    resetJlcpcbSearch()
+    resetKicadSearch()
+    setSelectedSearchResult(null)
+  }
+
   React.useEffect(() => {
     if (!isOpen) {
-      resetComponentSearch()
+      resetAllSearches()
       setSearchQuery("")
       setIsDetailsDialogOpen(false)
       setComponentForDetails(null)
       setImportErrorMessage(null)
     }
-  }, [isOpen, resetComponentSearch, setSearchQuery])
+  }, [isOpen, resetAllSearches])
 
-  const handleShowDetails = React.useCallback(
-    (component: ComponentSearchResult) => {
-      setSelectedSearchResult(component)
-      setComponentForDetails(component)
-      setDetailsPreviewTab("pcb")
-      setIsDetailsDialogOpen(true)
-      resetPackageDetails()
-      if (component.owner) {
-        const packageName = component.name.split("/").pop() ?? component.name
-        fetchPackageDetails(component.owner, packageName)
-      }
-    },
-    [fetchPackageDetails, resetPackageDetails, setSelectedSearchResult],
-  )
+  React.useEffect(() => {
+    setSearchQuery("")
+    setSelectedSearchResult(null)
+    if (activeSource === "tscircuit.com") {
+      resetTscircuitSearch()
+    } else if (activeSource === "jlcpcb") {
+      resetJlcpcbSearch()
+    } else if (activeSource === "kicad") {
+      resetKicadSearch()
+    }
+  }, [activeSource, resetJlcpcbSearch, resetKicadSearch, resetTscircuitSearch])
 
-  const performActionForComponent = React.useCallback(
-    async (component: ComponentSearchResult) => {
-      try {
-        setImportErrorMessage(null)
-        setIsSubmittingImport(true)
-        if (component.source === "kicad") {
-          if (!onKicadStringSelected) {
-            throw new Error("KiCad handler not provided")
-          }
-          await onKicadStringSelected({
-            component,
-            footprint: component.name,
-          })
-        } else if (component.source === "jlcpcb") {
-          if (!onJlcpcbComponentTsxLoaded) {
-            throw new Error("JLCPCB handler not provided")
-          }
-          if (!component.partNumber) {
-            throw new Error("Missing JLCPCB part number")
-          }
-          const tsx = await loadJlcpcbComponentTsx(component.partNumber, {
-            headers: proxyRequestHeaders,
-          })
-          await onJlcpcbComponentTsxLoaded({ component, tsx })
-        } else if (component.source === "tscircuit.com") {
-          if (!onTscircuitPackageSelected) {
-            throw new Error("tscircuit package handler not provided")
-          }
-          if (!component.owner) {
-            throw new Error("Missing package owner")
-          }
-          const packageName = component.name.split("/").pop() ?? component.name
-          const fullPackageName = `@tsci/${component.owner}.${packageName}`
-          await onTscircuitPackageSelected({
-            component,
-            fullPackageName,
-          })
+  const handleShowDetails = (component: TscircuitPackageSearchResult) => {
+    setSelectedSearchResult(component)
+    setComponentForDetails(component)
+    setDetailsPreviewTab("pcb")
+    setIsDetailsDialogOpen(true)
+    resetPackageDetails()
+    const owner = component.package.owner_github_username
+    const unscopedName = component.package.unscoped_name
+    if (owner && unscopedName) {
+      const packageName = unscopedName.split("/").pop() ?? unscopedName
+      fetchPackageDetails(owner, packageName)
+    }
+  }
+
+  const performSearch = async () => {
+    const trimmedQuery = searchQuery.trim()
+    if (!trimmedQuery) return
+
+    setSelectedSearchResult(null)
+
+    if (activeSource === "tscircuit.com") {
+      await searchTscircuit(searchQuery)
+    } else if (activeSource === "jlcpcb") {
+      await searchJlcpcb(searchQuery)
+    } else if (activeSource === "kicad") {
+      await searchKicad(searchQuery)
+    }
+  }
+
+  const performActionForComponent = async (
+    result: ImportComponentDialogSearchResult,
+  ) => {
+    try {
+      setImportErrorMessage(null)
+      setIsSubmittingImport(true)
+      if (result.source === "kicad") {
+        if (!onKicadStringSelected) {
+          throw new Error("KiCad handler not provided")
         }
-        return true
-      } catch (error) {
-        console.error("Failed to import component", error)
-        setImportErrorMessage(
-          error instanceof Error ? error.message : "Failed to import component",
-        )
-        return false
-      } finally {
-        setIsSubmittingImport(false)
+        await onKicadStringSelected({
+          result,
+          footprint: result.footprint.qualifiedName,
+        })
+      } else if (result.source === "jlcpcb") {
+        if (!onJlcpcbComponentTsxLoaded) {
+          throw new Error("JLCPCB handler not provided")
+        }
+        const tsx = await loadJlcpcbComponentTsx(result.component.partNumber, {
+          headers: jlcpcbProxyRequestHeaders,
+        })
+        await onJlcpcbComponentTsxLoaded({ result, tsx })
+      } else if (result.source === "tscircuit.com") {
+        if (!onTscircuitPackageSelected) {
+          throw new Error("tscircuit package handler not provided")
+        }
+        const owner = result.package.owner_github_username
+        const unscopedName = result.package.unscoped_name
+        if (!owner || !unscopedName) {
+          throw new Error("Missing package metadata")
+        }
+        const packageName = unscopedName.split("/").pop() ?? unscopedName
+        const fullPackageName = `@tsci/${owner}.${packageName}`
+        await onTscircuitPackageSelected({
+          result,
+          fullPackageName,
+        })
       }
-    },
-    [
-      onJlcpcbComponentTsxLoaded,
-      onKicadStringSelected,
-      onTscircuitPackageSelected,
-      proxyRequestHeaders,
-    ],
-  )
+      return true
+    } catch (error) {
+      console.error("Failed to import component", error)
+      setImportErrorMessage(
+        error instanceof Error ? error.message : "Failed to import component",
+      )
+      return false
+    } finally {
+      setIsSubmittingImport(false)
+    }
+  }
 
-  const handleConfirm = React.useCallback(async () => {
+  let searchResults: ImportComponentDialogSearchResult[] = []
+  let isSearching = false
+  let searchError: string | null = null
+  let hasExecutedSearch = false
+
+  if (activeSource === "tscircuit.com") {
+    searchResults = tscircuitResults
+    isSearching = isTscircuitSearching
+    searchError = tscircuitError
+    hasExecutedSearch = hasTscircuitSearched
+  } else if (activeSource === "jlcpcb") {
+    searchResults = jlcpcbResults
+    isSearching = isJlcpcbSearching
+    searchError = jlcpcbError
+    hasExecutedSearch = hasJlcpcbSearched
+  } else if (activeSource === "kicad") {
+    searchResults = kicadResults
+    isSearching = isKicadSearching
+    searchError = kicadError
+    hasExecutedSearch = hasKicadSearched
+  }
+
+  const handleConfirm = async () => {
     if (!selectedSearchResult) return
     const succeeded = await performActionForComponent(selectedSearchResult)
     if (succeeded) {
       onClose()
-      resetComponentSearch()
+      resetAllSearches()
       setSearchQuery("")
     }
-  }, [
-    onClose,
-    performActionForComponent,
-    resetComponentSearch,
-    selectedSearchResult,
-    setSearchQuery,
-  ])
+  }
 
-  const handleDialogClose = React.useCallback(
-    (open: boolean) => {
-      if (!open) {
-        onClose()
-      }
-    },
-    [onClose],
-  )
+  const handleDialogClose = (open: boolean) => {
+    if (!open) {
+      onClose()
+    }
+  }
 
-  const handleDetailsClose = React.useCallback(async (open: boolean) => {
+  const handleDetailsClose = (open: boolean) => {
     setIsDetailsDialogOpen(open)
     if (!open) {
       setComponentForDetails(null)
     }
-  }, [])
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleDialogClose}>
@@ -251,13 +308,13 @@ export const ImportComponentDialog2 = ({
             <SearchBar
               query={searchQuery}
               placeholder={SOURCE_CONFIG[activeSource].placeholder}
-              isSearching={isComponentSearchLoading}
+              isSearching={isSearching}
               onQueryChange={setSearchQuery}
-              onSubmit={runComponentSearch}
+              onSubmit={performSearch}
             />
 
             <div className="rf-mt-4 rf-flex-1 rf-min-h-[200px] !rf-max-h-[40vh] !rf-overflow-y-auto rf-border rf-rounded-md">
-              {isComponentSearchLoading ? (
+              {isSearching ? (
                 <div className="rf-p-8 rf-text-center rf-text-zinc-500">
                   <Loader2 className="rf-h-8 rf-w-8 rf-animate-spin rf-mx-auto rf-mb-2" />
                   <p>Searching...</p>
@@ -265,7 +322,7 @@ export const ImportComponentDialog2 = ({
               ) : searchResults.length > 0 ? (
                 <SearchResultsList
                   results={searchResults}
-                  selectedId={selectedSearchResult?.id ?? null}
+                  selected={selectedSearchResult}
                   onSelect={setSelectedSearchResult}
                   onShowDetails={
                     activeSource === "tscircuit.com"
@@ -275,9 +332,9 @@ export const ImportComponentDialog2 = ({
                 />
               ) : (
                 <div className="rf-p-8 rf-text-center rf-text-zinc-500">
-                  {componentSearchError
-                    ? `Error: ${componentSearchError}`
-                    : hasExecutedComponentSearch
+                  {searchError
+                    ? `Error: ${searchError}`
+                    : hasExecutedSearch
                       ? SOURCE_CONFIG[activeSource].emptyMessage
                       : "Enter a search term to find components"}
                 </div>
@@ -315,7 +372,7 @@ export const ImportComponentDialog2 = ({
       </DialogContent>
 
       <TscircuitPackageDetailsDialog
-        component={componentForDetails}
+        packageResult={componentForDetails}
         isOpen={isDetailsDialogOpen}
         onOpenChange={handleDetailsClose}
         isLoading={isPackageDetailsLoading}
@@ -329,7 +386,7 @@ export const ImportComponentDialog2 = ({
             if (succeeded) {
               setIsDetailsDialogOpen(false)
               onClose()
-              resetComponentSearch()
+              resetAllSearches()
               setSearchQuery("")
             }
           })

@@ -31,27 +31,26 @@ export default function ImportComponentDialog2Fixture() {
 
     if (enableTscircuit) {
       maybeHandlers.onTscircuitPackageSelected = async ({
-        component,
+        result,
         fullPackageName,
       }) => {
-        appendLog(`tscircuit → ${component.name} (${fullPackageName})`)
+        appendLog(
+          `tscircuit → ${result.package.unscoped_name ?? result.package.name} (${fullPackageName})`,
+        )
       }
     }
 
     if (enableJlcpcb) {
-      maybeHandlers.onJlcpcbComponentTsxLoaded = async ({ component, tsx }) => {
+      maybeHandlers.onJlcpcbComponentTsxLoaded = async ({ result, tsx }) => {
         appendLog(
-          `jlcpcb → ${component.partNumber ?? component.name} (tsx: ${tsx.length} chars)`,
+          `jlcpcb → ${result.component.partNumber} (tsx: ${tsx.length} chars)`,
         )
       }
     }
 
     if (enableKicad) {
-      maybeHandlers.onKicadStringSelected = async ({
-        component,
-        footprint,
-      }) => {
-        appendLog(`kicad → ${component.name} (${footprint})`)
+      maybeHandlers.onKicadStringSelected = async ({ result, footprint }) => {
+        appendLog(`kicad → ${result.footprint.qualifiedName} (${footprint})`)
       }
     }
 

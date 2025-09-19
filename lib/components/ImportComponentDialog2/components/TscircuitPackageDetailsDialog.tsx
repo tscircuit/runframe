@@ -10,12 +10,13 @@ import {
 } from "../../ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs"
 import type {
-  ComponentSearchResult,
   TscircuitPackageDetails,
+  TscircuitPackageSearchResult,
 } from "../types"
+import type { Package } from "@tscircuit/fake-snippets/schema"
 
 interface TscircuitPackageDetailsDialogProps {
-  component: ComponentSearchResult | null
+  packageResult: TscircuitPackageSearchResult | null
   isOpen: boolean
   onOpenChange: (open: boolean) => void
   isLoading: boolean
@@ -26,16 +27,13 @@ interface TscircuitPackageDetailsDialogProps {
   onImport: () => void
 }
 
-const buildPreviewUrl = (
-  component: ComponentSearchResult | null,
-  tab: "pcb" | "schematic",
-) => {
-  if (!component?.owner || !component?.name) return null
-  return `https://registry-api.tscircuit.com/packages/images/${component.owner}/${component.name}/${tab}.png`
+const buildPreviewUrl = (pkg: Package | null, tab: "pcb" | "schematic") => {
+  if (!pkg?.owner_github_username || !pkg?.unscoped_name) return null
+  return `https://registry-api.tscircuit.com/packages/images/${pkg.owner_github_username}/${pkg.unscoped_name}/${tab}.png`
 }
 
 export const TscircuitPackageDetailsDialog = ({
-  component,
+  packageResult,
   isOpen,
   onOpenChange,
   isLoading,
@@ -45,15 +43,17 @@ export const TscircuitPackageDetailsDialog = ({
   isSubmitting,
   onImport,
 }: TscircuitPackageDetailsDialogProps) => {
-  const pcbPreviewUrl = buildPreviewUrl(component, "pcb")
-  const schematicPreviewUrl = buildPreviewUrl(component, "schematic")
-  const packageName = component?.name?.split("/").pop()
-  const ownerUrl = component?.owner
-    ? `https://tscircuit.com/${component.owner}`
+  const pkg = packageResult?.package ?? null
+  const pcbPreviewUrl = buildPreviewUrl(pkg, "pcb")
+  const schematicPreviewUrl = buildPreviewUrl(pkg, "schematic")
+  const packageName = pkg?.unscoped_name?.split("/").pop() ?? pkg?.unscoped_name
+  const ownerUsername = pkg?.owner_github_username ?? undefined
+  const ownerUrl = ownerUsername
+    ? `https://tscircuit.com/${ownerUsername}`
     : undefined
   const packageUrl =
-    component?.owner && packageName
-      ? `https://tscircuit.com/${component.owner}/${packageName}`
+    ownerUsername && packageName
+      ? `https://tscircuit.com/${ownerUsername}/${packageName}`
       : undefined
 
   return (
@@ -69,15 +69,13 @@ export const TscircuitPackageDetailsDialog = ({
               <DialogTitle className="rf-text-xl rf-font-semibold rf-truncate">
                 {packageName}
               </DialogTitle>
-              <DialogDescription>
-                {component?.description}
-              </DialogDescription>
+              <DialogDescription>{pkg?.description}</DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
         <div className="rf-flex-1 rf-overflow-y-auto rf-py-4 rf-space-y-6">
-          {component?.owner ? (
+          {ownerUsername ? (
             <div>
               <label className="rf-text-xs rf-font-medium rf-text-gray-500 rf-uppercase rf-tracking-wide">
                 Created by
@@ -90,10 +88,10 @@ export const TscircuitPackageDetailsDialog = ({
                     rel="noopener noreferrer"
                     className="rf-text-black hover:rf-underline"
                   >
-                    {component.owner}
+                    {ownerUsername}
                   </a>
                 ) : (
-                  component.owner
+                  ownerUsername
                 )}
               </div>
             </div>
@@ -115,7 +113,7 @@ export const TscircuitPackageDetailsDialog = ({
                   {pcbPreviewUrl ? (
                     <img
                       src={pcbPreviewUrl}
-                      alt={`${component?.name} PCB preview`}
+                      alt={`${packageName ?? "package"} PCB preview`}
                       className="rf-w-full rf-h-full rf-object-contain rf-bg-white rf-p-4"
                     />
                   ) : null}
@@ -127,7 +125,7 @@ export const TscircuitPackageDetailsDialog = ({
                   {schematicPreviewUrl ? (
                     <img
                       src={schematicPreviewUrl}
-                      alt={`${component?.name} schematic preview`}
+                      alt={`${packageName ?? "package"} schematic preview`}
                       className="rf-w-full rf-h-full rf-object-contain rf-bg-white rf-p-4"
                     />
                   ) : null}
@@ -138,7 +136,9 @@ export const TscircuitPackageDetailsDialog = ({
 
           {details?.ai_description ? (
             <section>
-              <h3 className="rf-text-lg rf-font-semibold rf-mb-3">AI Description</h3>
+              <h3 className="rf-text-lg rf-font-semibold rf-mb-3">
+                AI Description
+              </h3>
               <div className="rf-bg-gray-50 rf-border rf-border-gray-200 rf-rounded-lg rf-p-4">
                 <p className="rf-text-sm rf-text-gray-700 rf-leading-relaxed">
                   {details.ai_description}
@@ -149,7 +149,9 @@ export const TscircuitPackageDetailsDialog = ({
 
           {details?.ai_usage_instructions ? (
             <section>
-              <h3 className="rf-text-lg rf-font-semibold rf-mb-3">Usage Instructions</h3>
+              <h3 className="rf-text-lg rf-font-semibold rf-mb-3">
+                Usage Instructions
+              </h3>
               <div className="rf-bg-gray-50 rf-border rf-border-gray-200 rf-rounded-lg rf-p-4">
                 <p className="rf-text-sm rf-text-gray-700 rf-leading-relaxed rf-whitespace-pre-wrap">
                   {details.ai_usage_instructions}

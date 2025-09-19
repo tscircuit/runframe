@@ -1,6 +1,6 @@
 import { fetchEasyEDAComponent, convertRawEasyToTsx } from "easyeda/browser"
 import { API_BASE } from "lib/components/RunFrameWithApi/api-base"
-import type { ComponentSearchResult } from "../types"
+import type { JlcpcbComponentSummary } from "../types"
 
 interface JlcpcbComponentApiResult {
   description: string
@@ -31,13 +31,12 @@ export const searchJlcpcbComponents = async (
   return data.components ?? []
 }
 
-export const mapJlcpcbComponentToSearchResult = (
+export const mapJlcpcbComponentToSummary = (
   component: JlcpcbComponentApiResult,
-): ComponentSearchResult => ({
-  id: `jlc-${component.lcsc}`,
-  name: component.mfr,
+): JlcpcbComponentSummary => ({
+  lcscId: component.lcsc,
+  manufacturer: component.mfr,
   description: component.description,
-  source: "jlcpcb",
   partNumber: `C${component.lcsc}`,
   package: component.package,
   price: component.price,

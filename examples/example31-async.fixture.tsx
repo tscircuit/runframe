@@ -71,7 +71,7 @@ const mockCircuitAPI = {
         },
       ],
     }
-  }
+  },
 }
 
 const AsyncCircuitViewer = () => {

@@ -113,7 +113,7 @@ export const SearchResultsList = ({
                   className="rf-text-xs rf-w-full sm:rf-w-auto"
                   onClick={(event) => {
                     event.stopPropagation()
-                    onShowDetails(result)
+                    onShowDetails(result as TscircuitPackageSearchResult)
                   }}
                 >
                   See Details

@@ -58,14 +58,23 @@ export const EnhancedFileSelectorCombobox = ({
     setFile(currentFile)
   }, [currentFile])
 
-  const filteredFiles = files.filter(
-    (file) =>
-      (file.endsWith(".tsx") ||
-        file.endsWith(".ts") ||
-        file.endsWith(".jsx") ||
-        file.endsWith(".js")) &&
-      !file.endsWith(".d.ts"),
-  )
+  const filteredFiles = files.filter((file) => {
+    const fileName = file.split("/").pop() ?? ""
+    const lowerCaseFileName = fileName.toLowerCase()
+    const isScriptFile =
+      file.endsWith(".tsx") ||
+      file.endsWith(".ts") ||
+      file.endsWith(".jsx") ||
+      file.endsWith(".js")
+
+    if (!isScriptFile || file.endsWith(".d.ts")) return false
+
+    if (lowerCaseFileName.startsWith("test.tsx")) {
+      return false
+    }
+
+    return true
+  })
 
   const fileTree = parseFilesToTree(filteredFiles)
   const { files: currentFiles, folders: currentFolders } =

@@ -41,14 +41,14 @@ export const RunFrameStaticBuildViewer = (
     try {
       setIsLoading(true)
       setError(null)
-      
+
       const result = loadCircuitJsonFilesSync(circuitJsonFiles, defaultFilename)
-      
+
       setCircuitJson(result.circuitJson)
       setSelectedFile(result.selectedFile)
       setAvailableFiles(result.availableFiles)
       setError(result.error)
-      
+
       if (result.circuitJson && !result.error) {
         onCircuitJsonLoaded?.(result.circuitJson, result.selectedFile)
       }
@@ -74,9 +74,12 @@ export const RunFrameStaticBuildViewer = (
     [circuitJsonFiles, onFileChange, onCircuitJsonLoaded],
   )
 
-  const handleExport = useCallback((format: string, filename: string) => {
-    onExport?.(format, filename)
-  }, [onExport])
+  const handleExport = useCallback(
+    (format: string, filename: string) => {
+      onExport?.(format, filename)
+    },
+    [onExport],
+  )
 
   if (isLoading) {
     return (
@@ -136,7 +139,6 @@ export const RunFrameStaticBuildViewer = (
               exportFormats={exportFormats}
             />
           )}
-          
           {showFileSelector && (
             <CircuitJsonFileSelector
               files={availableFiles}
@@ -147,17 +149,11 @@ export const RunFrameStaticBuildViewer = (
             />
           )}
         </div>
-        
         <div className="flex items-center gap-4">
           {scenarioSelectorContent}
-          
-          <FileMenuLeftHeader
-            circuitJson={circuitJson}
-            isWebEmbedded={false}
-          />
+          <FileMenuLeftHeader circuitJson={circuitJson} isWebEmbedded={false} />
         </div>
       </div>
-      
       <div className="flex-1 overflow-hidden">
         <CircuitJsonPreview
           circuitJson={circuitJson}

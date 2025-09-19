@@ -255,7 +255,12 @@ class CircuitAPIService {
   private circuits: Record<string, any> = circuitDatabase
 
   async getCircuitList(): Promise<
-    Array<{ filename: string; name: string; description: string; complexity: string }>
+    Array<{
+      filename: string
+      name: string
+      description: string
+      complexity: string
+    }>
   > {
     await new Promise((resolve) => setTimeout(resolve, 300))
     return Object.entries(this.circuits).map(([filename, circuit]) => ({
@@ -335,7 +340,12 @@ const ScenarioSelector: React.FC<{
 const FullIntegrationExample = () => {
   const [circuitFiles, setCircuitFiles] = useState<Record<string, any>>({})
   const [circuitList, setCircuitList] = useState<
-    Array<{ filename: string; name: string; description: string; complexity: string }>
+    Array<{
+      filename: string
+      name: string
+      description: string
+      complexity: string
+    }>
   >([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -350,25 +360,24 @@ const FullIntegrationExample = () => {
     try {
       setIsLoading(true)
       setError(null)
-      
+
       const list = await apiService.getCircuitList()
       setCircuitList(list)
-      
+
       const circuitPromises = list.map(async (item) => {
         const data = await apiService.getCircuit(item.filename)
         return { filename: item.filename, data }
       })
-      
+
       const loadedCircuits = await Promise.all(circuitPromises)
-      
+
       const circuitRecord: Record<string, any> = {}
       loadedCircuits.forEach(({ filename, data }) => {
         circuitRecord[filename] = data
       })
-      
+
       setCircuitFiles(circuitRecord)
       setSelectedFile(list[0]?.filename || "")
-      
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load circuits")
       console.error("Error loading circuits:", err)
@@ -385,38 +394,47 @@ const FullIntegrationExample = () => {
     setSelectedFile(filename)
   }, [])
 
-  const handleCircuitLoaded = useCallback((circuitJson: any, filename: string) => {
-    const circuitName = circuitJson.name || filename
-    document.title = `${circuitName} - Circuit Viewer`
-  }, [])
+  const handleCircuitLoaded = useCallback(
+    (circuitJson: any, filename: string) => {
+      const circuitName = circuitJson.name || filename
+      document.title = `${circuitName} - Circuit Viewer`
+    },
+    [],
+  )
 
-  const handleExport = useCallback(async (format: string, filename: string) => {
-    try {
-      setIsExporting(true)
-      setExportStatus(`Exporting ${filename} as ${format.toUpperCase()}...`)
-      
-      const blob = await apiService.exportCircuit(filename, format)
-      
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${filename.replace('.json', '')}.${format}`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-      
-      setExportStatus(`Successfully exported ${filename} as ${format.toUpperCase()}`)
-      setTimeout(() => setExportStatus(null), 3000)
-      
-    } catch (err) {
-      console.error('Export failed:', err)
-      setExportStatus(`Export failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
-      setTimeout(() => setExportStatus(null), 5000)
-    } finally {
-      setIsExporting(false)
-    }
-  }, [apiService])
+  const handleExport = useCallback(
+    async (format: string, filename: string) => {
+      try {
+        setIsExporting(true)
+        setExportStatus(`Exporting ${filename} as ${format.toUpperCase()}...`)
+
+        const blob = await apiService.exportCircuit(filename, format)
+
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = `${filename.replace(".json", "")}.${format}`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+
+        setExportStatus(
+          `Successfully exported ${filename} as ${format.toUpperCase()}`,
+        )
+        setTimeout(() => setExportStatus(null), 3000)
+      } catch (err) {
+        console.error("Export failed:", err)
+        setExportStatus(
+          `Export failed: ${err instanceof Error ? err.message : "Unknown error"}`,
+        )
+        setTimeout(() => setExportStatus(null), 5000)
+      } finally {
+        setIsExporting(false)
+      }
+    },
+    [apiService],
+  )
 
   const handleScenarioChange = useCallback((scenario: string) => {
     setSelectedScenario(scenario)
@@ -433,8 +451,8 @@ const FullIntegrationExample = () => {
           <p className="text-gray-600">Preparing your circuit design environment...</p>
           <div className="mt-4 flex justify-center gap-2">
             <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
-            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
+            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
           </div>
         </div>
       </div>

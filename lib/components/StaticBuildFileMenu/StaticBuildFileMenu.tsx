@@ -86,7 +86,17 @@ export const StaticBuildFileMenu = (props: StaticBuildFileMenuProps) => {
                 >
                   <Download className="h-4 w-4" />
                   Export as{" "}
-                  {typeof format === "string" ? format.toUpperCase() : format.name}
+                  {typeof format === "string"
+                    ? (
+                      <span>
+                        {format.toUpperCase()}
+                      </span>
+                    )
+                    : (
+                      <span>
+                        {format.name}
+                      </span>
+                    )}
                 </DropdownMenuItem>
               ))}
               <DropdownMenuSeparator />

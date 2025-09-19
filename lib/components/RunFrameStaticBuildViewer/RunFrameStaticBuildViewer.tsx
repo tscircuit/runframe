@@ -43,10 +43,10 @@ export const RunFrameStaticBuildViewer = (
 
   const circuitJsonFiles = props.circuitJsonFiles ?? {}
   const fileReferences = props.files ?? []
-  const availableFiles =
-    fileReferences.length > 0
-      ? fileReferences.map((f) => f.filePath)
-      : Object.keys(circuitJsonFiles)
+  const availableFiles = [
+    ...Object.keys(circuitJsonFiles),
+    ...fileReferences.map((f) => f.filePath),
+  ]
 
   const defaultFetchFile = useCallback(
     async (fileRef: CircuitJsonFileReference): Promise<CircuitJson> => {

@@ -26,6 +26,13 @@ export default () => {
     "middleware/auth.ts",
     "api/routes/users.ts",
     "tests/components/Button.test.tsx",
+    // Added very long file names and paths to test ellipsis
+    "VeryLongFileNameThatShouldBeEllipsedInTheDropdown.tsx",
+    "AnotherExtremelyLongFileNameForTestingPurposes.ts",
+    "features/very-long-feature-name/components/deeply-nested/subdirectory/with-many-levels/VeryLongComponentNameForTesting.tsx",
+    "src/components/extremely-verbose-directory-structure/nested-components/ui-elements/form-controls/advanced-inputs/SuperLongInputComponentWithManyFeatures.tsx",
+    "lib/utilities/data-processing/advanced-algorithms/machine-learning/neural-networks/deep-learning/VeryComplexAIModelImplementation.ts",
+    "pages/dashboard/analytics/reports/quarterly/financial/revenue/breakdown/DetailedRevenueAnalysisReportComponent.tsx",
   ]
 
   return (

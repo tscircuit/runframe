@@ -176,25 +176,9 @@ export const EnhancedFileSelectorCombobox = ({
 
   const displayPath = currentFolder || "/"
   const shortDisplayPath =
-    displayPath.length > 25 ? "..." + displayPath.slice(-22) : displayPath
-
-  // Calculate dynamic width based on path length
+    displayPath.length > 25 ? "..." + displayPath.slice(-22) : displayPath // Fixed width to eliminate jitter - no dynamic sizing
   const getDropdownWidth = () => {
-    if (isSearching) {
-      return "rf-w-fit rf-min-w-96 rf-max-w-[900px]"
-    }
-
-    const pathLength = displayPath.length
-    const estimatedTextWidth = pathLength * 8
-    const baseContentWidth = 280
-    if (estimatedTextWidth > baseContentWidth + 120) {
-      return "rf-w-96 rf-min-w-96 rf-max-w-[600px]"
-    } else if (estimatedTextWidth > baseContentWidth + 40) {
-      return "rf-w-[22rem] rf-min-w-80 rf-max-w-96"
-    } else {
-      // Default size
-      return "rf-w-80 rf-min-w-80 rf-max-w-96"
-    }
+    return "rf-w-[400px] rf-min-w-[400px] rf-max-w-[400px]"
   }
 
   return (
@@ -236,7 +220,7 @@ export const EnhancedFileSelectorCombobox = ({
 
             {/* Directory Header */}
             <div className="rf-px-3 rf-py-2 rf-border-t rf-border-b rf-border-gray-200 rf-bg-slate-50">
-              <div className="rf-flex rf-items-center rf-text-xs rf-text-slate-600 rf-min-w-0">
+              <div className="rf-flex rf-items-center rf-text-xs rf-text-slate-600 rf-min-w-0 rf-overflow-hidden">
                 <button
                   onClick={() => navigateToFolder("")}
                   className="rf-text-blue-600 hover:rf-text-blue-800 rf-underline rf-cursor-pointer rf-bg-transparent rf-border-none rf-p-0 rf-flex-shrink-0"
@@ -255,13 +239,16 @@ export const EnhancedFileSelectorCombobox = ({
                       >
                         <span className="rf-mx-1 rf-flex-shrink-0">/</span>
                         {index === array.length - 1 ? (
-                          <span className="rf-text-slate-800" title={segment}>
+                          <span
+                            className="rf-text-slate-800 rf-truncate rf-max-w-[150px]"
+                            title={segment}
+                          >
                             {segment}
                           </span>
                         ) : (
                           <button
                             onClick={() => navigateToFolder(pathToSegment)}
-                            className="rf-text-blue-600 hover:rf-text-blue-800 rf-underline rf-cursor-pointer rf-bg-transparent rf-border-none rf-p-0"
+                            className="rf-text-blue-600 hover:rf-text-blue-800 rf-underline rf-cursor-pointer rf-bg-transparent rf-border-none rf-p-0 rf-truncate rf-max-w-[100px]"
                             title={segment}
                           >
                             {segment}
@@ -366,22 +353,17 @@ export const EnhancedFileSelectorCombobox = ({
                                 <span className="rf-mr-2">
                                   {getFileIcon(file.fileName)}
                                 </span>
-                                <div className="rf-flex rf-items-center rf-justify-between rf-w-full rf-min-w-0">
-                                  <span className="rf-truncate">
+                                <div className="rf-flex rf-items-center rf-w-full rf-min-w-0">
+                                  <span className="rf-truncate rf-flex-1">
                                     {file.fileName}
                                   </span>
-                                  <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-flex-shrink-0">
+                                  <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[120px]">
                                     {currentFolder || "/"}
                                   </span>
-                                </div>
-                                <Check
-                                  className={cn(
-                                    "rf-ml-2 rf-h-4 rf-w-4 rf-flex-shrink-0",
-                                    file.path === currentFile
-                                      ? "rf-opacity-100"
-                                      : "rf-opacity-0",
+                                  {file.path === currentFile && (
+                                    <Check className="rf-ml-2 rf-h-4 rf-w-4 rf-flex-shrink-0" />
                                   )}
-                                />
+                                </div>
                               </CommandItem>
                             ),
                           )}
@@ -407,25 +389,20 @@ export const EnhancedFileSelectorCombobox = ({
                               <span className="rf-mr-2">
                                 {getFileIcon(file.fileName)}
                               </span>
-                              <div className="rf-flex rf-items-center rf-justify-between rf-w-full rf-min-w-0">
-                                <span className="rf-truncate">
+                              <div className="rf-flex rf-items-center rf-w-full rf-min-w-0">
+                                <span className="rf-truncate rf-flex-1">
                                   {file.fileName}
                                 </span>
-                                <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-flex-shrink-0">
+                                <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[120px]">
                                   {file.path.substring(
                                     0,
                                     file.path.lastIndexOf("/"),
                                   ) || "/"}
                                 </span>
-                              </div>
-                              <Check
-                                className={cn(
-                                  "rf-ml-2 rf-h-4 rf-w-4 rf-flex-shrink-0",
-                                  file.path === currentFile
-                                    ? "rf-opacity-100"
-                                    : "rf-opacity-0",
+                                {file.path === currentFile && (
+                                  <Check className="rf-ml-2 rf-h-4 rf-w-4 rf-flex-shrink-0" />
                                 )}
-                              />
+                              </div>
                             </CommandItem>
                           ))}
                         </CommandGroup>

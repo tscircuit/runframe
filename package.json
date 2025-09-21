@@ -64,7 +64,7 @@
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.20",
     "chokidar-cli": "^3.0.0",
-    "circuit-json": "0.0.261",
+    "circuit-json": "0.0.262",
     "circuit-json-to-bom-csv": "^0.0.7",
     "circuit-json-to-gerber": "^0.0.34",
     "circuit-json-to-gltf": "^0.0.7",

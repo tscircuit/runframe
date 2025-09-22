@@ -19,6 +19,7 @@
         "@tscircuit/3d-viewer": "^0.0.398",
         "@tscircuit/assembly-viewer": "^0.0.5",
         "@tscircuit/checks": "^0.0.75",
+        "@tscircuit/common": "^0.0.4",
         "@tscircuit/create-snippet-url": "^0.0.9",
         "@tscircuit/eval": "^0.0.333",
         "@tscircuit/fake-snippets": "^0.0.87",
@@ -567,6 +568,8 @@
     "@tscircuit/circuit-json-util": ["@tscircuit/circuit-json-util@0.0.67", "", { "dependencies": { "parsel-js": "^1.1.2" }, "peerDependencies": { "circuit-json": "*", "transformation-matrix": "*", "zod": "3" } }, "sha512-ErTCyrW/zOBq+Ulqan8weUNNgcJNpelJ7gIq2G3OZGcI3xUrZBB+BE7oZeritvDtG1ofKrVMgvHTnENdxXjIug=="],
 
     "@tscircuit/cli": ["@tscircuit/cli@0.1.224", "", { "peerDependencies": { "tscircuit": "*" }, "bin": { "tscircuit-cli": "cli/entrypoint.js" } }, "sha512-c8FpXeqcOaQIkWBzjX+ly45NTTlMehzHkKjrSrMbvTHYzluvdt9rrBnu6FohJLgdCPsHSzh5uWIk0z6mpZO/KQ=="],
+
+    "@tscircuit/common": ["@tscircuit/common@0.0.4", "", {}, "sha512-nFfMJ6F9dWaF3Wtbz58H20mmUxkjjDaI3QZAknHWxgwSagLXCnKbsUVzBKkjorMnBdYke1lt61GU79dZgXzAFQ=="],
 
     "@tscircuit/core": ["@tscircuit/core@0.0.737", "", { "dependencies": { "@flatten-js/core": "^1.6.2", "@lume/kiwi": "^0.4.3", "calculate-packing": "0.0.37", "css-select": "5.1.0", "format-si-unit": "^0.0.3", "nanoid": "^5.0.7", "performance-now": "^2.1.0", "react-reconciler": "^0.32.0", "transformation-matrix": "^2.16.1", "zod": "^3.25.67" }, "peerDependencies": { "@tscircuit/capacity-autorouter": "*", "@tscircuit/checks": "*", "@tscircuit/circuit-json-util": "*", "@tscircuit/footprinter": "*", "@tscircuit/infgrid-ijump-astar": "*", "@tscircuit/matchpack": "*", "@tscircuit/math-utils": "*", "@tscircuit/props": "*", "@tscircuit/schematic-autolayout": "*", "@tscircuit/schematic-match-adapt": "*", "bpc-graph": "*", "circuit-json": "*", "circuit-json-to-bpc": "*", "circuit-json-to-connectivity-map": "*", "schematic-symbols": "*", "typescript": "^5.0.0" } }, "sha512-NBYDcsONQiCP1bQe2KPE2jR78q00U0ovNyJSzMBMz9U/ieeFfLERYGCZN5BdIPNwdjlfFjsgI//QlG9s+UhfUw=="],
 

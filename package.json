@@ -65,7 +65,7 @@
     "autoprefixer": "^10.4.20",
     "chokidar-cli": "^3.0.0",
     "circuit-json": "0.0.265",
-    "circuit-json-to-bom-csv": "^0.0.7",
+    "circuit-json-to-bom-csv": "^0.0.8",
     "circuit-json-to-gerber": "^0.0.34",
     "circuit-json-to-gltf": "^0.0.7",
     "circuit-json-to-pnp-csv": "^0.0.7",

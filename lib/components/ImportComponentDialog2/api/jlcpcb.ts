@@ -8,6 +8,7 @@ interface JlcpcbComponentApiResult {
   mfr: string
   package: string
   price: number
+  stock: number
 }
 
 interface SearchResponse {
@@ -40,6 +41,7 @@ export const mapJlcpcbComponentToSummary = (
   partNumber: `C${component.lcsc}`,
   package: component.package,
   price: component.price,
+  stock: component.stock,
 })
 
 export const loadJlcpcbComponentTsx = async (

@@ -86,6 +86,7 @@ export const SearchResultsList = ({
         const primary = getPrimaryText(result)
         const secondary = getSecondaryText(result)
         const partNumber = getPartNumberLabel(result)
+        const stock = result.source === "jlcpcb" ? result.component.stock : null
 
         return (
           <div
@@ -118,6 +119,10 @@ export const SearchResultsList = ({
                 >
                   See Details
                 </Button>
+              </div>
+            ) : result.source === "jlcpcb" && stock != null ? (
+              <div className="rf-text-xs rf-text-zinc-500 rf-font-medium rf-w-full sm:rf-w-auto sm:rf-text-right sm:rf-justify-self-end rf-whitespace-nowrap">
+                {stock.toLocaleString()} in stock
               </div>
             ) : null}
           </div>

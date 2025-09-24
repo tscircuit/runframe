@@ -1,4 +1,5 @@
 import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
+import { useCallback, useState } from "react"
 import { RunFrameWithApi } from "../RunFrameWithApi/RunFrameWithApi"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 
@@ -12,6 +13,24 @@ export const RunFrameForCli = (props: {
     "load-latest-eval",
     true,
   )
+  const [initialMainComponentPath] = useState<string | undefined>(() => {
+    if (typeof window === "undefined") return undefined
+    const params = new URLSearchParams(window.location.hash.slice(1))
+    return params.get("main_component") ?? undefined
+  })
+
+  const updateMainComponentHash = useCallback((mainComponentPath: string) => {
+    if (typeof window === "undefined") return
+    const params = new URLSearchParams(window.location.hash.slice(1))
+    if (params.get("main_component") === mainComponentPath) return
+    params.set("main_component", mainComponentPath)
+    const newHash = params.toString()
+    const newUrl =
+      `${window.location.pathname}${window.location.search}` +
+      (newHash.length > 0 ? `#${newHash}` : "")
+    window.history.replaceState(null, "", newUrl)
+  }, [])
+
   return (
     <RunFrameWithApi
       debug={props.debug}
@@ -22,6 +41,8 @@ export const RunFrameForCli = (props: {
       showFilesSwitch
       showFileMenu={false}
       enableFetchProxy={props.enableFetchProxy}
+      initialMainComponentPath={initialMainComponentPath}
+      onMainComponentPathChange={updateMainComponentHash}
       leftHeaderContent={
         <div className="rf-flex rf-items-center rf-justify-between">
           <FileMenuLeftHeader

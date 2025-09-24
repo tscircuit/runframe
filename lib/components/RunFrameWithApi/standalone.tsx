@@ -2,7 +2,16 @@ import { createRoot } from "react-dom/client"
 import { RunFrameWithApi } from "./RunFrameWithApi"
 import { RunFrameForCli } from "../RunFrameForCli/RunFrameForCli"
 import { RunFrame } from "../RunFrame/RunFrame"
+import { RunFrameStaticBuildViewer } from "../RunFrameStaticBuildViewer/RunFrameStaticBuildViewer"
+import type { CircuitJsonFileReference } from "../RunFrameStaticBuildViewer/RunFrameStaticBuildViewer"
 import type { ComponentProps } from "react"
+
+declare global {
+  interface Window {
+    TSCIRCUIT_USE_RUNFRAME_FOR_CLI?: boolean
+    TSCIRCUIT_RUNFRAME_STATIC_FILE_LIST?: CircuitJsonFileReference[]
+  }
+}
 
 const ensureDocumentReady = (): Promise<void> => {
   return new Promise((resolve) => {
@@ -70,8 +79,10 @@ const runframeStandaloneProps: ComponentProps<typeof RunFrameWithApi> = {
 
   const root = createRoot(ensureRoot())
 
-  // @ts-ignore
-  if (window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI) {
+  const staticFileList = window.TSCIRCUIT_RUNFRAME_STATIC_FILE_LIST
+  if (Array.isArray(staticFileList)) {
+    root.render(<RunFrameStaticBuildViewer files={staticFileList} />)
+  } else if (window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI) {
     root.render(<RunFrameForCli {...runframeStandaloneProps} />)
   } else {
     const { fsMap } = await loadScriptsAsFsMap()

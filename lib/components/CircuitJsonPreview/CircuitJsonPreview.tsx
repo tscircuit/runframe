@@ -11,7 +11,7 @@ import { ErrorFallback } from "../ErrorFallback"
 import { ErrorBoundary } from "react-error-boundary"
 import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
 import { SchematicViewer } from "@tscircuit/schematic-viewer"
-import { AssemblyViewer } from "@tscircuit/assembly-viewer"
+import { AssemblyViewer, PinoutViewer } from "@tscircuit/assembly-viewer"
 import PreviewEmptyState from "../PreviewEmptyState"
 import { CircuitJsonTableViewer } from "../CircuitJsonTableViewer/CircuitJsonTableViewer"
 import { BomTable } from "../BomTable"
@@ -58,6 +58,7 @@ declare global {
 
 const dropdownMenuItems = [
   "assembly",
+  "pinout",
   "bom",
   "circuit_json",
   "errors",
@@ -104,6 +105,7 @@ export const CircuitJsonPreview = ({
   allowSelectingVersion = true,
   showFileMenu = false,
   isWebEmbedded = false,
+  projectName,
   onRerunWithDebug,
 }: PreviewContentProps) => {
   useStyles()
@@ -214,6 +216,7 @@ export const CircuitJsonPreview = ({
               <FileMenuLeftHeader
                 isWebEmbedded={isWebEmbedded}
                 circuitJson={circuitJson}
+                projectName={projectName}
               />
             )}
             {(leftHeaderContent || showFileMenu) && (
@@ -515,6 +518,31 @@ export const CircuitJsonPreview = ({
                       }}
                       editingEnabled
                       debugGrid
+                    />
+                  ) : (
+                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                  )}
+                </ErrorBoundary>
+              </div>
+            </TabsContent>
+          )}
+          {(!availableTabs || availableTabs.includes("pinout")) && (
+            <TabsContent value="pinout">
+              <div
+                className={cn(
+                  "rf-overflow-auto",
+                  isFullScreen ? "rf-h-screen" : "rf-h-full  rf-min-h-[620px]",
+                )}
+              >
+                <ErrorBoundary
+                  fallback={<div>Error loading Pinout Viewer</div>}
+                >
+                  {circuitJson ? (
+                    <PinoutViewer
+                      circuitJson={circuitJson}
+                      containerStyle={{
+                        height: "100%",
+                      }}
                     />
                   ) : (
                     <PreviewEmptyState onRunClicked={onRunClicked} />

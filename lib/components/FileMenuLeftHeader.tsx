@@ -44,6 +44,7 @@ export const FileMenuLeftHeader = (props: {
   shouldLoadLatestEval?: boolean
   onChangeShouldLoadLatestEval?: (shouldLoadLatestEval: boolean) => void
   circuitJson?: any
+  projectName?: string
 }) => {
   const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
   const [snippetName, setSnippetName] = useState<string | null>(null)
@@ -159,7 +160,7 @@ export const FileMenuLeftHeader = (props: {
             File
           </div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent className="rf-z-[101]">
           {/* CLI-only menu items */}
           {!props.isWebEmbedded && (
             <>
@@ -227,7 +228,8 @@ export const FileMenuLeftHeader = (props: {
                       exportAndDownload({
                         exportName: exp.name,
                         circuitJson,
-                        projectName: snippetName ?? "Untitled",
+                        projectName:
+                          props.projectName ?? snippetName ?? "Untitled",
                       })
                     }}
                     disabled={isExporting}

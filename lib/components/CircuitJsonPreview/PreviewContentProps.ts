@@ -7,6 +7,7 @@ export type TabId =
   | "pcb"
   | "schematic"
   | "assembly"
+  | "pinout"
   | "cad"
   | "bom"
   | "circuit_json"
@@ -99,6 +100,11 @@ export interface PreviewContentProps {
    * Whether the preview is being embedded in a web page
    */
   isWebEmbedded?: boolean
+
+  /**
+   * Project name to use for exports
+   */
+  projectName?: string
 
   /**
    * Callback to rerun render with debug options

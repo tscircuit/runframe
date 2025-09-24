@@ -7,7 +7,8 @@ import { API_BASE } from "./api-base"
 import { useRunFrameStore } from "./store"
 import { applyEditEventsToManualEditsFile } from "@tscircuit/core"
 import type { ManualEditsFile } from "@tscircuit/props"
-import { FileSelectorCombobox } from "./file-selector-combobox"
+
+import { EnhancedFileSelectorCombobox } from "./EnhancedFileSelectorCombobox"
 
 const debug = Debug("run-frame:RunFrameWithApi")
 
@@ -37,10 +38,19 @@ export interface RunFrameWithApiProps {
   workerBlobUrl?: string
   evalWebWorkerBlobUrl?: string
   showFileMenu?: boolean
+
   /**
    * Enable fetch proxy for the web worker (useful for standalone bundles)
    */
   enableFetchProxy?: boolean
+  /**
+   * The main component path that should be selected initially when available.
+   */
+  initialMainComponentPath?: string
+  /**
+   * Callback invoked whenever the selected main component path changes.
+   */
+  onMainComponentPathChange?: (path: string) => void
 }
 
 export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
@@ -60,7 +70,9 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   const fsMap = useRunFrameStore((s) => s.fsMap)
   const circuitJson = useRunFrameStore((s) => s.circuitJson)
 
-  const [componentPath, setComponentPath] = useState<string>("")
+  const [componentPath, setComponentPath] = useState<string>(
+    props.initialMainComponentPath ?? "",
+  )
   const [isLoadingFiles, setIsLoadingFiles] = useState(true)
 
   useEffect(() => {
@@ -75,22 +87,34 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       return
     }
     const defaultPath = window?.TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH
-    if (defaultPath && files.includes(defaultPath)) {
-      setComponentPath(defaultPath)
-    } else {
-      const firstMatch = files.find(
-        (file) =>
-          (file.endsWith(".tsx") ||
-            file.endsWith(".ts") ||
-            file.endsWith(".jsx") ||
-            file.endsWith(".js")) &&
-          !file.endsWith(".d.ts"),
-      )
-      if (firstMatch) {
-        setComponentPath(firstMatch)
+    const candidatePaths = [props.initialMainComponentPath, defaultPath].filter(
+      (value): value is string => Boolean(value),
+    )
+
+    for (const candidate of candidatePaths) {
+      if (files.includes(candidate)) {
+        setComponentPath(candidate)
+        return
       }
     }
-  }, [fsMap])
+
+    const firstMatch = files.find(
+      (file) =>
+        (file.endsWith(".tsx") ||
+          file.endsWith(".ts") ||
+          file.endsWith(".jsx") ||
+          file.endsWith(".js")) &&
+        !file.endsWith(".d.ts"),
+    )
+    if (firstMatch) {
+      setComponentPath(firstMatch)
+    }
+  }, [fsMap, props.initialMainComponentPath, componentPath])
+
+  useEffect(() => {
+    if (!componentPath) return
+    props.onMainComponentPathChange?.(componentPath)
+  }, [componentPath, props.onMainComponentPathChange])
   useSyncPageTitle()
 
   const {
@@ -137,7 +161,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
           {props.leftHeaderContent}
           {props.showFilesSwitch && (
             <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2">
-              <FileSelectorCombobox
+              <EnhancedFileSelectorCombobox
                 currentFile={componentPath}
                 files={Array.from(fsMap.keys())}
                 onFileChange={(value) => {

@@ -69,7 +69,7 @@
     "circuit-json-to-gerber": "^0.0.34",
     "circuit-json-to-gltf": "^0.0.7",
     "circuit-json-to-pnp-csv": "^0.0.7",
-    "circuit-to-svg": "^0.0.200",
+    "circuit-to-svg": "^0.0.201",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "comlink": "^4.4.2",

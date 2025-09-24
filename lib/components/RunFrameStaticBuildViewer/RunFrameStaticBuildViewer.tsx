@@ -196,7 +196,7 @@ export const RunFrameStaticBuildViewer = (
           <div className="rf-flex rf-items-center rf-justify-between rf-w-full rf-p-4 rf-border-b rf-border-gray-200">
             {(props.showFileMenu ?? true) && (
               <FileMenuLeftHeader
-                isWebEmbedded={false}
+                isWebEmbedded={true}
                 circuitJson={null}
                 projectName={props.projectName}
               />
@@ -247,7 +247,7 @@ export const RunFrameStaticBuildViewer = (
             <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
               {(props.showFileMenu ?? true) && (
                 <FileMenuLeftHeader
-                  isWebEmbedded={false}
+                  isWebEmbedded={true}
                   circuitJson={circuitJson}
                   projectName={props.projectName}
                 />

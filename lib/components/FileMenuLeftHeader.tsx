@@ -160,7 +160,7 @@ export const FileMenuLeftHeader = (props: {
             File
           </div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent className="rf-z-[101]">
           {/* CLI-only menu items */}
           {!props.isWebEmbedded && (
             <>

@@ -20,6 +20,7 @@ export interface JlcpcbComponentSummary {
   description: string
   package: string
   price?: number
+  stock?: number
 }
 
 export interface JlcpcbComponentSearchResult {

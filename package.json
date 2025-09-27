@@ -53,7 +53,7 @@
     "@tscircuit/footprinter": "^0.0.236",
     "@tscircuit/math-utils": "^0.0.25",
     "@tscircuit/pcb-viewer": "1.11.225",
-    "@tscircuit/props": "^0.0.337",
+    "@tscircuit/props": "^0.0.338",
     "@tscircuit/schematic-trace-solver": "^0.0.38",
     "@tscircuit/schematic-viewer": "2.0.44",
     "@types/bun": "latest",

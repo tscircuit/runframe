@@ -76,7 +76,7 @@
     "concurrently": "^9.1.2",
     "cssnano": "^7.0.6",
     "debug": "^4.4.0",
-    "easyeda": "^0.0.217",
+    "easyeda": "^0.0.228",
     "fflate": "^0.8.2",
     "fuse.js": "^7.1.0",
     "jszip": "^3.10.1",

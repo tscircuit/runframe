@@ -25,6 +25,7 @@ import type {
 import { useTscircuitPackageSearch } from "./hooks/useTscircuitPackageSearch"
 import { useJlcpcbComponentSearch } from "./hooks/useJlcpcbComponentSearch"
 import { useKicadFootprintSearch } from "./hooks/useKicadFootprintSearch"
+import { useStyles } from "../../hooks/use-styles"
 
 const computeAvailableSources = ({
   onTscircuitPackageSelected,
@@ -51,6 +52,8 @@ export const ImportComponentDialog2 = ({
   onTscircuitPackageSelected,
   onJlcpcbComponentTsxLoaded,
 }: ImportComponentDialog2Props) => {
+  useStyles()
+
   const availableSources = React.useMemo(
     () =>
       computeAvailableSources({

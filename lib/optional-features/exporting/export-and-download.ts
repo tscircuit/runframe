@@ -2,6 +2,7 @@ import type { CircuitJson } from "circuit-json"
 import { exportFabricationFiles } from "./formats/export-fabrication-files"
 import { openForDownload } from "./open-for-download"
 import { exportGlb } from "./formats/export-glb"
+import { exportPinoutSvg } from "./formats/export-pinout-svg"
 import { exportKicadProject } from "./formats/export-kicad-project"
 
 export const availableExports = [
@@ -9,6 +10,7 @@ export const availableExports = [
   { extension: "zip", name: "Fabrication Files" },
   { extension: "zip", name: "KiCad Project" },
   { extension: "glb", name: "GLB (Binary GLTF)" },
+  { extension: "svg", name: "Pinout SVG" },
   // { extension: "svg", name: "SVG" },
   // { extension: "dsn", name: "Specctra DSN" },
   // { extension: "kicad_mod", name: "KiCad Module" },
@@ -43,6 +45,10 @@ export const exportAndDownload = async ({
   }
   if (exportName === "GLB (Binary GLTF)") {
     await exportGlb({ circuitJson, projectName })
+    return
+  }
+  if (exportName === "Pinout SVG") {
+    exportPinoutSvg({ circuitJson, projectName })
     return
   }
   throw new Error(`Unsupported export type: "${exportName}"`)

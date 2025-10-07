@@ -94,9 +94,16 @@ export const SearchResultsList = ({
             className={`rf-p-3 rf-flex rf-flex-col sm:rf-grid sm:rf-grid-cols-[1fr_auto] rf-items-start sm:rf-items-center rf-cursor-pointer hover:rf-bg-zinc-100 rf-gap-2 ${isSelected ? "rf-bg-zinc-100" : ""}`}
             onClick={() => onSelect(result)}
           >
-            <div className="rf-min-w-0 rf-overflow-hidden">
-              <div className="rf-font-medium rf-text-sm rf-truncate">
-                {primary}
+            <div className="rf-min-w-0 rf-overflow-hidden rf-w-full">
+              <div className="rf-flex rf-items-start rf-gap-2">
+                <div className="rf-font-medium rf-text-sm rf-truncate rf-flex-1 rf-min-w-0">
+                  {primary}
+                </div>
+                {result.source === "jlcpcb" && stock != null ? (
+                  <div className="rf-text-xs rf-text-zinc-500 rf-font-medium rf-whitespace-nowrap sm:rf-hidden">
+                    {stock.toLocaleString()} in stock
+                  </div>
+                ) : null}
               </div>
               <div className="rf-text-xs rf-text-zinc-500 rf-truncate">
                 {partNumber ? (
@@ -121,7 +128,7 @@ export const SearchResultsList = ({
                 </Button>
               </div>
             ) : result.source === "jlcpcb" && stock != null ? (
-              <div className="rf-text-xs rf-text-zinc-500 rf-font-medium rf-w-full sm:rf-w-auto sm:rf-text-right sm:rf-justify-self-end rf-whitespace-nowrap">
+              <div className="rf-hidden sm:rf-block rf-text-xs rf-text-zinc-500 rf-font-medium rf-w-full sm:rf-w-auto sm:rf-text-right sm:rf-justify-self-end rf-whitespace-nowrap">
                 {stock.toLocaleString()} in stock
               </div>
             ) : null}

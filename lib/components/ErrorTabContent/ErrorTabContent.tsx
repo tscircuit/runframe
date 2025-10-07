@@ -265,56 +265,58 @@ export const ErrorTabContent = ({
             )}
           </>
         )}
-      </div>
-      <div className="rf-flex rf-gap-2 rf-mt-4 rf-justify-end">
-        <AutoroutingLogOptions
-          autoroutingLog={autoroutingLog}
-          onReportAutoroutingLog={onReportAutoroutingLog}
-        />
-        <Button
-          variant="outline"
-          className="rf-p-1"
-          onClick={() => {
-            let errorText = `${currentError.type}: ${currentError.message}`
-            if (evalVersion) errorText += `\n@tscircuit/eval@${evalVersion}`
-            if (softwareUsedString) errorText += `\n${softwareUsedString}`
-            if (currentError.stack) errorText += `\n${currentError.stack}`
-            navigator.clipboard.writeText(errorText)
-            alert("Error copied to clipboard!")
-          }}
-        >
-          <ClipboardIcon className="rf-w-4 rf-h-4" />
-          Copy Error
-        </Button>
-        <Button
-          variant="outline"
-          className="rf-p-1"
-          onClick={() => {
-            const title = `Error ${currentError.type}`
-              .replace(/[^a-zA-Z0-9 ]/g, " ")
-              .replace(/\s+/g, " ")
-              .slice(0, 100)
 
-            let errorDetails = `${currentError.type}: ${currentError.message}`
-            if (evalVersion) errorDetails += `\n@tscircuit/eval@${evalVersion}`
-            if (softwareUsedString) errorDetails += `\n${softwareUsedString}`
-            if (currentError.stack) errorDetails += `\n${currentError.stack}`
+        <div className="rf-flex rf-gap-2 rf-mt-4 rf-justify-end">
+          <AutoroutingLogOptions
+            autoroutingLog={autoroutingLog}
+            onReportAutoroutingLog={onReportAutoroutingLog}
+          />
+          <Button
+            variant="outline"
+            className="rf-p-1"
+            onClick={() => {
+              let errorText = `${currentError.type}: ${currentError.message}`
+              if (evalVersion) errorText += `\n@tscircuit/eval@${evalVersion}`
+              if (softwareUsedString) errorText += `\n${softwareUsedString}`
+              if (currentError.stack) errorText += `\n${currentError.stack}`
+              navigator.clipboard.writeText(errorText)
+              alert("Error copied to clipboard!")
+            }}
+          >
+            <ClipboardIcon className="rf-w-4 rf-h-4" />
+            Copy Error
+          </Button>
+          <Button
+            variant="outline"
+            className="rf-p-1"
+            onClick={() => {
+              const title = `Error ${currentError.type}`
+                .replace(/[^a-zA-Z0-9 ]/g, " ")
+                .replace(/\s+/g, " ")
+                .slice(0, 100)
 
-            let body = `[Package code to reproduce](${packageUrl})\n\n### Error\n\`\`\`\n${errorDetails}\n\`\`\`\n`
-            if (body.length > 35000) {
-              const truncatedMessage =
-                currentError.message.length > 500
-                  ? `${currentError.message.slice(0, 500)}...`
-                  : currentError.message
-              body = `[Package code to reproduce](${packageUrl})\n\n### Error\n\`\`\`\n${currentError.type}: ${truncatedMessage}\n\`\`\``
-            }
+              let errorDetails = `${currentError.type}: ${currentError.message}`
+              if (evalVersion)
+                errorDetails += `\n@tscircuit/eval@${evalVersion}`
+              if (softwareUsedString) errorDetails += `\n${softwareUsedString}`
+              if (currentError.stack) errorDetails += `\n${currentError.stack}`
 
-            openIssue(title, body)
-          }}
-        >
-          <GitHubLogoIcon className="rf-w-4 rf-h-4" />
-          Report Issue
-        </Button>
+              let body = `[Package code to reproduce](${packageUrl})\n\n### Error\n\`\`\`\n${errorDetails}\n\`\`\`\n`
+              if (body.length > 35000) {
+                const truncatedMessage =
+                  currentError.message.length > 500
+                    ? `${currentError.message.slice(0, 500)}...`
+                    : currentError.message
+                body = `[Package code to reproduce](${packageUrl})\n\n### Error\n\`\`\`\n${currentError.type}: ${truncatedMessage}\n\`\`\``
+              }
+
+              openIssue(title, body)
+            }}
+          >
+            <GitHubLogoIcon className="rf-w-4 rf-h-4" />
+            Report Issue
+          </Button>
+        </div>
       </div>
     </>
   )

@@ -16,7 +16,7 @@ export const tips = [
   "Publish modules via the [registry](https://tscircuit.com/trending) for working with a team or sharing your work",
   "[Explore tutorials](https://docs.tscircuit.com/category/tutorials) for real-world circuit design examples.",
   "Upload your Circuit JSON to [circuitjson.com](https://circuitjson.com) for a quick preview.",
-  "You can display Circuit JSON in 3D, PCB or Schematic mode with the [<CircuitJsonPreview />](https://docs.tscircuit.com/elements/circuitjsonpreview) React component",
+  "You can display Circuit JSON in 3D, PCB or Schematic mode with the [<CircuitJsonPreview />](https://docs.tscircuit.com/guides/running-tscircuit/displaying-circuit-json-on-a-webpage#react-display-all-available-previews-with-circuitjsonpreview-) React component",
   "Use a [<group />](https://docs.tscircuit.com/elements/group) element to move multiple components at once in a schematic or PCB layout.",
   "Check out the [GitHub Discussions page](https://github.com/tscircuit/tscircuit/discussions) to upvote features",
   "You can customize the autorouter using the [autorouter prop](https://docs.tscircuit.com/elements/board#setting-the-autorouter)",

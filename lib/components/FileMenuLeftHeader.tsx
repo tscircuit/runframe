@@ -38,6 +38,7 @@ import { hasRegistryToken } from "lib/utils/get-registry-ky"
 import { toast } from "lib/utils/toast"
 import { Toaster } from "react-hot-toast"
 import { useOrderDialogCli } from "./OrderDialog/useOrderDialog"
+import packageJson from "../../package.json"
 
 export const FileMenuLeftHeader = (props: {
   isWebEmbedded?: boolean
@@ -275,6 +276,13 @@ export const FileMenuLeftHeader = (props: {
                       </div>
                     </DropdownMenuItem>
                   )}
+                  <DropdownMenuItem className="rf-flex rf-items-center rf-gap-2">
+                    <div className="rf-flex rf-items-center rf-gap-2">
+                      <span className="rf-text-xs">
+                        @tscircuit/runframe@{packageJson.version}
+                      </span>
+                    </div>
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     className="rf-flex rf-items-center rf-gap-2"
                     onClick={() => {

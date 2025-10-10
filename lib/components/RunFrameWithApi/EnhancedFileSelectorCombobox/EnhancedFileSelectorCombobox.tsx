@@ -49,11 +49,9 @@ const defaultFileIcon = (fileName: string) => {
 
 const defaultFileFilter = (filename: string) => {
   return (
-    (filename.endsWith(".tsx") ||
-      filename.endsWith(".ts") ||
-      filename.endsWith(".jsx") ||
-      filename.endsWith(".js")) &&
-    !filename.endsWith(".d.ts")
+    filename.endsWith(".tsx") ||
+    filename.endsWith(".jsx") ||
+    filename.endsWith(".ciruit.json")
   )
 }
 

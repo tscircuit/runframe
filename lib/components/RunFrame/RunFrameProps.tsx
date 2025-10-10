@@ -130,6 +130,12 @@ export interface RunFrameProps {
   ) => void
 
   /**
+   * When false, disables autorun. Code only executes when the Run button is clicked.
+   * Defaults to true.
+   */
+  autorun?: boolean
+
+  /**
    * Enable fetch proxy for the web worker (useful for standalone bundles)
    */
   enableFetchProxy?: boolean

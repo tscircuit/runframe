@@ -279,7 +279,7 @@ export const RunFrame = (props: RunFrameProps) => {
       debug("Starting render...")
       props.onRenderStarted?.()
 
-      let fsMapObj =
+      const fsMapObj =
         fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap
 
       let lastRenderLogSet = Date.now()

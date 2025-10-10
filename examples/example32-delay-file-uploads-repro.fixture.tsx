@@ -1,9 +1,8 @@
 import { RunFrame } from "lib/components/RunFrame/RunFrame"
+import React, { useEffect, useState } from "react"
 
 export default () => {
-  ;(window as any).DELAY_FILE_UPLOADS = true
-
-  const fsMap = {
+  const [fsMap, setFsMap] = useState<Record<string, string>>({
     "main.tsx": `
 import { partName } from "./util.ts"
 
@@ -13,21 +12,20 @@ circuit.add(
   </board>
 )
 `.trim(),
-    "util.ts": `
-export const partName = "R1"
-`.trim(),
-  }
+  })
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFsMap((prev) => ({
+        ...prev,
+        "util.ts": `export const partName = "R1"`,
+      }))
+    }, 1500)
+    return () => clearTimeout(timer)
+  }, [])
 
   return (
     <div className="rf-space-y-3 rf-p-4">
-      <div className="rf-flex rf-items-center rf-gap-4">
-        <span className="rf-text-sm rf-text-muted-foreground">
-          Initial run omits newly seen files for the delay to simulate staggered
-          uploads, causing an import error; then it auto re-runs when the delay
-          elapses since autorun is enabled.
-        </span>
-      </div>
-
       <RunFrame
         fsMap={fsMap}
         entrypoint="main.tsx"

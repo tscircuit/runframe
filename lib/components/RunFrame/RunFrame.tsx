@@ -17,9 +17,6 @@ const debug = Debug("run-frame:RunFrame")
 
 declare global {
   var runFrameWorker: any
-  interface Window {
-    DELAY_FILE_UPLOADS?: boolean | number
-  }
 }
 
 import {
@@ -187,8 +184,6 @@ export const RunFrame = (props: RunFrameProps) => {
         )
   const lastFsMapRef = useRef<Map<string, string> | null>(null)
   const lastEntrypointRef = useRef<string | null>(null)
-  const firstSeenAtRef = useRef<Map<string, number>>(new Map())
-  const pendingDelayedRerunRef = useRef<number | null>(null)
 
   useEffect(() => {
     if (props.isLoadingFiles) return
@@ -286,56 +281,6 @@ export const RunFrame = (props: RunFrameProps) => {
 
       let fsMapObj =
         fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap
-
-      // Track when files first appear to simulate delayed availability
-      const now = Date.now()
-      Object.keys(fsMapObj).forEach((path) => {
-        if (!firstSeenAtRef.current.has(path)) {
-          firstSeenAtRef.current.set(path, now)
-        }
-      })
-
-      // If window.DELAY_FILE_UPLOADS is set (boolean or ms number), omit
-      // newly-seen files for the first delay window to simulate staggered uploads.
-      const delayFlag =
-        typeof window !== "undefined"
-          ? (window as any).DELAY_FILE_UPLOADS
-          : undefined
-      const delayMs =
-        typeof delayFlag === "number" ? delayFlag : delayFlag ? 1500 : 0
-
-      if (delayMs > 0) {
-        const entryOrMain =
-          (props.entrypoint ?? props.mainComponentPath) || undefined
-
-        const filteredEntries = Object.entries(fsMapObj).filter(([path]) => {
-          if (entryOrMain && path === entryOrMain) return true
-          const firstSeen = firstSeenAtRef.current.get(path) ?? now
-          return now - firstSeen >= delayMs
-        })
-        const filteredFsMapObj = Object.fromEntries(filteredEntries)
-        const filteredCount =
-          Object.keys(fsMapObj).length - Object.keys(filteredFsMapObj).length
-
-        if (filteredCount > 0) {
-          debug(
-            `DELAY_FILE_UPLOADS active: omitting ${filteredCount} recently-added file(s) for this run`,
-          )
-          fsMapObj = filteredFsMapObj
-
-          // Schedule a re-run after the delay to include the omitted files when in autorun mode
-          if (pendingDelayedRerunRef.current) {
-            clearTimeout(pendingDelayedRerunRef.current)
-            pendingDelayedRerunRef.current = null
-          }
-          if (props.autorun !== false && !props.showRunButton) {
-            pendingDelayedRerunRef.current = window.setTimeout(() => {
-              incRunCountTrigger(1)
-              pendingDelayedRerunRef.current = null
-            }, delayMs + 10)
-          }
-        }
-      }
 
       let lastRenderLogSet = Date.now()
       worker.on("asyncEffect:start", (event: any) => {

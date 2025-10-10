@@ -18,8 +18,7 @@ export const createKicadProjectZip = async ({
   schConverter.runUntilFinished()
   const schContent = schConverter.getOutputString()
 
-  const pcbConverter = new CircuitJsonToKicadPcbCooverter(circuitJson as any)
-      arrayPropertyMap.shape?.[0] ?? propertyMap.shape,
+  const pcbConverter = new CircuitJsonToKicadPcbConverter(circuitJson as any)
   pcbConverter.runUntilFinished()
   const pcbContent = pcbConverter.getOutputString()
 

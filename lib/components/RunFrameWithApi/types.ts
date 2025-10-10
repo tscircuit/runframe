@@ -104,6 +104,11 @@ export interface RunFrameState {
   pushEvent: (event: RunFrameEventInput) => Promise<void>
   loadInitialFiles: () => Promise<void>
   setSimulateScenarioOrder: (simulateScenarioOrder: string) => void
+  // Optional upload queue for delayed uploads
+  uploadQueue?: Array<{ path: FilePath; content: FileContent }>
+  flushUploadQueue?: () => Promise<void>
+  deleteFile?: (path: FilePath) => Promise<void>
+  renameFile?: (prevPath: FilePath, newPath: FilePath) => Promise<void>
 }
 
 declare global {

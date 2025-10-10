@@ -5,6 +5,8 @@ import Debug from "lib/utils/debug"
 import { create } from "zustand"
 import { devtools } from "zustand/middleware"
 import { API_BASE } from "./api-base"
+import resolveRunframeConfig from "lib/runframe-config"
+import { eventsApi } from "lib/api/events"
 import type {
   File,
   FileContent,
@@ -73,6 +75,7 @@ export const useRunFrameStore = create<RunFrameState>()(
   devtools(
     (set, get) => ({
       fsMap: new Map(),
+      uploadQueue: [],
       lastEventTime: new Date().toISOString(),
       isPolling: false,
       error: null,
@@ -89,10 +92,37 @@ export const useRunFrameStore = create<RunFrameState>()(
 
       upsertFile: async (path, content) => {
         try {
+          const cfg = resolveRunframeConfig()
+          if (cfg.delayFileUploads) {
+            // queue upload
+            set((state) => ({
+              uploadQueue: [...(state.uploadQueue || []), { path, content }],
+            }))
+            // post a queued event
+            try {
+              await eventsApi.postUpload(path, {
+                queued: true,
+                initiator: "runframe",
+              })
+            } catch (e) {
+              console.warn("Failed to post queued upload event", e)
+            }
+            return
+          }
+
           const file = await upsertFileApi(path, content)
           set((state) => ({
             fsMap: new Map(state.fsMap).set(file.file_path, file.text_content),
           }))
+
+          // Post upload event
+          try {
+            await eventsApi.postUpload(file.file_path, {
+              initiator: "runframe",
+            })
+          } catch (e) {
+            console.warn("Failed to post upload event", e)
+          }
         } catch (error) {
           set({ error: error as Error })
         }
@@ -213,10 +243,94 @@ export const useRunFrameStore = create<RunFrameState>()(
           ),
         }))
 
-        await upsertFileApi(
+        // Use upsertFile so that delay flag and events are respected
+        await get().upsertFile(
           "manual-edits.json",
           JSON.stringify(updatedManualEditsFileContent, null, 2),
         )
+      },
+
+      // Flush queued uploads (if any)
+      flushUploadQueue: async () => {
+        const queued = get().uploadQueue || []
+        if (!queued.length) return
+        set({ uploadQueue: [] })
+        for (const item of queued) {
+          try {
+            const file = await upsertFileApi(item.path, item.content)
+            set((state) => ({
+              fsMap: new Map(state.fsMap).set(
+                file.file_path,
+                file.text_content,
+              ),
+            }))
+            try {
+              await eventsApi.postUpload(file.file_path, { queuedFlush: true })
+            } catch (e) {
+              console.warn("Failed to post upload event after flush", e)
+            }
+          } catch (err) {
+            console.error("Failed to flush upload for", item.path, err)
+          }
+        }
+      },
+
+      // Delete a file (best-effort API call) and post a delete event
+      deleteFile: async (path: string) => {
+        try {
+          // attempt API delete (if endpoint exists)
+          try {
+            await fetch(`${API_BASE}/files/delete`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ file_path: path }),
+            })
+          } catch (e) {
+            // ignore - endpoint may not exist
+          }
+          set((state) => {
+            const m = new Map(state.fsMap)
+            m.delete(path)
+            return { fsMap: m }
+          })
+          try {
+            await eventsApi.postDelete(path)
+          } catch (e) {
+            console.warn("Failed to post delete event", e)
+          }
+        } catch (error) {
+          set({ error: error as Error })
+        }
+      },
+
+      // Rename a file and post a rename event
+      renameFile: async (prevPath: string, newPath: string) => {
+        try {
+          // attempt API rename (if endpoint exists)
+          try {
+            await fetch(`${API_BASE}/files/rename`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ prev_path: prevPath, new_path: newPath }),
+            })
+          } catch (e) {
+            // ignore
+          }
+          set((state) => {
+            const m = new Map(state.fsMap)
+            const val = m.get(prevPath)
+            m.delete(prevPath)
+            if (val !== undefined) m.set(newPath, val)
+            return { fsMap: m }
+          })
+          try {
+            await eventsApi.postRename(prevPath, newPath)
+          } catch (e) {
+            console.warn("Failed to post rename event", e)
+          }
+        } catch (error) {
+          set({ error: error as Error })
+        }
       },
 
       setSimulateScenarioOrder: (scenarioOrder?: string) =>

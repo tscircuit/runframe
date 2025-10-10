@@ -20,6 +20,9 @@ import {
   Folder,
 } from "lucide-react"
 import { cn } from "lib/utils"
+import resolveRunframeConfig from "lib/runframe-config"
+import { eventsApi } from "lib/api/events"
+import { useRunFrameStore } from "../store"
 import {
   parseFilesToTree,
   getCurrentFolderContents,
@@ -72,6 +75,8 @@ export const EnhancedFileSelectorCombobox = ({
   onFileChange: (value: string) => void
   config?: FileSelectorConfig
 }) => {
+  // Resolve global/override config (autorun and delay flags available here)
+  const rfConfig = resolveRunframeConfig()
   const [open, setOpen] = useState(false)
   const [file, setFile] = useState(currentFile)
   const [currentFolder, setCurrentFolder] = useState("")
@@ -151,6 +156,20 @@ export const EnhancedFileSelectorCombobox = ({
     onFileChange(filePath)
   }
 
+  const enqueueUpload = (path: string, content?: string) => {
+    const upsert = useRunFrameStore.getState().upsertFile
+    if (typeof content === "string") {
+      upsert(path, content)
+    } else {
+      eventsApi.postUpload(path, { queued: true }).catch(() => {})
+    }
+  }
+
+  const flushUploads = async () => {
+    const flush = useRunFrameStore.getState().flushUploadQueue
+    if (flush) await flush()
+  }
+
   useEffect(() => {
     if (currentFiles.length > 0) {
       const fileInCurrentFolder = currentFiles.findIndex(
@@ -171,6 +190,14 @@ export const EnhancedFileSelectorCombobox = ({
 
   return (
     <div className="rf-flex rf-items-center rf-gap-1">
+      {/* Quick controls for delayed uploads when enabled */}
+      {rfConfig.delayFileUploads && (
+        <div className="rf-flex rf-items-center rf-gap-2 rf-mr-2">
+          <Button size="sm" onClick={() => flushUploads()}>
+            Flush uploads
+          </Button>
+        </div>
+      )}
       <Popover
         open={open}
         onOpenChange={(newOpen) => {

@@ -51,7 +51,7 @@ const defaultFileFilter = (filename: string) => {
   return (
     filename.endsWith(".tsx") ||
     filename.endsWith(".jsx") ||
-    filename.endsWith(".ciruit.json")
+    filename.endsWith(".circuit.json")
   )
 }
 

@@ -48,7 +48,11 @@ const defaultFileIcon = (fileName: string) => {
 }
 
 const defaultFileFilter = (filename: string) => {
-  return filename.endsWith(".tsx") || filename.endsWith(".circuit.json")
+  return (
+    filename.endsWith(".tsx") ||
+    filename.endsWith(".jsx") ||
+    filename.endsWith(".circuit.json")
+  )
 }
 
 const defaultDisplayName = (filename: string) => {

@@ -111,6 +111,7 @@ export const RunFrame = (props: RunFrameProps) => {
     >
   >({})
   const [currentDebugOption, setCurrentDebugOption] = useState<string>("")
+  const [canAutoRun, setCanAutoRun] = useState<boolean>(false)
 
   const activeEffectName = Object.values(activeAsyncEffects).sort(
     (a, b) => a.startTime - b.startTime,
@@ -175,6 +176,60 @@ export const RunFrame = (props: RunFrameProps) => {
     if (props.debug) Debug.enable("run-frame*")
   }, [props.debug])
 
+  // Determine if we can autorun based on file server events
+  useEffect(() => {
+    if (props.isLoadingFiles) {
+      setCanAutoRun(false)
+      return
+    }
+    if (props.showRunButton) {
+      setCanAutoRun(false)
+      return
+    }
+    let cancelled = false
+    let interval: ReturnType<typeof setInterval> | null = null
+
+    const checkOnce = async (): Promise<boolean> => {
+      try {
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 1500)
+        const res = await fetch(
+          `${API_BASE}/events/list?event_name=FILESYSTEM_FULLY_UPDATED`,
+          { signal: controller.signal },
+        )
+        clearTimeout(timeoutId)
+        if (!res.ok) {
+          // If the endpoint isn't available, don't block autorun
+          if (!cancelled) setCanAutoRun(true)
+          return true
+        }
+        const data = await res.json()
+        const events = Array.isArray((data as any)?.events)
+          ? (data as any).events
+          : Array.isArray(data)
+            ? data
+            : []
+        const found = events.length > 0
+        if (!cancelled) setCanAutoRun(found)
+        return found
+      } catch {
+        // Network/timeout: assume file API isn't available; don't block autorun
+        if (!cancelled) setCanAutoRun(true)
+        return true
+      }
+    }
+    ;(async () => {
+      const found = await checkOnce()
+      if (cancelled || found) return
+      interval = setInterval(checkOnce, 1500)
+    })()
+
+    return () => {
+      cancelled = true
+      if (interval) clearInterval(interval)
+    }
+  }, [props.showRunButton, props.isLoadingFiles])
+
   const fsMap =
     props.fsMap instanceof Map
       ? props.fsMap
@@ -223,11 +278,13 @@ export const RunFrame = (props: RunFrameProps) => {
     ) {
       return
     }
-    // Explicit autorun gate: if autorun is disabled, only run when the Run button triggers it
+    // Gate autorun until the file server reports FILESYSTEM_FULLY_UPDATED
     if (
-      props.autorun === false &&
-      runCountTrigger === lastRunCountTriggerRef.current
+      !props.showRunButton &&
+      runCountTrigger === lastRunCountTriggerRef.current &&
+      !canAutoRun
     ) {
+      debug("skipping autorun: waiting for FILESYSTEM_FULLY_UPDATED")
       return
     }
 
@@ -437,6 +494,7 @@ export const RunFrame = (props: RunFrameProps) => {
     props.mainComponentPath,
     props.isLoadingFiles,
     currentDebugOption,
+    canAutoRun,
   ])
 
   // Updated to debounce edit events so only the last event is emitted after dragging ends

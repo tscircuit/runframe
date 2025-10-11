@@ -29,8 +29,7 @@ circuit.add(
       <RunFrame
         fsMap={fsMap}
         entrypoint="main.tsx"
-        autorun={true}
-        showRunButton={false}
+        showRunButton={true}
         defaultActiveTab="errors"
       />
     </div>

@@ -38,9 +38,6 @@ const defaultFileIcon = (fileName: string) => {
   if (fileName.endsWith(".tsx") || fileName.endsWith(".jsx")) {
     return <Code className="rf-h-4 rf-w-4 rf-text-blue-500" />
   }
-  if (fileName.endsWith(".ts") || fileName.endsWith(".js")) {
-    return <Code className="rf-h-4 rf-w-4 rf-text-yellow-600" />
-  }
   if (fileName.endsWith(".md") || fileName.endsWith(".txt")) {
     return <FileText className="rf-h-4 rf-w-4 rf-text-gray-600" />
   }
@@ -48,7 +45,11 @@ const defaultFileIcon = (fileName: string) => {
 }
 
 const defaultFileFilter = (filename: string) => {
-  return filename.endsWith(".tsx") || filename.endsWith(".circuit.json")
+  return (
+    filename.endsWith(".tsx") ||
+    filename.endsWith(".circuit.json") ||
+    filename.endsWith(".jsx")
+  )
 }
 
 const defaultDisplayName = (filename: string) => {

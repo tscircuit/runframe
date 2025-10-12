@@ -50,7 +50,7 @@ jobs:
           PR_URL=$(gh pr view $PR_NUMBER --json url --jq '.url')
           
           # Send Slack notification
-          curl -X POST "$SLACK_AUTOMERGE_ALERT_WEBHOOK_URL" \
+          curl -X POST $SLACK_AUTOMERGE_ALERT_WEBHOOK_URL \
             -H "Content-Type: application/json" \
             -d "{
               \"message\": \"CI failed for automated package update in ${{ github.repository }} - PR #$PR_NUMBER: $PR_URL\"

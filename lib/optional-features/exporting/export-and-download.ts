@@ -4,6 +4,7 @@ import { openForDownload } from "./open-for-download"
 import { exportGlb } from "./formats/export-glb"
 import { exportPinoutSvg } from "./formats/export-pinout-svg"
 import { exportKicadProject } from "./formats/export-kicad-project"
+import { exportStep } from "./formats/export-step"
 
 export const availableExports = [
   { extension: "json", name: "Circuit JSON" },
@@ -11,6 +12,7 @@ export const availableExports = [
   { extension: "zip", name: "KiCad Project" },
   { extension: "glb", name: "GLB (Binary GLTF)" },
   { extension: "svg", name: "Pinout SVG" },
+  { extension: "step", name: "STEP" },
   // { extension: "svg", name: "SVG" },
   // { extension: "dsn", name: "Specctra DSN" },
   // { extension: "kicad_mod", name: "KiCad Module" },
@@ -49,6 +51,10 @@ export const exportAndDownload = async ({
   }
   if (exportName === "Pinout SVG") {
     exportPinoutSvg({ circuitJson, projectName })
+    return
+  }
+  if (exportName === "STEP") {
+    await exportStep({ circuitJson, projectName })
     return
   }
   throw new Error(`Unsupported export type: "${exportName}"`)

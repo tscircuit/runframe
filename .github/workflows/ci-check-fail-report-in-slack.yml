@@ -53,7 +53,7 @@ jobs:
           curl -X POST $SLACK_AUTOMERGE_ALERT_WEBHOOK_URL \
             -H "Content-Type: application/json" \
             -d "{
-              \"message\": \"CI failed for automated package update in ${{ github.repository }} - PR #$PR_NUMBER: $PR_URL\"
+              \"MESSAGE\": \"CI failed for automated package update in ${{ github.repository }} - PR #$PR_NUMBER: $PR_URL\"
             }"
             
           # Optional: Still add a comment to the PR for visibility

@@ -11,8 +11,10 @@ export const exportStep = async ({
 }) => {
   try {
     // Extract board dimensions from circuit JSON
-    const pcbBoard = circuitJson.find((el: any) => el.type === "pcb_board") as any
-    
+    const pcbBoard = circuitJson.find(
+      (el: any) => el.type === "pcb_board",
+    ) as any
+
     const boardWidth = pcbBoard?.width ?? 20
     const boardHeight = pcbBoard?.height ?? 15
     const boardThickness = pcbBoard?.thickness ?? 1.6

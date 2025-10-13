@@ -9,18 +9,21 @@ export const exportStep = async ({
   circuitJson: CircuitJson
   projectName: string
 }) => {
+  // Extract board dimensions from circuit JSON
+  const pcbBoard = circuitJson.find((el) => el.type === "pcb_board")
+
+  const boardWidth =
+    (pcbBoard && "width" in pcbBoard ? pcbBoard.width : undefined) ?? 20
+  const boardHeight =
+    (pcbBoard && "height" in pcbBoard ? pcbBoard.height : undefined) ?? 15
+  const boardThickness =
+    (pcbBoard && "thickness" in pcbBoard ? pcbBoard.thickness : undefined) ??
+    1.6
+
+  // Convert Circuit JSON to STEP format
+  let stepText: string
   try {
-    // Extract board dimensions from circuit JSON
-    const pcbBoard = circuitJson.find(
-      (el: any) => el.type === "pcb_board",
-    ) as any
-
-    const boardWidth = pcbBoard?.width ?? 20
-    const boardHeight = pcbBoard?.height ?? 15
-    const boardThickness = pcbBoard?.thickness ?? 1.6
-
-    // Convert Circuit JSON to STEP format
-    const stepText = await circuitJsonToStep(circuitJson, {
+    stepText = await circuitJsonToStep(circuitJson, {
       boardWidth,
       boardHeight,
       boardThickness,
@@ -28,17 +31,22 @@ export const exportStep = async ({
       includeComponents: true,
       includeExternalMeshes: true,
     })
+  } catch (error) {
+    console.error("STEP conversion error:", error)
+    throw error
+  }
 
-    // Create blob and trigger download
-    const blob = new Blob([stepText], {
-      type: "application/step",
-    })
+  // Create blob and trigger download
+  const blob = new Blob([stepText], {
+    type: "application/step",
+  })
 
+  try {
     openForDownload(blob, {
       fileName: `${projectName}.step`,
     })
   } catch (error) {
-    console.error("STEP Export Error:", error)
+    console.error("STEP download error:", error)
     throw error
   }
 }

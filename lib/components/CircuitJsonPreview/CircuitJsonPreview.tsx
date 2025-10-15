@@ -464,7 +464,7 @@ export const CircuitJsonPreview = ({
                   {circuitJson ? (
                     <PcbViewerWithContainerHeight
                       focusOnHover={false}
-                      circuitJson={circuitJson}
+                      circuitJson={circuitJson as any}
                       debugGraphics={autoroutingGraphics}
                       containerClassName={cn(
                         "rf-h-full rf-w-full",

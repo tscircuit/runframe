@@ -4,6 +4,20 @@ import { useState } from "react"
 import RenderTimingsBar, { getPhaseColor } from "./RenderTimingsBar"
 import { Button } from "../ui/button"
 
+const formatDebugOutputContent = (content: unknown) => {
+  if (content instanceof Blob) return content
+  if (content == null) return ""
+  if (typeof content === "string") return content
+  if (typeof content === "object") {
+    try {
+      return JSON.stringify(content, null, 2)
+    } catch (_error) {
+      return String(content)
+    }
+  }
+  return String(content)
+}
+
 export const RenderLogViewer = ({
   renderLog,
   onRerunWithDebug,
@@ -115,9 +129,15 @@ export const RenderLogViewer = ({
                     (output) => output.name === e.target.value,
                   )
                   if (debugOutput) {
-                    const blob = new Blob([debugOutput.content], {
-                      type: "text/plain",
-                    })
+                    const formattedContent = formatDebugOutputContent(
+                      debugOutput.content,
+                    )
+                    const blob =
+                      formattedContent instanceof Blob
+                        ? formattedContent
+                        : new Blob([formattedContent], {
+                            type: "text/plain",
+                          })
                     const url = URL.createObjectURL(blob)
                     const a = document.createElement("a")
                     a.href = url

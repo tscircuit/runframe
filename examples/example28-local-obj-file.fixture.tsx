@@ -66,6 +66,14 @@ export default () => (
 )`,
         }),
       })
+      await fetch("/api/events/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event_type: "INITIAL_FILES_UPLOADED",
+          file_count: 2,
+        }),
+      })
     }, 500)
   }, [])
 

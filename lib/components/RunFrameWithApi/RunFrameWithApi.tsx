@@ -1,5 +1,6 @@
 import Debug from "debug"
 import { useEditEventController } from "lib/hooks/use-edit-event-controller"
+import { useHasReceivedInitialFilesLoaded } from "lib/hooks/use-has-received-initial-files-loaded"
 import { useSyncPageTitle } from "lib/hooks/use-sync-page-title"
 import { useEffect, useMemo, useState } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
@@ -60,13 +61,11 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     if (props.debug) Debug.enable("run-frame*")
   }, [props.debug])
 
-  const { startPolling, stopPolling, loadInitialFiles } = useRunFrameStore(
-    (s) => ({
-      startPolling: s.startPolling,
-      stopPolling: s.stopPolling,
-      loadInitialFiles: s.loadInitialFiles,
-    }),
-  )
+  const { startPolling, stopPolling } = useRunFrameStore((s) => ({
+    startPolling: s.startPolling,
+    stopPolling: s.stopPolling,
+  }))
+  const hasReceivedInitialFiles = useHasReceivedInitialFilesLoaded()
 
   const fsMap = useRunFrameStore((s) => s.fsMap)
   const allFiles = useMemo(() => Array.from(fsMap.keys()), [fsMap])
@@ -83,12 +82,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   const [componentPath, setComponentPath] = useState<string>(
     props.initialMainComponentPath ?? "",
   )
-  const [isLoadingFiles, setIsLoadingFiles] = useState(true)
-
-  useEffect(() => {
-    setIsLoadingFiles(true)
-    loadInitialFiles().finally(() => setIsLoadingFiles(false))
-  }, [])
+  const isLoadingFiles = !hasReceivedInitialFiles
 
   useEffect(() => {
     if (componentPath && boardFiles.includes(componentPath)) {

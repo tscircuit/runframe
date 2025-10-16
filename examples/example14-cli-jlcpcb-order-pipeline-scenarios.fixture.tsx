@@ -89,12 +89,12 @@ export default () => {
 
   useEffect(() => {
     setTimeout(async () => {
-      fetch("/api/events/reset", {
+      await fetch("/api/events/reset", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
       })
-      fetch("/api/files/upsert", {
+      await fetch("/api/files/upsert", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -111,12 +111,20 @@ export default () => (
 )`,
         }),
       })
-      fetch("/api/files/upsert", {
+      await fetch("/api/files/upsert", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           file_path: "manual-edits.json",
           text_content: JSON.stringify({}),
+        }),
+      })
+      await fetch("/api/events/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event_type: "INITIAL_FILES_UPLOADED",
+          file_count: 2,
         }),
       })
     }, 500)

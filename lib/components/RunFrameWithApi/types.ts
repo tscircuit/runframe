@@ -19,6 +19,13 @@ export interface FileUpdatedEvent {
   created_at: string
 }
 
+export interface InitialFilesUploadedEvent {
+  event_id: string
+  event_type: "INITIAL_FILES_UPLOADED"
+  created_at: string
+  file_count: number
+}
+
 export interface FileDeletedEvent {
   event_id: string
   event_type: "FILE_DELETED"
@@ -75,6 +82,7 @@ export interface RequestToExportSnippetEvent {
 
 export type RunFrameEvent =
   | FileUpdatedEvent
+  | InitialFilesUploadedEvent
   | FileDeletedEvent
   | RequestToSaveSnippetEvent
   | FailedToSaveSnippetEvent

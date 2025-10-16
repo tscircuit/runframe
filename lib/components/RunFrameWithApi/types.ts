@@ -19,6 +19,13 @@ export interface FileUpdatedEvent {
   created_at: string
 }
 
+export interface FileDeletedEvent {
+  event_id: string
+  event_type: "FILE_DELETED"
+  file_path: FilePath
+  created_at: string
+}
+
 export interface RequestToSaveSnippetEvent {
   event_id: string
   event_type: "REQUEST_TO_SAVE_SNIPPET"
@@ -68,6 +75,7 @@ export interface RequestToExportSnippetEvent {
 
 export type RunFrameEvent =
   | FileUpdatedEvent
+  | FileDeletedEvent
   | RequestToSaveSnippetEvent
   | FailedToSaveSnippetEvent
   | SnippetSavedEvent

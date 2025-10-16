@@ -148,6 +148,8 @@ export const useRunFrameStore = create<RunFrameState>()(
                   } else {
                     updates.set(file.file_path, "__STATIC_ASSET__")
                   }
+                } else if (event.event_type === "FILE_DELETED") {
+                  updates.delete(event.file_path)
                 }
               }
 

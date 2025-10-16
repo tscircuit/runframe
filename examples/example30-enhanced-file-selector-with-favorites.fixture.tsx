@@ -51,6 +51,30 @@ export default () => {
           content: `export const LedMatrix = () => <group name="LedMatrix" />`,
         },
         {
+          path: "components/display/Molecule4x2MedShort.tsx",
+          content: `export const Molecule4x2MedShort = () => <group name="Molecule4x2" />`,
+        },
+        {
+          path: "components/display/Molecule6x2MedShort.tsx",
+          content: `export const Molecule6x2MedShort = () => <group name="Molecule6x2" />`,
+        },
+        {
+          path: "components/display/Molecule8x8MedShort.tsx",
+          content: `export const Molecule8x8MedShort = () => <group name="Molecule8x8" />`,
+        },
+        {
+          path: "components/display/Molecule8x8MedStandard.tsx",
+          content: `export const Molecule8x8MedStandard = () => <group name="Molecule8x8" />`,
+        },
+        {
+          path: "components/display/Molecule16x16MedStandard.tsx",
+          content: `export const Molecule16x16MedStandard = () => <group name="Molecule16x16" />`,
+        },
+        {
+          path: "components/display/Molecule32x32MedStandard.tsx",
+          content: `export const Molecule32x32MedStandard = () => <group name="Molecule32x32" />`,
+        },
+        {
           path: "modules/power/PowerModule.tsx",
           content: `export const PowerModule = () => <group name="PowerModule" />`,
         },

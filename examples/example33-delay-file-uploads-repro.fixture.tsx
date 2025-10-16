@@ -49,7 +49,7 @@ export default () => (
           })
         }, 2000)
       } catch (e) {
-        console.error("Failed to seed example32 files", e)
+        console.error("Failed to seed example33 files", e)
       }
     }
     seed()

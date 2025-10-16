@@ -3,6 +3,7 @@ import JSZip from "jszip"
 import {
   CircuitJsonToKicadPcbConverter,
   CircuitJsonToKicadSchConverter,
+  CircuitJsonToKicadProConverter,
 } from "circuit-json-to-kicad"
 import { openForDownload } from "../open-for-download"
 
@@ -21,10 +22,19 @@ export const createKicadProjectZip = async ({
   pcbConverter.runUntilFinished()
   const pcbContent = pcbConverter.getOutputString()
 
+  const proConverter = new CircuitJsonToKicadProConverter(circuitJson as any, {
+    projectName,
+    schematicFilename: `${projectName}.kicad_sch`,
+    pcbFilename: `${projectName}.kicad_pcb`,
+  })
+  proConverter.runUntilFinished()
+  const proContent = proConverter.getOutputString()
+
   const zip = new JSZip()
 
   zip.file(`${projectName}.kicad_sch`, schContent)
   zip.file(`${projectName}.kicad_pcb`, pcbContent)
+  zip.file(`${projectName}.kicad_pro`, proContent)
 
   return zip
 }

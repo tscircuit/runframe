@@ -74,9 +74,14 @@ function getCurrentFolderContents(
   const files = targetNode.children.filter((node) => node.type === "file")
   const folders = targetNode.children.filter((node) => node.type === "folder")
 
-  // Sort files first, then folders, both alphabetically
-  files.sort((a, b) => a.name.localeCompare(b.name))
-  folders.sort((a, b) => a.name.localeCompare(b.name))
+  // Natural sort comparator for numeric parts
+  const naturalSort = (a: string, b: string) => {
+    return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" })
+  }
+
+  // Sort files first, then folders, using natural sorting
+  files.sort((a, b) => naturalSort(a.name, b.name))
+  folders.sort((a, b) => naturalSort(a.name, b.name))
 
   return { files, folders }
 }

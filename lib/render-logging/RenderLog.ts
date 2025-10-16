@@ -25,6 +25,6 @@ export interface RenderLog {
   debugOutputs?: Array<{
     type: string
     name: string
-    content: string
+    content: unknown
   }>
 }

@@ -10,6 +10,7 @@ import { applyEditEventsToManualEditsFile } from "@tscircuit/core"
 import type { ManualEditsFile } from "@tscircuit/props"
 
 import { EnhancedFileSelectorCombobox } from "./EnhancedFileSelectorCombobox"
+import { getBoardFilesFromConfig } from "lib/utils/get-board-files-from-config"
 
 const debug = Debug("run-frame:RunFrameWithApi")
 
@@ -67,6 +68,15 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   const hasReceivedInitialFiles = useHasReceivedInitialFilesLoaded()
 
   const fsMap = useRunFrameStore((s) => s.fsMap)
+  const allFiles = useMemo(() => Array.from(fsMap.keys()), [fsMap])
+  const projectConfigContent = useMemo(() => {
+    const rawConfig = fsMap.get("tscircuit.config.json")
+    return typeof rawConfig === "string" ? rawConfig : undefined
+  }, [fsMap])
+  const boardFiles = useMemo(
+    () => getBoardFilesFromConfig(allFiles, projectConfigContent),
+    [allFiles, projectConfigContent],
+  )
   const circuitJson = useRunFrameStore((s) => s.circuitJson)
 
   const [componentPath, setComponentPath] = useState<string>(
@@ -75,8 +85,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   const isLoadingFiles = !hasReceivedInitialFiles
 
   useEffect(() => {
-    const files = Array.from(fsMap.keys())
-    if (componentPath && files.includes(componentPath)) {
+    if (componentPath && boardFiles.includes(componentPath)) {
       // Retain current selection if it still exists
       return
     }
@@ -86,24 +95,17 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     )
 
     for (const candidate of candidatePaths) {
-      if (files.includes(candidate)) {
+      if (boardFiles.includes(candidate)) {
         setComponentPath(candidate)
         return
       }
     }
 
-    const firstMatch = files.find(
-      (file) =>
-        (file.endsWith(".tsx") ||
-          file.endsWith(".ts") ||
-          file.endsWith(".jsx") ||
-          file.endsWith(".js")) &&
-        !file.endsWith(".d.ts"),
-    )
+    const firstMatch = boardFiles[0]
     if (firstMatch) {
       setComponentPath(firstMatch)
     }
-  }, [fsMap, props.initialMainComponentPath, componentPath])
+  }, [boardFiles, props.initialMainComponentPath, componentPath])
 
   useEffect(() => {
     if (!componentPath) return
@@ -157,7 +159,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
             <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2">
               <EnhancedFileSelectorCombobox
                 currentFile={componentPath}
-                files={Array.from(fsMap.keys())}
+                files={boardFiles}
                 onFileChange={(value) => {
                   if (typeof fsMap.get(value) === "string") {
                     setComponentPath(value)

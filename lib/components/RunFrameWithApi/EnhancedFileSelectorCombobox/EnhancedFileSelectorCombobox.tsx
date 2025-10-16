@@ -18,6 +18,8 @@ import {
   FileText,
   Code,
   Folder,
+  ArrowUp,
+  Star,
 } from "lucide-react"
 import { cn } from "lib/utils"
 import {
@@ -32,6 +34,15 @@ export interface FileSelectorConfig {
   placeholder?: string
   searchPlaceholder?: string
   emptyMessage?: string
+  /**
+   * Array of file paths to pin at the top of the file selector.
+   * Pinned files appear in a "Favorites" section for quick access.
+   */
+  pinnedFiles?: string[]
+  /**
+   * Callback when a file is toggled as favorite.
+   */
+  onToggleFavorite?: (filePath: string) => void
 }
 
 const defaultFileIcon = (fileName: string) => {
@@ -54,6 +65,10 @@ const defaultFileFilter = (filename: string) => {
 
 const defaultDisplayName = (filename: string) => {
   return filename.split("/").pop() || ""
+}
+
+const getDirectoryPath = (filePath: string) => {
+  return filePath.substring(0, filePath.lastIndexOf("/")) || "/"
 }
 
 export const EnhancedFileSelectorCombobox = ({
@@ -79,6 +94,8 @@ export const EnhancedFileSelectorCombobox = ({
     placeholder = "Select file",
     searchPlaceholder = "Search for file",
     emptyMessage = "No files found in this directory.",
+    pinnedFiles = [],
+    onToggleFavorite,
   } = config
 
   useEffect(() => {
@@ -139,11 +156,33 @@ export const EnhancedFileSelectorCombobox = ({
     setCurrentFileIndex(0)
   }
 
-  const selectFile = (filePath: string, index: number) => {
+  const navigateUp = () => {
+    if (!currentFolder) return
+    const parentPath = currentFolder.substring(
+      0,
+      currentFolder.lastIndexOf("/"),
+    )
+    navigateToFolder(parentPath)
+  }
+
+  const selectFile = (
+    filePath: string,
+    index: number,
+    updateFolder = false,
+  ) => {
     setFile(filePath)
     setCurrentFileIndex(index)
     setOpen(false)
     onFileChange(filePath)
+
+    if (updateFolder) {
+      const fileDir = getDirectoryPath(filePath)
+      if (fileDir !== "/") {
+        setCurrentFolder(fileDir)
+      } else {
+        setCurrentFolder("")
+      }
+    }
   }
 
   useEffect(() => {
@@ -202,43 +241,55 @@ export const EnhancedFileSelectorCombobox = ({
 
             {/* Directory Header */}
             <div className="rf-px-3 rf-py-2 rf-border-t rf-border-b rf-border-gray-200 rf-bg-slate-50">
-              <div className="rf-flex rf-items-center rf-text-xs rf-text-slate-600 rf-min-w-0 rf-overflow-hidden">
-                <button
-                  onClick={() => navigateToFolder("")}
-                  className="rf-text-blue-600 hover:rf-text-blue-800 rf-underline rf-cursor-pointer rf-bg-transparent rf-border-none rf-p-0 rf-flex-shrink-0"
-                >
-                  root
-                </button>
-                {currentFolder
-                  .split("/")
-                  .filter(Boolean)
-                  .map((segment, index, array) => {
-                    const pathToSegment = array.slice(0, index + 1).join("/")
-                    return (
-                      <span
-                        key={pathToSegment}
-                        className="rf-flex rf-items-center rf-min-w-0"
-                      >
-                        <span className="rf-mx-1 rf-flex-shrink-0">/</span>
-                        {index === array.length - 1 ? (
-                          <span
-                            className="rf-text-slate-800 rf-truncate rf-max-w-[150px]"
-                            title={segment}
-                          >
-                            {segment}
-                          </span>
-                        ) : (
-                          <button
-                            onClick={() => navigateToFolder(pathToSegment)}
-                            className="rf-text-blue-600 hover:rf-text-blue-800 rf-underline rf-cursor-pointer rf-bg-transparent rf-border-none rf-p-0 rf-truncate rf-max-w-[100px]"
-                            title={segment}
-                          >
-                            {segment}
-                          </button>
-                        )}
-                      </span>
-                    )
-                  })}
+              <div className="rf-flex rf-items-center rf-justify-between rf-text-xs rf-text-slate-600 rf-min-w-0 rf-overflow-hidden">
+                <div className="rf-flex rf-items-center rf-min-w-0 rf-flex-1">
+                  <button
+                    onClick={() => navigateToFolder("")}
+                    className="rf-text-blue-600 hover:rf-text-blue-800 rf-underline rf-cursor-pointer rf-bg-transparent rf-border-none rf-p-0 rf-flex-shrink-0"
+                  >
+                    root
+                  </button>
+                  {currentFolder
+                    .split("/")
+                    .filter(Boolean)
+                    .map((segment, index, array) => {
+                      const pathToSegment = array.slice(0, index + 1).join("/")
+                      return (
+                        <span
+                          key={pathToSegment}
+                          className="rf-flex rf-items-center rf-min-w-0"
+                        >
+                          <span className="rf-mx-1 rf-flex-shrink-0">/</span>
+                          {index === array.length - 1 ? (
+                            <span
+                              className="rf-text-slate-800 rf-truncate rf-max-w-[150px]"
+                              title={segment}
+                            >
+                              {segment}
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => navigateToFolder(pathToSegment)}
+                              className="rf-text-blue-600 hover:rf-text-blue-800 rf-underline rf-cursor-pointer rf-bg-transparent rf-border-none rf-p-0 rf-truncate rf-max-w-[100px]"
+                              title={segment}
+                            >
+                              {segment}
+                            </button>
+                          )}
+                        </span>
+                      )
+                    })}
+                </div>
+                {currentFolder && (
+                  <button
+                    onClick={navigateUp}
+                    className="rf-ml-2 rf-flex rf-items-center rf-gap-1 rf-text-blue-600 hover:rf-text-blue-800 rf-bg-transparent rf-border rf-border-blue-300 hover:rf-border-blue-500 rf-rounded rf-px-2 rf-py-1 rf-flex-shrink-0"
+                    title="Go up one level"
+                  >
+                    <ArrowUp className="rf-h-3 rf-w-3" />
+                    <span>Up</span>
+                  </button>
+                )}
               </div>
             </div>
 
@@ -246,6 +297,41 @@ export const EnhancedFileSelectorCombobox = ({
               {!isSearching ? (
                 <>
                   <CommandEmpty>{emptyMessage}</CommandEmpty>
+
+                  {/* Pinned/Favorites Section */}
+                  {pinnedFiles.length > 0 && (
+                    <CommandGroup
+                      heading="Favorites"
+                      className="rf-border-b rf-border-gray-200 rf-pb-1 rf-bg-amber-50/30"
+                    >
+                      {pinnedFiles
+                        .filter((path) => filteredFiles.includes(path))
+                        .map((path, index) => (
+                          <CommandItem
+                            key={path}
+                            value={path}
+                            onSelect={() => selectFile(path, index, true)}
+                            className={cn(
+                              path === currentFile && "rf-font-medium",
+                            )}
+                          >
+                            <Star className="rf-mr-2 rf-h-4 rf-w-4 rf-text-amber-500 rf-fill-amber-500" />
+                            {getDisplayName(path.split("/").pop() || "")}
+                            <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[120px]">
+                              {getDirectoryPath(path)}
+                            </span>
+                            <Check
+                              className={cn(
+                                "rf-ml-auto rf-h-4 rf-w-4",
+                                path === currentFile
+                                  ? "rf-opacity-100"
+                                  : "rf-opacity-0",
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
+                    </CommandGroup>
+                  )}
 
                   {/* Current Directory Files */}
                   {currentFiles.length > 0 && (
@@ -259,20 +345,52 @@ export const EnhancedFileSelectorCombobox = ({
                           onSelect={() => selectFile(fileNode.path, index)}
                           className={cn(
                             fileNode.path === currentFile && "rf-font-medium",
+                            "rf-group",
                           )}
                         >
                           <span className="rf-mr-2">
                             {defaultFileIcon(fileNode.name)}
                           </span>
                           {getDisplayName(fileNode.name)}
-                          <Check
-                            className={cn(
-                              "rf-ml-auto rf-h-4 rf-w-4",
-                              fileNode.path === currentFile
-                                ? "rf-opacity-100"
-                                : "rf-opacity-0",
+                          <div className="rf-ml-auto rf-flex rf-items-center rf-gap-1">
+                            {onToggleFavorite && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  onToggleFavorite(fileNode.path)
+                                }}
+                                className="rf-p-1 rf-rounded hover:rf-bg-slate-200 rf-opacity-0 group-hover:rf-opacity-100 rf-transition-opacity"
+                                aria-label={
+                                  pinnedFiles.includes(fileNode.path)
+                                    ? "Remove from favorites"
+                                    : "Add to favorites"
+                                }
+                                title={
+                                  pinnedFiles.includes(fileNode.path)
+                                    ? "Remove from favorites"
+                                    : "Add to favorites"
+                                }
+                              >
+                                <Star
+                                  className={cn(
+                                    "rf-h-3 rf-w-3",
+                                    pinnedFiles.includes(fileNode.path)
+                                      ? "rf-text-amber-500 rf-fill-amber-500"
+                                      : "rf-text-slate-400",
+                                  )}
+                                />
+                              </button>
                             )}
-                          />
+                            <Check
+                              className={cn(
+                                "rf-h-4 rf-w-4",
+                                fileNode.path === currentFile
+                                  ? "rf-opacity-100"
+                                  : "rf-opacity-0",
+                              )}
+                            />
+                          </div>
                         </CommandItem>
                       ))}
                     </CommandGroup>
@@ -330,6 +448,7 @@ export const EnhancedFileSelectorCombobox = ({
                                 }}
                                 className={cn(
                                   file.path === currentFile && "rf-font-medium",
+                                  "rf-group",
                                 )}
                               >
                                 <span className="rf-mr-2">
@@ -342,6 +461,35 @@ export const EnhancedFileSelectorCombobox = ({
                                   <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[120px]">
                                     {currentFolder || "/"}
                                   </span>
+                                  {onToggleFavorite && (
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        onToggleFavorite(file.path)
+                                      }}
+                                      className="rf-p-1 rf-rounded hover:rf-bg-slate-200 rf-opacity-0 group-hover:rf-opacity-100 rf-transition-opacity rf-ml-2"
+                                      aria-label={
+                                        pinnedFiles.includes(file.path)
+                                          ? "Remove from favorites"
+                                          : "Add to favorites"
+                                      }
+                                      title={
+                                        pinnedFiles.includes(file.path)
+                                          ? "Remove from favorites"
+                                          : "Add to favorites"
+                                      }
+                                    >
+                                      <Star
+                                        className={cn(
+                                          "rf-h-3 rf-w-3",
+                                          pinnedFiles.includes(file.path)
+                                            ? "rf-text-amber-500 rf-fill-amber-500"
+                                            : "rf-text-slate-400",
+                                        )}
+                                      />
+                                    </button>
+                                  )}
                                   {file.path === currentFile && (
                                     <Check className="rf-ml-2 rf-h-4 rf-w-4 rf-flex-shrink-0" />
                                   )}
@@ -366,6 +514,7 @@ export const EnhancedFileSelectorCombobox = ({
                               }}
                               className={cn(
                                 file.path === currentFile && "rf-font-medium",
+                                "rf-group",
                               )}
                             >
                               <span className="rf-mr-2">
@@ -376,11 +525,31 @@ export const EnhancedFileSelectorCombobox = ({
                                   {getDisplayName(file.fileName)}
                                 </span>
                                 <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[120px]">
-                                  {file.path.substring(
-                                    0,
-                                    file.path.lastIndexOf("/"),
-                                  ) || "/"}
+                                  {getDirectoryPath(file.path)}
                                 </span>
+                                {onToggleFavorite && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      onToggleFavorite(file.path)
+                                    }}
+                                    className="rf-p-1 rf-rounded hover:rf-bg-slate-200 rf-opacity-0 group-hover:rf-opacity-100 rf-transition-opacity rf-ml-2"
+                                    title={
+                                      pinnedFiles.includes(file.path)
+                                        ? "Remove from favorites"
+                                        : "Add to favorites"
+                                    }
+                                  >
+                                    <Star
+                                      className={cn(
+                                        "rf-h-3 rf-w-3",
+                                        pinnedFiles.includes(file.path)
+                                          ? "rf-text-amber-500 rf-fill-amber-500"
+                                          : "rf-text-slate-400",
+                                      )}
+                                    />
+                                  </button>
+                                )}
                                 {file.path === currentFile && (
                                   <Check className="rf-ml-2 rf-h-4 rf-w-4 rf-flex-shrink-0" />
                                 )}

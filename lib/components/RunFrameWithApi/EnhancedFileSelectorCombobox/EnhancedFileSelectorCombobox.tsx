@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useCurrentFolder } from "./useCurrentFolder"
 import { Button } from "../../ui/button"
 import {
   Command,
@@ -84,28 +85,10 @@ export const EnhancedFileSelectorCombobox = ({
 }) => {
   const [open, setOpen] = useState(false)
   const [file, setFile] = useState(currentFile)
-  const [currentFolder, setCurrentFolder] = useState(() => {
-    // Initialize to the folder of the current file
-    // First check if there's a file in the URL (search params or hash)
-    if (typeof window !== "undefined") {
-      const searchParams = new URLSearchParams(window.location.search)
-      const hashParams = new URLSearchParams(window.location.hash.slice(1))
-      const urlFile = searchParams.get("file") ?? hashParams.get("file")
-      if (urlFile && files.includes(urlFile)) {
-        const fileDir = getDirectoryPath(urlFile)
-        return fileDir === "/" ? "" : fileDir
-      }
-    }
-    // Fall back to currentFile prop
-    if (currentFile && files.includes(currentFile)) {
-      const fileDir = getDirectoryPath(currentFile)
-      return fileDir === "/" ? "" : fileDir
-    }
-    return ""
-  })
+  const { currentFolder, navigateToFolder, resetManualNavigation } =
+    useCurrentFolder({ currentFile: file, files })
   const [currentFileIndex, setCurrentFileIndex] = useState(0)
   const [searchValue, setSearchValue] = useState("")
-  const [hasManuallyNavigated, setHasManuallyNavigated] = useState(false)
 
   const {
     fileFilter = defaultFileFilter,
@@ -119,22 +102,13 @@ export const EnhancedFileSelectorCombobox = ({
 
   useEffect(() => {
     setFile(currentFile)
-    // Only auto-sync folder if user hasn't manually navigated and file exists
-    if (currentFile && !hasManuallyNavigated && files.includes(currentFile)) {
-      const fileDir = getDirectoryPath(currentFile)
-      if (fileDir !== "/") {
-        setCurrentFolder(fileDir)
-      } else {
-        setCurrentFolder("")
-      }
-    }
-  }, [currentFile, hasManuallyNavigated, files])
+  }, [currentFile])
 
   const filteredFiles = files.filter(fileFilter)
 
   const fileTree = parseFilesToTree(filteredFiles)
   const { files: currentFiles, folders: currentFolders } =
-    getCurrentFolderContents(fileTree, currentFolder)
+    getCurrentFolderContents(fileTree, currentFolder || "")
 
   // Search logic - when searching, show results with full paths
   const getSearchResults = () => {
@@ -179,19 +153,17 @@ export const EnhancedFileSelectorCombobox = ({
 
   const searchResults = getSearchResults()
   const isSearching = searchValue.trim().length > 0
-  const navigateToFolder = (folderPath: string) => {
-    setCurrentFolder(folderPath)
+  const handleNavigateToFolder = (folderPath: string | null) => {
+    navigateToFolder(folderPath)
     setCurrentFileIndex(0)
-    setHasManuallyNavigated(true)
   }
 
   const navigateUp = () => {
     if (!currentFolder) return
-    const parentPath = currentFolder.substring(
-      0,
-      currentFolder.lastIndexOf("/"),
-    )
-    navigateToFolder(parentPath)
+    const lastSlashIndex = currentFolder.lastIndexOf("/")
+    const parentPath =
+      lastSlashIndex === -1 ? null : currentFolder.substring(0, lastSlashIndex)
+    handleNavigateToFolder(parentPath)
   }
 
   const selectFile = (
@@ -205,12 +177,10 @@ export const EnhancedFileSelectorCombobox = ({
     onFileChange(filePath)
 
     if (updateFolder) {
-      const fileDir = getDirectoryPath(filePath)
-      if (fileDir !== "/") {
-        setCurrentFolder(fileDir)
-      } else {
-        setCurrentFolder("")
-      }
+      const lastSlashIndex = filePath.lastIndexOf("/")
+      const fileDir =
+        lastSlashIndex === -1 ? null : filePath.substring(0, lastSlashIndex)
+      handleNavigateToFolder(fileDir)
     }
   }
 
@@ -225,7 +195,7 @@ export const EnhancedFileSelectorCombobox = ({
     }
   }, [currentFiles, currentFile])
 
-  const displayPath = currentFolder || "/"
+  const displayPath = currentFolder ?? "/"
   const shortDisplayPath =
     displayPath.length > 25 ? "..." + displayPath.slice(-22) : displayPath // Fixed width to eliminate jitter - no dynamic sizing
   const getDropdownWidth = () => {
@@ -240,16 +210,7 @@ export const EnhancedFileSelectorCombobox = ({
           setOpen(newOpen)
           if (!newOpen) {
             setSearchValue("")
-            // Reset manual navigation flag when closing
-            setHasManuallyNavigated(false)
-          } else if (newOpen && file && files.includes(file)) {
-            // When opening, navigate to the folder of the current file
-            const fileDir = getDirectoryPath(file)
-            if (fileDir !== "/") {
-              setCurrentFolder(fileDir)
-            } else {
-              setCurrentFolder("")
-            }
+            resetManualNavigation()
           }
         }}
       >
@@ -285,13 +246,13 @@ export const EnhancedFileSelectorCombobox = ({
               <div className="rf-flex rf-items-center rf-justify-between rf-text-xs rf-text-slate-600 rf-min-w-0 rf-overflow-hidden">
                 <div className="rf-flex rf-items-center rf-min-w-0 rf-flex-1">
                   <button
-                    onClick={() => navigateToFolder("")}
+                    onClick={() => handleNavigateToFolder(null)}
                     className="rf-text-blue-600 hover:rf-text-blue-800 rf-underline rf-cursor-pointer rf-bg-transparent rf-border-none rf-p-0 rf-flex-shrink-0"
                   >
                     root
                   </button>
                   {currentFolder
-                    .split("/")
+                    ?.split("/")
                     .filter(Boolean)
                     .map((segment, index, array) => {
                       const pathToSegment = array.slice(0, index + 1).join("/")
@@ -310,7 +271,9 @@ export const EnhancedFileSelectorCombobox = ({
                             </span>
                           ) : (
                             <button
-                              onClick={() => navigateToFolder(pathToSegment)}
+                              onClick={() =>
+                                handleNavigateToFolder(pathToSegment)
+                              }
                               className="rf-text-blue-600 hover:rf-text-blue-800 rf-underline rf-cursor-pointer rf-bg-transparent rf-border-none rf-p-0 rf-truncate rf-max-w-[100px]"
                               title={segment}
                             >
@@ -446,7 +409,9 @@ export const EnhancedFileSelectorCombobox = ({
                         <CommandItem
                           key={folderNode.path}
                           value={`folder-${folderNode.path}`}
-                          onSelect={() => navigateToFolder(folderNode.path)}
+                          onSelect={() =>
+                            handleNavigateToFolder(folderNode.path)
+                          }
                           className="rf-text-slate-600 hover:rf-text-slate-900"
                         >
                           <Folder className="rf-mr-2 rf-h-4 rf-w-4 rf-text-blue-600" />

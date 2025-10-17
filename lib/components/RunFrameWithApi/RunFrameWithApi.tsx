@@ -2,7 +2,7 @@ import Debug from "debug"
 import { useEditEventController } from "lib/hooks/use-edit-event-controller"
 import { useHasReceivedInitialFilesLoaded } from "lib/hooks/use-has-received-initial-files-loaded"
 import { useSyncPageTitle } from "lib/hooks/use-sync-page-title"
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
 import { API_BASE } from "./api-base"
 import { useRunFrameStore } from "./store"
@@ -79,9 +79,12 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   )
   const circuitJson = useRunFrameStore((s) => s.circuitJson)
 
-  const [componentPath, setComponentPath] = useState<string>(
-    props.initialMainComponentPath ?? "",
-  )
+  const [componentPath, setComponentPath] = useState<string>(() => {
+    if (typeof window === "undefined")
+      return props.initialMainComponentPath ?? ""
+    const params = new URLSearchParams(window.location.hash.slice(1))
+    return params.get("file") ?? props.initialMainComponentPath ?? ""
+  })
   const isLoadingFiles = !hasReceivedInitialFiles
 
   useEffect(() => {
@@ -107,10 +110,23 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     }
   }, [boardFiles, props.initialMainComponentPath, componentPath])
 
+  const updateFileHash = useCallback((filePath: string) => {
+    if (typeof window === "undefined") return
+    const params = new URLSearchParams(window.location.hash.slice(1))
+    if (params.get("file") === filePath) return
+    params.set("file", filePath)
+    const newHash = params.toString()
+    const newUrl =
+      `${window.location.pathname}${window.location.search}` +
+      (newHash.length > 0 ? `#${newHash}` : "")
+    window.history.replaceState(null, "", newUrl)
+  }, [])
+
   useEffect(() => {
     if (!componentPath) return
+    updateFileHash(componentPath)
     props.onMainComponentPathChange?.(componentPath)
-  }, [componentPath, props.onMainComponentPathChange])
+  }, [componentPath, props.onMainComponentPathChange, updateFileHash])
   useSyncPageTitle()
 
   const {

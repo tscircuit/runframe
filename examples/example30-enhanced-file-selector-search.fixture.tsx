@@ -1,10 +1,14 @@
 import { useState } from "react"
 import { EnhancedFileSelectorCombobox } from "lib/components/RunFrameWithApi/EnhancedFileSelectorCombobox"
 import { useStyles } from "lib/hooks/use-styles"
+import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 
 export default () => {
   useStyles()
-  const [currentFile, setCurrentFile] = useState("app.tsx")
+  const [currentFile, setCurrentFile] = useLocalStorageState(
+    "runframe:example30:current-file",
+    "app.tsx",
+  )
 
   // Mock file structure with various path lengths to test dynamic width
   const mockFiles = [

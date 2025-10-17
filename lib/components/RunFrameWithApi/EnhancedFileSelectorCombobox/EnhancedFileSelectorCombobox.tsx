@@ -84,9 +84,17 @@ export const EnhancedFileSelectorCombobox = ({
 }) => {
   const [open, setOpen] = useState(false)
   const [file, setFile] = useState(currentFile)
-  const [currentFolder, setCurrentFolder] = useState("")
+  const [currentFolder, setCurrentFolder] = useState(() => {
+    // Initialize to the folder of the current file
+    if (currentFile && files.includes(currentFile)) {
+      const fileDir = getDirectoryPath(currentFile)
+      return fileDir === "/" ? "" : fileDir
+    }
+    return ""
+  })
   const [currentFileIndex, setCurrentFileIndex] = useState(0)
   const [searchValue, setSearchValue] = useState("")
+  const [hasManuallyNavigated, setHasManuallyNavigated] = useState(false)
 
   const {
     fileFilter = defaultFileFilter,
@@ -100,7 +108,16 @@ export const EnhancedFileSelectorCombobox = ({
 
   useEffect(() => {
     setFile(currentFile)
-  }, [currentFile])
+    // Only auto-sync folder if user hasn't manually navigated and file exists
+    if (currentFile && !hasManuallyNavigated && files.includes(currentFile)) {
+      const fileDir = getDirectoryPath(currentFile)
+      if (fileDir !== "/") {
+        setCurrentFolder(fileDir)
+      } else {
+        setCurrentFolder("")
+      }
+    }
+  }, [currentFile, hasManuallyNavigated, files])
 
   const filteredFiles = files.filter(fileFilter)
 
@@ -154,6 +171,7 @@ export const EnhancedFileSelectorCombobox = ({
   const navigateToFolder = (folderPath: string) => {
     setCurrentFolder(folderPath)
     setCurrentFileIndex(0)
+    setHasManuallyNavigated(true)
   }
 
   const navigateUp = () => {
@@ -209,7 +227,19 @@ export const EnhancedFileSelectorCombobox = ({
         open={open}
         onOpenChange={(newOpen) => {
           setOpen(newOpen)
-          if (!newOpen) setSearchValue("")
+          if (!newOpen) {
+            setSearchValue("")
+            // Reset manual navigation flag when closing
+            setHasManuallyNavigated(false)
+          } else if (newOpen && file && files.includes(file)) {
+            // When opening, navigate to the folder of the current file
+            const fileDir = getDirectoryPath(file)
+            if (fileDir !== "/") {
+              setCurrentFolder(fileDir)
+            } else {
+              setCurrentFolder("")
+            }
+          }
         }}
       >
         <PopoverTrigger asChild>

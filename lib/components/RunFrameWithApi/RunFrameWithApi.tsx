@@ -2,6 +2,7 @@ import Debug from "debug"
 import { useEditEventController } from "lib/hooks/use-edit-event-controller"
 import { useHasReceivedInitialFilesLoaded } from "lib/hooks/use-has-received-initial-files-loaded"
 import { useSyncPageTitle } from "lib/hooks/use-sync-page-title"
+import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { useEffect, useMemo, useState } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
 import { API_BASE } from "./api-base"
@@ -79,7 +80,8 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   )
   const circuitJson = useRunFrameStore((s) => s.circuitJson)
 
-  const [componentPath, setComponentPath] = useState<string>(
+  const [componentPath, setComponentPath] = useLocalStorageState<string>(
+    "runframe:selected-file",
     props.initialMainComponentPath ?? "",
   )
   const isLoadingFiles = !hasReceivedInitialFiles

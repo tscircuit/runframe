@@ -3,14 +3,21 @@ import { useState, useEffect } from "react"
 import { DebugEventsTable } from "./utils/DebugEventsTable"
 import { isFileApiAccessible } from "./utils/isFileApiAccessible.ts"
 import { EnhancedFileSelectorCombobox } from "lib/components/RunFrameWithApi/EnhancedFileSelectorCombobox"
+import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 
 export default () => {
-  const [currentFile, setCurrentFile] = useState("")
-  const [favorites, setFavorites] = useState<string[]>([
-    "main.tsx",
-    "modules/power/PowerModule.tsx",
-    "components/display/LedMatrix.tsx",
-  ])
+  const [currentFile, setCurrentFile] = useLocalStorageState(
+    "runframe:example30-favorites:current-file",
+    "",
+  )
+  const [favorites, setFavorites] = useLocalStorageState<string[]>(
+    "runframe:example30-favorites:favorites",
+    [
+      "main.tsx",
+      "modules/power/PowerModule.tsx",
+      "components/display/LedMatrix.tsx",
+    ],
+  )
   const fsMap = useRunFrameStore((s) => s.fsMap)
   const loadInitialFiles = useRunFrameStore((s) => s.loadInitialFiles)
   const allFiles = Array.from(fsMap.keys())

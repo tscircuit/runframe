@@ -6,10 +6,7 @@ import { EnhancedFileSelectorCombobox } from "lib/components/RunFrameWithApi/Enh
 import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 
 export default () => {
-  const [currentFile, setCurrentFile] = useLocalStorageState(
-    "runframe:example30-favorites:current-file",
-    "",
-  )
+  const [currentFile, setCurrentFile] = useState("")
   const [favorites, setFavorites] = useLocalStorageState<string[]>(
     "runframe:example30-favorites:favorites",
     [

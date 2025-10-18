@@ -133,4 +133,9 @@ export interface RunFrameProps {
    * Enable fetch proxy for the web worker (useful for standalone bundles)
    */
   enableFetchProxy?: boolean
+
+  /**
+   * Automatically trigger re-rendering when an edit event finishes (not in progress)
+   */
+  autoRerenderOnEditFinish?: boolean
 }

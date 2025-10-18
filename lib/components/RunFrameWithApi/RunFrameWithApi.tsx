@@ -168,6 +168,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       forceLatestEvalVersion={props.forceLatestEvalVersion}
       evalWebWorkerBlobUrl={props.evalWebWorkerBlobUrl ?? props.workerBlobUrl}
       enableFetchProxy={props.enableFetchProxy}
+      autoRerenderOnEditFinish={true}
       leftHeaderContent={
         <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
           {props.leftHeaderContent}

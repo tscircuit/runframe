@@ -53,6 +53,8 @@ export interface RunFrameWithApiProps {
    * Callback invoked whenever the selected main component path changes.
    */
   onMainComponentPathChange?: (path: string) => void
+  autoRenderOnEdit?: boolean
+  showRunButton?: boolean
 }
 
 export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
@@ -188,6 +190,8 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       }
       defaultToFullScreen={props.defaultToFullScreen}
       showToggleFullScreen={props.showToggleFullScreen}
+      autoRenderOnEdit={props.autoRenderOnEdit ?? false}
+      showRunButton={props.showRunButton ?? true}
       onInitialRender={() => {
         debug("onInitialRender / markRenderStarted")
         markRenderStarted()

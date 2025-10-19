@@ -133,4 +133,8 @@ export interface RunFrameProps {
    * Enable fetch proxy for the web worker (useful for standalone bundles)
    */
   enableFetchProxy?: boolean
+  /**
+   * Whether to auto-render on edit
+   */
+  autoRenderOnEdit?: boolean
 }

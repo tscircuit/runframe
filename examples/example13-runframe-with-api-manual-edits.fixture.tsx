@@ -67,5 +67,5 @@ export default () => (
     )
   }
 
-  return <RunFrameWithApi debug />
+  return <RunFrameWithApi debug autoRenderOnEdit={true} showRunButton={false} />
 }

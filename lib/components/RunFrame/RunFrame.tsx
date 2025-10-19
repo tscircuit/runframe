@@ -228,6 +228,7 @@ export const RunFrame = (props: RunFrameProps) => {
     lastEntrypointRef.current = props.entrypoint ?? null
     lastRunCountTriggerRef.current = runCountTrigger
     setIsRunning(true)
+    setShowRerunMessage(false)
 
     const runWorker = async () => {
       debug("running render worker")
@@ -432,6 +433,8 @@ export const RunFrame = (props: RunFrameProps) => {
     currentDebugOption,
   ])
 
+  const [showRerunMessage, setShowRerunMessage] = useState(false)
+
   // Updated to debounce edit events so only the last event is emitted after dragging ends
   const lastEditEventRef = useRef<any>(null)
   const dragTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -458,6 +461,12 @@ export const RunFrame = (props: RunFrameProps) => {
         props.onEditEvent?.(eventToSend)
         lastEditEventRef.current = null
         dragTimeout.current = null
+
+        if (props.autoRenderOnEdit) {
+          incRunCountTrigger(1)
+        } else {
+          setShowRerunMessage(true)
+        }
       }, 100)
     }
   }
@@ -541,6 +550,19 @@ export const RunFrame = (props: RunFrameProps) => {
                   <Play className="rf-w-3 rf-h-3" />
                 )}
               </button>
+              {showRerunMessage && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    incRunCountTrigger(1)
+                    setShowRerunMessage(false)
+                  }}
+                  className="rf-flex rf-items-center rf-gap-2 rf-px-4 rf-py-2 rf-bg-blue-600 hover:rf-bg-blue-700 rf-text-white rf-rounded-md disabled:rf-opacity-50 transition-colors duration-200 rf-ml-2"
+                  disabled={isRunning || !dependenciesLoaded}
+                >
+                  Rerun to reroute
+                </button>
+              )}
               {isRunning && (
                 <div className="rf-flex rf-items-center rf-ml-1">
                   <Button

@@ -2,7 +2,7 @@ import clsx from "clsx"
 import ky, { HTTPError } from "ky"
 import { useCallback, useMemo, useState, type ReactElement } from "react"
 import { API_BASE } from "./RunFrameWithApi/api-base"
-import { hasRegistryToken } from "lib/utils/get-registry-ky"
+import { getRegistryKy, hasRegistryToken } from "lib/utils/get-registry-ky"
 import { toast } from "lib/utils/toast"
 import { buttonVariants } from "./ui/button"
 import {
@@ -91,15 +91,11 @@ export const useBugReportDialog = ({
     setIsSubmitting(true)
     setErrorMessage(null)
 
-    const bugReportClient = ky.create({
-      prefixUrl: API_BASE,
-      credentials: "include",
-      timeout: 120000,
-    })
+    const registryKy = getRegistryKy()
 
     try {
       const deleteAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-      const createResponse = await bugReportClient
+      const createResponse = await registryKy
         .post("bug_reports/create", {
           json: {
             text: executionError ?? undefined,
@@ -115,7 +111,7 @@ export const useBugReportDialog = ({
       const bugReportId = createResponse.bug_report.bug_report_id
 
       for (const [filePath, fileContents] of effectiveFsMap.entries()) {
-        await bugReportClient.post("bug_reports/upload_file", {
+        await registryKy.post("bug_reports/upload_file", {
           json: {
             bug_report_id: bugReportId,
             file_path: filePath,
@@ -208,7 +204,7 @@ export const useBugReportDialog = ({
                       })`
                     : ""}{" "}
                   to tscircuit support. After submission the report will be
-                  automatically deleted.
+                  stored for approximately 48 hours then automatically deleted
                 </p>
                 <p>
                   Share the generated bug report link privately with tscircuit

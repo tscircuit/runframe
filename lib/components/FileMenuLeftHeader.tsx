@@ -232,7 +232,6 @@ export const FileMenuLeftHeader = (props: {
           <DropdownMenuItem
             className="rf-text-xs"
             onSelect={(event) => {
-              event.preventDefault()
               openBugReportDialog()
             }}
           >

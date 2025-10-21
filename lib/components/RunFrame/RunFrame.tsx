@@ -578,7 +578,11 @@ export const RunFrame = (props: RunFrameProps) => {
             </div>
           )}
           {props.showFileMenu !== false && (
-            <FileMenuLeftHeader isWebEmbedded={props.isWebEmbedded} />
+            <FileMenuLeftHeader
+              isWebEmbedded={props.isWebEmbedded}
+              fsMap={fsMap}
+              executionError={error?.error}
+            />
           )}
           {props.leftHeaderContent}
         </>

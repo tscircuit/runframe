@@ -61,6 +61,10 @@ export const useBugReportDialog = ({
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [userText, setUserText] = useState("")
+  const [successState, setSuccessState] = useState<{
+    bugReportUrl: string
+  } | null>(null)
 
   const effectiveFsMap = useMemo(() => normalizeFsMap(fsMap), [fsMap])
   const bugReportFileCount = effectiveFsMap?.size ?? 0
@@ -75,8 +79,14 @@ export const useBugReportDialog = ({
 
   const openBugReportDialog = useCallback(() => {
     setErrorMessage(null)
+    setSuccessState(null)
+    if (executionError) {
+      setUserText(`I'm getting this execution error:\n\n${executionError}`)
+    } else {
+      setUserText("")
+    }
     setIsOpen(true)
-  }, [])
+  }, [executionError])
 
   const closeBugReportDialog = useCallback(() => {
     setIsOpen(false)
@@ -95,10 +105,11 @@ export const useBugReportDialog = ({
 
     try {
       const deleteAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+
       const createResponse = await registryKy
         .post("bug_reports/create", {
           json: {
-            text: executionError ?? undefined,
+            text: userText.trim() || undefined,
             is_auto_deleted: true,
             delete_at: deleteAt,
           },
@@ -120,36 +131,8 @@ export const useBugReportDialog = ({
         })
       }
 
-      closeBugReportDialog()
       const bugReportUrl = buildBugReportUrl(bugReportId)
-      toast.success(
-        <div className="rf-text-sm rf-space-y-2">
-          <div>Bug report created successfully.</div>
-          <div>
-            <a
-              className="rf-text-blue-600 hover:rf-underline"
-              href={bugReportUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
-              View bug report
-            </a>
-          </div>
-          <div>
-            Please share this link privately with tscircuit staff so we can help
-            debug. Join the
-            <a
-              className="rf-ml-1 rf-text-blue-600 hover:rf-underline"
-              href="https://tscircuit.com/join"
-              target="_blank"
-              rel="noreferrer"
-            >
-              tscircuit Discord
-            </a>
-            .
-          </div>
-        </div>,
-      )
+      setSuccessState({ bugReportUrl })
     } catch (error) {
       console.error("Failed to submit bug report", error)
       if (error instanceof HTTPError) {
@@ -187,75 +170,137 @@ export const useBugReportDialog = ({
             }
           } else {
             setErrorMessage(null)
+            setSuccessState(null)
             setIsOpen(true)
           }
         }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Report Bug</AlertDialogTitle>
+            <AlertDialogTitle>
+              {successState ? "Bug Report Created" : "Report Bug"}
+            </AlertDialogTitle>
             <AlertDialogDescription asChild>
-              <div className="rf-text-left rf-space-y-3 rf-text-sm">
-                <p>
-                  Reporting a bug will upload your entire project
-                  {bugReportFileCount > 0
-                    ? ` (${bugReportFileCount} file${
-                        bugReportFileCount === 1 ? "" : "s"
-                      })`
-                    : ""}{" "}
-                  to tscircuit support. After submission the report will be
-                  stored for approximately 48 hours then automatically deleted
-                </p>
-                <p>
-                  Share the generated bug report link privately with tscircuit
-                  staff so we can help debug your issue. You can also reach out
-                  on our
-                  <a
-                    className="rf-ml-1 rf-text-blue-600 hover:rf-underline"
-                    href="https://tscircuit.com/join"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Discord community
-                  </a>
-                  .
-                </p>
-                {!isSessionLoggedIn && (
-                  <p className="rf-text-red-600">
-                    You appear to be logged out. Please log in before reporting
-                    a bug or the upload will fail.
+              {successState ? (
+                <div className="rf-text-left rf-space-y-3 rf-text-sm">
+                  <p>Bug report created successfully.</p>
+                  <div>
+                    <a
+                      className="rf-text-blue-600 hover:rf-underline"
+                      href={successState.bugReportUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      View bug report
+                    </a>
+                  </div>
+                  <p>
+                    Please share this link privately with tscircuit staff so we
+                    can help debug. Join the
+                    <a
+                      className="rf-ml-1 rf-text-blue-600 hover:rf-underline"
+                      href="https://tscircuit.com/join"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      tscircuit Discord
+                    </a>
+                    .
                   </p>
-                )}
-                {errorMessage && (
-                  <p className="rf-text-red-600">{errorMessage}</p>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="rf-text-left rf-space-y-3 rf-text-sm">
+                  <p>
+                    Reporting a bug will upload your entire project
+                    {bugReportFileCount > 0
+                      ? ` (${bugReportFileCount} file${
+                          bugReportFileCount === 1 ? "" : "s"
+                        })`
+                      : ""}{" "}
+                    to tscircuit support.
+                  </p>
+                  <div className="rf-space-y-2">
+                    <label
+                      htmlFor="bug-description"
+                      className="rf-block rf-font-medium"
+                    >
+                      Description (optional)
+                    </label>
+                    <textarea
+                      id="bug-description"
+                      className="rf-w-full rf-min-h-[100px] rf-px-3 rf-py-2 rf-text-sm rf-border rf-border-gray-300 rf-rounded-md focus:rf-outline-none focus:rf-ring-2 focus:rf-ring-blue-500"
+                      placeholder="Describe the issue you're experiencing..."
+                      value={userText}
+                      onChange={(e) => setUserText(e.target.value)}
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                  <p>
+                    Share the generated bug report link privately with tscircuit
+                    staff so we can help debug your issue. You can also reach
+                    out on our
+                    <a
+                      className="rf-ml-1 rf-text-blue-600 hover:rf-underline"
+                      href="https://tscircuit.com/join"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Discord community
+                    </a>
+                    .
+                  </p>
+                  {!isSessionLoggedIn && (
+                    <p className="rf-text-red-600">
+                      You appear to be logged out. Please log in before
+                      reporting a bug or the upload will fail.
+                    </p>
+                  )}
+                  {errorMessage && (
+                    <p className="rf-text-red-600">{errorMessage}</p>
+                  )}
+                </div>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel
-              disabled={isSubmitting}
-              onClick={() => {
-                if (!isSubmitting) {
+            {successState ? (
+              <button
+                type="button"
+                className={buttonVariants()}
+                onClick={() => {
                   closeBugReportDialog()
-                }
-              }}
-            >
-              Cancel
-            </AlertDialogCancel>
-            <button
-              className={clsx(
-                buttonVariants(),
-                isSubmitting && "rf-opacity-70 rf-cursor-not-allowed",
-              )}
-              disabled={isSubmitting}
-              onClick={(event) => {
-                event.preventDefault()
-                void handleConfirmBugReport()
-              }}
-            >
-              {isSubmitting ? "Reporting..." : "Upload & Report"}
-            </button>
+                }}
+              >
+                Close
+              </button>
+            ) : (
+              <>
+                <AlertDialogCancel
+                  disabled={isSubmitting}
+                  onClick={() => {
+                    if (!isSubmitting) {
+                      closeBugReportDialog()
+                    }
+                  }}
+                >
+                  Cancel
+                </AlertDialogCancel>
+                <button
+                  type="button"
+                  className={clsx(
+                    buttonVariants(),
+                    isSubmitting && "rf-opacity-70 rf-cursor-not-allowed",
+                  )}
+                  disabled={isSubmitting}
+                  onClick={(event) => {
+                    event.preventDefault()
+                    void handleConfirmBugReport()
+                  }}
+                >
+                  {isSubmitting ? "Reporting..." : "Upload & Report"}
+                </button>
+              </>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -268,6 +313,8 @@ export const useBugReportDialog = ({
     isOpen,
     isSessionLoggedIn,
     isSubmitting,
+    successState,
+    userText,
   ])
 
   return {

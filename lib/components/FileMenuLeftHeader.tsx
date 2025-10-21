@@ -46,7 +46,6 @@ export const FileMenuLeftHeader = (props: {
   onChangeShouldLoadLatestEval?: (shouldLoadLatestEval: boolean) => void
   circuitJson?: any
   projectName?: string
-  fsMap?: Map<string, string> | Record<string, string>
 }) => {
   const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
   const [snippetName, setSnippetName] = useState<string | null>(null)
@@ -71,7 +70,6 @@ export const FileMenuLeftHeader = (props: {
 
   const pushEvent = useRunFrameStore((state) => state.pushEvent)
   const recentEvents = useRunFrameStore((state) => state.recentEvents)
-  const storeFsMap = useRunFrameStore((state) => state.fsMap)
 
   const firstRenderTime = useMemo(() => Date.now(), [])
 
@@ -155,22 +153,7 @@ export const FileMenuLeftHeader = (props: {
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
   const [isAiReviewDialogOpen, setIsAiReviewDialogOpen] = useState(false)
 
-  const effectiveFsMap = useMemo(() => {
-    if (props.fsMap) {
-      if (props.fsMap instanceof Map) {
-        return props.fsMap
-      }
-      return new Map(Object.entries(props.fsMap))
-    }
-    if (storeFsMap && storeFsMap.size > 0) {
-      return storeFsMap
-    }
-    return null
-  }, [props.fsMap, storeFsMap])
-
-  const { BugReportDialog, openBugReportDialog } = useBugReportDialog({
-    fsMap: effectiveFsMap,
-  })
+  const { BugReportDialog, openBugReportDialog } = useBugReportDialog()
 
   return (
     <>
@@ -227,14 +210,16 @@ export const FileMenuLeftHeader = (props: {
             </>
           )}
 
-          <DropdownMenuItem
-            className="rf-text-xs"
-            onSelect={() => {
-              openBugReportDialog()
-            }}
-          >
-            Report Bug
-          </DropdownMenuItem>
+          {!props.isWebEmbedded && (
+            <DropdownMenuItem
+              className="rf-text-xs"
+              onSelect={() => {
+                openBugReportDialog()
+              }}
+            >
+              Report Bug
+            </DropdownMenuItem>
+          )}
 
           {/* Export - always available */}
           <DropdownMenuSub>

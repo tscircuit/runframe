@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import ky, { HTTPError } from "ky"
+import { HTTPError } from "ky"
 import {
   useCallback,
   useEffect,
@@ -27,25 +27,34 @@ declare global {
   }
 }
 
-type FsMapLike =
-  | Map<string, string | undefined>
-  | Record<string, string | undefined>
-  | null
-  | undefined
-
-type UseBugReportDialogOptions = {
-  fsMap?: FsMapLike
-}
-
 type UseBugReportDialogResult = {
   BugReportDialog: () => ReactElement
   openBugReportDialog: () => void
 }
 
-const normalizeFsMap = (fsMap?: FsMapLike) => {
-  if (!fsMap) return null
-  if (fsMap instanceof Map) return fsMap
-  return new Map(Object.entries(fsMap))
+const DYNAMIC_FILE_EXTENSIONS = [".tsx", ".ts", ".jsx", ".js", ".json"]
+
+async function getFilesFromServer(): Promise<Map<string, string>> {
+  const response = await fetch(`${API_BASE}/files/list`)
+  const { file_list } = (await response.json()) as {
+    file_list: Array<{ file_id: string; file_path: string }>
+  }
+
+  const fileMap = new Map<string, string>()
+
+  for (const file of file_list) {
+    if (DYNAMIC_FILE_EXTENSIONS.some((ext) => file.file_path.endsWith(ext))) {
+      const fileResponse = await fetch(
+        `${API_BASE}/files/get?file_path=${encodeURIComponent(file.file_path)}`,
+      )
+      const fileData = await fileResponse.json()
+      if (fileData.file?.text_content) {
+        fileMap.set(file.file_path, fileData.file.text_content)
+      }
+    }
+  }
+
+  return fileMap
 }
 
 const buildBugReportUrl = (bugReportId: string) => {
@@ -65,9 +74,7 @@ const buildBugReportUrl = (bugReportId: string) => {
   ).toString()
 }
 
-export const useBugReportDialog = ({
-  fsMap,
-}: UseBugReportDialogOptions): UseBugReportDialogResult => {
+export const useBugReportDialog = (): UseBugReportDialogResult => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -75,9 +82,7 @@ export const useBugReportDialog = ({
   const [successState, setSuccessState] = useState<{
     bugReportUrl: string
   } | null>(null)
-
-  const effectiveFsMap = useMemo(() => normalizeFsMap(fsMap), [fsMap])
-  const bugReportFileCount = effectiveFsMap?.size ?? 0
+  const [bugReportFileCount, setBugReportFileCount] = useState<number>(0)
 
   const isSessionLoggedIn = useMemo(() => {
     if (hasRegistryToken()) return true
@@ -100,6 +105,20 @@ export const useBugReportDialog = ({
     }
   }, [isOpen, successState])
 
+  // Fetch file count when dialog opens
+  useEffect(() => {
+    if (isOpen && !successState) {
+      getFilesFromServer()
+        .then((files) => {
+          setBugReportFileCount(files.size)
+        })
+        .catch((error) => {
+          console.error("Failed to fetch file count", error)
+          setBugReportFileCount(0)
+        })
+    }
+  }, [isOpen, successState])
+
   const openBugReportDialog = useCallback(() => {
     setErrorMessage(null)
     setSuccessState(null)
@@ -112,17 +131,21 @@ export const useBugReportDialog = ({
   }, [])
 
   const handleConfirmBugReport = useCallback(async () => {
-    if (!effectiveFsMap || effectiveFsMap.size === 0) {
-      toast.error("No project files available to include in the bug report")
-      return
-    }
-
     setIsSubmitting(true)
     setErrorMessage(null)
 
     const registryKy = getRegistryKy()
 
     try {
+      // Fetch files from the file server
+      const filesFromServer = await getFilesFromServer()
+
+      if (filesFromServer.size === 0) {
+        toast.error("No project files available to include in the bug report")
+        setIsSubmitting(false)
+        return
+      }
+
       const deleteAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
 
       const createResponse = await registryKy
@@ -140,7 +163,7 @@ export const useBugReportDialog = ({
 
       const bugReportId = createResponse.bug_report.bug_report_id
 
-      for (const [filePath, fileContents] of effectiveFsMap.entries()) {
+      for (const [filePath, fileContents] of filesFromServer.entries()) {
         await registryKy.post("bug_reports/upload_file", {
           json: {
             bug_report_id: bugReportId,
@@ -176,7 +199,7 @@ export const useBugReportDialog = ({
     } finally {
       setIsSubmitting(false)
     }
-  }, [closeBugReportDialog, effectiveFsMap])
+  }, [userText])
 
   const BugReportDialog = useCallback(() => {
     return (

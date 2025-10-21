@@ -47,7 +47,6 @@ export const FileMenuLeftHeader = (props: {
   circuitJson?: any
   projectName?: string
   fsMap?: Map<string, string> | Record<string, string>
-  executionError?: string | null
 }) => {
   const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
   const [snippetName, setSnippetName] = useState<string | null>(null)
@@ -171,7 +170,6 @@ export const FileMenuLeftHeader = (props: {
 
   const { BugReportDialog, openBugReportDialog } = useBugReportDialog({
     fsMap: effectiveFsMap,
-    executionError: props.executionError ?? null,
   })
 
   return (
@@ -231,7 +229,7 @@ export const FileMenuLeftHeader = (props: {
 
           <DropdownMenuItem
             className="rf-text-xs"
-            onSelect={(event) => {
+            onSelect={() => {
               openBugReportDialog()
             }}
           >

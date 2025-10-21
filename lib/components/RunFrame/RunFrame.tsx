@@ -581,7 +581,6 @@ export const RunFrame = (props: RunFrameProps) => {
             <FileMenuLeftHeader
               isWebEmbedded={props.isWebEmbedded}
               fsMap={fsMap}
-              executionError={error?.error}
             />
           )}
           {props.leftHeaderContent}

@@ -4,8 +4,14 @@ import { Button } from "lib/components/ui/button"
 import { createSnippetUrl } from "@tscircuit/create-snippet-url"
 import { encodeFsMapToUrlHash } from "lib/utils"
 import { AutoroutingLogOptions } from "./AutoroutingLogOptions"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import type { CircuitJsonError } from "circuit-json"
+
+declare global {
+  interface Window {
+    __TSCIRCUIT_LAST_EXECUTION_ERROR?: string
+  }
+}
 
 interface UnifiedError {
   type: string
@@ -167,6 +173,19 @@ export const ErrorTabContent = ({
 
   const currentError = unifiedErrors[currentErrorIndex]
   const currentWarning = unifiedWarnings[currentWarningIndex]
+
+  // Store execution error globally so bug report dialog can access it
+  useEffect(() => {
+    if (errorMessage) {
+      let errorText = errorMessage
+      if (errorStack) {
+        errorText += `\n\n${errorStack}`
+      }
+      if (typeof window !== "undefined") {
+        window.__TSCIRCUIT_LAST_EXECUTION_ERROR = errorText
+      }
+    }
+  }, [errorMessage, errorStack])
 
   return (
     <>

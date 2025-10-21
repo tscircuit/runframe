@@ -1,6 +1,12 @@
 import clsx from "clsx"
 import ky, { HTTPError } from "ky"
-import { useCallback, useMemo, useState, type ReactElement } from "react"
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactElement,
+} from "react"
 import { API_BASE } from "./RunFrameWithApi/api-base"
 import { getRegistryKy, hasRegistryToken } from "lib/utils/get-registry-ky"
 import { toast } from "lib/utils/toast"
@@ -15,6 +21,12 @@ import {
   AlertDialogTitle,
 } from "./ui/alert-dialog"
 
+declare global {
+  interface Window {
+    __TSCIRCUIT_LAST_EXECUTION_ERROR?: string
+  }
+}
+
 type FsMapLike =
   | Map<string, string | undefined>
   | Record<string, string | undefined>
@@ -23,7 +35,6 @@ type FsMapLike =
 
 type UseBugReportDialogOptions = {
   fsMap?: FsMapLike
-  executionError?: string | null
 }
 
 type UseBugReportDialogResult = {
@@ -56,7 +67,6 @@ const buildBugReportUrl = (bugReportId: string) => {
 
 export const useBugReportDialog = ({
   fsMap,
-  executionError,
 }: UseBugReportDialogOptions): UseBugReportDialogResult => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -77,16 +87,25 @@ export const useBugReportDialog = ({
       .some((cookie) => cookie.trim().startsWith("session="))
   }, [isOpen])
 
+  // Populate text field with execution error when dialog opens
+  useEffect(() => {
+    if (isOpen && !successState) {
+      const globalError =
+        typeof window !== "undefined"
+          ? window.__TSCIRCUIT_LAST_EXECUTION_ERROR
+          : undefined
+      if (globalError) {
+        setUserText(`I'm getting this execution error:\n\n${globalError}`)
+      }
+    }
+  }, [isOpen, successState])
+
   const openBugReportDialog = useCallback(() => {
     setErrorMessage(null)
     setSuccessState(null)
-    if (executionError) {
-      setUserText(`I'm getting this execution error:\n\n${executionError}`)
-    } else {
-      setUserText("")
-    }
+    setUserText("")
     setIsOpen(true)
-  }, [executionError])
+  }, [])
 
   const closeBugReportDialog = useCallback(() => {
     setIsOpen(false)
@@ -157,7 +176,7 @@ export const useBugReportDialog = ({
     } finally {
       setIsSubmitting(false)
     }
-  }, [closeBugReportDialog, effectiveFsMap, executionError])
+  }, [closeBugReportDialog, effectiveFsMap])
 
   const BugReportDialog = useCallback(() => {
     return (

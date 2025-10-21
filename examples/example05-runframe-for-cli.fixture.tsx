@@ -89,7 +89,7 @@ export default () => (
           text_content: `
 
 export default () => (
-  <board width="10mm" height="10mm">
+  <board width="10mm" height="10mm"
   </board>
 )`,
         }),

@@ -108,6 +108,27 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       // Retain current selection if it still exists
       return
     }
+
+    // If current file was deleted, try to stay in the same directory
+    if (componentPath) {
+      const currentDir = componentPath.includes("/")
+        ? componentPath.substring(0, componentPath.lastIndexOf("/"))
+        : ""
+
+      // Find another file in the same directory
+      const fileInSameDir = boardFiles.find((file) => {
+        const fileDir = file.includes("/")
+          ? file.substring(0, file.lastIndexOf("/"))
+          : ""
+        return fileDir === currentDir
+      })
+
+      if (fileInSameDir) {
+        setComponentPath(fileInSameDir)
+        return
+      }
+    }
+
     const defaultPath = window?.TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH
     const candidatePaths = [props.initialMainComponentPath, defaultPath].filter(
       (value): value is string => Boolean(value),

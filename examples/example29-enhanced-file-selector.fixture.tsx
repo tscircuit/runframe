@@ -218,6 +218,10 @@ describe('PowerModule', () => {
           path: "scripts/deploy.sh",
           content: `#!/bin/bash\necho "Deploying project..."\nnpm run deploy`,
         },
+        {
+          path: "deeply-nested-folder-structure/with-very-long-descriptive-names/for-comprehensive-testing-purposes/of-breadcrumb-navigation/and-file-selector-behavior/with-additional-nesting-levels/for-maximum-depth-testing/and-ui-responsiveness-validation/VeryLongComponentNameForTesting.tsx",
+          content: `export const VeryLongComponentNameForTesting = () => (\n  <group name="DeepComponent">\n    <chip name="deep_chip" footprint="QFN-48" />\n  </group>\n)`,
+        },
       ]
 
       // Create all files

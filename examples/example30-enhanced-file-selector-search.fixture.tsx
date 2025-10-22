@@ -57,10 +57,8 @@ export default () => {
             files={mockFiles}
             currentFile={currentFile}
             onFileChange={setCurrentFile}
-            config={{
-              pinnedFiles: favorites,
-              onToggleFavorite: handleToggleFavorite,
-            }}
+            pinnedFiles={favorites}
+            onToggleFavorite={handleToggleFavorite}
           />
         </div>
       </div>

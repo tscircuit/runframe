@@ -29,23 +29,6 @@ import {
   type FileNode,
 } from "./parseFilesToTree"
 
-export interface FileSelectorConfig {
-  fileFilter?: (filename: string) => boolean
-  getDisplayName?: (filename: string) => string
-  placeholder?: string
-  searchPlaceholder?: string
-  emptyMessage?: string
-  /**
-   * Array of file paths to pin at the top of the file selector.
-   * Pinned files appear in a "Favorites" section for quick access.
-   */
-  pinnedFiles?: string[]
-  /**
-   * Callback when a file is toggled as favorite.
-   */
-  onToggleFavorite?: (filePath: string) => void
-}
-
 const defaultFileIcon = (fileName: string) => {
   if (fileName.endsWith(".tsx") || fileName.endsWith(".jsx")) {
     return <Code className="rf-h-4 rf-w-4 rf-text-blue-500" />
@@ -76,12 +59,31 @@ export const EnhancedFileSelectorCombobox = ({
   files,
   onFileChange,
   currentFile,
-  config = {},
+  fileFilter = defaultFileFilter,
+  getDisplayName = defaultDisplayName,
+  placeholder = "Select file",
+  searchPlaceholder = "Search for file",
+  emptyMessage = "No files found in this directory.",
+  pinnedFiles = [],
+  onToggleFavorite,
 }: {
   files: string[]
   currentFile: string
   onFileChange: (value: string) => void
-  config?: FileSelectorConfig
+  fileFilter?: (filename: string) => boolean
+  getDisplayName?: (filename: string) => string
+  placeholder?: string
+  searchPlaceholder?: string
+  emptyMessage?: string
+  /**
+   * Array of file paths to pin at the top of the file selector.
+   * Pinned files appear in a "Favorites" section for quick access.
+   */
+  pinnedFiles?: string[]
+  /**
+   * Callback when a file is toggled as favorite.
+   */
+  onToggleFavorite?: (filePath: string) => void
 }) => {
   const [open, setOpen] = useState(false)
   const [file, setFile] = useState(currentFile)
@@ -89,16 +91,6 @@ export const EnhancedFileSelectorCombobox = ({
     useCurrentFolder({ currentFile: file, files })
   const [currentFileIndex, setCurrentFileIndex] = useState(0)
   const [searchValue, setSearchValue] = useState("")
-
-  const {
-    fileFilter = defaultFileFilter,
-    getDisplayName = defaultDisplayName,
-    placeholder = "Select file",
-    searchPlaceholder = "Search for file",
-    emptyMessage = "No files found in this directory.",
-    pinnedFiles = [],
-    onToggleFavorite,
-  } = config
 
   useEffect(() => {
     setFile(currentFile)

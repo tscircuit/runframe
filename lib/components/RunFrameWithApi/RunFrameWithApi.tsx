@@ -218,10 +218,8 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
                     setComponentPath(value)
                   }
                 }}
-                config={{
-                  pinnedFiles: favorites,
-                  onToggleFavorite: handleToggleFavorite,
-                }}
+                pinnedFiles={favorites}
+                onToggleFavorite={handleToggleFavorite}
               />
             </div>
           )}

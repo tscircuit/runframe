@@ -145,12 +145,10 @@ export default () => {
             files={allFiles}
             currentFile={currentFile}
             onFileChange={setCurrentFile}
-            config={{
-              pinnedFiles: favorites,
-              onToggleFavorite: handleToggleFavorite,
-              placeholder: "Choose a file...",
-              searchPlaceholder: "Search files...",
-            }}
+            pinnedFiles={favorites}
+            onToggleFavorite={handleToggleFavorite}
+            placeholder="Choose a file..."
+            searchPlaceholder="Search files..."
           />
         </div>
         <div className="rf-text-center rf-text-sm rf-text-muted-foreground">

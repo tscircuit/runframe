@@ -13,6 +13,7 @@ export default () => {
     "components/Button.tsx",
     "components/ui/Select.tsx",
     "pages/About.tsx",
+    "features/feature-one-extended-version/subfeature-alpha-detailed-implementation/module-beta-expanded-core/components-and-shared-widgets/nested-deep-structure-with-hooks/level-six-extended-context/level-seven-detailed-services/level-eight-expanded-handlers/level-nine-extra-utilities/level-ten-finalized-renderers/level-eleven-ultra-specific/level-twelve-experimental-variants/level-thirteen-temporary-migration/DeepComponent.tsx",
     "features/dashboard/components/widgets/charts/LineChart.tsx",
     "lib/utils/helpers/data-processing/validators/EmailValidator.ts",
     "pages/Home.tsx",

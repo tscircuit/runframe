@@ -29,23 +29,6 @@ import {
   type FileNode,
 } from "./parseFilesToTree"
 
-export interface FileSelectorConfig {
-  fileFilter?: (filename: string) => boolean
-  getDisplayName?: (filename: string) => string
-  placeholder?: string
-  searchPlaceholder?: string
-  emptyMessage?: string
-  /**
-   * Array of file paths to pin at the top of the file selector.
-   * Pinned files appear in a "Favorites" section for quick access.
-   */
-  pinnedFiles?: string[]
-  /**
-   * Callback when a file is toggled as favorite.
-   */
-  onToggleFavorite?: (filePath: string) => void
-}
-
 const defaultFileIcon = (fileName: string) => {
   if (fileName.endsWith(".tsx") || fileName.endsWith(".jsx")) {
     return <Code className="rf-h-4 rf-w-4 rf-text-blue-500" />
@@ -76,12 +59,31 @@ export const EnhancedFileSelectorCombobox = ({
   files,
   onFileChange,
   currentFile,
-  config = {},
+  fileFilter = defaultFileFilter,
+  getDisplayName = defaultDisplayName,
+  placeholder = "Select file",
+  searchPlaceholder = "Search for file",
+  emptyMessage = "No files found in this directory.",
+  pinnedFiles = [],
+  onToggleFavorite,
 }: {
   files: string[]
   currentFile: string
   onFileChange: (value: string) => void
-  config?: FileSelectorConfig
+  fileFilter?: (filename: string) => boolean
+  getDisplayName?: (filename: string) => string
+  placeholder?: string
+  searchPlaceholder?: string
+  emptyMessage?: string
+  /**
+   * Array of file paths to pin at the top of the file selector.
+   * Pinned files appear in a "Favorites" section for quick access.
+   */
+  pinnedFiles?: string[]
+  /**
+   * Callback when a file is toggled as favorite.
+   */
+  onToggleFavorite?: (filePath: string) => void
 }) => {
   const [open, setOpen] = useState(false)
   const [file, setFile] = useState(currentFile)
@@ -89,16 +91,6 @@ export const EnhancedFileSelectorCombobox = ({
     useCurrentFolder({ currentFile: file, files })
   const [currentFileIndex, setCurrentFileIndex] = useState(0)
   const [searchValue, setSearchValue] = useState("")
-
-  const {
-    fileFilter = defaultFileFilter,
-    getDisplayName = defaultDisplayName,
-    placeholder = "Select file",
-    searchPlaceholder = "Search for file",
-    emptyMessage = "No files found in this directory.",
-    pinnedFiles = [],
-    onToggleFavorite,
-  } = config
 
   useEffect(() => {
     setFile(currentFile)
@@ -199,7 +191,8 @@ export const EnhancedFileSelectorCombobox = ({
   const shortDisplayPath =
     displayPath.length > 25 ? "..." + displayPath.slice(-22) : displayPath // Fixed width to eliminate jitter - no dynamic sizing
   const getDropdownWidth = () => {
-    return "rf-w-[400px] rf-min-w-[400px] rf-max-w-[400px]"
+    const maxWidth = isSearching ? "rf-max-w-[600px]" : "rf-max-w-[1000px]"
+    return `rf-w-full rf-min-w-[600px] ${maxWidth}`
   }
 
   return (
@@ -219,7 +212,7 @@ export const EnhancedFileSelectorCombobox = ({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="rf-w-fit rf-min-w-32 rf-max-w-64 rf-justify-center rf-items-center rf-gap-1 !rf-font-normal"
+            className="rf-w-fit rf-min-w-32 rf-max-w-100 rf-justify-center rf-items-center rf-gap-1 !rf-font-normal"
           >
             <span className="rf-truncate rf-text-left">
               {file ? getDisplayName(file) : placeholder}
@@ -229,7 +222,7 @@ export const EnhancedFileSelectorCombobox = ({
         </PopoverTrigger>
         <PopoverContent
           className={cn(
-            "!rf-p-0 !rf-overflow-x-auto !rf-z-[200]",
+            "!rf-p-0 !rf-overflow-hidden !rf-z-[200]",
             getDropdownWidth(),
           )}
         >
@@ -264,7 +257,7 @@ export const EnhancedFileSelectorCombobox = ({
                           <span className="rf-mx-1 rf-flex-shrink-0">/</span>
                           {index === array.length - 1 ? (
                             <span
-                              className="rf-text-slate-800 rf-truncate rf-max-w-[150px]"
+                              className="rf-text-slate-800 rf-truncate rf-max-w-[200px]"
                               title={segment}
                             >
                               {segment}
@@ -274,7 +267,7 @@ export const EnhancedFileSelectorCombobox = ({
                               onClick={() =>
                                 handleNavigateToFolder(pathToSegment)
                               }
-                              className="rf-text-blue-600 hover:rf-text-blue-800 rf-underline rf-cursor-pointer rf-bg-transparent rf-border-none rf-p-0 rf-truncate rf-max-w-[100px]"
+                              className="rf-text-blue-600 hover:rf-text-blue-800 rf-underline rf-cursor-pointer rf-bg-transparent rf-border-none rf-p-0 rf-truncate rf-max-w-[150px]"
                               title={segment}
                             >
                               {segment}
@@ -321,7 +314,7 @@ export const EnhancedFileSelectorCombobox = ({
                           >
                             <Star className="rf-mr-2 rf-h-4 rf-w-4 rf-text-amber-500 rf-fill-amber-500" />
                             {getDisplayName(path.split("/").pop() || "")}
-                            <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[120px]">
+                            <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[40%]">
                               {getDirectoryPath(path)}
                             </span>
                             <Check
@@ -364,7 +357,12 @@ export const EnhancedFileSelectorCombobox = ({
                                   e.stopPropagation()
                                   onToggleFavorite(fileNode.path)
                                 }}
-                                className="rf-p-1 rf-rounded hover:rf-bg-slate-200 rf-opacity-0 group-hover:rf-opacity-100 rf-transition-opacity"
+                                className={cn(
+                                  "rf-p-1 rf-rounded hover:rf-bg-slate-200 rf-transition-opacity",
+                                  pinnedFiles.includes(fileNode.path)
+                                    ? "rf-opacity-100"
+                                    : "rf-opacity-0 group-hover:rf-opacity-100",
+                                )}
                                 aria-label={
                                   pinnedFiles.includes(fileNode.path)
                                     ? "Remove from favorites"
@@ -464,7 +462,7 @@ export const EnhancedFileSelectorCombobox = ({
                                   <span className="rf-truncate rf-flex-1">
                                     {getDisplayName(file.fileName)}
                                   </span>
-                                  <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[120px]">
+                                  <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[40%]">
                                     {currentFolder || "/"}
                                   </span>
                                   {onToggleFavorite && (
@@ -474,7 +472,12 @@ export const EnhancedFileSelectorCombobox = ({
                                         e.stopPropagation()
                                         onToggleFavorite(file.path)
                                       }}
-                                      className="rf-p-1 rf-rounded hover:rf-bg-slate-200 rf-opacity-0 group-hover:rf-opacity-100 rf-transition-opacity rf-ml-2"
+                                      className={cn(
+                                        "rf-p-1 rf-rounded hover:rf-bg-slate-200 rf-transition-opacity rf-ml-2",
+                                        pinnedFiles.includes(file.path)
+                                          ? "rf-opacity-100"
+                                          : "rf-opacity-0 group-hover:rf-opacity-100",
+                                      )}
                                       aria-label={
                                         pinnedFiles.includes(file.path)
                                           ? "Remove from favorites"
@@ -530,7 +533,7 @@ export const EnhancedFileSelectorCombobox = ({
                                 <span className="rf-truncate rf-flex-1">
                                   {getDisplayName(file.fileName)}
                                 </span>
-                                <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[120px]">
+                                <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[40%]">
                                   {getDirectoryPath(file.path)}
                                 </span>
                                 {onToggleFavorite && (
@@ -539,7 +542,12 @@ export const EnhancedFileSelectorCombobox = ({
                                       e.stopPropagation()
                                       onToggleFavorite(file.path)
                                     }}
-                                    className="rf-p-1 rf-rounded hover:rf-bg-slate-200 rf-opacity-0 group-hover:rf-opacity-100 rf-transition-opacity rf-ml-2"
+                                    className={cn(
+                                      "rf-p-1 rf-rounded hover:rf-bg-slate-200 rf-transition-opacity rf-ml-2",
+                                      pinnedFiles.includes(file.path)
+                                        ? "rf-opacity-100"
+                                        : "rf-opacity-0 group-hover:rf-opacity-100",
+                                    )}
                                     title={
                                       pinnedFiles.includes(file.path)
                                         ? "Remove from favorites"

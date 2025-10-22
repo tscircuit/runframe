@@ -3,6 +3,9 @@
   "workspaces": {
     "": {
       "name": "@tscircuit/runframe",
+      "dependencies": {
+        "jose": "^6.1.0",
+      },
       "devDependencies": {
         "@babel/standalone": "^7.26.10",
         "@biomejs/biome": "^1.9.4",

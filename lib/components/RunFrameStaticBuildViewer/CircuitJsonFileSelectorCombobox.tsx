@@ -1,14 +1,4 @@
-import {
-  EnhancedFileSelectorCombobox,
-  type FileSelectorConfig,
-} from "../RunFrameWithApi/EnhancedFileSelectorCombobox/EnhancedFileSelectorCombobox"
-
-const circuitJsonConfig: FileSelectorConfig = {
-  fileFilter: () => true,
-  placeholder: "Select circuit",
-  searchPlaceholder: "Search for circuit file",
-  emptyMessage: "No circuit files found in this directory.",
-}
+import { EnhancedFileSelectorCombobox } from "../RunFrameWithApi/EnhancedFileSelectorCombobox/EnhancedFileSelectorCombobox"
 
 export const CircuitJsonFileSelectorCombobox = ({
   files,
@@ -24,7 +14,10 @@ export const CircuitJsonFileSelectorCombobox = ({
       files={files}
       onFileChange={onFileChange}
       currentFile={currentFile}
-      config={circuitJsonConfig}
+      fileFilter={() => true}
+      placeholder="Select circuit"
+      searchPlaceholder="Search for circuit file"
+      emptyMessage="No circuit files found in this directory."
     />
   )
 }

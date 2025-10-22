@@ -2,6 +2,7 @@ import Debug from "debug"
 import { useEditEventController } from "lib/hooks/use-edit-event-controller"
 import { useHasReceivedInitialFilesLoaded } from "lib/hooks/use-has-received-initial-files-loaded"
 import { useSyncPageTitle } from "lib/hooks/use-sync-page-title"
+import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
 import { API_BASE } from "./api-base"
@@ -85,13 +86,49 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     const params = new URLSearchParams(window.location.hash.slice(1))
     return params.get("file") ?? props.initialMainComponentPath ?? ""
   })
+  const [favorites, setFavorites] = useLocalStorageState<string[]>(
+    "runframe:favorites",
+    [],
+  )
   const isLoadingFiles = !hasReceivedInitialFiles
+
+  const handleToggleFavorite = useCallback(
+    (filePath: string) => {
+      setFavorites((prev) =>
+        prev.includes(filePath)
+          ? prev.filter((f) => f !== filePath)
+          : [...prev, filePath],
+      )
+    },
+    [setFavorites],
+  )
 
   useEffect(() => {
     if (componentPath && boardFiles.includes(componentPath)) {
       // Retain current selection if it still exists
       return
     }
+
+    // If current file was deleted, try to stay in the same directory
+    if (componentPath) {
+      const currentDir = componentPath.includes("/")
+        ? componentPath.substring(0, componentPath.lastIndexOf("/"))
+        : ""
+
+      // Find another file in the same directory
+      const fileInSameDir = boardFiles.find((file) => {
+        const fileDir = file.includes("/")
+          ? file.substring(0, file.lastIndexOf("/"))
+          : ""
+        return fileDir === currentDir
+      })
+
+      if (fileInSameDir) {
+        setComponentPath(fileInSameDir)
+        return
+      }
+    }
+
     const defaultPath = window?.TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH
     const candidatePaths = [props.initialMainComponentPath, defaultPath].filter(
       (value): value is string => Boolean(value),
@@ -181,6 +218,8 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
                     setComponentPath(value)
                   }
                 }}
+                pinnedFiles={favorites}
+                onToggleFavorite={handleToggleFavorite}
               />
             </div>
           )}

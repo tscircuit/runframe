@@ -365,7 +365,12 @@ export const EnhancedFileSelectorCombobox = ({
                                   e.stopPropagation()
                                   onToggleFavorite(fileNode.path)
                                 }}
-                                className="rf-p-1 rf-rounded hover:rf-bg-slate-200 rf-opacity-0 group-hover:rf-opacity-100 rf-transition-opacity"
+                                className={cn(
+                                  "rf-p-1 rf-rounded hover:rf-bg-slate-200 rf-transition-opacity",
+                                  pinnedFiles.includes(fileNode.path)
+                                    ? "rf-opacity-100"
+                                    : "rf-opacity-0 group-hover:rf-opacity-100",
+                                )}
                                 aria-label={
                                   pinnedFiles.includes(fileNode.path)
                                     ? "Remove from favorites"
@@ -475,7 +480,12 @@ export const EnhancedFileSelectorCombobox = ({
                                         e.stopPropagation()
                                         onToggleFavorite(file.path)
                                       }}
-                                      className="rf-p-1 rf-rounded hover:rf-bg-slate-200 rf-opacity-0 group-hover:rf-opacity-100 rf-transition-opacity rf-ml-2"
+                                      className={cn(
+                                        "rf-p-1 rf-rounded hover:rf-bg-slate-200 rf-transition-opacity rf-ml-2",
+                                        pinnedFiles.includes(file.path)
+                                          ? "rf-opacity-100"
+                                          : "rf-opacity-0 group-hover:rf-opacity-100",
+                                      )}
                                       aria-label={
                                         pinnedFiles.includes(file.path)
                                           ? "Remove from favorites"
@@ -540,7 +550,12 @@ export const EnhancedFileSelectorCombobox = ({
                                       e.stopPropagation()
                                       onToggleFavorite(file.path)
                                     }}
-                                    className="rf-p-1 rf-rounded hover:rf-bg-slate-200 rf-opacity-0 group-hover:rf-opacity-100 rf-transition-opacity rf-ml-2"
+                                    className={cn(
+                                      "rf-p-1 rf-rounded hover:rf-bg-slate-200 rf-transition-opacity rf-ml-2",
+                                      pinnedFiles.includes(file.path)
+                                        ? "rf-opacity-100"
+                                        : "rf-opacity-0 group-hover:rf-opacity-100",
+                                    )}
                                     title={
                                       pinnedFiles.includes(file.path)
                                         ? "Remove from favorites"

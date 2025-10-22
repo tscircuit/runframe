@@ -1,10 +1,23 @@
 import { useState } from "react"
 import { EnhancedFileSelectorCombobox } from "lib/components/RunFrameWithApi/EnhancedFileSelectorCombobox"
 import { useStyles } from "lib/hooks/use-styles"
+import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 
 export default () => {
   useStyles()
   const [currentFile, setCurrentFile] = useState("app.tsx")
+  const [favorites, setFavorites] = useLocalStorageState<string[]>(
+    "runframe:example30-search:favorites",
+    ["app.tsx", "components/Button.tsx"],
+  )
+
+  const handleToggleFavorite = (filePath: string) => {
+    setFavorites((prev) =>
+      prev.includes(filePath)
+        ? prev.filter((f) => f !== filePath)
+        : [...prev, filePath],
+    )
+  }
 
   // Mock file structure with various path lengths to test dynamic width
   const mockFiles = [
@@ -44,6 +57,10 @@ export default () => {
             files={mockFiles}
             currentFile={currentFile}
             onFileChange={setCurrentFile}
+            config={{
+              pinnedFiles: favorites,
+              onToggleFavorite: handleToggleFavorite,
+            }}
           />
         </div>
       </div>

@@ -2,6 +2,7 @@ import Debug from "debug"
 import { useEditEventController } from "lib/hooks/use-edit-event-controller"
 import { useHasReceivedInitialFilesLoaded } from "lib/hooks/use-has-received-initial-files-loaded"
 import { useSyncPageTitle } from "lib/hooks/use-sync-page-title"
+import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
 import { API_BASE } from "./api-base"
@@ -85,7 +86,22 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     const params = new URLSearchParams(window.location.hash.slice(1))
     return params.get("file") ?? props.initialMainComponentPath ?? ""
   })
+  const [favorites, setFavorites] = useLocalStorageState<string[]>(
+    "runframe:favorites",
+    [],
+  )
   const isLoadingFiles = !hasReceivedInitialFiles
+
+  const handleToggleFavorite = useCallback(
+    (filePath: string) => {
+      setFavorites((prev) =>
+        prev.includes(filePath)
+          ? prev.filter((f) => f !== filePath)
+          : [...prev, filePath],
+      )
+    },
+    [setFavorites],
+  )
 
   useEffect(() => {
     if (componentPath && boardFiles.includes(componentPath)) {
@@ -180,6 +196,10 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
                   if (typeof fsMap.get(value) === "string") {
                     setComponentPath(value)
                   }
+                }}
+                config={{
+                  pinnedFiles: favorites,
+                  onToggleFavorite: handleToggleFavorite,
                 }}
               />
             </div>

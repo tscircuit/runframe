@@ -57,22 +57,11 @@ async function getFilesFromServer(): Promise<Map<string, string>> {
   return fileMap
 }
 
-const buildBugReportUrl = (bugReportId: string) => {
-  const normalizedApiBase = API_BASE.endsWith("/") ? API_BASE : `${API_BASE}/`
-  const baseForView =
-    API_BASE.startsWith("http://") || API_BASE.startsWith("https://")
-      ? normalizedApiBase
-      : `${
-          typeof window !== "undefined"
-            ? window.location.origin
-            : "https://api.tscircuit.com"
-        }/${normalizedApiBase.replace(/^\//, "")}`
+const BUG_REPORT_VIEW_BASE_URL =
+  "https://api.tscircuit.com/bug_reports/view?bug_report_id="
 
-  return new URL(
-    `bug_reports/view?bug_report_id=${bugReportId}`,
-    baseForView,
-  ).toString()
-}
+const buildBugReportUrl = (bugReportId: string) =>
+  `${BUG_REPORT_VIEW_BASE_URL}${bugReportId}`
 
 export const useBugReportDialog = (): UseBugReportDialogResult => {
   const [isOpen, setIsOpen] = useState(false)

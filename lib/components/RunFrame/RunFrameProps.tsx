@@ -1,4 +1,4 @@
-import type { ManualEditEvent } from "@tscircuit/props"
+import type { ManualEditEvent, PlatformConfig } from "@tscircuit/props"
 import type { TabId } from "lib/components/CircuitJsonPreview/PreviewContentProps"
 
 export interface RunFrameProps {
@@ -123,6 +123,16 @@ export interface RunFrameProps {
    * reporting autorouting bugs
    */
   projectUrl?: string
+
+  /**
+   * Base URL for the project, used in webworker platform config
+   */
+  projectBaseUrl?: string
+
+  /**
+   * Platform config for the eval webworker
+   */
+  platformConfig?: PlatformConfig
 
   onReportAutoroutingLog?: (
     name: string,

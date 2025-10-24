@@ -140,8 +140,12 @@ export const RunFrame = (props: RunFrameProps) => {
             evalVersion,
             webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
             projectConfig: {
-              projectBaseUrl: `${API_BASE}/files/static`,
+              projectBaseUrl:
+                props.projectBaseUrl || `${API_BASE}/files/static`,
             },
+            ...(props.platformConfig && {
+              platformConfig: props.platformConfig,
+            }),
             verbose: true,
             ...(props.enableFetchProxy && {
               enableFetchProxy: props.enableFetchProxy,
@@ -255,8 +259,11 @@ export const RunFrame = (props: RunFrameProps) => {
           webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
           verbose: true,
           projectConfig: {
-            projectBaseUrl: `${API_BASE}/files/static`,
+            projectBaseUrl: props.projectBaseUrl || `${API_BASE}/files/static`,
           },
+          ...(props.platformConfig && {
+            platformConfig: props.platformConfig,
+          }),
           ...(props.enableFetchProxy && {
             enableFetchProxy: props.enableFetchProxy,
           }),

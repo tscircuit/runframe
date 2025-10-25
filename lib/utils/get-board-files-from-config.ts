@@ -1,6 +1,6 @@
 import type { ProjectConfig } from "@tscircuit/props"
 import { projectConfig } from "@tscircuit/props"
-import micromatch from "micromatch"
+import { Minimatch } from "minimatch"
 
 const DEFAULT_BOARD_FILE_EXTENSIONS = [
   ".tsx",
@@ -34,9 +34,13 @@ export const getBoardFilesFromConfig = (
   const includeBoardFiles = parsedConfig?.includeBoardFiles?.filter(Boolean)
 
   if (includeBoardFiles && includeBoardFiles.length > 0) {
-    return micromatch(files, includeBoardFiles, {
-      dot: true,
-    })
+    const matchers = includeBoardFiles.map(
+      (pattern) => new Minimatch(pattern, { dot: true }),
+    )
+
+    return files.filter((file) =>
+      matchers.some((matcher) => matcher.match(file)),
+    )
   }
 
   return files.filter(DEFAULT_BOARD_FILE_FILTER)

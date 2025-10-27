@@ -62,10 +62,12 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     if (props.debug) Debug.enable("run-frame*")
   }, [props.debug])
 
-  const { startPolling, stopPolling } = useRunFrameStore((s) => ({
-    startPolling: s.startPolling,
-    stopPolling: s.stopPolling,
-  }))
+  const { startPolling, stopPolling, setCurrentMainComponentPath } =
+    useRunFrameStore((s) => ({
+      startPolling: s.startPolling,
+      stopPolling: s.stopPolling,
+      setCurrentMainComponentPath: s.setCurrentMainComponentPath,
+    }))
   const hasReceivedInitialFiles = useHasReceivedInitialFilesLoaded()
 
   const fsMap = useRunFrameStore((s) => s.fsMap)
@@ -163,7 +165,13 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     if (!componentPath) return
     updateFileHash(componentPath)
     props.onMainComponentPathChange?.(componentPath)
-  }, [componentPath, props.onMainComponentPathChange, updateFileHash])
+    setCurrentMainComponentPath(componentPath)
+  }, [
+    componentPath,
+    props.onMainComponentPathChange,
+    updateFileHash,
+    setCurrentMainComponentPath,
+  ])
   useSyncPageTitle()
 
   const {

@@ -1,13 +1,11 @@
 import { RunFrameForCli } from "lib/components/RunFrameForCli/RunFrameForCli"
-import { RunFrameWithApi } from "lib/components/RunFrameWithApi/RunFrameWithApi"
 import { useRunFrameStore } from "lib/components/RunFrameWithApi/store"
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import { DebugEventsTable } from "./utils/DebugEventsTable"
 import { useEventHandler } from "lib/components/RunFrameForCli/useEventHandler"
 import { isFileApiAccessible } from "./utils/isFileApiAccessible.ts"
 
 export default () => {
-  const recentEvents = useRunFrameStore((state) => state.recentEvents)
   const pushEvent = useRunFrameStore((state) => state.pushEvent)
 
   useEffect(() => {
@@ -89,7 +87,7 @@ export default () => (
           text_content: `
 
 export default () => (
-  <board width="10mm" height="10mm"
+  <board width="10mm" height="10mm">
   </board>
 )`,
         }),

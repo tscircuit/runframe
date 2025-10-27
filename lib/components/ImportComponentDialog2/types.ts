@@ -48,6 +48,7 @@ export interface ImportComponentDialog2Props {
   isOpen: boolean
   onClose: () => void
   jlcpcbProxyRequestHeaders?: Record<string, string>
+  jlcpcbProxyApiBase?: string
   onKicadStringSelected?: (
     payload: KicadStringSelectedPayload,
   ) => void | Promise<void>

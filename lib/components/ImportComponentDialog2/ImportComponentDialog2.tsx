@@ -51,6 +51,7 @@ export const ImportComponentDialog2 = ({
   onKicadStringSelected,
   onTscircuitPackageSelected,
   onJlcpcbComponentTsxLoaded,
+  jlcpcbProxyApiBase,
 }: ImportComponentDialog2Props) => {
   useStyles()
 
@@ -199,6 +200,7 @@ export const ImportComponentDialog2 = ({
         }
         const tsx = await loadJlcpcbComponentTsx(result.component.partNumber, {
           headers: jlcpcbProxyRequestHeaders,
+          apiBase: jlcpcbProxyApiBase,
         })
         await onJlcpcbComponentTsxLoaded({ result, tsx })
       } else if (result.source === "tscircuit.com") {

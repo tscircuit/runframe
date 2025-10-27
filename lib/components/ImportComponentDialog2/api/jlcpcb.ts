@@ -46,12 +46,12 @@ export const mapJlcpcbComponentToSummary = (
 
 export const loadJlcpcbComponentTsx = async (
   partNumber: string,
-  opts?: { headers?: Record<string, string> },
+  opts?: { headers?: Record<string, string>; apiBase?: string },
 ): Promise<string> => {
   const component = await fetchEasyEDAComponent(partNumber, {
     // @ts-ignore
     fetch: (url, options: RequestInit & { headers?: Record<string, string> }) =>
-      fetch(`${API_BASE}/proxy`, {
+      fetch(`${opts?.apiBase ?? API_BASE}/proxy`, {
         ...options,
         headers: {
           ...options?.headers,

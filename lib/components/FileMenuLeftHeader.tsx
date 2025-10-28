@@ -48,6 +48,9 @@ export const FileMenuLeftHeader = (props: {
   projectName?: string
 }) => {
   const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
+  const currentMainComponentPath = useRunFrameStore(
+    (s) => s.currentMainComponentPath,
+  )
   const [snippetName, setSnippetName] = useState<string | null>(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [hasNeverBeenSaved, setHasNeverBeenSaved] = useState(true)
@@ -239,11 +242,22 @@ export const FileMenuLeftHeader = (props: {
                         toast.error("No Circuit JSON to export")
                         return
                       }
+                      let projectNameFromPath = "Untitled"
+                      if (currentMainComponentPath) {
+                        const filename = currentMainComponentPath
+                          .split("/")
+                          .pop()
+                        if (filename) {
+                          projectNameFromPath = filename.replace(/\.[^.]+$/, "")
+                        }
+                      }
                       exportAndDownload({
                         exportName: exp.name,
                         circuitJson,
                         projectName:
-                          props.projectName ?? snippetName ?? "Untitled",
+                          props.projectName ??
+                          snippetName ??
+                          projectNameFromPath,
                       })
                     }}
                     disabled={isExporting}

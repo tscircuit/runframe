@@ -80,6 +80,7 @@ export const useRunFrameStore = create<RunFrameState>()(
       lastManualEditsChangeSentAt: 0,
       recentEvents: [],
       simulateScenarioOrder: undefined,
+      currentMainComponentPath: null,
 
       loadInitialFiles: async () => {
         const fsMap = await getInitialFilesFromApi()
@@ -223,6 +224,9 @@ export const useRunFrameStore = create<RunFrameState>()(
 
       setSimulateScenarioOrder: (scenarioOrder?: string) =>
         set({ simulateScenarioOrder: scenarioOrder }),
+
+      setCurrentMainComponentPath: (path: string | null) =>
+        set({ currentMainComponentPath: path }),
     }),
     { name: "run-frame-store" },
   ),

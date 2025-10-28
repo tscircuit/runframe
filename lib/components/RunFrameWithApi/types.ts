@@ -108,6 +108,7 @@ export interface RunFrameState {
   lastManualEditsChangeSentAt: number
   recentEvents: RunFrameEvent[]
   simulateScenarioOrder: string | undefined
+  currentMainComponentPath: string | null
   // Actions
   upsertFile: (path: FilePath, content: FileContent) => Promise<void>
   getFile: (path: FilePath) => Promise<void>
@@ -120,6 +121,7 @@ export interface RunFrameState {
   pushEvent: (event: RunFrameEventInput) => Promise<void>
   loadInitialFiles: () => Promise<void>
   setSimulateScenarioOrder: (simulateScenarioOrder: string) => void
+  setCurrentMainComponentPath: (path: string | null) => void
 }
 
 declare global {

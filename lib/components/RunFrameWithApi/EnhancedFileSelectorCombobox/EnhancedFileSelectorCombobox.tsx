@@ -414,9 +414,23 @@ export const EnhancedFileSelectorCombobox = ({
                             onSelect={() => selectFile(path, index, true)}
                             className={cn(
                               path === currentFile && "rf-font-medium",
+                              "rf-group",
                             )}
                           >
-                            <Star className="rf-mr-2 rf-h-4 rf-w-4 rf-text-amber-500 rf-fill-amber-500" />
+                            {onToggleFavorite && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  onToggleFavorite(path)
+                                }}
+                                className="rf-mr-2 rf-p-0 rf-bg-transparent rf-border-none"
+                                aria-label="Remove from favorites"
+                                title="Remove from favorites"
+                              >
+                                <Star className="rf-h-4 rf-w-4 rf-text-amber-500 rf-fill-amber-500" />
+                              </button>
+                            )}
                             {getDisplayName(path.split("/").pop() || "")}
                             <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[40%]">
                               {getDirectoryPath(path)}

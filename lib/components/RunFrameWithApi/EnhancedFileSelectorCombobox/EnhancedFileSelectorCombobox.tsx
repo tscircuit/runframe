@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef, useMemo } from "react"
 import { useCurrentFolder } from "./useCurrentFolder"
 import { Button } from "../../ui/button"
 import {
@@ -109,18 +109,31 @@ export const EnhancedFileSelectorCombobox = ({
   )
 
   const filteredFiles = files.filter(fileFilter)
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     setFile(currentFile)
     if (currentFile && filteredFiles.includes(currentFile)) {
-      setRecentlyViewedFiles((prev) => {
-        // Only update if this file isn't already at the top
-        if (prev[0] === currentFile) return prev
-        const filtered = prev.filter((f) => f !== currentFile)
-        return [currentFile, ...filtered].slice(0, 10)
-      })
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
+
+      debounceTimerRef.current = setTimeout(() => {
+        setRecentlyViewedFiles((prev) => {
+          // Only update if this file isn't already at the top
+          if (prev[0] === currentFile) return prev
+          const filtered = prev.filter((f) => f !== currentFile)
+          return [currentFile, ...filtered].slice(0, 10)
+        })
+      }, 500)
     }
-  }, [currentFile, filteredFiles])
+
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
+    }
+  }, [currentFile, filteredFiles, setRecentlyViewedFiles])
 
   const fileTree = parseFilesToTree(filteredFiles)
   const { files: currentFiles, folders: currentFolders } =
@@ -212,7 +225,7 @@ export const EnhancedFileSelectorCombobox = ({
   }, [currentFiles, currentFile])
 
   // Combine recently viewed and recently changed files
-  const getRecentFiles = () => {
+  const recentFiles = useMemo(() => {
     if (!showRecents) return []
     const combined = new Set<string>()
     for (const file of recentlyChangedFiles) {
@@ -228,9 +241,7 @@ export const EnhancedFileSelectorCombobox = ({
       }
     }
     return Array.from(combined)
-  }
-
-  const recentFiles = getRecentFiles()
+  }, [showRecents, recentlyChangedFiles, recentlyViewedFiles, filteredFiles])
 
   const displayPath = currentFolder ?? "/"
   const shortDisplayPath =

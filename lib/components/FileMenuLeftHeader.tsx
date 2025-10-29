@@ -38,7 +38,6 @@ import { toast } from "lib/utils/toast"
 import { Toaster } from "react-hot-toast"
 import { useOrderDialogCli } from "./OrderDialog/useOrderDialog"
 import packageJson from "../../package.json"
-import { useBugReportDialog } from "./useBugReportDialog"
 
 export const FileMenuLeftHeader = (props: {
   isWebEmbedded?: boolean
@@ -46,6 +45,7 @@ export const FileMenuLeftHeader = (props: {
   onChangeShouldLoadLatestEval?: (shouldLoadLatestEval: boolean) => void
   circuitJson?: any
   projectName?: string
+  openBugReportDialog?: () => void
 }) => {
   const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
   const currentMainComponentPath = useRunFrameStore(
@@ -156,8 +156,6 @@ export const FileMenuLeftHeader = (props: {
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
   const [isAiReviewDialogOpen, setIsAiReviewDialogOpen] = useState(false)
 
-  const { BugReportDialog, openBugReportDialog } = useBugReportDialog()
-
   return (
     <>
       <DropdownMenu>
@@ -213,11 +211,11 @@ export const FileMenuLeftHeader = (props: {
             </>
           )}
 
-          {!props.isWebEmbedded && (
+          {!props.isWebEmbedded && props.openBugReportDialog && (
             <DropdownMenuItem
               className="rf-text-xs"
               onSelect={() => {
-                openBugReportDialog()
+                props.openBugReportDialog?.()
               }}
             >
               Report Bug
@@ -356,7 +354,6 @@ export const FileMenuLeftHeader = (props: {
           isOpen={isSelectSnippetDialogOpen}
         />
       </DropdownMenu>
-      <BugReportDialog />
       <ImportComponentDialogForCli
         isOpen={isImportDialogOpen}
         onClose={() => setIsImportDialogOpen(false)}

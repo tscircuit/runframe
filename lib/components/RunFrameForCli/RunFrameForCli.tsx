@@ -1,7 +1,7 @@
 import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { useCallback, useState } from "react"
 import { RunFrameWithApi } from "../RunFrameWithApi/RunFrameWithApi"
-import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
+import { FileMenuLeftHeaderWithBugReport } from "../FileMenuLeftHeaderWithBugReport"
 
 export const RunFrameForCli = (props: {
   debug?: boolean
@@ -45,7 +45,7 @@ export const RunFrameForCli = (props: {
       onMainComponentPathChange={updateMainComponentHash}
       leftHeaderContent={
         <div className="rf-flex rf-items-center rf-justify-between">
-          <FileMenuLeftHeader
+          <FileMenuLeftHeaderWithBugReport
             isWebEmbedded={false}
             shouldLoadLatestEval={!props.workerBlobUrl && shouldLoadLatestEval}
             onChangeShouldLoadLatestEval={(newShouldLoadLatestEval) => {

@@ -28,7 +28,7 @@ declare global {
 }
 
 type UseBugReportDialogResult = {
-  BugReportDialog: () => ReactElement
+  BugReportDialog: ReactElement
   openBugReportDialog: () => void
 }
 
@@ -208,11 +208,12 @@ export const useBugReportDialog = (): UseBugReportDialogResult => {
     } finally {
       setIsSubmitting(false)
     }
-  }, [userText])
+  }, [])
 
-  const BugReportDialog = useCallback(() => {
+  const BugReportDialog = useMemo(() => {
     return (
       <AlertDialog
+        key="bug-report-dialog"
         open={isOpen}
         onOpenChange={(open) => {
           if (!open) {
@@ -278,6 +279,7 @@ export const useBugReportDialog = (): UseBugReportDialogResult => {
                       Description (optional)
                     </label>
                     <textarea
+                      key="bug-description-textarea"
                       id="bug-description"
                       className="rf-w-full rf-min-h-[100px] rf-px-3 rf-py-2 rf-text-sm rf-border rf-border-gray-300 rf-rounded-md focus:rf-outline-none focus:rf-ring-2 focus:rf-ring-blue-500"
                       placeholder="Describe the issue you're experiencing..."
@@ -357,15 +359,15 @@ export const useBugReportDialog = (): UseBugReportDialogResult => {
       </AlertDialog>
     )
   }, [
-    bugReportFileCount,
+    isOpen,
+    isSubmitting,
     closeBugReportDialog,
     errorMessage,
-    handleConfirmBugReport,
-    isOpen,
-    isSessionLoggedIn,
-    isSubmitting,
     successState,
+    bugReportFileCount,
     userText,
+    isSessionLoggedIn,
+    handleConfirmBugReport,
   ])
 
   return {

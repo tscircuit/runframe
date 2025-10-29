@@ -32,7 +32,7 @@ import { useRunnerStore } from "./runner-store/use-runner-store"
 import { useMutex } from "./useMutex"
 import type { ManualEditEvent } from "@tscircuit/props"
 import { registryKy } from "../../utils/get-registry-ky"
-import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
+import { FileMenuLeftHeaderWithBugReport } from "../FileMenuLeftHeaderWithBugReport"
 import { LoadingSkeleton } from "../ui/LoadingSkeleton"
 import { useStyles } from "../../hooks/use-styles"
 import { API_BASE } from "../RunFrameWithApi/api-base"
@@ -585,7 +585,9 @@ export const RunFrame = (props: RunFrameProps) => {
             </div>
           )}
           {props.showFileMenu !== false && (
-            <FileMenuLeftHeader isWebEmbedded={props.isWebEmbedded} />
+            <FileMenuLeftHeaderWithBugReport
+              isWebEmbedded={props.isWebEmbedded}
+            />
           )}
           {props.leftHeaderContent}
         </>

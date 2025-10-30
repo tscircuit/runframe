@@ -219,23 +219,54 @@ export const EnhancedFileSelectorCombobox = ({
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [open, navigateUp])
 
-  const selectFile = (
-    filePath: string,
-    index: number,
-    updateFolder = false,
-  ) => {
-    setFile(filePath)
-    setCurrentFileIndex(index)
-    setOpen(false)
-    onFileChange(filePath)
+  const selectFile = useCallback(
+    (filePath: string, index: number, updateFolder = false) => {
+      setFile(filePath)
+      setCurrentFileIndex(index)
+      setOpen(false)
+      onFileChange(filePath)
 
-    if (updateFolder) {
-      const lastSlashIndex = filePath.lastIndexOf("/")
-      const fileDir =
-        lastSlashIndex === -1 ? null : filePath.substring(0, lastSlashIndex)
-      handleNavigateToFolder(fileDir)
+      if (updateFolder) {
+        const lastSlashIndex = filePath.lastIndexOf("/")
+        const fileDir =
+          lastSlashIndex === -1 ? null : filePath.substring(0, lastSlashIndex)
+        handleNavigateToFolder(fileDir)
+      }
+    },
+    [onFileChange, handleNavigateToFolder],
+  )
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === "[" || e.key === "]")) {
+        e.preventDefault()
+
+        if (!currentFile || currentFiles.length === 0) return
+
+        const currentIndex = currentFiles.findIndex(
+          (f) => f.path === currentFile,
+        )
+        if (currentIndex === -1) return
+
+        let newIndex: number
+        if (e.key === "[") {
+          newIndex =
+            currentIndex === 0 ? currentFiles.length - 1 : currentIndex - 1
+        } else {
+          newIndex =
+            currentIndex === currentFiles.length - 1 ? 0 : currentIndex + 1
+        }
+
+        const newFile = currentFiles[newIndex]
+        if (newFile) {
+          selectFile(newFile.path, newIndex)
+        }
+      }
     }
-  }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [currentFile, currentFiles, selectFile])
 
   useEffect(() => {
     if (currentFiles.length > 0) {

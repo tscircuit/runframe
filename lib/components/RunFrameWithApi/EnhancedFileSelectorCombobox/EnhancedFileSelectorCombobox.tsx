@@ -103,6 +103,19 @@ export const EnhancedFileSelectorCombobox = ({
     true,
   )
 
+  // Add global Cmd+K / Ctrl+K hotkey to open file selector
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault()
+        setOpen((prev) => !prev)
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [])
+
   const filteredFiles = files.filter(fileFilter)
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
 

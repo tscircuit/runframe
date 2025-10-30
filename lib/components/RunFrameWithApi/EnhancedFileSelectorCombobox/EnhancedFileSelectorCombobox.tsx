@@ -238,7 +238,10 @@ export const EnhancedFileSelectorCombobox = ({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+      if (
+        (e.metaKey || e.ctrlKey) &&
+        (e.key === "ArrowLeft" || e.key === "ArrowRight")
+      ) {
         e.preventDefault()
 
         if (!currentFile || currentFiles.length === 0) return

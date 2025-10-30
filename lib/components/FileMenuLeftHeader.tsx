@@ -356,7 +356,7 @@ export const FileMenuLeftHeader = (props: {
           isOpen={isSelectSnippetDialogOpen}
         />
       </DropdownMenu>
-      <BugReportDialog />
+      {BugReportDialog}
       <ImportComponentDialogForCli
         isOpen={isImportDialogOpen}
         onClose={() => setIsImportDialogOpen(false)}

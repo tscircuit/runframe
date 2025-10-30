@@ -106,6 +106,46 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   )
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === "[" || e.key === "]")) {
+        e.preventDefault()
+
+        if (!componentPath || boardFiles.length === 0) return
+
+        const currentDir = componentPath.includes("/")
+          ? componentPath.substring(0, componentPath.lastIndexOf("/"))
+          : ""
+
+        const filesInSameDir = boardFiles.filter((file) => {
+          const fileDir = file.includes("/")
+            ? file.substring(0, file.lastIndexOf("/"))
+            : ""
+          return fileDir === currentDir
+        })
+
+        if (filesInSameDir.length <= 1) return
+
+        const currentIndex = filesInSameDir.indexOf(componentPath)
+        if (currentIndex === -1) return
+
+        let newIndex: number
+        if (e.key === "[") {
+          newIndex =
+            currentIndex === 0 ? filesInSameDir.length - 1 : currentIndex - 1
+        } else {
+          newIndex =
+            currentIndex === filesInSameDir.length - 1 ? 0 : currentIndex + 1
+        }
+
+        setComponentPath(filesInSameDir[newIndex])
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [componentPath, boardFiles])
+
+  useEffect(() => {
     if (componentPath && boardFiles.includes(componentPath)) {
       // Retain current selection if it still exists
       return

@@ -108,7 +108,6 @@ export const EnhancedFileSelectorCombobox = ({
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault()
-        e.stopPropagation()
         setOpen((prev) => !prev)
       }
     }
@@ -212,7 +211,6 @@ export const EnhancedFileSelectorCombobox = ({
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "ArrowUp") {
         e.preventDefault()
-        e.stopPropagation()
         navigateUp()
       }
     }
@@ -240,9 +238,8 @@ export const EnhancedFileSelectorCombobox = ({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && (e.key === "[" || e.key === "]")) {
+      if ((e.metaKey || e.ctrlKey) && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
         e.preventDefault()
-        e.stopPropagation()
 
         if (!currentFile || currentFiles.length === 0) return
 
@@ -252,7 +249,7 @@ export const EnhancedFileSelectorCombobox = ({
         if (currentIndex === -1) return
 
         let newIndex: number
-        if (e.key === "[") {
+        if (e.key === "ArrowLeft") {
           newIndex =
             currentIndex === 0 ? currentFiles.length - 1 : currentIndex - 1
         } else {

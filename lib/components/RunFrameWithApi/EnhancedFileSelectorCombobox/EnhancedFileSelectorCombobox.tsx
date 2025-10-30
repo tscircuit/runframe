@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo } from "react"
+import { useEffect, useState, useRef, useMemo, useCallback } from "react"
 import { useCurrentFolder } from "./useCurrentFolder"
 import { Button } from "../../ui/button"
 import {
@@ -196,13 +196,28 @@ export const EnhancedFileSelectorCombobox = ({
     setCurrentFileIndex(0)
   }
 
-  const navigateUp = () => {
+  const navigateUp = useCallback(() => {
     if (!currentFolder) return
     const lastSlashIndex = currentFolder.lastIndexOf("/")
     const parentPath =
       lastSlashIndex === -1 ? null : currentFolder.substring(0, lastSlashIndex)
     handleNavigateToFolder(parentPath)
-  }
+  }, [currentFolder, handleNavigateToFolder])
+
+  // Add Cmd+↑ / Ctrl+↑ shortcut to navigate up directory when file selector is open
+  useEffect(() => {
+    if (!open) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "ArrowUp") {
+        e.preventDefault()
+        navigateUp()
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [open, navigateUp])
 
   const selectFile = (
     filePath: string,

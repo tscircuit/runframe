@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef, useMemo, useCallback } from "react"
 import { useCurrentFolder } from "./useCurrentFolder"
 import { Button } from "../../ui/button"
 import {
@@ -21,6 +21,9 @@ import {
   Folder,
   ArrowUp,
   Star,
+  Eye,
+  EyeOff,
+  Clock,
 } from "lucide-react"
 import { cn } from "lib/utils"
 import {
@@ -28,6 +31,7 @@ import {
   getCurrentFolderContents,
   type FileNode,
 } from "./parseFilesToTree"
+import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 
 const defaultFileIcon = (fileName: string) => {
   if (fileName.endsWith(".tsx") || fileName.endsWith(".jsx")) {
@@ -91,12 +95,54 @@ export const EnhancedFileSelectorCombobox = ({
     useCurrentFolder({ currentFile: file, files })
   const [currentFileIndex, setCurrentFileIndex] = useState(0)
   const [searchValue, setSearchValue] = useState("")
+  const [recentlyViewedFiles, setRecentlyViewedFiles] = useLocalStorageState<
+    string[]
+  >("runframe:recentlyViewed", [])
+  const [showRecents, setShowRecents] = useLocalStorageState(
+    "runframe:showRecents",
+    true,
+  )
 
+  // Add global Cmd+K / Ctrl+K hotkey to open file selector
   useEffect(() => {
-    setFile(currentFile)
-  }, [currentFile])
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault()
+        setOpen((prev) => !prev)
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [])
 
   const filteredFiles = files.filter(fileFilter)
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    const clearDebounceTimer = () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+        debounceTimerRef.current = null
+      }
+    }
+
+    setFile(currentFile)
+    if (currentFile && filteredFiles.includes(currentFile)) {
+      clearDebounceTimer()
+
+      debounceTimerRef.current = setTimeout(() => {
+        setRecentlyViewedFiles((prev) => {
+          // Only update if this file isn't already at the top
+          if (prev[0] === currentFile) return prev
+          const filtered = prev.filter((f) => f !== currentFile)
+          return [currentFile, ...filtered].slice(0, 10)
+        })
+      }, 500)
+    }
+
+    return clearDebounceTimer
+  }, [currentFile, filteredFiles, setRecentlyViewedFiles])
 
   const fileTree = parseFilesToTree(filteredFiles)
   const { files: currentFiles, folders: currentFolders } =
@@ -150,13 +196,28 @@ export const EnhancedFileSelectorCombobox = ({
     setCurrentFileIndex(0)
   }
 
-  const navigateUp = () => {
+  const navigateUp = useCallback(() => {
     if (!currentFolder) return
     const lastSlashIndex = currentFolder.lastIndexOf("/")
     const parentPath =
       lastSlashIndex === -1 ? null : currentFolder.substring(0, lastSlashIndex)
     handleNavigateToFolder(parentPath)
-  }
+  }, [currentFolder, handleNavigateToFolder])
+
+  // Add Cmd+↑ / Ctrl+↑ shortcut to navigate up directory when file selector is open
+  useEffect(() => {
+    if (!open) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "ArrowUp") {
+        e.preventDefault()
+        navigateUp()
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [open, navigateUp])
 
   const selectFile = (
     filePath: string,
@@ -186,6 +247,14 @@ export const EnhancedFileSelectorCombobox = ({
       }
     }
   }, [currentFiles, currentFile])
+
+  // Show recently viewed files (from localStorage)
+  const recentFiles = useMemo(() => {
+    if (!showRecents) return []
+    return recentlyViewedFiles
+      .filter((file) => filteredFiles.includes(file))
+      .slice(0, 3)
+  }, [showRecents, recentlyViewedFiles, filteredFiles])
 
   const displayPath = currentFolder ?? "/"
   const shortDisplayPath =
@@ -235,9 +304,9 @@ export const EnhancedFileSelectorCombobox = ({
             />
 
             {/* Directory Header */}
-            <div className="rf-px-3 rf-py-2 rf-border-t rf-border-b rf-border-gray-200 rf-bg-slate-50">
-              <div className="rf-flex rf-items-center rf-justify-between rf-text-xs rf-text-slate-600 rf-min-w-0 rf-overflow-hidden">
-                <div className="rf-flex rf-items-center rf-min-w-0 rf-flex-1">
+            <div className="rf-px-3 rf-py-2 rf-border-t rf-border-b rf-border-gray-200 rf-bg-slate-50 rf-flex rf-items-center rf-justify-between rf-gap-2">
+              <div className="rf-flex rf-items-center rf-text-xs rf-text-slate-600 rf-min-w-0 rf-flex-1">
+                <div className="rf-flex rf-items-center rf-min-w-0">
                   <button
                     onClick={() => handleNavigateToFolder(null)}
                     className="rf-text-blue-600 hover:rf-text-blue-800 rf-underline rf-cursor-pointer rf-bg-transparent rf-border-none rf-p-0 rf-flex-shrink-0"
@@ -277,10 +346,25 @@ export const EnhancedFileSelectorCombobox = ({
                       )
                     })}
                 </div>
+              </div>
+              <div className="rf-flex rf-items-center rf-gap-2 rf-flex-shrink-0">
+                <button
+                  onClick={() => setShowRecents(!showRecents)}
+                  className="rf-flex rf-items-center rf-gap-1 rf-text-slate-600 hover:rf-text-slate-800 rf-bg-transparent rf-border-none rf-p-0"
+                  title={
+                    showRecents ? "Hide recent files" : "Show recent files"
+                  }
+                >
+                  {showRecents ? (
+                    <Eye className="rf-h-3.5 rf-w-3.5" />
+                  ) : (
+                    <EyeOff className="rf-h-3.5 rf-w-3.5" />
+                  )}
+                </button>
                 {currentFolder && (
                   <button
                     onClick={navigateUp}
-                    className="rf-ml-2 rf-flex rf-items-center rf-gap-1 rf-text-blue-600 hover:rf-text-blue-800 rf-bg-transparent rf-border rf-border-blue-300 hover:rf-border-blue-500 rf-rounded rf-px-2 rf-py-1 rf-flex-shrink-0"
+                    className="rf-flex rf-items-center rf-gap-1 rf-text-blue-600 hover:rf-text-blue-800 rf-bg-transparent rf-border rf-border-blue-300 hover:rf-border-blue-500 rf-rounded rf-px-2 rf-py-1"
                     title="Go up one level"
                   >
                     <ArrowUp className="rf-h-3 rf-w-3" />
@@ -294,6 +378,39 @@ export const EnhancedFileSelectorCombobox = ({
               {!isSearching ? (
                 <>
                   <CommandEmpty>{emptyMessage}</CommandEmpty>
+
+                  {/* Recent Files Section */}
+                  {recentFiles.length > 0 && (
+                    <CommandGroup
+                      heading="Recent"
+                      className="rf-border-b rf-border-gray-200 rf-pb-1 rf-bg-blue-50/30"
+                    >
+                      {recentFiles.map((path, index) => (
+                        <CommandItem
+                          key={path}
+                          value={path}
+                          onSelect={() => selectFile(path, index, true)}
+                          className={cn(
+                            path === currentFile && "rf-font-medium",
+                          )}
+                        >
+                          <Clock className="rf-mr-2 rf-h-4 rf-w-4 rf-text-blue-500" />
+                          {getDisplayName(path.split("/").pop() || "")}
+                          <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[40%]">
+                            {getDirectoryPath(path)}
+                          </span>
+                          <Check
+                            className={cn(
+                              "rf-ml-auto rf-h-4 rf-w-4",
+                              path === currentFile
+                                ? "rf-opacity-100"
+                                : "rf-opacity-0",
+                            )}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  )}
 
                   {/* Pinned/Favorites Section */}
                   {pinnedFiles.length > 0 && (
@@ -310,9 +427,23 @@ export const EnhancedFileSelectorCombobox = ({
                             onSelect={() => selectFile(path, index, true)}
                             className={cn(
                               path === currentFile && "rf-font-medium",
+                              "rf-group",
                             )}
                           >
-                            <Star className="rf-mr-2 rf-h-4 rf-w-4 rf-text-amber-500 rf-fill-amber-500" />
+                            {onToggleFavorite && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  onToggleFavorite(path)
+                                }}
+                                className="rf-mr-2 rf-p-0 rf-bg-transparent rf-border-none"
+                                aria-label="Remove from favorites"
+                                title="Remove from favorites"
+                              >
+                                <Star className="rf-h-4 rf-w-4 rf-text-amber-500 rf-fill-amber-500" />
+                              </button>
+                            )}
                             {getDisplayName(path.split("/").pop() || "")}
                             <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[40%]">
                               {getDirectoryPath(path)}

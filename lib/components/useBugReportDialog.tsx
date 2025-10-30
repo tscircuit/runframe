@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactElement,
 } from "react"
@@ -73,7 +74,7 @@ export const useBugReportDialog = (): UseBugReportDialogResult => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [userText, setUserText] = useState("")
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [successState, setSuccessState] = useState<{
     bugReportUrl: string
   } | null>(null)
@@ -89,13 +90,13 @@ export const useBugReportDialog = (): UseBugReportDialogResult => {
 
   // Populate text field with execution error when dialog opens
   useEffect(() => {
-    if (isOpen && !successState) {
+    if (isOpen && !successState && textareaRef.current) {
       const globalError =
         typeof window !== "undefined"
           ? window.__TSCIRCUIT_LAST_EXECUTION_ERROR
           : undefined
       if (globalError) {
-        setUserText(`I'm getting this execution error:\n\n${globalError}`)
+        textareaRef.current.value = `I'm getting this execution error:\n\n${globalError}`
       }
     }
   }, [isOpen, successState])
@@ -117,7 +118,9 @@ export const useBugReportDialog = (): UseBugReportDialogResult => {
   const openBugReportDialog = useCallback(() => {
     setErrorMessage(null)
     setSuccessState(null)
-    setUserText("")
+    if (textareaRef.current) {
+      textareaRef.current.value = ""
+    }
     setIsOpen(true)
   }, [])
 
@@ -130,6 +133,7 @@ export const useBugReportDialog = (): UseBugReportDialogResult => {
     setErrorMessage(null)
 
     const registryKy = getRegistryKy()
+    const userText = textareaRef.current?.value || ""
 
     try {
       // Fetch files from the file server
@@ -279,12 +283,10 @@ export const useBugReportDialog = (): UseBugReportDialogResult => {
                       Description (optional)
                     </label>
                     <textarea
-                      key="bug-description-textarea"
+                      ref={textareaRef}
                       id="bug-description"
                       className="rf-w-full rf-min-h-[100px] rf-px-3 rf-py-2 rf-text-sm rf-border rf-border-gray-300 rf-rounded-md focus:rf-outline-none focus:rf-ring-2 focus:rf-ring-blue-500"
                       placeholder="Describe the issue you're experiencing..."
-                      value={userText}
-                      onChange={(e) => setUserText(e.target.value)}
                       disabled={isSubmitting}
                     />
                   </div>
@@ -365,7 +367,6 @@ export const useBugReportDialog = (): UseBugReportDialogResult => {
     errorMessage,
     successState,
     bugReportFileCount,
-    userText,
     isSessionLoggedIn,
     handleConfirmBugReport,
   ])

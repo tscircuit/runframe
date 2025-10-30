@@ -62,17 +62,12 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     if (props.debug) Debug.enable("run-frame*")
   }, [props.debug])
 
-  const {
-    startPolling,
-    stopPolling,
-    setCurrentMainComponentPath,
-    recentEvents,
-  } = useRunFrameStore((s) => ({
-    startPolling: s.startPolling,
-    stopPolling: s.stopPolling,
-    setCurrentMainComponentPath: s.setCurrentMainComponentPath,
-    recentEvents: s.recentEvents,
-  }))
+  const { startPolling, stopPolling, setCurrentMainComponentPath } =
+    useRunFrameStore((s) => ({
+      startPolling: s.startPolling,
+      stopPolling: s.stopPolling,
+      setCurrentMainComponentPath: s.setCurrentMainComponentPath,
+    }))
   const hasReceivedInitialFiles = useHasReceivedInitialFilesLoaded()
 
   const fsMap = useRunFrameStore((s) => s.fsMap)
@@ -98,24 +93,6 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     [],
   )
   const isLoadingFiles = !hasReceivedInitialFiles
-
-  // Get recently changed files from events (last 5 minutes)
-  const recentlyChangedFiles = useMemo(() => {
-    const fiveMinutesAgo = Date.now() - 5 * 60 * 1000
-    const changedFiles = new Set<string>()
-    for (const event of recentEvents) {
-      if (event.event_type === "FILE_UPDATED") {
-        const eventTime = new Date(event.created_at).getTime()
-        if (
-          eventTime > fiveMinutesAgo &&
-          boardFiles.includes(event.file_path)
-        ) {
-          changedFiles.add(event.file_path)
-        }
-      }
-    }
-    return Array.from(changedFiles).reverse()
-  }, [recentEvents, boardFiles])
 
   const handleToggleFavorite = useCallback(
     (filePath: string) => {
@@ -251,7 +228,6 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
                 }}
                 pinnedFiles={favorites}
                 onToggleFavorite={handleToggleFavorite}
-                recentlyChangedFiles={recentlyChangedFiles}
               />
             </div>
           )}

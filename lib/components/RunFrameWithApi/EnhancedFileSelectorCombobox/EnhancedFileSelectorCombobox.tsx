@@ -70,7 +70,6 @@ export const EnhancedFileSelectorCombobox = ({
   emptyMessage = "No files found in this directory.",
   pinnedFiles = [],
   onToggleFavorite,
-  recentlyChangedFiles = [],
 }: {
   files: string[]
   currentFile: string
@@ -89,10 +88,6 @@ export const EnhancedFileSelectorCombobox = ({
    * Callback when a file is toggled as favorite.
    */
   onToggleFavorite?: (filePath: string) => void
-  /**
-   * Array of file paths that were recently changed on disk.
-   */
-  recentlyChangedFiles?: string[]
 }) => {
   const [open, setOpen] = useState(false)
   const [file, setFile] = useState(currentFile)
@@ -112,11 +107,16 @@ export const EnhancedFileSelectorCombobox = ({
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    setFile(currentFile)
-    if (currentFile && filteredFiles.includes(currentFile)) {
+    const clearDebounceTimer = () => {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current)
+        debounceTimerRef.current = null
       }
+    }
+
+    setFile(currentFile)
+    if (currentFile && filteredFiles.includes(currentFile)) {
+      clearDebounceTimer()
 
       debounceTimerRef.current = setTimeout(() => {
         setRecentlyViewedFiles((prev) => {
@@ -128,11 +128,7 @@ export const EnhancedFileSelectorCombobox = ({
       }, 500)
     }
 
-    return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current)
-      }
-    }
+    return clearDebounceTimer
   }, [currentFile, filteredFiles, setRecentlyViewedFiles])
 
   const fileTree = parseFilesToTree(filteredFiles)
@@ -224,24 +220,13 @@ export const EnhancedFileSelectorCombobox = ({
     }
   }, [currentFiles, currentFile])
 
-  // Combine recently viewed and recently changed files
+  // Show recently viewed files (from localStorage)
   const recentFiles = useMemo(() => {
     if (!showRecents) return []
-    const combined = new Set<string>()
-    for (const file of recentlyChangedFiles) {
-      if (filteredFiles.includes(file)) {
-        combined.add(file)
-        if (combined.size >= 3) break
-      }
-    }
-    for (const file of recentlyViewedFiles) {
-      if (filteredFiles.includes(file)) {
-        combined.add(file)
-        if (combined.size >= 3) break
-      }
-    }
-    return Array.from(combined)
-  }, [showRecents, recentlyChangedFiles, recentlyViewedFiles, filteredFiles])
+    return recentlyViewedFiles
+      .filter((file) => filteredFiles.includes(file))
+      .slice(0, 3)
+  }, [showRecents, recentlyViewedFiles, filteredFiles])
 
   const displayPath = currentFolder ?? "/"
   const shortDisplayPath =
@@ -372,41 +357,30 @@ export const EnhancedFileSelectorCombobox = ({
                       heading="Recent"
                       className="rf-border-b rf-border-gray-200 rf-pb-1 rf-bg-blue-50/30"
                     >
-                      {recentFiles.map((path, index) => {
-                        const isChanged = recentlyChangedFiles.includes(path)
-                        return (
-                          <CommandItem
-                            key={path}
-                            value={path}
-                            onSelect={() => selectFile(path, index, true)}
+                      {recentFiles.map((path, index) => (
+                        <CommandItem
+                          key={path}
+                          value={path}
+                          onSelect={() => selectFile(path, index, true)}
+                          className={cn(
+                            path === currentFile && "rf-font-medium",
+                          )}
+                        >
+                          <Clock className="rf-mr-2 rf-h-4 rf-w-4 rf-text-blue-500" />
+                          {getDisplayName(path.split("/").pop() || "")}
+                          <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[40%]">
+                            {getDirectoryPath(path)}
+                          </span>
+                          <Check
                             className={cn(
-                              path === currentFile && "rf-font-medium",
+                              "rf-ml-auto rf-h-4 rf-w-4",
+                              path === currentFile
+                                ? "rf-opacity-100"
+                                : "rf-opacity-0",
                             )}
-                          >
-                            <Clock className="rf-mr-2 rf-h-4 rf-w-4 rf-text-blue-500" />
-                            {getDisplayName(path.split("/").pop() || "")}
-                            <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[40%]">
-                              {getDirectoryPath(path)}
-                            </span>
-                            {isChanged && (
-                              <span
-                                className="rf-ml-2 rf-text-xs rf-text-blue-600 rf-font-medium"
-                                title="Recently changed on disk"
-                              >
-                                •
-                              </span>
-                            )}
-                            <Check
-                              className={cn(
-                                "rf-ml-auto rf-h-4 rf-w-4",
-                                path === currentFile
-                                  ? "rf-opacity-100"
-                                  : "rf-opacity-0",
-                              )}
-                            />
-                          </CommandItem>
-                        )
-                      })}
+                          />
+                        </CommandItem>
+                      ))}
                     </CommandGroup>
                   )}
 

@@ -61,6 +61,8 @@ export const loadJlcpcbComponentTsx = async (
           "X-Sender-Referer": options?.headers?.referer ?? "",
           "X-Sender-User-Agent": options?.headers?.userAgent ?? "",
           "X-Sender-Cookie": options?.headers?.cookie ?? "",
+          authority: options?.headers?.authority ?? "",
+          "content-type": options?.headers?.["content-type"] ?? "",
           ...opts?.headers,
         },
       }),

@@ -308,14 +308,18 @@ export const RunFrame = (props: RunFrameProps) => {
       worker.on("board:renderPhaseStarted", (event: any) => {
         renderLog.lastRenderEvent = event
         renderLog.eventsProcessed = (renderLog.eventsProcessed ?? 0) + 1
-        const hasProcessedEnoughToEstimateProgress =
-          renderLog.eventsProcessed > 2
+
+        const phaseIndex = orderedRenderPhases.indexOf(event.phase)
+        const normalizedPhaseIndex = Math.max(0, phaseIndex)
 
         const estProgressLinear =
-          (orderedRenderPhases.indexOf(event.phase) / numRenderPhases) * 0.75 +
+          (normalizedPhaseIndex / numRenderPhases) * 0.75 +
           (renderLog.eventsProcessed / 1000) * 0.25
 
-        const estProgress = 1 - Math.exp(-estProgressLinear * 3)
+        const estProgress = Math.max(
+          0,
+          Math.min(1, 1 - Math.exp(-estProgressLinear * 3)),
+        )
 
         renderLog.progress = estProgress
 

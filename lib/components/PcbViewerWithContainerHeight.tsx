@@ -1,5 +1,11 @@
-import { useRef, useState, useLayoutEffect, type ComponentProps } from "react"
-import { PCBViewer } from "@tscircuit/pcb-viewer"
+import {
+  useRef,
+  useState,
+  useLayoutEffect,
+  useMemo,
+  type ComponentProps,
+} from "react"
+import { PCBViewer, calculateCircuitJsonKey } from "@tscircuit/pcb-viewer"
 
 export const PcbViewerWithContainerHeight = ({
   containerClassName,
@@ -9,6 +15,11 @@ export const PcbViewerWithContainerHeight = ({
 } & ComponentProps<typeof PCBViewer>) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [computedHeight, setComputedHeight] = useState(620)
+
+  const circuitJsonKey = useMemo(
+    () => calculateCircuitJsonKey(props.circuitJson),
+    [props.circuitJson],
+  )
 
   useLayoutEffect(() => {
     const updateHeight = () => {
@@ -44,7 +55,7 @@ export const PcbViewerWithContainerHeight = ({
       ref={containerRef}
       className={containerClassName || "rf-w-full rf-h-full"}
     >
-      <PCBViewer {...props} height={computedHeight} />
+      <PCBViewer key={circuitJsonKey} {...props} height={computedHeight} />
     </div>
   )
 }

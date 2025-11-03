@@ -116,8 +116,6 @@ export const ErrorTabContent = ({
     window.open(issueUrl, "_blank")
   }
 
-
-
   if (unifiedErrors.length === 0 && unifiedWarnings.length === 0) {
     return (
       <div className="px-2">
@@ -152,8 +150,6 @@ export const ErrorTabContent = ({
     )
   }
 
-
-
   // Store execution error globally so bug report dialog can access it
   useEffect(() => {
     if (errorMessage) {
@@ -167,84 +163,161 @@ export const ErrorTabContent = ({
     }
   }, [errorMessage, errorStack])
 
+  const [expandedErrors, setExpandedErrors] = useState<Set<number>>(() => {
+    const allIndexes = new Set<number>()
+    unifiedErrors.forEach((_, i) => allIndexes.add(i))
+    return allIndexes
+  })
+  const [expandedWarnings, setExpandedWarnings] = useState<Set<number>>(() => {
+    const allIndexes = new Set<number>()
+    unifiedWarnings.forEach((_, i) => allIndexes.add(i))
+    return allIndexes
+  })
+
+  const toggleError = (index: number) => {
+    setExpandedErrors((prev) => {
+      const next = new Set(prev)
+      if (next.has(index)) {
+        next.delete(index)
+      } else {
+        next.add(index)
+      }
+      return next
+    })
+  }
+
+  const toggleWarning = (index: number) => {
+    setExpandedWarnings((prev) => {
+      const next = new Set(prev)
+      if (next.has(index)) {
+        next.delete(index)
+      } else {
+        next.add(index)
+      }
+      return next
+    })
+  }
+
   return (
     <>
-      <div className="rf-w-[95%] rf-mx-auto">
+      <div className="rf-w-full">
         {unifiedErrors.length > 0 && (
-          <div className="rf-space-y-2 rf-mt-4">
-            {unifiedErrors.length > 1 && (
-              <div className="rf-text-sm rf-text-red-600 rf-font-semibold rf-mb-2">
-                {unifiedErrors.length} {unifiedErrors.length === 1 ? "error" : "errors"}
-              </div>
-            )}
-            {unifiedErrors.map((error, index) => (
-              <div
-                key={index}
-                className="rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200 rf-p-3"
-              >
-                <div className="rf-flex rf-items-start rf-gap-3">
-                  <XCircle className="rf-h-5 rf-w-5 rf-text-red-500 rf-mt-0.5 rf-flex-shrink-0" />
-                  <div className="rf-flex-1 rf-min-w-0">
-                    <h3 className="rf-text-sm rf-font-semibold rf-text-red-800">
-                      {error.type}
-                    </h3>
-                    <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600 rf-mt-1">
-                      {error.message}
-                    </p>
-                    {(error.stack || evalVersion || softwareUsedString) && (
-                      <details
-                        open
-                        style={{ whiteSpace: "pre-wrap" }}
-                        className="rf-text-xs rf-font-mono rf-text-red-600 rf-mt-2"
-                      >
-                        <summary className="rf-cursor-pointer rf-text-red-700 rf-font-semibold">Stack trace</summary>
-                        {evalVersion && `@tscircuit/eval@${evalVersion}\n`}
-                        {softwareUsedString && `${softwareUsedString}\n`}
-                        {error.stack}
-                      </details>
-                    )}
+          <div className="rf-mt-2">
+            <div className="rf-text-xs rf-text-red-700 rf-font-semibold rf-px-2 rf-py-1 rf-bg-red-50 rf-border-b rf-border-red-200">
+              {unifiedErrors.length}{" "}
+              {unifiedErrors.length === 1 ? "error" : "errors"}
+            </div>
+            {unifiedErrors.map((error, index) => {
+              const isExpanded = expandedErrors.has(index)
+              const previewMessage = error.message
+              const hasDetails =
+                error.stack || evalVersion || softwareUsedString
+
+              return (
+                <div key={index} className="rf-bg-white">
+                  <div
+                    className="rf-flex rf-items-center rf-gap-1 rf-px-2 rf-py-0.5 rf-cursor-pointer rf-bg-red-50/50 hover:rf-bg-red-100"
+                    onClick={() => hasDetails && toggleError(index)}
+                  >
+                    <div className="rf-flex rf-items-center rf-gap-2">
+                      <XCircle className="rf-h-4 rf-w-4 rf-text-red-500 rf-flex-shrink-0" />
+                      {hasDetails && (
+                        <ChevronRight
+                          className={`rf-h-3 rf-w-3 rf-text-red-500 rf-flex-shrink-0 rf-transition-transform ${isExpanded ? "rf-rotate-90" : ""}`}
+                        />
+                      )}
+                    </div>
+                    <div className="rf-flex-1 rf-min-w-0 rf-leading-[1rem]">
+                      <span className="rf-text-xs rf-font-mono rf-text-red-700 rf-leading-[0.95rem]">
+                        {error.type}:
+                      </span>
+                      <span className="rf-text-xs rf-font-mono rf-text-red-600 rf-ml-1 rf-leading-[0.95rem]">
+                        {error.message}
+                      </span>
+                    </div>
                   </div>
+                  {isExpanded && hasDetails && (
+                    <div className="rf-bg-red-50/50 rf-pl-12">
+                      {error.stack
+                        ?.split("\n")
+                        .filter((line) => line.trim())
+                        .slice(1)
+                        .map((line, i) => (
+                          <div key={i} className="rf-px-2">
+                            <span className="rf-text-xs rf-font-mono rf-text-red-500 rf-leading-[0.9rem]">
+                              {line}
+                            </span>
+                          </div>
+                        ))}
+                      {(evalVersion || softwareUsedString) && (
+                        <div className="rf-px-2 rf-py-0.5">
+                          <span className="rf-text-xs rf-font-mono rf-text-red-400">
+                            {evalVersion && `@tscircuit/eval@${evalVersion}`}
+                            {evalVersion && softwareUsedString && " • "}
+                            {softwareUsedString}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
 
         {unifiedWarnings.length > 0 && (
-          <div className="rf-space-y-2 rf-mt-4">
-            {unifiedWarnings.length > 1 && (
-              <div className="rf-text-sm rf-text-orange-600 rf-font-semibold rf-mb-2">
-                {unifiedWarnings.length} {unifiedWarnings.length === 1 ? "warning" : "warnings"}
-              </div>
-            )}
-            {unifiedWarnings.map((warning, index) => (
-              <div
-                key={index}
-                className="rf-bg-orange-50 rf-rounded-md rf-border rf-border-orange-200 rf-p-3"
-              >
-                <div className="rf-flex rf-items-start rf-gap-3">
-                  <AlertCircle className="rf-h-5 rf-w-5 rf-text-orange-500 rf-mt-0.5 rf-flex-shrink-0" />
-                  <div className="rf-flex-1 rf-min-w-0">
-                    <h3 className="rf-text-sm rf-font-semibold rf-text-orange-800">
-                      {warning.type}
-                    </h3>
-                    <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-orange-600 rf-mt-1">
-                      {warning.message}
-                    </p>
-                    {warning.stack && (
-                      <details
-                        open
-                        style={{ whiteSpace: "pre-wrap" }}
-                        className="rf-text-xs rf-font-mono rf-text-orange-600 rf-mt-2"
-                      >
-                        <summary className="rf-cursor-pointer rf-text-orange-700 rf-font-semibold">Stack trace</summary>
-                        {warning.stack}
-                      </details>
-                    )}
+          <div className="rf-mt-2">
+            <div className="rf-text-xs rf-text-orange-700 rf-font-semibold rf-px-2 rf-py-1 rf-bg-orange-50 rf-border-b rf-border-orange-200">
+              {unifiedWarnings.length}{" "}
+              {unifiedWarnings.length === 1 ? "warning" : "warnings"}
+            </div>
+            {unifiedWarnings.map((warning, index) => {
+              const isExpanded = expandedWarnings.has(index)
+              const previewMessage = warning.message
+              const hasDetails = !!warning.stack
+
+              return (
+                <div key={index} className="rf-bg-white">
+                  <div
+                    className="rf-flex rf-items-center rf-gap-1 rf-px-2 rf-py-0.5 rf-cursor-pointer rf-bg-orange-50/50 hover:rf-bg-orange-100"
+                    onClick={() => hasDetails && toggleWarning(index)}
+                  >
+                    <div className="rf-flex rf-items-center rf-gap-2">
+                      <AlertCircle className="rf-h-4 rf-w-4 rf-text-orange-500 rf-flex-shrink-0" />
+                      {hasDetails && (
+                        <ChevronRight
+                          className={`rf-h-3 rf-w-3 rf-text-orange-500 rf-flex-shrink-0 rf-transition-transform ${isExpanded ? "rf-rotate-90" : ""}`}
+                        />
+                      )}
+                    </div>
+                    <div className="rf-flex-1 rf-min-w-0 rf-leading-[1rem]">
+                      <span className="rf-text-xs rf-font-mono rf-text-orange-700 rf-leading-[0.95rem]">
+                        {warning.type}:
+                      </span>
+                      <span className="rf-text-xs rf-font-mono rf-text-orange-600 rf-ml-1 rf-leading-[0.95rem]">
+                        {warning.message}
+                      </span>
+                    </div>
                   </div>
+                  {isExpanded && hasDetails && (
+                    <div className="rf-bg-orange-50/50 rf-pl-12">
+                      {warning.stack
+                        ?.split("\n")
+                        .filter((line) => line.trim())
+                        .slice(1)
+                        .map((line, i) => (
+                          <div key={i} className="rf-px-2">
+                            <span className="rf-text-xs rf-font-mono rf-text-orange-500 rf-leading-[0.9rem]">
+                              {line}
+                            </span>
+                          </div>
+                        ))}
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
 

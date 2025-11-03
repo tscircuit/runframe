@@ -6,6 +6,7 @@ import { encodeFsMapToUrlHash } from "lib/utils"
 import { AutoroutingLogOptions } from "./AutoroutingLogOptions"
 import { useState, useMemo, useEffect } from "react"
 import type { CircuitJsonError } from "circuit-json"
+import { toast } from "lib/utils/toast"
 
 declare global {
   interface Window {
@@ -299,7 +300,7 @@ export const ErrorTabContent = ({
               if (softwareUsedString) errorText += `\n${softwareUsedString}`
               if (currentError.stack) errorText += `\n${currentError.stack}`
               navigator.clipboard.writeText(errorText)
-              alert("Error copied to clipboard!")
+              toast.success("Error copied to clipboard!")
             }}
           >
             <ClipboardIcon className="rf-w-4 rf-h-4" />

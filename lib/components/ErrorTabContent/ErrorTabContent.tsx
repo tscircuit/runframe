@@ -214,9 +214,9 @@ export const ErrorTabContent = ({
                 error.stack || evalVersion || softwareUsedString
 
               return (
-                <div key={index} className="rf-bg-white">
+                <div key={index} className="rf-bg-white hover:rf-bg-red-100">
                   <div
-                    className="rf-flex rf-items-start rf-gap-1 rf-px-2 rf-pb-0 rf-pt-0.5 rf-cursor-pointer rf-bg-red-50/50 hover:rf-bg-red-100"
+                    className="rf-flex rf-items-start rf-gap-1 rf-px-2 rf-pb-0 rf-pt-0.5 rf-cursor-pointer rf-bg-red-50/50"
                     onClick={() => hasDetails && toggleError(index)}
                   >
                     <div className="rf-flex rf-items-center rf-gap-2 rf-mt-0.5">
@@ -278,9 +278,9 @@ export const ErrorTabContent = ({
               const hasDetails = !!warning.stack
 
               return (
-                <div key={index} className="rf-bg-white">
+                <div key={index} className="rf-bg-white hover:rf-bg-orange-100">
                   <div
-                    className="rf-flex rf-items-center rf-gap-2 rf-px-2 rf-pb-0 rf-pt-0.5 rf-cursor-pointer rf-bg-orange-50/50 hover:rf-bg-orange-100"
+                    className="rf-flex rf-items-center rf-gap-2 rf-px-2 rf-pb-0 rf-pt-0.5 rf-cursor-pointer rf-bg-orange-50/50"
                     onClick={() => hasDetails && toggleWarning(index)}
                   >
                     <AlertCircle className="rf-h-4 rf-w-4 rf-text-orange-500 rf-flex-shrink-0" />

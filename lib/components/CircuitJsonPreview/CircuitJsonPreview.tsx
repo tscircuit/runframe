@@ -40,6 +40,7 @@ import { Input } from "../ui/input"
 import { PcbViewerWithContainerHeight } from "../PcbViewerWithContainerHeight"
 import { useStyles } from "lib/hooks/use-styles"
 import { useFullscreenBodyScroll } from "lib/hooks/use-fullscreen-body-scroll"
+import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { capitalizeFirstLetters } from "lib/utils"
 import { useErrorTelemetry } from "lib/hooks/use-error-telemetry"
@@ -139,7 +140,8 @@ export const CircuitJsonPreview = ({
     circuitJsonErrors,
   })
 
-  const [activeTab, setActiveTabState] = useState<TabId>(
+  const [activeTab, setActiveTabState] = useLocalStorageState<TabId>(
+    "runframe-active-tab",
     defaultActiveTab ?? defaultTab ?? availableTabs?.[0] ?? "pcb",
   )
   const [lastActiveTab, setLastActiveTab] = useState<TabId | null>(null)
@@ -150,7 +152,7 @@ export const CircuitJsonPreview = ({
       setActiveTabState(tab)
       onActiveTabChange?.(tab)
     },
-    [onActiveTabChange],
+    [onActiveTabChange, setActiveTabState],
   )
 
   const toggleFullScreen = () => {

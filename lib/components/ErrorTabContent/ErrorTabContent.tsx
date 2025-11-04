@@ -216,10 +216,10 @@ export const ErrorTabContent = ({
               return (
                 <div key={index} className="rf-bg-white">
                   <div
-                    className="rf-flex rf-items-center rf-gap-1 rf-px-2 rf-py-0.5 rf-cursor-pointer rf-bg-red-50/50 hover:rf-bg-red-100"
+                    className="rf-flex rf-items-start rf-gap-1 rf-px-2 rf-py-0.5 rf-cursor-pointer rf-bg-red-50/50 hover:rf-bg-red-100"
                     onClick={() => hasDetails && toggleError(index)}
                   >
-                    <div className="rf-flex rf-items-center rf-gap-2">
+                    <div className="rf-flex rf-items-center rf-gap-2 rf-mt-0.5">
                       <XCircle className="rf-h-4 rf-w-4 rf-text-red-500 rf-flex-shrink-0" />
                       {hasDetails && (
                         <ChevronRight
@@ -237,20 +237,20 @@ export const ErrorTabContent = ({
                     </div>
                   </div>
                   {isExpanded && hasDetails && (
-                    <div className="rf-bg-red-50/50 rf-pl-12">
+                    <div className="rf-bg-red-50/50 rf-pl-12 rf-py-0.5">
                       {error.stack
                         ?.split("\n")
                         .filter((line) => line.trim())
                         .slice(1)
                         .map((line, i) => (
-                          <div key={i} className="rf-px-2">
-                            <span className="rf-text-xs rf-font-mono rf-text-red-500 rf-leading-[0.9rem]">
+                          <div key={i} className="rf-px-2 rf-leading-tight">
+                            <span className="rf-text-xs rf-font-mono rf-text-red-500">
                               {line}
                             </span>
                           </div>
                         ))}
                       {(evalVersion || softwareUsedString) && (
-                        <div className="rf-px-2 rf-py-0.5">
+                        <div className="rf-px-2">
                           <span className="rf-text-xs rf-font-mono rf-text-red-400">
                             {evalVersion && `@tscircuit/eval@${evalVersion}`}
                             {evalVersion && softwareUsedString && " • "}
@@ -280,35 +280,33 @@ export const ErrorTabContent = ({
               return (
                 <div key={index} className="rf-bg-white">
                   <div
-                    className="rf-flex rf-items-center rf-gap-1 rf-px-2 rf-py-0.5 rf-cursor-pointer rf-bg-orange-50/50 hover:rf-bg-orange-100"
+                    className="rf-flex rf-items-center rf-gap-2 rf-px-2 rf-py-0.5 rf-cursor-pointer rf-bg-orange-50/50 hover:rf-bg-orange-100"
                     onClick={() => hasDetails && toggleWarning(index)}
                   >
-                    <div className="rf-flex rf-items-center rf-gap-2">
-                      <AlertCircle className="rf-h-4 rf-w-4 rf-text-orange-500 rf-flex-shrink-0" />
-                      {hasDetails && (
-                        <ChevronRight
-                          className={`rf-h-3 rf-w-3 rf-text-orange-500 rf-flex-shrink-0 rf-transition-transform ${isExpanded ? "rf-rotate-90" : ""}`}
-                        />
-                      )}
-                    </div>
-                    <div className="rf-flex-1 rf-min-w-0 rf-leading-[1rem]">
-                      <span className="rf-text-xs rf-font-mono rf-text-orange-700 rf-leading-[0.95rem]">
+                    <AlertCircle className="rf-h-4 rf-w-4 rf-text-orange-500 rf-flex-shrink-0" />
+                    {hasDetails && (
+                      <ChevronRight
+                        className={`rf-h-3 rf-w-3 rf-text-orange-500 rf-flex-shrink-0 rf-transition-transform ${isExpanded ? "rf-rotate-90" : ""}`}
+                      />
+                    )}
+                    <div className="rf-flex-1 rf-min-w-0 rf-flex rf-items-center">
+                      <span className="rf-text-xs rf-font-mono rf-text-orange-700">
                         {warning.type}:
                       </span>
-                      <span className="rf-text-xs rf-font-mono rf-text-orange-600 rf-ml-1 rf-leading-[0.95rem]">
+                      <span className="rf-text-xs rf-font-mono rf-text-orange-600 rf-ml-1">
                         {warning.message}
                       </span>
                     </div>
                   </div>
                   {isExpanded && hasDetails && (
-                    <div className="rf-bg-orange-50/50 rf-pl-12">
+                    <div className="rf-bg-orange-50/50 rf-pl-12 rf-py-0.5">
                       {warning.stack
                         ?.split("\n")
                         .filter((line) => line.trim())
                         .slice(1)
                         .map((line, i) => (
-                          <div key={i} className="rf-px-2">
-                            <span className="rf-text-xs rf-font-mono rf-text-orange-500 rf-leading-[0.9rem]">
+                          <div key={i} className="rf-px-2 rf-leading-tight">
+                            <span className="rf-text-xs rf-font-mono rf-text-orange-500">
                               {line}
                             </span>
                           </div>

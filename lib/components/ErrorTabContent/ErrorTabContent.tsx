@@ -216,7 +216,7 @@ export const ErrorTabContent = ({
               return (
                 <div key={index} className="rf-bg-white">
                   <div
-                    className="rf-flex rf-items-start rf-gap-1 rf-px-2 rf-py-0.5 rf-cursor-pointer rf-bg-red-50/50 hover:rf-bg-red-100"
+                    className="rf-flex rf-items-start rf-gap-1 rf-px-2 rf-pb-0 rf-pt-0.5 rf-cursor-pointer rf-bg-red-50/50 hover:rf-bg-red-100"
                     onClick={() => hasDetails && toggleError(index)}
                   >
                     <div className="rf-flex rf-items-center rf-gap-2 rf-mt-0.5">
@@ -237,7 +237,7 @@ export const ErrorTabContent = ({
                     </div>
                   </div>
                   {isExpanded && hasDetails && (
-                    <div className="rf-bg-red-50/50 rf-pl-12 rf-py-0.5">
+                    <div className="rf-bg-red-50/50 rf-pl-12">
                       {error.stack
                         ?.split("\n")
                         .filter((line) => line.trim())
@@ -280,7 +280,7 @@ export const ErrorTabContent = ({
               return (
                 <div key={index} className="rf-bg-white">
                   <div
-                    className="rf-flex rf-items-center rf-gap-2 rf-px-2 rf-py-0.5 rf-cursor-pointer rf-bg-orange-50/50 hover:rf-bg-orange-100"
+                    className="rf-flex rf-items-center rf-gap-2 rf-px-2 rf-pb-0 rf-pt-0.5 rf-cursor-pointer rf-bg-orange-50/50 hover:rf-bg-orange-100"
                     onClick={() => hasDetails && toggleWarning(index)}
                   >
                     <AlertCircle className="rf-h-4 rf-w-4 rf-text-orange-500 rf-flex-shrink-0" />
@@ -299,7 +299,7 @@ export const ErrorTabContent = ({
                     </div>
                   </div>
                   {isExpanded && hasDetails && (
-                    <div className="rf-bg-orange-50/50 rf-pl-12 rf-py-0.5">
+                    <div className="rf-bg-orange-50/50 rf-pl-12">
                       {warning.stack
                         ?.split("\n")
                         .filter((line) => line.trim())

@@ -289,11 +289,11 @@ export const ErrorTabContent = ({
                         className={`rf-h-3 rf-w-3 rf-text-orange-500 rf-flex-shrink-0 rf-transition-transform ${isExpanded ? "rf-rotate-90" : ""}`}
                       />
                     )}
-                    <div className="rf-flex-1 rf-min-w-0 rf-flex rf-items-center">
-                      <span className="rf-text-xs rf-font-mono rf-text-orange-700">
+                    <div className="rf-flex-1 rf-min-w-0 rf-flex rf-items-center rf-flex-wrap">
+                      <span className="rf-text-xs rf-font-mono rf-text-orange-700 rf-break-words">
                         {warning.type}:
                       </span>
-                      <span className="rf-text-xs rf-font-mono rf-text-orange-600 rf-ml-1">
+                      <span className="rf-text-xs rf-font-mono rf-text-orange-600 rf-ml-1 rf-break-words">
                         {warning.message}
                       </span>
                     </div>

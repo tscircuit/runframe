@@ -216,10 +216,13 @@ export const ErrorTabContent = ({
               return (
                 <div key={index} className="rf-bg-white hover:rf-bg-red-100">
                   <div
-                    className="rf-flex rf-items-start rf-gap-1 rf-px-2 rf-pb-0 rf-pt-0.5 rf-cursor-pointer rf-bg-red-50/50"
+                    className="rf-flex rf-items-start rf-gap-1 rf-px-2 rf-pb-1 rf-cursor-pointer rf-bg-red-50/50"
                     onClick={() => hasDetails && toggleError(index)}
                   >
-                    <div className="rf-flex rf-items-center rf-gap-2 rf-mt-0.5">
+                    <div
+                      className="rf-flex rf-items-center rf-gap-2"
+                      style={{ marginTop: "3px" }}
+                    >
                       <XCircle className="rf-h-4 rf-w-4 rf-text-red-500 rf-flex-shrink-0" />
                       {hasDetails && (
                         <ChevronRight
@@ -280,7 +283,7 @@ export const ErrorTabContent = ({
               return (
                 <div key={index} className="rf-bg-white hover:rf-bg-orange-100">
                   <div
-                    className="rf-flex rf-items-center rf-gap-2 rf-px-2 rf-pb-0 rf-pt-0.5 rf-cursor-pointer rf-bg-orange-50/50"
+                    className="rf-flex rf-items-center rf-gap-2 rf-px-2 rf-py-1 rf-cursor-pointer rf-bg-orange-50/50"
                     onClick={() => hasDetails && toggleWarning(index)}
                   >
                     <AlertCircle className="rf-h-4 rf-w-4 rf-text-orange-500 rf-flex-shrink-0" />

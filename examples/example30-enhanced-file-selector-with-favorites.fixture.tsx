@@ -67,6 +67,18 @@ export default () => {
           content: `export const Molecule8x8MedShort = () => <group name="Molecule8x8" />`,
         },
         {
+          path: "components/display/MoleculeLaser8x8_2mmLRTBwing.tsx",
+          content: `export const MoleculeLaser8x8_2mmLRTBwing = () => <group name="MoleculeLaser8x8_2mmLRTBwing" />`,
+        },
+        {
+          path: "components/display/MoleculeLaser8x8.tsx",
+          content: `export const MoleculeLaser8x8 = () => <group name="MoleculeLaser8x8" />`,
+        },
+        {
+          path: "components/display/MoleculeLaser8x16_2mmLRTBwing.tsx",
+          content: `export const MoleculeLaser8x16_2mmLRTBwing = () => <group name="MoleculeLaser8x16_2mmLRTBwing" />`,
+        },
+        {
           path: "components/display/Molecule8x8MedStandard.tsx",
           content: `export const Molecule8x8MedStandard = () => <group name="Molecule8x8" />`,
         },

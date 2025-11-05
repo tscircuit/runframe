@@ -1,3 +1,5 @@
+import { naturalSort } from "./naturalSort"
+
 interface FileNode {
   name: string
   path: string
@@ -73,11 +75,6 @@ function getCurrentFolderContents(
 
   const files = targetNode.children.filter((node) => node.type === "file")
   const folders = targetNode.children.filter((node) => node.type === "folder")
-
-  // Natural sort comparator for numeric parts
-  const naturalSort = (a: string, b: string) => {
-    return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" })
-  }
 
   // Sort files first, then folders, using natural sorting
   files.sort((a, b) => naturalSort(a.name, b.name))

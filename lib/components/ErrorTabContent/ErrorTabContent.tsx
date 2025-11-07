@@ -217,12 +217,12 @@ export const ErrorTabContent = ({
               return (
                 <div key={index} className="rf-bg-white hover:rf-bg-red-100">
                   <div
-                    className="rf-flex rf-items-start rf-gap-1 rf-px-2 rf-pb-1 rf-cursor-pointer rf-bg-red-50/50"
+                    className="rf-flex rf-items-start rf-gap-1 rf-px-2 rf-pt-1 rf-pb-1 rf-cursor-pointer rf-bg-red-50/50"
                     onClick={() => hasDetails && toggleError(index)}
                   >
                     <div
                       className="rf-flex rf-items-center rf-gap-2"
-                      style={{ marginTop: "3px" }}
+                      style={{ marginTop: "2px" }}
                     >
                       <XCircle className="rf-h-4 rf-w-4 rf-text-red-500 rf-flex-shrink-0" />
                       {hasDetails && (

@@ -360,13 +360,13 @@ export const ErrorTabContent = ({
               if (softwareUsedString) errorDetails += `\n${softwareUsedString}`
               if (firstError.stack) errorDetails += `\n${firstError.stack}`
 
-              let body = `[Package code to reproduce](${packageUrl})\n\n### Error\n\`\`\`\n${errorDetails}\n\`\`\`\n`
+              let body = `[Package code to reproduce](${packageUrl()})\n\n### Error\n\`\`\`\n${errorDetails}\n\`\`\`\n`
               if (body.length > 35000) {
                 const truncatedMessage =
                   firstError.message.length > 500
                     ? `${firstError.message.slice(0, 500)}...`
                     : firstError.message
-                body = `[Package code to reproduce](${packageUrl})\n\n### Error\n\`\`\`\n${firstError.type}: ${truncatedMessage}\n\`\`\``
+                body = `[Package code to reproduce](${packageUrl()})\n\n### Error\n\`\`\`\n${firstError.type}: ${truncatedMessage}\n\`\`\``
               }
 
               openIssue(title, body)

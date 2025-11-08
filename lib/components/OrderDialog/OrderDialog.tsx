@@ -34,7 +34,17 @@ export const OrderDialog: FC<OrderDialogProps> = ({
           if (!open) onClose()
         }}
       >
-        <DialogContent className="!rf-max-w-[660px] !rf-p-0 !rf-z-[101]">
+        <DialogContent
+          className="
+          !rf-p-0 !rf-z-[101] rf-rounded-md
+          !rf-w-[95vw] !rf-max-w-[95vw]
+          sm:rf-w-[90vw] sm:rf-max-w-[500px]
+          md:rf-w-auto md:rf-max-w-[660px]
+          lg:rf-max-w-[720px]
+          xl:rf-max-w-[800px]
+          rf-max-h-[90vh] rf-overflow-y-auto
+        "
+        >
           <div className="rf-relative rf-w-full">
             {stage === "initial" && (
               <InitialOrderScreen

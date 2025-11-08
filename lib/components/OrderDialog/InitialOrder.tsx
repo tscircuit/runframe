@@ -97,8 +97,17 @@ export const InitialOrderScreen = ({
   }
 
   return (
-    <div className="rf-max-w-lg rf-mx-auto rf-bg-white rf-rounded-2xl rf-py-8 rf-flex rf-flex-col rf-gap-3">
-      <h2 className="rf-text-3xl rf-font-bold rf-text-center">Order PCB</h2>
+    <div
+      className="
+      rf-w-full rf-mx-auto rf-bg-white rf-rounded-2xl 
+      rf-p-4 sm:rf-p-6 md:rf-p-8 
+      rf-flex rf-flex-col rf-gap-3
+      rf-max-w-full sm:rf-max-w-md md:rf-max-w-lg lg:rf-max-w-xl
+    "
+    >
+      <h2 className="rf-text-xl sm:rf-text-2xl md:rf-text-3xl rf-font-bold rf-text-center">
+        Order PCB
+      </h2>
       {/* Loading States */}
       {!(createOrderQuoteError || orderQuote?.error) &&
         (!orderQuoteId || !orderQuote || orderQuote?.is_processing) && (
@@ -124,7 +133,7 @@ export const InitialOrderScreen = ({
         Array.isArray(orderQuote?.shipping_options) &&
         orderQuote.shipping_options.length > 0 && (
           <>
-            <div className="rf-bg-blue-100 rf-text-blue-800 rf-p-3 rf-rounded-md rf-text-center rf-text-sm">
+            <div className="rf-bg-blue-100 rf-text-blue-800 rf-p-2 sm:rf-p-3 rf-rounded-md rf-text-center rf-text-xs sm:rf-text-sm">
               This board is eligible for the tscircuit Flat Fee
             </div>
             <VendorQuoteCard
@@ -140,18 +149,18 @@ export const InitialOrderScreen = ({
           </>
         )}
 
-      <div className="rf-flex rf-justify-between rf-mt-5 rf-gap-4">
+      <div className="rf-flex rf-flex-col-reverse sm:rf-flex-row rf-justify-between rf-mt-5 rf-gap-3 sm:rf-gap-4">
         <Button
           variant="outline"
           type="button"
-          className="rf-w-1/2 rf-border-red-500 rf-text-red-500 rf-hover:bg-red-50 rf-hover:text-red-600"
+          className="rf-w-full sm:rf-w-1/2 rf-border-red-500 rf-text-red-500 rf-hover:bg-red-50 rf-hover:text-red-600 rf-text-sm sm:rf-text-base"
           onClick={onCancel}
         >
           Cancel
         </Button>
         <Button
           type="button"
-          className="rf-w-1/2 rf-bg-blue-600 rf-hover:bg-blue-700"
+          className="rf-w-full sm:rf-w-1/2 rf-bg-blue-600 rf-hover:bg-blue-700 rf-text-sm sm:rf-text-base"
           disabled={selectedShippingCarrier === null}
           onClick={() => {
             if (selectedShippingCarrier === null) {
@@ -167,7 +176,7 @@ export const InitialOrderScreen = ({
           Continue
         </Button>
       </div>
-      <div className="rf-text-xs rf-text-center rf-text-gray-400 rf-mt-4">
+      <div className="rf-text-xs rf-text-center rf-text-gray-400 rf-mt-3 sm:rf-mt-4 rf-px-2">
         Pricing may vary based on specifications.
       </div>
     </div>
@@ -186,12 +195,26 @@ const ErrorMessage = ({ message }: { message: string }) => (
   <div className="rf-text-red-600 rf-text-center rf-py-12">{message}</div>
 )
 const SignInView = ({ signIn }: { signIn: () => void }) => (
-  <div className="rf-max-w-lg rf-mx-auto rf-bg-white rf-rounded-2xl rf-py-8 rf-flex rf-flex-col rf-gap-3">
-    <h2 className="rf-text-3xl rf-font-bold rf-text-center">Order PCB</h2>
-    <div className="rf-flex rf-flex-col rf-items-center rf-gap-4 rf-py-8">
-      <p className="rf-text-gray-600">Please sign in to continue</p>
-      <Button onClick={signIn} className="rf-flex rf-items-center rf-gap-2">
-        <GitHubLogoIcon className="rf-w-5 rf-h-5" />
+  <div
+    className="
+    rf-w-full rf-mx-auto rf-bg-white rf-rounded-2xl 
+    rf-p-4 sm:rf-p-6 md:rf-p-8 
+    rf-flex rf-flex-col rf-gap-3
+    rf-max-w-full sm:rf-max-w-md md:rf-max-w-lg lg:rf-max-w-xl
+  "
+  >
+    <h2 className="rf-text-xl sm:rf-text-2xl md:rf-text-3xl rf-font-bold rf-text-center">
+      Order PCB
+    </h2>
+    <div className="rf-flex rf-flex-col rf-items-center rf-gap-4 rf-py-4 sm:rf-py-6 md:rf-py-8">
+      <p className="rf-text-gray-600 rf-text-sm sm:rf-text-base rf-text-center rf-px-2">
+        Please sign in to continue
+      </p>
+      <Button
+        onClick={signIn}
+        className="rf-flex rf-items-center rf-gap-2 rf-text-sm sm:rf-text-base rf-px-4 sm:rf-px-6"
+      >
+        <GitHubLogoIcon className="rf-w-4 rf-h-4 sm:rf-w-5 sm:rf-h-5" />
         Sign in with GitHub
       </Button>
     </div>

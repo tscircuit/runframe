@@ -669,10 +669,10 @@ export const CircuitJsonPreview = ({
             </TabsContent>
           )}
           {(!availableTabs || availableTabs.includes("errors")) && (
-            <TabsContent value="errors">
+            <TabsContent value="errors" className="rf-h-full">
               <div
                 className={cn(
-                  "rf-overflow-auto",
+                  "rf-overflow-hidden",
                   isFullScreen ? "rf-h-screen" : "rf-h-full  rf-min-h-[620px]",
                 )}
               >

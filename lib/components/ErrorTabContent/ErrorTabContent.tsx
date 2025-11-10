@@ -1,5 +1,11 @@
 import { GitHubLogoIcon } from "@radix-ui/react-icons"
-import { ClipboardIcon, ChevronRight, XCircle, AlertCircle } from "lucide-react"
+import {
+  ClipboardIcon,
+  ChevronRight,
+  ChevronDown,
+  XCircle,
+  AlertCircle,
+} from "lucide-react"
 import { Button } from "lib/components/ui/button"
 import { createSnippetUrl } from "@tscircuit/create-snippet-url"
 import { encodeFsMapToUrlHash } from "lib/utils"
@@ -174,6 +180,8 @@ export const ErrorTabContent = ({
     unifiedWarnings.forEach((_, i) => allIndexes.add(i))
     return allIndexes
   })
+  const [errorsCollapsed, setErrorsCollapsed] = useState(false)
+  const [warningsCollapsed, setWarningsCollapsed] = useState(false)
 
   const toggleError = (index: number) => {
     setExpandedErrors((prev) => {
@@ -201,129 +209,160 @@ export const ErrorTabContent = ({
 
   return (
     <>
-      <div className="rf-w-full">
-        {unifiedErrors.length > 0 && (
-          <div className="rf-mt-2">
-            <div className="rf-text-xs rf-text-red-700 rf-font-semibold rf-px-2 rf-py-1 rf-bg-red-50 rf-border-b rf-border-red-200">
-              {unifiedErrors.length}{" "}
-              {unifiedErrors.length === 1 ? "error" : "errors"}
-            </div>
-            {unifiedErrors.map((error, index) => {
-              const isExpanded = expandedErrors.has(index)
-              const previewMessage = error.message
-              const hasDetails =
-                error.stack || evalVersion || softwareUsedString
+      <div className="rf-w-full rf-flex rf-flex-col rf-h-full">
+        <div className="rf-overflow-y-auto rf-min-h-0">
+          {unifiedErrors.length > 0 && (
+            <div className="rf-mt-2">
+              <div
+                className="rf-text-xs rf-text-red-700 rf-font-semibold rf-px-2 rf-py-1 rf-bg-red-50 rf-border-b rf-border-red-200 rf-flex rf-items-center rf-gap-2 rf-cursor-pointer hover:rf-bg-red-100"
+                onClick={() => setErrorsCollapsed(!errorsCollapsed)}
+              >
+                {errorsCollapsed ? (
+                  <ChevronRight className="rf-h-3 rf-w-3 rf-text-red-700" />
+                ) : (
+                  <ChevronDown className="rf-h-3 rf-w-3 rf-text-red-700" />
+                )}
+                <span>
+                  {unifiedErrors.length}{" "}
+                  {unifiedErrors.length === 1 ? "error" : "errors"}
+                </span>
+              </div>
+              {!errorsCollapsed &&
+                unifiedErrors.map((error, index) => {
+                  const isExpanded = expandedErrors.has(index)
+                  const previewMessage = error.message
+                  const hasDetails =
+                    error.stack || evalVersion || softwareUsedString
 
-              return (
-                <div key={index} className="rf-bg-white hover:rf-bg-red-100">
-                  <div
-                    className="rf-flex rf-items-start rf-gap-1 rf-px-2 rf-pt-1 rf-pb-1 rf-cursor-pointer rf-bg-red-50/50"
-                    onClick={() => hasDetails && toggleError(index)}
-                  >
+                  return (
                     <div
-                      className="rf-flex rf-items-center rf-gap-2"
-                      style={{ marginTop: "2px" }}
+                      key={index}
+                      className="rf-bg-white hover:rf-bg-red-100"
                     >
-                      <XCircle className="rf-h-4 rf-w-4 rf-text-red-500 rf-flex-shrink-0" />
-                      {hasDetails && (
-                        <ChevronRight
-                          className={`rf-h-3 rf-w-3 rf-text-red-500 rf-flex-shrink-0 rf-transition-transform ${isExpanded ? "rf-rotate-90" : ""}`}
-                        />
-                      )}
-                    </div>
-                    <div className="rf-flex-1 rf-min-w-0 rf-leading-[1rem]">
-                      <span className="rf-text-xs rf-font-mono rf-text-red-700 rf-leading-[0.95rem]">
-                        {error.type}:
-                      </span>
-                      <span className="rf-text-xs rf-font-mono rf-text-red-600 rf-ml-1 rf-leading-[0.95rem]">
-                        {error.message}
-                      </span>
-                    </div>
-                  </div>
-                  {isExpanded && hasDetails && (
-                    <div className="rf-bg-red-50/50 rf-pl-12">
-                      {error.stack
-                        ?.split("\n")
-                        .filter((line) => line.trim())
-                        .slice(1)
-                        .map((line, i) => (
-                          <div key={i} className="rf-px-2 rf-leading-tight">
-                            <span className="rf-text-xs rf-font-mono rf-text-red-500">
-                              {line}
-                            </span>
-                          </div>
-                        ))}
-                      {(evalVersion || softwareUsedString) && (
-                        <div className="rf-px-2">
-                          <span className="rf-text-xs rf-font-mono rf-text-red-400">
-                            {evalVersion && `@tscircuit/eval@${evalVersion}`}
-                            {evalVersion && softwareUsedString && " • "}
-                            {softwareUsedString}
+                      <div
+                        className="rf-flex rf-items-start rf-gap-1 rf-px-2 rf-pt-1 rf-pb-1 rf-cursor-pointer rf-bg-red-50/50"
+                        onClick={() => hasDetails && toggleError(index)}
+                      >
+                        <div
+                          className="rf-flex rf-items-center rf-gap-2"
+                          style={{ marginTop: "2px" }}
+                        >
+                          <XCircle className="rf-h-4 rf-w-4 rf-text-red-500 rf-flex-shrink-0" />
+                          {hasDetails && (
+                            <ChevronRight
+                              className={`rf-h-3 rf-w-3 rf-text-red-500 rf-flex-shrink-0 rf-transition-transform ${isExpanded ? "rf-rotate-90" : ""}`}
+                            />
+                          )}
+                        </div>
+                        <div className="rf-flex-1 rf-min-w-0 rf-leading-[1rem]">
+                          <span className="rf-text-xs rf-font-mono rf-text-red-700 rf-leading-[0.95rem]">
+                            {error.type}:
                           </span>
+                          <span className="rf-text-xs rf-font-mono rf-text-red-600 rf-ml-1 rf-leading-[0.95rem]">
+                            {error.message}
+                          </span>
+                        </div>
+                      </div>
+                      {isExpanded && hasDetails && (
+                        <div className="rf-bg-red-50/50 rf-pl-12">
+                          {error.stack
+                            ?.split("\n")
+                            .filter((line) => line.trim())
+                            .slice(1)
+                            .map((line, i) => (
+                              <div key={i} className="rf-px-2 rf-leading-tight">
+                                <span className="rf-text-xs rf-font-mono rf-text-red-500">
+                                  {line}
+                                </span>
+                              </div>
+                            ))}
+                          {(evalVersion || softwareUsedString) && (
+                            <div className="rf-px-2">
+                              <span className="rf-text-xs rf-font-mono rf-text-red-400">
+                                {evalVersion &&
+                                  `@tscircuit/eval@${evalVersion}`}
+                                {evalVersion && softwareUsedString && " • "}
+                                {softwareUsedString}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        )}
-
-        {unifiedWarnings.length > 0 && (
-          <div className="rf-mt-2">
-            <div className="rf-text-xs rf-text-orange-700 rf-font-semibold rf-px-2 rf-py-1 rf-bg-orange-50 rf-border-b rf-border-orange-200">
-              {unifiedWarnings.length}{" "}
-              {unifiedWarnings.length === 1 ? "warning" : "warnings"}
+                  )
+                })}
             </div>
-            {unifiedWarnings.map((warning, index) => {
-              const isExpanded = expandedWarnings.has(index)
-              const previewMessage = warning.message
-              const hasDetails = !!warning.stack
+          )}
 
-              return (
-                <div key={index} className="rf-bg-white hover:rf-bg-orange-100">
-                  <div
-                    className="rf-flex rf-items-center rf-gap-2 rf-px-2 rf-py-1 rf-cursor-pointer rf-bg-orange-50/50"
-                    onClick={() => hasDetails && toggleWarning(index)}
-                  >
-                    <AlertCircle className="rf-h-4 rf-w-4 rf-text-orange-500 rf-flex-shrink-0" />
-                    {hasDetails && (
-                      <ChevronRight
-                        className={`rf-h-3 rf-w-3 rf-text-orange-500 rf-flex-shrink-0 rf-transition-transform ${isExpanded ? "rf-rotate-90" : ""}`}
-                      />
-                    )}
-                    <div className="rf-flex-1 rf-min-w-0 rf-flex rf-items-center rf-flex-wrap">
-                      <span className="rf-text-xs rf-font-mono rf-text-orange-700 rf-break-words">
-                        {warning.type}:
-                      </span>
-                      <span className="rf-text-xs rf-font-mono rf-text-orange-600 rf-ml-1 rf-break-words">
-                        {warning.message}
-                      </span>
-                    </div>
-                  </div>
-                  {isExpanded && hasDetails && (
-                    <div className="rf-bg-orange-50/50 rf-pl-12">
-                      {warning.stack
-                        ?.split("\n")
-                        .filter((line) => line.trim())
-                        .slice(1)
-                        .map((line, i) => (
-                          <div key={i} className="rf-px-2 rf-leading-tight">
-                            <span className="rf-text-xs rf-font-mono rf-text-orange-500">
-                              {line}
-                            </span>
-                          </div>
-                        ))}
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        )}
+          {unifiedWarnings.length > 0 && (
+            <div className="rf-mt-2">
+              <div
+                className="rf-text-xs rf-text-orange-700 rf-font-semibold rf-px-2 rf-py-1 rf-bg-orange-50 rf-border-b rf-border-orange-200 rf-flex rf-items-center rf-gap-2 rf-cursor-pointer hover:rf-bg-orange-100"
+                onClick={() => setWarningsCollapsed(!warningsCollapsed)}
+              >
+                {warningsCollapsed ? (
+                  <ChevronRight className="rf-h-3 rf-w-3 rf-text-orange-700" />
+                ) : (
+                  <ChevronDown className="rf-h-3 rf-w-3 rf-text-orange-700" />
+                )}
+                <span>
+                  {unifiedWarnings.length}{" "}
+                  {unifiedWarnings.length === 1 ? "warning" : "warnings"}
+                </span>
+              </div>
+              {!warningsCollapsed &&
+                unifiedWarnings.map((warning, index) => {
+                  const isExpanded = expandedWarnings.has(index)
+                  const previewMessage = warning.message
+                  const hasDetails = !!warning.stack
 
-        <div className="rf-flex rf-gap-2 rf-mt-4 rf-justify-end">
+                  return (
+                    <div
+                      key={index}
+                      className="rf-bg-white hover:rf-bg-orange-100"
+                    >
+                      <div
+                        className="rf-flex rf-items-center rf-gap-2 rf-px-2 rf-py-1 rf-cursor-pointer rf-bg-orange-50/50"
+                        onClick={() => hasDetails && toggleWarning(index)}
+                      >
+                        <AlertCircle className="rf-h-4 rf-w-4 rf-text-orange-500 rf-flex-shrink-0" />
+                        {hasDetails && (
+                          <ChevronRight
+                            className={`rf-h-3 rf-w-3 rf-text-orange-500 rf-flex-shrink-0 rf-transition-transform ${isExpanded ? "rf-rotate-90" : ""}`}
+                          />
+                        )}
+                        <div className="rf-flex-1 rf-min-w-0 rf-flex rf-items-center rf-flex-wrap">
+                          <span className="rf-text-xs rf-font-mono rf-text-orange-700 rf-break-words">
+                            {warning.type}:
+                          </span>
+                          <span className="rf-text-xs rf-font-mono rf-text-orange-600 rf-ml-1 rf-break-words">
+                            {warning.message}
+                          </span>
+                        </div>
+                      </div>
+                      {isExpanded && hasDetails && (
+                        <div className="rf-bg-orange-50/50 rf-pl-12">
+                          {warning.stack
+                            ?.split("\n")
+                            .filter((line) => line.trim())
+                            .slice(1)
+                            .map((line, i) => (
+                              <div key={i} className="rf-px-2 rf-leading-tight">
+                                <span className="rf-text-xs rf-font-mono rf-text-orange-500">
+                                  {line}
+                                </span>
+                              </div>
+                            ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+            </div>
+          )}
+        </div>
+
+        <div className="rf-flex rf-gap-2 rf-mt-4 rf-justify-end rf-flex-shrink-0">
           <AutoroutingLogOptions
             autoroutingLog={autoroutingLog}
             onReportAutoroutingLog={onReportAutoroutingLog}

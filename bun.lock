@@ -1,6 +1,5 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "@tscircuit/runframe",
@@ -43,7 +42,7 @@
         "circuit-json-to-bom-csv": "^0.0.8",
         "circuit-json-to-gerber": "^0.0.37",
         "circuit-json-to-gltf": "^0.0.7",
-        "circuit-json-to-kicad": "^0.0.22",
+        "circuit-json-to-kicad": "^0.0.25",
         "circuit-json-to-pnp-csv": "^0.0.7",
         "circuit-json-to-step": "^0.0.2",
         "circuit-to-svg": "^0.0.205",
@@ -701,7 +700,7 @@
 
     "circuit-json-to-gltf": ["circuit-json-to-gltf@0.0.7", "", { "peerDependencies": { "@resvg/resvg-js": "2", "@resvg/resvg-wasm": "2", "@tscircuit/circuit-json-util": "*", "circuit-json": "*", "circuit-to-svg": "*", "typescript": "^5" }, "optionalPeers": ["@resvg/resvg-wasm"] }, "sha512-MbTAxzqgcfKho0veYceEM2LamAmIqax1rG2cnR6MhnEowDLFPO8Sd2qoXStqDbWADXQpIglJ0NdICTu8igUvFg=="],
 
-    "circuit-json-to-kicad": ["circuit-json-to-kicad@0.0.22", "", { "peerDependencies": { "typescript": "^5" } }, "sha512-4iNb4TH1lfvYqw5vmB18X1/yxpgbgbxmuEkjmLB7zYy2GxROtbIbctau3mVW9ftuWU36K+Z30hzK3Qd53PEQKQ=="],
+    "circuit-json-to-kicad": ["circuit-json-to-kicad@0.0.25", "", { "peerDependencies": { "typescript": "^5" } }, "sha512-MWK6gEdR3dJXDMY62aI43tAd9ffPnjQmPpV9/eP9O6U+INc69/aw5eT5qBskLh+6OnNcwHN2Zz3x8yRQi/0P+w=="],
 
     "circuit-json-to-pnp-csv": ["circuit-json-to-pnp-csv@0.0.7", "", { "dependencies": { "papaparse": "^5.4.1" }, "peerDependencies": { "@tscircuit/soup-util": "*", "typescript": "^5.0.0" } }, "sha512-WAdNRHtaPhQM8X5NN/43WMBKDCEKQSLShg/mHIZxMUzJviymnfbq6rJj/2WvDqm/bogey34PyTEHwF3mC7zxlQ=="],
 

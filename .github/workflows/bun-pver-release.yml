@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  UPSTREAM_REPOS: "cli" # for example: "eval"
+  UPSTREAM_REPOS: "cli, tscircuit.com" # for example: "eval"
   PACKAGE_NAMES: "@tscircuit/runframe" # comma-separated list, e.g. "@tscircuit/core,@tscircuit/props"
 
 jobs:

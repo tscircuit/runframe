@@ -178,16 +178,13 @@ export const useRunFrameStore = create<RunFrameState>()(
       pushEvent: async (
         event: Omit<RunFrameEvent, "event_id" | "created_at">,
       ) => {
-        await fetch(
-          `${window.TSCIRCUIT_FILESERVER_API_BASE_URL ?? ""}/api/events/create`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(event),
+        await fetch(`${API_BASE}/events/create`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        )
+          body: JSON.stringify(event),
+        })
       },
 
       applyEditEventsAndUpdateManualEditsJson: async (

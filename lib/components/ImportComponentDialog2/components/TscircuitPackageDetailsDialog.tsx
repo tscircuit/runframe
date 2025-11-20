@@ -21,15 +21,10 @@ interface TscircuitPackageDetailsDialogProps {
   onOpenChange: (open: boolean) => void
   isLoading: boolean
   details: TscircuitPackageDetails | null
-  previewTab: "pcb" | "schematic"
-  onPreviewTabChange: (value: "pcb" | "schematic") => void
+  previewTab: "pcb" | "schematic" | "3d"
+  onPreviewTabChange: (value: "pcb" | "schematic" | "3d") => void
   isSubmitting: boolean
   onImport: () => void
-}
-
-const buildPreviewUrl = (pkg: Package | null, tab: "pcb" | "schematic") => {
-  if (!pkg?.owner_github_username || !pkg?.unscoped_name) return null
-  return `https://registry-api.tscircuit.com/packages/images/${pkg.owner_github_username}/${pkg.unscoped_name}/${tab}.png`
 }
 
 export const TscircuitPackageDetailsDialog = ({
@@ -44,8 +39,9 @@ export const TscircuitPackageDetailsDialog = ({
   onImport,
 }: TscircuitPackageDetailsDialogProps) => {
   const pkg = packageResult?.package ?? null
-  const pcbPreviewUrl = buildPreviewUrl(pkg, "pcb")
-  const schematicPreviewUrl = buildPreviewUrl(pkg, "schematic")
+  const pcbPreviewUrl = pkg?.latest_pcb_preview_image_url
+  const schematicPreviewUrl = pkg?.latest_sch_preview_image_url
+  const cadPreviewUrl = (pkg as any)?.latest_cad_preview_image_url
   const packageName = pkg?.unscoped_name?.split("/").pop() ?? pkg?.unscoped_name
   const ownerUsername = pkg?.owner_github_username ?? undefined
   const ownerUrl = ownerUsername
@@ -61,7 +57,7 @@ export const TscircuitPackageDetailsDialog = ({
       <DialogContent
         showOverlay={false}
         style={{ width: "calc(100vw - 2rem)" }}
-        className="rf-max-w-5xl !rf-overflow-y-auto rf-max-h-[90vh] rf-overflow-hidden rf-flex rf-flex-col rf-rounded-sm"
+        className="rf-max-w-5xl no-scrollbar !rf-overflow-y-auto rf-max-h-[90vh] rf-overflow-hidden rf-flex rf-flex-col rf-rounded-sm"
       >
         <DialogHeader className="rf-pb-4 rf-border-b">
           <div className="rf-flex rf-items-start rf-justify-between rf-gap-4">
@@ -97,47 +93,68 @@ export const TscircuitPackageDetailsDialog = ({
             </div>
           ) : null}
 
-          <div>
-            <h3 className="rf-text-lg rf-font-semibold rf-mb-4">Preview</h3>
-            <Tabs
-              value={previewTab}
-              onValueChange={(value) =>
-                onPreviewTabChange(value as "pcb" | "schematic")
-              }
-            >
-              <TabsList className="rf-inline-flex rf-h-9 rf-items-center rf-justify-center rf-rounded-lg rf-bg-zinc-100 rf-p-1 rf-text-zinc-500 dark:rf-bg-zinc-800 dark:rf-text-zinc-400">
-                <TabsTrigger value="pcb">PCB</TabsTrigger>
-                <TabsTrigger value="schematic">Schematic</TabsTrigger>
-              </TabsList>
+          {(cadPreviewUrl || pcbPreviewUrl || schematicPreviewUrl) && (
+            <>
+              <div>
+                <h3 className="rf-text-lg rf-font-semibold rf-mb-4">Preview</h3>
+                <Tabs
+                  value={previewTab}
+                  onValueChange={(value) =>
+                    onPreviewTabChange(value as "pcb" | "schematic" | "3d")
+                  }
+                >
+                  <TabsList className="rf-inline-flex rf-h-9 rf-items-center rf-justify-center rf-rounded-lg rf-bg-zinc-100 rf-p-1 rf-text-zinc-500 dark:rf-bg-zinc-800 dark:rf-text-zinc-400">
+                    {pcbPreviewUrl && (
+                      <TabsTrigger value="pcb">PCB</TabsTrigger>
+                    )}
+                    {schematicPreviewUrl && (
+                      <TabsTrigger value="schematic">Schematic</TabsTrigger>
+                    )}
+                    {cadPreviewUrl && <TabsTrigger value="3d">3D</TabsTrigger>}
+                  </TabsList>
 
-              <div className="rf-mt-4">
-                <TabsContent
-                  value="pcb"
-                  className="rf-border rf-rounded-lg rf-overflow-hidden rf-bg-gray-50"
-                >
-                  {pcbPreviewUrl ? (
-                    <img
-                      src={pcbPreviewUrl}
-                      alt={`${packageName ?? "package"} PCB preview`}
-                      className="rf-w-full rf-h-full rf-object-contain rf-bg-white rf-p-4"
-                    />
-                  ) : null}
-                </TabsContent>
-                <TabsContent
-                  value="schematic"
-                  className="rf-border rf-rounded-lg rf-overflow-hidden rf-bg-gray-50"
-                >
-                  {schematicPreviewUrl ? (
-                    <img
-                      src={schematicPreviewUrl}
-                      alt={`${packageName ?? "package"} schematic preview`}
-                      className="rf-w-full rf-h-full rf-object-contain rf-bg-white rf-p-4"
-                    />
-                  ) : null}
-                </TabsContent>
+                  <div className="rf-mt-4">
+                    <TabsContent
+                      value="pcb"
+                      className="rf-border rf-rounded-lg rf-overflow-hidden rf-bg-gray-50"
+                    >
+                      {pcbPreviewUrl ? (
+                        <img
+                          src={pcbPreviewUrl}
+                          alt={`${packageName ?? "package"} PCB preview`}
+                          className="rf-w-full rf-h-full rf-object-contain rf-bg-white rf-p-4"
+                        />
+                      ) : null}
+                    </TabsContent>
+                    <TabsContent
+                      value="schematic"
+                      className="rf-border rf-rounded-lg rf-overflow-hidden rf-bg-gray-50"
+                    >
+                      {schematicPreviewUrl ? (
+                        <img
+                          src={schematicPreviewUrl}
+                          alt={`${packageName ?? "package"} schematic preview`}
+                          className="rf-w-full rf-h-full rf-object-contain rf-bg-white rf-p-4"
+                        />
+                      ) : null}
+                    </TabsContent>
+                    <TabsContent
+                      value="3d"
+                      className="rf-border rf-rounded-lg rf-overflow-hidden rf-bg-gray-50"
+                    >
+                      {cadPreviewUrl ? (
+                        <img
+                          src={cadPreviewUrl}
+                          alt={`${packageName ?? "package"} 3D preview`}
+                          className="rf-w-full rf-h-full rf-object-contain rf-bg-white rf-p-4"
+                        />
+                      ) : null}
+                    </TabsContent>
+                  </div>
+                </Tabs>
               </div>
-            </Tabs>
-          </div>
+            </>
+          )}
 
           {details?.ai_description ? (
             <section>

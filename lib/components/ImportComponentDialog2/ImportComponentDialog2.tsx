@@ -111,7 +111,7 @@ export const ImportComponentDialog2 = ({
     React.useState<TscircuitPackageSearchResult | null>(null)
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false)
   const [detailsPreviewTab, setDetailsPreviewTab] = React.useState<
-    "pcb" | "schematic"
+    "pcb" | "schematic" | "3d"
   >("pcb")
   const [importErrorMessage, setImportErrorMessage] = React.useState<
     string | null
@@ -318,7 +318,7 @@ export const ImportComponentDialog2 = ({
               onSubmit={performSearch}
             />
 
-            <div className="rf-mt-4 rf-flex-1 rf-min-h-[200px] !rf-max-h-[40vh] !rf-overflow-y-auto rf-border rf-rounded-md">
+            <div className="no-scrollbar rf-mt-4 rf-flex-1 rf-min-h-[200px] !rf-max-h-[40vh] !rf-overflow-y-auto rf-border rf-rounded-md">
               {isSearching ? (
                 <div className="rf-p-8 rf-text-center rf-text-zinc-500">
                   <Loader2 className="rf-h-8 rf-w-8 rf-animate-spin rf-mx-auto rf-mb-2" />

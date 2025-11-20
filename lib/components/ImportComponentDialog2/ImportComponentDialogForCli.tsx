@@ -49,9 +49,6 @@ export const ImportComponentDialogForCli = (props: CliImportDialogProps) => {
           }`,
       },
     )
-
-    // TODO wait on event indicating the package was successfully installed
-    throw new Error("Not implemented")
   }
 
   const handleKicadStringSelected = async ({

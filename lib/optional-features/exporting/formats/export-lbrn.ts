@@ -28,7 +28,7 @@ export const exportLbrn = async ({
     })
 
     openForDownload(blob, {
-      fileName: `${projectName}.lbrn`,
+      fileName: `${projectName}.lbrn2`,
     })
   } catch (error) {
     const errorMessage =

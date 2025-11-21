@@ -14,7 +14,7 @@ export const availableExports = [
   { extension: "glb", name: "GLB (Binary GLTF)" },
   { extension: "svg", name: "Pinout SVG" },
   { extension: "step", name: "STEP" },
-  { extension: "lbrn", name: "LightBurn" },
+  { extension: "lbrn2", name: "LightBurn" },
   // { extension: "svg", name: "SVG" },
   // { extension: "dsn", name: "Specctra DSN" },
   // { extension: "kicad_mod", name: "KiCad Module" },

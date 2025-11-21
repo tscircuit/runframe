@@ -5,6 +5,7 @@ import { exportGlb } from "./formats/export-glb"
 import { exportPinoutSvg } from "./formats/export-pinout-svg"
 import { exportKicadProject } from "./formats/export-kicad-project"
 import { exportStep } from "./formats/export-step"
+import { exportLbrn } from "./formats/export-lbrn"
 
 export const availableExports = [
   { extension: "json", name: "Circuit JSON" },
@@ -13,6 +14,7 @@ export const availableExports = [
   { extension: "glb", name: "GLB (Binary GLTF)" },
   { extension: "svg", name: "Pinout SVG" },
   { extension: "step", name: "STEP" },
+  { extension: "lbrn", name: "LightBurn" },
   // { extension: "svg", name: "SVG" },
   // { extension: "dsn", name: "Specctra DSN" },
   // { extension: "kicad_mod", name: "KiCad Module" },
@@ -55,6 +57,10 @@ export const exportAndDownload = async ({
   }
   if (exportName === "STEP") {
     await exportStep({ circuitJson, projectName })
+    return
+  }
+  if (exportName === "LightBurn") {
+    await exportLbrn({ circuitJson, projectName })
     return
   }
   throw new Error(`Unsupported export type: "${exportName}"`)

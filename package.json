@@ -116,5 +116,8 @@
     "tsup": "^8.3.5",
     "vite": "^7.1.2",
     "yargs": "^17.7.2"
+  },
+  "dependencies": {
+    "circuit-json-to-lbrn": "^0.0.4"
   }
 }

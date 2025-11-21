@@ -19,7 +19,7 @@ export const exportLbrn = async ({
   try {
     // Convert Circuit JSON to LBRN format
     const lbrnContent = await convertCircuitJsonToLbrn(circuitJson, {
-      includeSilkscreen: options.includeSilkscreen ?? true,
+      includeSilkscreen: options.includeSilkscreen ?? false,
     })
 
     // Create blob and trigger download

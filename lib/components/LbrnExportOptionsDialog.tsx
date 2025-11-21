@@ -25,7 +25,7 @@ export function LbrnExportOptionsDialog({
   onOpenChange,
   onExport,
 }: LbrnExportOptionsDialogProps) {
-  const [includeSilkscreen, setIncludeSilkscreen] = useState(true)
+  const [includeSilkscreen, setIncludeSilkscreen] = useState(false)
 
   const handleExport = () => {
     onExport({ includeSilkscreen })
@@ -42,7 +42,7 @@ export function LbrnExportOptionsDialog({
         <DialogHeader>
           <DialogTitle>LightBurn Export Options</DialogTitle>
           <DialogDescription>
-            Configure export settings for LightBurn format
+            Configure export settings for PCB laser ablation with LightBurn
           </DialogDescription>
         </DialogHeader>
 
@@ -57,7 +57,7 @@ export function LbrnExportOptionsDialog({
             />
             <label
               htmlFor="includeSilkscreen"
-              className="rf-text-sm rf-font-medium rf-leading-none peer-disabled:rf-cursor-not-allowed peer-disabled:rf-opacity-70"
+              className="rf-text-xs rf-font-medium rf-leading-none peer-disabled:rf-cursor-not-allowed peer-disabled:rf-opacity-70"
             >
               Include silkscreen layer
             </label>

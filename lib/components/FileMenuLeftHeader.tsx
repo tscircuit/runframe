@@ -39,6 +39,11 @@ import { Toaster } from "react-hot-toast"
 import { useOrderDialogCli } from "./OrderDialog/useOrderDialog"
 import packageJson from "../../package.json"
 import { useBugReportDialog } from "./useBugReportDialog"
+import {
+  LbrnExportOptionsDialog,
+  type LbrnExportOptions,
+} from "./LbrnExportOptionsDialog"
+import { exportLbrn } from "lib/optional-features/exporting/formats/export-lbrn"
 
 export const FileMenuLeftHeader = (props: {
   isWebEmbedded?: boolean
@@ -69,6 +74,11 @@ export const FileMenuLeftHeader = (props: {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isError, setIsError] = useState(false)
   const [isExporting, setisExporting] = useState(false)
+  const [isLbrnDialogOpen, setIsLbrnDialogOpen] = useState(false)
+  const [pendingLbrnExport, setPendingLbrnExport] = useState<{
+    circuitJson: any
+    projectName: string
+  } | null>(null)
   const orderDialog = useOrderDialogCli()
 
   const pushEvent = useRunFrameStore((state) => state.pushEvent)
@@ -157,6 +167,18 @@ export const FileMenuLeftHeader = (props: {
   const [isAiReviewDialogOpen, setIsAiReviewDialogOpen] = useState(false)
 
   const { BugReportDialog, openBugReportDialog } = useBugReportDialog()
+
+  const handleLbrnExport = async (options: LbrnExportOptions) => {
+    if (!pendingLbrnExport) return
+
+    await exportLbrn({
+      circuitJson: pendingLbrnExport.circuitJson,
+      projectName: pendingLbrnExport.projectName,
+      options,
+    })
+
+    setPendingLbrnExport(null)
+  }
 
   return (
     <>
@@ -251,13 +273,23 @@ export const FileMenuLeftHeader = (props: {
                           projectNameFromPath = filename.replace(/\.[^.]+$/, "")
                         }
                       }
+                      const projectName =
+                        props.projectName ?? snippetName ?? projectNameFromPath
+
+                      // Special handling for LightBurn export - show options dialog
+                      if (exp.name === "LightBurn") {
+                        setPendingLbrnExport({
+                          circuitJson,
+                          projectName,
+                        })
+                        setIsLbrnDialogOpen(true)
+                        return
+                      }
+
                       exportAndDownload({
                         exportName: exp.name,
                         circuitJson,
-                        projectName:
-                          props.projectName ??
-                          snippetName ??
-                          projectNameFromPath,
+                        projectName,
                       })
                     }}
                     disabled={isExporting}
@@ -357,6 +389,11 @@ export const FileMenuLeftHeader = (props: {
         />
       </DropdownMenu>
       {BugReportDialog}
+      <LbrnExportOptionsDialog
+        open={isLbrnDialogOpen}
+        onOpenChange={setIsLbrnDialogOpen}
+        onExport={handleLbrnExport}
+      />
       <ImportComponentDialogForCli
         isOpen={isImportDialogOpen}
         onClose={() => setIsImportDialogOpen(false)}

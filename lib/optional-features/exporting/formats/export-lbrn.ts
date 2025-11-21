@@ -18,9 +18,12 @@ export const exportLbrn = async ({
 }) => {
   try {
     // Convert Circuit JSON to LBRN format
-    const lbrnContent = await convertCircuitJsonToLbrn(circuitJson, {
+    const lbrnProject = await convertCircuitJsonToLbrn(circuitJson, {
       includeSilkscreen: options.includeSilkscreen ?? false,
     })
+
+    // Convert to XML string
+    const lbrnContent = lbrnProject.toXml()
 
     // Create blob and trigger download
     const blob = new Blob([lbrnContent], {

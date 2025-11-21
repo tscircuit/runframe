@@ -70,6 +70,7 @@
     "circuit-json-to-gerber": "^0.0.37",
     "circuit-json-to-gltf": "^0.0.41",
     "circuit-json-to-kicad": "^0.0.25",
+    "circuit-json-to-lbrn": "^0.0.4",
     "circuit-json-to-pnp-csv": "^0.0.7",
     "circuit-json-to-step": "^0.0.2",
     "circuit-to-svg": "^0.0.205",
@@ -116,8 +117,5 @@
     "tsup": "^8.3.5",
     "vite": "^7.1.2",
     "yargs": "^17.7.2"
-  },
-  "dependencies": {
-    "circuit-json-to-lbrn": "^0.0.4"
   }
 }

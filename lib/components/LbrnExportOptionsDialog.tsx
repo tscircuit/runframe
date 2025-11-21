@@ -62,9 +62,6 @@ export function LbrnExportOptionsDialog({
               Include silkscreen layer
             </label>
           </div>
-          <p className="rf-text-sm rf-text-zinc-500 dark:rf-text-zinc-400 rf-ml-6">
-            Export silkscreen markings and labels for laser engraving
-          </p>
         </div>
 
         <DialogFooter>

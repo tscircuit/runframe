@@ -382,27 +382,14 @@ export const EnhancedFileSelectorCombobox = ({
                 </div>
               </div>
               <div className="rf-flex rf-items-center rf-gap-2 rf-flex-shrink-0">
-                <button
-                  onClick={() => setShowRecents(!showRecents)}
-                  className="rf-flex rf-items-center rf-gap-1 rf-text-slate-600 hover:rf-text-slate-800 rf-bg-transparent rf-border-none rf-p-0"
-                  title={
-                    showRecents ? "Hide recent files" : "Show recent files"
-                  }
-                >
-                  {showRecents ? (
-                    <Eye className="rf-h-3.5 rf-w-3.5" />
-                  ) : (
-                    <EyeOff className="rf-h-3.5 rf-w-3.5" />
-                  )}
-                </button>
                 {currentFolder && (
                   <button
                     onClick={navigateUp}
-                    className="rf-flex rf-items-center rf-gap-1 rf-text-blue-600 hover:rf-text-blue-800 rf-bg-transparent rf-border rf-border-blue-300 hover:rf-border-blue-500 rf-rounded rf-px-2 rf-py-1"
+                    className="rf-flex rf-items-center rf-gap-1 rf-text-slate-600 hover:rf-text-slate-800 rf-bg-transparent rf-border-none rf-p-1 rf-rounded hover:rf-bg-slate-200 rf-transition-colors"
                     title="Go up one level"
                   >
                     <ArrowUp className="rf-h-3 rf-w-3" />
-                    <span>Up</span>
+                    <span className="rf-text-xs rf-font-medium">Up</span>
                   </button>
                 )}
               </div>
@@ -413,36 +400,56 @@ export const EnhancedFileSelectorCombobox = ({
                 <>
                   <CommandEmpty>{emptyMessage}</CommandEmpty>
 
-                  {/* Recent Files Section */}
-                  {recentFiles.length > 0 && (
+                  {/* Recent Files Section - Always show header if there are recent files */}
+                  {recentlyViewedFiles.length > 0 && (
                     <CommandGroup
-                      heading="Recent"
+                      heading={
+                        <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
+                          <span>Recent</span>
+                          <button
+                            onClick={() => setShowRecents(!showRecents)}
+                            className="rf-flex rf-items-center rf-gap-1 rf-text-slate-600 hover:rf-text-slate-800 rf-bg-transparent rf-border-none rf-p-0"
+                            title={
+                              showRecents
+                                ? "Hide recent files"
+                                : "Show recent files"
+                            }
+                          >
+                            {showRecents ? (
+                              <Eye className="rf-h-3.5 rf-w-3.5" />
+                            ) : (
+                              <EyeOff className="rf-h-3.5 rf-w-3.5" />
+                            )}
+                          </button>
+                        </div>
+                      }
                       className="rf-border-b rf-border-gray-200 rf-pb-1 rf-bg-blue-50/30"
                     >
-                      {recentFiles.map((path, index) => (
-                        <CommandItem
-                          key={path}
-                          value={path}
-                          onSelect={() => selectFile(path, index, true)}
-                          className={cn(
-                            path === currentFile && "rf-font-medium",
-                          )}
-                        >
-                          <Clock className="rf-mr-2 rf-h-4 rf-w-4 rf-text-blue-500" />
-                          {getDisplayName(path.split("/").pop() || "")}
-                          <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[40%]">
-                            {getDirectoryPath(path)}
-                          </span>
-                          <Check
+                      {showRecents &&
+                        recentFiles.map((path, index) => (
+                          <CommandItem
+                            key={path}
+                            value={path}
+                            onSelect={() => selectFile(path, index, true)}
                             className={cn(
-                              "rf-ml-auto rf-h-4 rf-w-4",
-                              path === currentFile
-                                ? "rf-opacity-100"
-                                : "rf-opacity-0",
+                              path === currentFile && "rf-font-medium",
                             )}
-                          />
-                        </CommandItem>
-                      ))}
+                          >
+                            <Clock className="rf-mr-2 rf-h-4 rf-w-4 rf-text-blue-500" />
+                            {getDisplayName(path.split("/").pop() || "")}
+                            <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[40%]">
+                              {getDirectoryPath(path)}
+                            </span>
+                            <Check
+                              className={cn(
+                                "rf-ml-auto rf-h-4 rf-w-4",
+                                path === currentFile
+                                  ? "rf-opacity-100"
+                                  : "rf-opacity-0",
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
                     </CommandGroup>
                   )}
 

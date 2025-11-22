@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
+import type { CircuitJson } from "circuit-json"
 import { useRunFrameStore } from "./RunFrameWithApi/store"
 import type {
   FailedToSaveSnippetEvent,
@@ -76,7 +77,7 @@ export const FileMenuLeftHeader = (props: {
   const [isExporting, setisExporting] = useState(false)
   const [isLbrnDialogOpen, setIsLbrnDialogOpen] = useState(false)
   const [pendingLbrnExport, setPendingLbrnExport] = useState<{
-    circuitJson: any
+    circuitJson: CircuitJson
     projectName: string
   } | null>(null)
   const orderDialog = useOrderDialogCli()
@@ -393,6 +394,7 @@ export const FileMenuLeftHeader = (props: {
         open={isLbrnDialogOpen}
         onOpenChange={setIsLbrnDialogOpen}
         onExport={handleLbrnExport}
+        circuitJson={pendingLbrnExport?.circuitJson}
       />
       <ImportComponentDialogForCli
         isOpen={isImportDialogOpen}

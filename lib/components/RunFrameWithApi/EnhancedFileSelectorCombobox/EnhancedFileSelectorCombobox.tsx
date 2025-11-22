@@ -404,11 +404,11 @@ export const EnhancedFileSelectorCombobox = ({
                   {recentlyViewedFiles.length > 0 && (
                     <CommandGroup
                       heading={
-                        <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
-                          <span>Recent</span>
+                        <div className="rf-flex rf-items-center rf-gap-0">
+                          <span className="rf-leading-none">Recent</span>
                           <button
                             onClick={() => setShowRecents(!showRecents)}
-                            className="rf-flex rf-items-center rf-gap-1 rf-text-slate-600 hover:rf-text-slate-800 rf-bg-transparent rf-border-none rf-p-0"
+                            className="rf-flex rf-items-center rf-justify-center rf-text-slate-600 hover:rf-text-slate-800 rf-bg-transparent rf-border-none rf-p-0 rf-w-3.5 rf-h-3.5 rf-ml-2"
                             title={
                               showRecents
                                 ? "Hide recent files"

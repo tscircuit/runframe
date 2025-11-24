@@ -51,6 +51,7 @@ export const FileMenuLeftHeader = (props: {
   onChangeShouldLoadLatestEval?: (shouldLoadLatestEval: boolean) => void
   circuitJson?: any
   projectName?: string
+  onLoginRequired?: () => void
 }) => {
   const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
   const currentMainComponentPath = useRunFrameStore(
@@ -166,7 +167,9 @@ export const FileMenuLeftHeader = (props: {
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
   const [isAiReviewDialogOpen, setIsAiReviewDialogOpen] = useState(false)
 
-  const { BugReportDialog, openBugReportDialog } = useBugReportDialog()
+  const { BugReportDialog, openBugReportDialog } = useBugReportDialog({
+    onLoginRequired: props.onLoginRequired,
+  })
 
   const handleLbrnExport = async (options: LbrnExportOptions) => {
     if (!pendingLbrnExport) return

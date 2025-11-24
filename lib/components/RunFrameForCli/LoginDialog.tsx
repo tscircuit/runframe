@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -39,6 +39,14 @@ export const LoginDialog = ({
   const pushEvent = useRunFrameStore((state) => state.pushEvent)
   const abortControllerRef = useRef<AbortController | null>(null)
 
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+    }
+  }, [])
+
   const handleSignIn = useCallback(async () => {
     setLoginState("creating")
     setErrorMessage(null)
@@ -50,6 +58,7 @@ export const LoginDialog = ({
       const { login_page } = await ky
         .post("sessions/login_page/create", {
           json: {},
+          signal: abortControllerRef.current?.signal,
         })
         .json<{
           login_page: {
@@ -75,6 +84,7 @@ export const LoginDialog = ({
             headers: {
               Authorization: `Bearer ${login_page.login_page_auth_token}`,
             },
+            signal: abortControllerRef.current?.signal,
           })
           .json<{
             login_page: { was_login_successful: boolean; is_expired: boolean }
@@ -105,6 +115,7 @@ export const LoginDialog = ({
           headers: {
             Authorization: `Bearer ${login_page.login_page_auth_token}`,
           },
+          signal: abortControllerRef.current?.signal,
         })
         .json<{ session: { token: string } }>()
 
@@ -127,6 +138,10 @@ export const LoginDialog = ({
         setLoginUrl(null)
       }, 1000)
     } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        setLoginState("idle")
+        return
+      }
       console.error("Login error:", error)
       const message =
         error instanceof Error ? error.message : "Failed to complete login"

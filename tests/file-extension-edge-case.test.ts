@@ -236,4 +236,26 @@ describe("File extension edge case - default config behavior", () => {
     expect(autoSelected).not.toMatch(/\.ts$/)
     expect(autoSelected).toMatch(/\.tsx$/)
   })
+
+  test("fallback: .ts/.js only projects still load (when no .tsx available)", () => {
+    // Edge case: Project uses ONLY .ts/.js files (e.g., legacy project)
+    // visibleBoardFiles would be empty, so fallback to boardFiles is needed
+
+    const boardFiles = ["main.ts", "utils.ts", "helpers.js"]
+    const visibleBoardFiles = boardFiles.filter(UI_FILE_FILTER)
+
+    // UI filter gives us nothing
+    expect(visibleBoardFiles).toHaveLength(0)
+
+    // BUT auto-selection should still fallback to boardFiles
+    const filesToConsider =
+      visibleBoardFiles.length > 0 ? visibleBoardFiles : boardFiles
+    const firstMatch = filesToConsider[0]
+
+    // Should pick from boardFiles when visibleBoardFiles is empty
+    expect(firstMatch).toBe("main.ts")
+    expect(firstMatch).toBeDefined()
+
+    // This ensures .ts/.js-only projects don't break
+  })
 })

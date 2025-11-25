@@ -169,7 +169,9 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       }
     }
 
-    const firstMatch = visibleBoardFiles[0]
+    const filesToConsider =
+      visibleBoardFiles.length > 0 ? visibleBoardFiles : boardFiles
+    const firstMatch = filesToConsider[0]
     if (firstMatch) {
       setComponentPath(firstMatch)
     }

@@ -15,6 +15,19 @@ import { getBoardFilesFromConfig } from "lib/utils/get-board-files-from-config"
 
 const debug = Debug("run-frame:RunFrameWithApi")
 
+/**
+ * Default file filter for selecting valid board files in the UI.
+ * Matches the filter used in EnhancedFileSelectorCombobox to ensure
+ * consistency between file browser display and auto-selection behavior.
+ */
+const DEFAULT_UI_FILE_FILTER = (filename: string) => {
+  return (
+    filename.endsWith(".tsx") ||
+    filename.endsWith(".circuit.json") ||
+    filename.endsWith(".jsx")
+  )
+}
+
 export const guessEntrypoint = (files: string[]) =>
   files.find((file) => file.includes("entrypoint.")) ??
   files.find((file) => file.includes("index.")) ??
@@ -54,6 +67,10 @@ export interface RunFrameWithApiProps {
    * Callback invoked whenever the selected main component path changes.
    */
   onMainComponentPathChange?: (path: string) => void
+  /**
+   * File filter function to determine which files are valid for display in UI.
+   */
+  fileFilter?: (filename: string) => boolean
 }
 
 export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
@@ -105,8 +122,17 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     [setFavorites],
   )
 
+  // Use provided file filter or default to UI-visible files
+  const activeFileFilter = props.fileFilter ?? DEFAULT_UI_FILE_FILTER
+
+  // Filter board files to only include UI-visible files
+  const visibleBoardFiles = useMemo(
+    () => boardFiles.filter(activeFileFilter),
+    [boardFiles, activeFileFilter],
+  )
+
   useEffect(() => {
-    if (componentPath && boardFiles.includes(componentPath)) {
+    if (componentPath && visibleBoardFiles.includes(componentPath)) {
       // Retain current selection if it still exists
       return
     }
@@ -118,7 +144,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
         : ""
 
       // Find another file in the same directory
-      const fileInSameDir = boardFiles.find((file) => {
+      const fileInSameDir = visibleBoardFiles.find((file) => {
         const fileDir = file.includes("/")
           ? file.substring(0, file.lastIndexOf("/"))
           : ""
@@ -137,17 +163,17 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     )
 
     for (const candidate of candidatePaths) {
-      if (boardFiles.includes(candidate)) {
+      if (visibleBoardFiles.includes(candidate)) {
         setComponentPath(candidate)
         return
       }
     }
 
-    const firstMatch = boardFiles[0]
+    const firstMatch = visibleBoardFiles[0]
     if (firstMatch) {
       setComponentPath(firstMatch)
     }
-  }, [boardFiles, props.initialMainComponentPath, componentPath])
+  }, [visibleBoardFiles, props.initialMainComponentPath, componentPath])
 
   const updateFileHash = useCallback((filePath: string) => {
     if (typeof window === "undefined") return
@@ -220,7 +246,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
             <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2">
               <EnhancedFileSelectorCombobox
                 currentFile={componentPath}
-                files={boardFiles}
+                files={visibleBoardFiles}
                 onFileChange={(value) => {
                   if (typeof fsMap.get(value) === "string") {
                     setComponentPath(value)
@@ -228,6 +254,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
                 }}
                 pinnedFiles={favorites}
                 onToggleFavorite={handleToggleFavorite}
+                fileFilter={activeFileFilter}
               />
             </div>
           )}

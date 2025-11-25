@@ -12,21 +12,9 @@ import type { ManualEditsFile } from "@tscircuit/props"
 
 import { EnhancedFileSelectorCombobox } from "./EnhancedFileSelectorCombobox"
 import { getBoardFilesFromConfig } from "lib/utils/get-board-files-from-config"
+import { DEFAULT_UI_FILE_FILTER } from "lib/utils/file-filters"
 
 const debug = Debug("run-frame:RunFrameWithApi")
-
-/**
- * Default file filter for selecting valid board files in the UI.
- * Matches the filter used in EnhancedFileSelectorCombobox to ensure
- * consistency between file browser display and auto-selection behavior.
- */
-const DEFAULT_UI_FILE_FILTER = (filename: string) => {
-  return (
-    filename.endsWith(".tsx") ||
-    filename.endsWith(".circuit.json") ||
-    filename.endsWith(".jsx")
-  )
-}
 
 export const guessEntrypoint = (files: string[]) =>
   files.find((file) => file.includes("entrypoint.")) ??

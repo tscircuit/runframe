@@ -429,7 +429,7 @@ export const EnhancedFileSelectorCombobox = ({
                         recentFiles.map((path, index) => (
                           <CommandItem
                             key={path}
-                            value={path}
+                            value={`recent:${path}`}
                             onSelect={() => selectFile(path, index, true)}
                             className={cn(
                               path === currentFile && "rf-font-medium",
@@ -464,7 +464,7 @@ export const EnhancedFileSelectorCombobox = ({
                         .map((path, index) => (
                           <CommandItem
                             key={path}
-                            value={path}
+                            value={`favorite:${path}`}
                             onSelect={() => selectFile(path, index, true)}
                             className={cn(
                               path === currentFile && "rf-font-medium",
@@ -510,7 +510,7 @@ export const EnhancedFileSelectorCombobox = ({
                       {currentFiles.map((fileNode, index) => (
                         <CommandItem
                           key={fileNode.path}
-                          value={fileNode.path}
+                          value={`current:${fileNode.path}`}
                           onSelect={() => selectFile(fileNode.path, index)}
                           className={cn(
                             fileNode.path === currentFile && "rf-font-medium",
@@ -616,7 +616,7 @@ export const EnhancedFileSelectorCombobox = ({
                             (file, index) => (
                               <CommandItem
                                 key={file.path}
-                                value={file.path}
+                                value={`search-current:${file.path}`}
                                 onSelect={() => {
                                   setFile(file.path)
                                   setOpen(false)
@@ -687,7 +687,7 @@ export const EnhancedFileSelectorCombobox = ({
                           {searchResults.globalResults.map((file) => (
                             <CommandItem
                               key={file.path}
-                              value={file.path}
+                              value={`search-global:${file.path}`}
                               onSelect={() => {
                                 setFile(file.path)
                                 setOpen(false)

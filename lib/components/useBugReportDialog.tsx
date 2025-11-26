@@ -21,7 +21,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "./ui/alert-dialog"
-
 declare global {
   interface Window {
     __TSCIRCUIT_LAST_EXECUTION_ERROR?: string
@@ -31,6 +30,10 @@ declare global {
 type UseBugReportDialogResult = {
   BugReportDialog: ReactElement
   openBugReportDialog: () => void
+}
+
+type UseBugReportDialogOptions = {
+  onLoginRequired?: () => void
 }
 
 type FileContent = {
@@ -70,7 +73,9 @@ const BUG_REPORT_VIEW_BASE_URL =
 const buildBugReportUrl = (bugReportId: string) =>
   `${BUG_REPORT_VIEW_BASE_URL}${bugReportId}`
 
-export const useBugReportDialog = (): UseBugReportDialogResult => {
+export const useBugReportDialog = (
+  options?: UseBugReportDialogOptions,
+): UseBugReportDialogResult => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -79,6 +84,7 @@ export const useBugReportDialog = (): UseBugReportDialogResult => {
     bugReportUrl: string
   } | null>(null)
   const [bugReportFileCount, setBugReportFileCount] = useState<number>(0)
+  const onLoginRequired = options?.onLoginRequired
 
   const isSessionLoggedIn = useMemo(() => {
     if (hasRegistryToken()) return true
@@ -192,10 +198,28 @@ export const useBugReportDialog = (): UseBugReportDialogResult => {
       console.error("Failed to submit bug report", error)
       if (error instanceof HTTPError) {
         if (error.response.status === 401) {
-          const message =
-            "You must be logged in to report a bug. Please sign in and try again."
-          setErrorMessage(message)
-          toast.error(message)
+          if (isSessionLoggedIn) {
+            const message =
+              "Your session has expired. Please sign in again to continue."
+            setErrorMessage(message)
+            toast.error(message)
+            if (onLoginRequired) {
+              closeBugReportDialog()
+              onLoginRequired()
+            }
+          } else {
+            const message =
+              "You must be logged in to report a bug. Please sign in via cli and try again."
+            setErrorMessage(message)
+            toast.error(message)
+
+            setTimeout(() => {
+              if (onLoginRequired) {
+                closeBugReportDialog()
+                onLoginRequired()
+              }
+            }, 1000)
+          }
         } else {
           const message = `Failed to submit bug report (${error.response.status})`
           setErrorMessage(message)
@@ -212,7 +236,7 @@ export const useBugReportDialog = (): UseBugReportDialogResult => {
     } finally {
       setIsSubmitting(false)
     }
-  }, [])
+  }, [isSessionLoggedIn, onLoginRequired])
 
   const BugReportDialog = useMemo(() => {
     return (
@@ -340,20 +364,34 @@ export const useBugReportDialog = (): UseBugReportDialogResult => {
                 >
                   Cancel
                 </AlertDialogCancel>
-                <button
-                  type="button"
-                  className={clsx(
-                    buttonVariants(),
-                    isSubmitting && "rf-opacity-70 rf-cursor-not-allowed",
-                  )}
-                  disabled={isSubmitting}
-                  onClick={(event) => {
-                    event.preventDefault()
-                    void handleConfirmBugReport()
-                  }}
-                >
-                  {isSubmitting ? "Reporting..." : "Upload & Report"}
-                </button>
+                {!isSessionLoggedIn && onLoginRequired ? (
+                  <button
+                    type="button"
+                    className={buttonVariants()}
+                    onClick={(event) => {
+                      event.preventDefault()
+                      closeBugReportDialog()
+                      onLoginRequired()
+                    }}
+                  >
+                    Sign In
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className={clsx(
+                      buttonVariants(),
+                      isSubmitting && "rf-opacity-70 rf-cursor-not-allowed",
+                    )}
+                    disabled={isSubmitting}
+                    onClick={(event) => {
+                      event.preventDefault()
+                      void handleConfirmBugReport()
+                    }}
+                  >
+                    {isSubmitting ? "Reporting..." : "Upload & Report"}
+                  </button>
+                )}
               </>
             )}
           </AlertDialogFooter>
@@ -369,6 +407,7 @@ export const useBugReportDialog = (): UseBugReportDialogResult => {
     bugReportFileCount,
     isSessionLoggedIn,
     handleConfirmBugReport,
+    onLoginRequired,
   ])
 
   return {

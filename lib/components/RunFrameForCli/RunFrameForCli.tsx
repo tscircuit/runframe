@@ -2,6 +2,7 @@ import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { useCallback, useState } from "react"
 import { RunFrameWithApi } from "../RunFrameWithApi/RunFrameWithApi"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
+import { useLoginDialog } from "./LoginDialog"
 
 export const RunFrameForCli = (props: {
   debug?: boolean
@@ -31,31 +32,39 @@ export const RunFrameForCli = (props: {
     window.history.replaceState(null, "", newUrl)
   }, [])
 
+  const { LoginDialog, openLoginDialog } = useLoginDialog()
+
   return (
-    <RunFrameWithApi
-      debug={props.debug}
-      forceLatestEvalVersion={!props.workerBlobUrl && shouldLoadLatestEval}
-      defaultToFullScreen={true}
-      showToggleFullScreen={false}
-      workerBlobUrl={props.workerBlobUrl}
-      showFilesSwitch
-      showFileMenu={false}
-      enableFetchProxy={props.enableFetchProxy}
-      initialMainComponentPath={initialMainComponentPath}
-      onMainComponentPathChange={updateMainComponentHash}
-      leftHeaderContent={
-        <div className="rf-flex rf-items-center rf-justify-between">
-          <FileMenuLeftHeader
-            isWebEmbedded={false}
-            shouldLoadLatestEval={!props.workerBlobUrl && shouldLoadLatestEval}
-            onChangeShouldLoadLatestEval={(newShouldLoadLatestEval) => {
-              setLoadLatestEval(newShouldLoadLatestEval)
-              globalThis.runFrameWorker = null
-            }}
-          />
-          {props.scenarioSelectorContent}
-        </div>
-      }
-    />
+    <>
+      {LoginDialog}
+      <RunFrameWithApi
+        debug={props.debug}
+        forceLatestEvalVersion={!props.workerBlobUrl && shouldLoadLatestEval}
+        defaultToFullScreen={true}
+        showToggleFullScreen={false}
+        workerBlobUrl={props.workerBlobUrl}
+        showFilesSwitch
+        showFileMenu={false}
+        enableFetchProxy={props.enableFetchProxy}
+        initialMainComponentPath={initialMainComponentPath}
+        onMainComponentPathChange={updateMainComponentHash}
+        leftHeaderContent={
+          <div className="rf-flex rf-items-center rf-justify-between">
+            <FileMenuLeftHeader
+              isWebEmbedded={false}
+              shouldLoadLatestEval={
+                !props.workerBlobUrl && shouldLoadLatestEval
+              }
+              onChangeShouldLoadLatestEval={(newShouldLoadLatestEval) => {
+                setLoadLatestEval(newShouldLoadLatestEval)
+                globalThis.runFrameWorker = null
+              }}
+              onLoginRequired={openLoginDialog}
+            />
+            {props.scenarioSelectorContent}
+          </div>
+        }
+      />
+    </>
   )
 }

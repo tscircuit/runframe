@@ -80,6 +80,13 @@ export interface RequestToExportSnippetEvent {
   created_at: string
 }
 
+export interface TokenUpdatedEvent {
+  event_id: string
+  event_type: "TOKEN_UPDATED"
+  created_at: string
+  registry_token: string
+}
+
 export type RunFrameEvent =
   | FileUpdatedEvent
   | InitialFilesUploadedEvent
@@ -90,6 +97,7 @@ export type RunFrameEvent =
   | SnippetExportCreatedEvent
   | RequestToExportSnippetEvent
   | InstallPackageEvent
+  | TokenUpdatedEvent
 
 type MappedOmit<T, K extends keyof T> = {
   [P in keyof T as P extends K ? never : P]: T[P]

@@ -212,6 +212,6 @@ The event bus for the RunFrame is accessible from the `@tscircuit/file-server`
 | Event Name              | Description                                             |
 | ----------------------- | ------------------------------------------------------- |
 | FILE_UPDATED            | A file was updated                                      |
-| REQUEST_TO_SAVE_SNIPPET | Browser request to save the current circuit to snippets |
+| REQUEST_TO_SAVE_SNIPPET | Browser request to save the current circuit |
 | FAILED_TO_SAVE_SNIPPET  | Failed to save the current snippet to Registry          |
 | SNIPPET_SAVED           | Snippet was saved to Registry                           |

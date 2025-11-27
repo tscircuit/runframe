@@ -298,8 +298,6 @@ export const EnhancedFileSelectorCombobox = ({
 
   // Show recently saved files (from FILE_UPDATED events) - up to 3
   const recentlySavedFiles = useMemo(() => {
-    if (!showRecentlySaved) return []
-
     const savedFiles: string[] = []
     // Iterate from most recent to oldest
     for (let i = recentEvents.length - 1; i >= 0; i--) {
@@ -315,7 +313,7 @@ export const EnhancedFileSelectorCombobox = ({
     }
 
     return savedFiles
-  }, [showRecentlySaved, recentEvents, filteredFiles])
+  }, [recentEvents, filteredFiles])
 
   const displayPath = currentFolder ?? "/"
   const shortDisplayPath =

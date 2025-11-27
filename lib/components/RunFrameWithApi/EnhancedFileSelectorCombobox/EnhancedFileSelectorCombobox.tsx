@@ -103,6 +103,10 @@ export const EnhancedFileSelectorCombobox = ({
     "runframe:showRecents",
     true,
   )
+  const [showRecentlySaved, setShowRecentlySaved] = useLocalStorageState(
+    "runframe:showRecentlySaved",
+    true,
+  )
   const recentEvents = useRunFrameStore((state) => state.recentEvents)
 
   // Add global Cmd+K / Ctrl+K hotkey to open file selector
@@ -294,7 +298,7 @@ export const EnhancedFileSelectorCombobox = ({
 
   // Show recently saved files (from FILE_UPDATED events) - up to 3
   const recentlySavedFiles = useMemo(() => {
-    if (!showRecents) return []
+    if (!showRecentlySaved) return []
 
     const savedFiles: string[] = []
     // Iterate from most recent to oldest
@@ -311,7 +315,7 @@ export const EnhancedFileSelectorCombobox = ({
     }
 
     return savedFiles
-  }, [showRecents, recentEvents, filteredFiles])
+  }, [showRecentlySaved, recentEvents, filteredFiles])
 
   const displayPath = currentFolder ?? "/"
   const shortDisplayPath =
@@ -428,7 +432,9 @@ export const EnhancedFileSelectorCombobox = ({
                     <CommandGroup
                       heading={
                         <div className="rf-flex rf-items-center rf-gap-0">
-                          <span className="rf-leading-none">Recent</span>
+                          <span className="rf-leading-none">
+                            Recently Opened
+                          </span>
                           <button
                             onClick={() => setShowRecents(!showRecents)}
                             className="rf-flex rf-items-center rf-justify-center rf-text-slate-600 hover:rf-text-slate-800 rf-bg-transparent rf-border-none rf-p-0 rf-w-3.5 rf-h-3.5 rf-ml-2"
@@ -479,33 +485,57 @@ export const EnhancedFileSelectorCombobox = ({
                   {/* Recently Saved Files Section */}
                   {recentlySavedFiles.length > 0 && (
                     <CommandGroup
-                      heading={"Recently Saved"}
+                      heading={
+                        <div className="rf-flex rf-items-center rf-gap-0">
+                          <span className="rf-leading-none">
+                            Recently Saved
+                          </span>
+                          <button
+                            onClick={() =>
+                              setShowRecentlySaved(!showRecentlySaved)
+                            }
+                            className="rf-flex rf-items-center rf-justify-center rf-text-slate-600 hover:rf-text-slate-800 rf-bg-transparent rf-border-none rf-p-0 rf-w-3.5 rf-h-3.5 rf-ml-2"
+                            title={
+                              showRecentlySaved
+                                ? "Hide recently saved files"
+                                : "Show recently saved files"
+                            }
+                          >
+                            {showRecentlySaved ? (
+                              <Eye className="rf-h-3.5 rf-w-3.5" />
+                            ) : (
+                              <EyeOff className="rf-h-3.5 rf-w-3.5" />
+                            )}
+                          </button>
+                        </div>
+                      }
                       className="rf-border-b rf-border-gray-200 rf-pb-1 rf-bg-green-50/30"
                     >
-                      {recentlySavedFiles.map((path, index) => (
-                        <CommandItem
-                          key={path}
-                          value={`recently-saved:${path}`}
-                          onSelect={() => selectFile(path, index, true)}
-                          className={cn(
-                            path === currentFile && "rf-font-medium",
-                          )}
-                        >
-                          <File className="rf-mr-2 rf-h-4 rf-w-4 rf-text-green-600" />
-                          {getDisplayName(path.split("/").pop() || "")}
-                          <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[40%]">
-                            {getDirectoryPath(path)}
-                          </span>
-                          <Check
+                      {showRecentlySaved &&
+                        recentlySavedFiles.map((path, index) => (
+                          <CommandItem
+                            key={path}
+                            value={`recently-saved:${path}`}
+                            onSelect={() => selectFile(path, index, true)}
                             className={cn(
-                              "rf-ml-auto rf-h-4 rf-w-4",
-                              path === currentFile
-                                ? "rf-opacity-100"
-                                : "rf-opacity-0",
+                              path === currentFile && "rf-font-medium",
                             )}
-                          />
-                        </CommandItem>
-                      ))}
+                          >
+                            <File className="rf-mr-2 rf-h-4 rf-w-4 rf-text-green-600" />
+                            {getDisplayName(path.split("/").pop() || "")}
+                            <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[40%]">
+                              {getDirectoryPath(path)}
+                            </span>
+                            <Check
+                              className={cn(
+                                "rf-ml-auto rf-h-4 rf-w-4",
+                                path === currentFile
+                                  ? "rf-opacity-100"
+                                  : "rf-opacity-0",
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
                     </CommandGroup>
                   )}
 

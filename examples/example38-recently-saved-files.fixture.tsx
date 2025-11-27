@@ -100,9 +100,9 @@ export default () => {
             <button
               key={file}
               onClick={() => simulateFileSave(file)}
-              className="rf-px-3 rf-py-2 rf-bg-green-600 rf-text-white rf-rounded rf-text-sm hover:rf-bg-green-700 rf-transition-colors"
+              className="rf-px-4 rf-py-2 rf-bg-blue-600 rf-text-white rf-rounded rf-text-sm hover:rf-bg-blue-700 rf-transition-colors rf-font-medium rf-border rf-border-blue-700"
             >
-              Save {file.split("/").pop()}
+              💾 Save {file.split("/").pop()}
             </button>
           ))}
         </div>

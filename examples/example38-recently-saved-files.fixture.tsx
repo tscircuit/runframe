@@ -123,7 +123,7 @@ export default () => {
               .slice(0, 10)
               .map((event, idx) => (
                 <div
-                  key={idx}
+                  key={event.event_id}
                   className="rf-p-2 rf-bg-white rf-rounded rf-border"
                 >
                   <span className="rf-text-green-600 rf-font-semibold">

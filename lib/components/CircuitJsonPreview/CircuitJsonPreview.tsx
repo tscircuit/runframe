@@ -615,6 +615,7 @@ export const CircuitJsonPreview = ({
                 <ErrorBoundary FallbackComponent={ErrorFallback}>
                   {circuitJson ? (
                     <CadViewer
+                      key={`cad-${isFullScreen}`}
                       ref={setCadViewerRef}
                       circuitJson={circuitJson as any}
                       autoRotateDisabled={autoRotate3dViewerDisabled}

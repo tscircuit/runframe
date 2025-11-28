@@ -17,6 +17,9 @@ const debug = Debug("run-frame:RunFrame")
 
 declare global {
   var runFrameWorker: any
+  interface Window {
+    TSCIRCUIT_USE_RUNFRAME_FOR_CLI?: boolean
+  }
 }
 
 import {
@@ -150,6 +153,9 @@ export const RunFrame = (props: RunFrameProps) => {
             ...(props.enableFetchProxy && {
               enableFetchProxy: props.enableFetchProxy,
             }),
+            ...(window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI && {
+              disableCdnLoading: true,
+            }),
           })
           if (cancelled) return
           globalThis.runFrameWorker = worker
@@ -266,6 +272,9 @@ export const RunFrame = (props: RunFrameProps) => {
           }),
           ...(props.enableFetchProxy && {
             enableFetchProxy: props.enableFetchProxy,
+          }),
+          ...(window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI && {
+            disableCdnLoading: true,
           }),
         }))
       globalThis.runFrameWorker = worker

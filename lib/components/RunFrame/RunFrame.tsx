@@ -38,7 +38,7 @@ import { registryKy } from "../../utils/get-registry-ky"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 import { LoadingSkeleton } from "../ui/LoadingSkeleton"
 import { useStyles } from "../../hooks/use-styles"
-import { API_BASE } from "../RunFrameWithApi/api-base"
+import { API_BASE, getAbsoluteApiBase } from "../RunFrameWithApi/api-base"
 
 const fetchLatestEvalVersion = async () => {
   try {
@@ -144,7 +144,7 @@ export const RunFrame = (props: RunFrameProps) => {
             webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
             projectConfig: {
               projectBaseUrl:
-                props.projectBaseUrl || `${API_BASE}/files/static`,
+                props.projectBaseUrl || `${getAbsoluteApiBase()}/files/static`,
             },
             ...(props.platformConfig && {
               platformConfig: props.platformConfig,
@@ -265,7 +265,8 @@ export const RunFrame = (props: RunFrameProps) => {
           webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
           verbose: true,
           projectConfig: {
-            projectBaseUrl: props.projectBaseUrl || `${API_BASE}/files/static`,
+            projectBaseUrl:
+              props.projectBaseUrl || `${getAbsoluteApiBase()}/files/static`,
           },
           ...(props.platformConfig && {
             platformConfig: props.platformConfig,

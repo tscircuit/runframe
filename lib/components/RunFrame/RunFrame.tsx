@@ -39,6 +39,10 @@ import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 import { LoadingSkeleton } from "../ui/LoadingSkeleton"
 import { useStyles } from "../../hooks/use-styles"
 import { API_BASE } from "../RunFrameWithApi/api-base"
+import {
+  buildRunCompletedPayload,
+  type RunCompletedPayload,
+} from "./run-completion"
 
 const fetchLatestEvalVersion = async () => {
   try {
@@ -118,6 +122,10 @@ export const RunFrame = (props: RunFrameProps) => {
   const activeEffectName = Object.values(activeAsyncEffects).sort(
     (a, b) => a.startTime - b.startTime,
   )[0]?.effectName
+
+  const emitRunCompleted = (payload: RunCompletedPayload) => {
+    props.onRunCompleted?.(payload)
+  }
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -383,6 +391,7 @@ export const RunFrame = (props: RunFrameProps) => {
           const message: string = e.message.replace("Error: ", "")
           debug(`eval error: ${message}`)
           props.onError?.(e)
+          emitRunCompleted(buildRunCompletedPayload({ executionError: e }))
           setError({ error: message, stack: e.stack })
           setRenderLog(null)
           console.error(e)
@@ -401,6 +410,7 @@ export const RunFrame = (props: RunFrameProps) => {
       let circuitJson = await worker.getCircuitJson().catch((e: any) => {
         debug("error getting initial circuit json", e)
         props.onError?.(e)
+        emitRunCompleted(buildRunCompletedPayload({ executionError: e }))
         setError({ error: e.message, stack: e.stack })
         setRenderLog(null)
         setIsRunning(false)
@@ -419,6 +429,7 @@ export const RunFrame = (props: RunFrameProps) => {
       circuitJson = await worker.getCircuitJson()
       props.onCircuitJsonChange?.(circuitJson)
       setCircuitJson(circuitJson)
+      emitRunCompleted(buildRunCompletedPayload({ circuitJson }))
       props.onRenderFinished?.({ circuitJson })
       setAutoroutingGraphics({})
 

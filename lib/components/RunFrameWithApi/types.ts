@@ -87,6 +87,14 @@ export interface TokenUpdatedEvent {
   registry_token: string
 }
 
+export interface RunCompletedEvent {
+  event_id: string
+  event_type: "RUN_COMPLETED"
+  created_at: string
+  hasExecutionError: boolean
+  errors?: Array<any>
+}
+
 export type RunFrameEvent =
   | FileUpdatedEvent
   | InitialFilesUploadedEvent
@@ -98,6 +106,7 @@ export type RunFrameEvent =
   | RequestToExportSnippetEvent
   | InstallPackageEvent
   | TokenUpdatedEvent
+  | RunCompletedEvent
 
 type MappedOmit<T, K extends keyof T> = {
   [P in keyof T as P extends K ? never : P]: T[P]

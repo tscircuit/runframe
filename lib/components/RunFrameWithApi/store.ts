@@ -127,7 +127,10 @@ export const useRunFrameStore = create<RunFrameState>()(
               // Update lastEventTime to most recent event
               const newLastEventTime = events[events.length - 1].created_at
 
-              debug("received events", events.map((e) => e.event_type))
+              debug(
+                "received events",
+                events.map((e) => e.event_type),
+              )
 
               set((state) => ({
                 recentEvents: [...state.recentEvents, ...events].slice(0, 100),

@@ -1,6 +1,5 @@
 import type { ManualEditEvent, PlatformConfig } from "@tscircuit/props"
 import type { TabId } from "lib/components/CircuitJsonPreview/PreviewContentProps"
-import type { RunCompletedPayload } from "./run-completion"
 
 export interface RunFrameProps {
   /**
@@ -66,11 +65,6 @@ export interface RunFrameProps {
    * Called when rendering is finished
    */
   onRenderFinished?: (params: { circuitJson: any }) => void
-
-  /**
-   * Called when code execution and rendering have completed (even if errors occurred)
-   */
-  onRunCompleted?: (payload: RunCompletedPayload) => void
 
   /**
    * Called when the initial render is finished (fast)

@@ -90,6 +90,7 @@ export interface TokenUpdatedEvent {
 export interface RunCompletedEvent {
   event_id: string
   event_type: "RUN_COMPLETED"
+  initiator: "runframe"
   created_at: string
   hasExecutionError: boolean
   errors?: Array<any>

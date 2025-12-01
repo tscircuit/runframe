@@ -124,18 +124,23 @@ export const useRunFrameStore = create<RunFrameState>()(
             const events = await getEvents(state.lastEventTime)
 
             if (events.length > 0) {
+              // Update lastEventTime to most recent event
+              const newLastEventTime = events[events.length - 1].created_at
+
               set((state) => ({
                 recentEvents: [...state.recentEvents, ...events].slice(0, 100),
+                lastEventTime: newLastEventTime,
                 // TODO sort
                 // .sort((a, b) => b.created_at.localeCompare(a.created_at)),
               }))
-              // Update lastEventTime to most recent event
-              const newLastEventTime = events[events.length - 1].created_at
+
+              let fsUpdateCount = 0
 
               // Process all file updates
               const updates = new Map(state.fsMap)
               for (const event of events) {
                 if (event.event_type === "FILE_UPDATED") {
+                  fsUpdateCount++
                   const file = await getFileApi(event.file_path)
                   // Don't update the manual edits file if we're the ones who changed it
                   if (
@@ -150,14 +155,16 @@ export const useRunFrameStore = create<RunFrameState>()(
                     updates.set(file.file_path, "__STATIC_ASSET__")
                   }
                 } else if (event.event_type === "FILE_DELETED") {
+                  fsUpdateCount++
                   updates.delete(event.file_path)
                 }
               }
 
-              set({
-                fsMap: updates,
-                lastEventTime: newLastEventTime,
-              })
+              if (fsUpdateCount > 0) {
+                set({
+                  fsMap: updates,
+                })
+              }
             }
           } catch (error) {
             set({ error: error as Error })

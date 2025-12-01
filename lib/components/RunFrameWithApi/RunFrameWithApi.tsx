@@ -225,7 +225,11 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   const handleRunCompleted = useCallback(
     async (payload: RunCompletedPayload) => {
       try {
-        await pushEvent({ event_type: "RUN_COMPLETED", ...payload })
+        await pushEvent({
+          event_type: "RUN_COMPLETED",
+          initiator: "runframe",
+          ...payload,
+        })
       } catch (err) {
         debug("Failed to push RUN_COMPLETED event", err)
       }

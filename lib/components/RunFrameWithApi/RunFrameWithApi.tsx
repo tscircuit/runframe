@@ -9,6 +9,7 @@ import { API_BASE } from "./api-base"
 import { useRunFrameStore } from "./store"
 import { applyEditEventsToManualEditsFile } from "@tscircuit/core"
 import type { ManualEditsFile } from "@tscircuit/props"
+import type { RunCompletedPayload } from "../RunFrame/run-completion"
 
 import { EnhancedFileSelectorCombobox } from "./EnhancedFileSelectorCombobox"
 import { getBoardFilesFromConfig } from "lib/utils/get-board-files-from-config"
@@ -67,12 +68,12 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     if (props.debug) Debug.enable("run-frame*")
   }, [props.debug])
 
-  const { startPolling, stopPolling, setCurrentMainComponentPath } =
-    useRunFrameStore((s) => ({
-      startPolling: s.startPolling,
-      stopPolling: s.stopPolling,
-      setCurrentMainComponentPath: s.setCurrentMainComponentPath,
-    }))
+  const startPolling = useRunFrameStore((s) => s.startPolling)
+  const stopPolling = useRunFrameStore((s) => s.stopPolling)
+  const setCurrentMainComponentPath = useRunFrameStore(
+    (s) => s.setCurrentMainComponentPath,
+  )
+  const pushEvent = useRunFrameStore((s) => s.pushEvent)
   const hasReceivedInitialFiles = useHasReceivedInitialFilesLoaded()
 
   const fsMap = useRunFrameStore((s) => s.fsMap)
@@ -220,6 +221,21 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     [componentPath],
   )
 
+  const handleRunCompleted = useCallback(
+    async (payload: RunCompletedPayload) => {
+      try {
+        await pushEvent({
+          event_type: "RUN_COMPLETED",
+          initiator: "runframe",
+          ...payload,
+        })
+      } catch (err) {
+        debug("Failed to push RUN_COMPLETED event", err)
+      }
+    },
+    [pushEvent],
+  )
+
   return (
     <RunFrame
       fsMap={fsMap}
@@ -260,6 +276,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
         debug("onRenderFinished / markRenderComplete")
         markRenderComplete()
       }}
+      onRunCompleted={handleRunCompleted}
       editEvents={editEventsForRender}
       onEditEvent={(ee) => {
         pushEditEvent(ee)

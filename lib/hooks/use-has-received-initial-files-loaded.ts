@@ -7,10 +7,8 @@ const debug = Debug("run-frame:useHasReceivedInitialFilesLoaded")
 
 export const useHasReceivedInitialFilesLoaded = () => {
   const [hasReceived, setHasReceived] = useState(false)
-  const { recentEvents, loadInitialFiles } = useRunFrameStore((s) => ({
-    recentEvents: s.recentEvents,
-    loadInitialFiles: s.loadInitialFiles,
-  }))
+  const recentEvents = useRunFrameStore((s) => s.recentEvents)
+  const loadInitialFiles = useRunFrameStore((s) => s.loadInitialFiles)
 
   useEffect(() => {
     const initialize = async () => {

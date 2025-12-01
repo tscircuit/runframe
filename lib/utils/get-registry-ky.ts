@@ -1,4 +1,17 @@
-import ky from "ky"
+import ky, { HTTPError, type NormalizedOptions } from "ky"
+
+class RegistryHTTPError extends HTTPError {
+  constructor(
+    response: Response,
+    request: Request,
+    options: NormalizedOptions,
+    message: string,
+  ) {
+    super(response, request, options)
+    this.name = "RegistryHTTPError"
+    this.message = message
+  }
+}
 
 export function getWindowVar(name: string) {
   return typeof window !== "undefined" ? (window as any)[name] : null
@@ -18,6 +31,50 @@ export function getRegistryKy() {
       Authorization: `Bearer ${registryToken}`,
     },
     timeout: 30000,
+    hooks: {
+      afterResponse: [
+        async (request, options, response) => {
+          if (response.ok) return response
+
+          let serverError: any = null
+
+          try {
+            serverError = await response.clone().json()
+          } catch (jsonError) {
+            console.error("Failed to parse registry error response", jsonError)
+          }
+
+          const errorMessage =
+            serverError?.error?.message ??
+            serverError?.error?.error_message ??
+            serverError?.message
+
+          const errorCode =
+            serverError?.error?.error_code ?? serverError?.error_code
+          const url = new URL(response.url)
+          const requestPath = `${url.pathname}${url.search}`
+
+          const detailedMessageParts = [
+            `Registry request failed for ${requestPath} (${response.status})`,
+          ]
+
+          if (errorMessage) {
+            detailedMessageParts.push(`Server message: ${errorMessage}`)
+          }
+
+          if (errorCode) {
+            detailedMessageParts.push(`Error code: ${errorCode}`)
+          }
+
+          throw new RegistryHTTPError(
+            response,
+            request,
+            options,
+            detailedMessageParts.join(" | "),
+          )
+        },
+      ],
+    },
   })
 }
 

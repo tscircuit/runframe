@@ -68,13 +68,12 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     if (props.debug) Debug.enable("run-frame*")
   }, [props.debug])
 
-  const { startPolling, stopPolling, setCurrentMainComponentPath, pushEvent } =
-    useRunFrameStore((s) => ({
-      startPolling: s.startPolling,
-      stopPolling: s.stopPolling,
-      setCurrentMainComponentPath: s.setCurrentMainComponentPath,
-      pushEvent: s.pushEvent,
-    }))
+  const startPolling = useRunFrameStore((s) => s.startPolling)
+  const stopPolling = useRunFrameStore((s) => s.stopPolling)
+  const setCurrentMainComponentPath = useRunFrameStore(
+    (s) => s.setCurrentMainComponentPath,
+  )
+  const pushEvent = useRunFrameStore((s) => s.pushEvent)
   const hasReceivedInitialFiles = useHasReceivedInitialFilesLoaded()
 
   const fsMap = useRunFrameStore((s) => s.fsMap)

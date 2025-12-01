@@ -85,10 +85,8 @@ export type { RunFrameProps }
 export const RunFrame = (props: RunFrameProps) => {
   useStyles()
 
-  const [circuitJson, setCircuitJson] = useRunFrameStore((s) => [
-    s.circuitJson,
-    s.setCircuitJson,
-  ])
+  const circuitJson = useRunFrameStore((s) => s.circuitJson)
+  const setCircuitJson = useRunFrameStore((s) => s.setCircuitJson)
   const [error, setError] = useState<{
     phase?: string
     componentDisplayName?: string

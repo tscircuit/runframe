@@ -127,6 +127,8 @@ export const useRunFrameStore = create<RunFrameState>()(
               // Update lastEventTime to most recent event
               const newLastEventTime = events[events.length - 1].created_at
 
+              debug("received events", events.map((e) => e.event_type))
+
               set((state) => ({
                 recentEvents: [...state.recentEvents, ...events].slice(0, 100),
                 lastEventTime: newLastEventTime,
@@ -161,6 +163,7 @@ export const useRunFrameStore = create<RunFrameState>()(
               }
 
               if (fsUpdateCount > 0) {
+                debug("updating fsMap, fsUpdateCount:", fsUpdateCount)
                 set({
                   fsMap: updates,
                 })

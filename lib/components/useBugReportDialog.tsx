@@ -41,6 +41,24 @@ type FileContent = {
   binary_content_b64?: string
 }
 
+type UploadProgress = {
+  current: number
+  total: number
+  currentFile: string
+}
+
+type FileUploadError = {
+  filePath: string
+  message: string
+}
+
+type UploadPayload = {
+  bug_report_id: string
+  file_path: string
+  content_text?: string
+  content_base64?: string
+}
+
 async function getFilesFromServer(): Promise<Map<string, FileContent>> {
   const response = await fetch(`${API_BASE}/files/list`)
   const { file_list } = (await response.json()) as {
@@ -79,6 +97,10 @@ export const useBugReportDialog = (
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(
+    null,
+  )
+  const [uploadErrors, setUploadErrors] = useState<FileUploadError[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [successState, setSuccessState] = useState<{
     bugReportUrl: string
@@ -124,6 +146,8 @@ export const useBugReportDialog = (
   const openBugReportDialog = useCallback(() => {
     setErrorMessage(null)
     setSuccessState(null)
+    setUploadProgress(null)
+    setUploadErrors([])
     if (textareaRef.current) {
       textareaRef.current.value = ""
     }
@@ -137,12 +161,13 @@ export const useBugReportDialog = (
   const handleConfirmBugReport = useCallback(async () => {
     setIsSubmitting(true)
     setErrorMessage(null)
+    setUploadProgress(null)
+    setUploadErrors([])
 
     const registryKy = getRegistryKy()
     const userText = textareaRef.current?.value || ""
 
     try {
-      // Fetch files from the file server
       const filesFromServer = await getFilesFromServer()
 
       if (filesFromServer.size === 0) {
@@ -167,31 +192,46 @@ export const useBugReportDialog = (
         }>()
 
       const bugReportId = createResponse.bug_report.bug_report_id
+      const fileEntries = Array.from(filesFromServer.entries())
+      const errors: FileUploadError[] = []
 
-      for (const [filePath, fileContent] of filesFromServer.entries()) {
-        const uploadPayload: {
-          bug_report_id: string
-          file_path: string
-          content_text?: string
-          content_base64?: string
-        } = {
-          bug_report_id: bugReportId,
-          file_path: filePath,
-        }
+      for (let i = 0; i < fileEntries.length; i++) {
+        const [filePath, fileContent] = fileEntries[i]
 
-        // Add either text or binary content
-        if (fileContent.text_content) {
-          uploadPayload.content_text = fileContent.text_content
-        }
-        if (fileContent.binary_content_b64) {
-          uploadPayload.content_base64 = fileContent.binary_content_b64
-        }
-
-        await registryKy.post("bug_reports/upload_file", {
-          json: uploadPayload,
+        setUploadProgress({
+          current: i + 1,
+          total: fileEntries.length,
+          currentFile: filePath,
         })
+
+        try {
+          const uploadPayload: UploadPayload = {
+            bug_report_id: bugReportId,
+            file_path: filePath,
+          }
+
+          if (fileContent.text_content) {
+            uploadPayload.content_text = fileContent.text_content
+          }
+          if (fileContent.binary_content_b64) {
+            uploadPayload.content_base64 = fileContent.binary_content_b64
+          }
+          await registryKy.post("bug_reports/upload_file", {
+            json: uploadPayload,
+          })
+        } catch (uploadError) {
+          const errorMsg =
+            uploadError instanceof HTTPError
+              ? `HTTP ${uploadError.response.status}`
+              : uploadError instanceof Error
+                ? uploadError.message
+                : "Upload failed"
+          errors.push({ filePath, message: errorMsg })
+          setUploadErrors([...errors])
+        }
       }
 
+      setUploadProgress(null)
       const bugReportUrl = buildBugReportUrl(bugReportId)
       setSuccessState({ bugReportUrl })
     } catch (error) {
@@ -239,6 +279,10 @@ export const useBugReportDialog = (
   }, [isSessionLoggedIn, onLoginRequired])
 
   const BugReportDialog = useMemo(() => {
+    const progressPercent = uploadProgress
+      ? Math.round((uploadProgress.current / uploadProgress.total) * 100)
+      : 0
+
     return (
       <AlertDialog
         key="bug-report-dialog"
@@ -251,6 +295,8 @@ export const useBugReportDialog = (
           } else {
             setErrorMessage(null)
             setSuccessState(null)
+            setUploadProgress(null)
+            setUploadErrors([])
             setIsOpen(true)
           }
         }}
@@ -264,6 +310,21 @@ export const useBugReportDialog = (
               {successState ? (
                 <div className="rf-text-left rf-space-y-3 rf-text-sm">
                   <p>Bug report created successfully.</p>
+                  {uploadErrors.length > 0 && (
+                    <div className="rf-bg-red-50 rf-border rf-border-red-200 rf-rounded rf-p-2 rf-max-h-28 rf-overflow-y-auto no-scrollbar">
+                      <p className="rf-text-red-700 rf-font-medium rf-text-xs rf-mb-1">
+                        {uploadErrors.length} file(s) failed:
+                      </p>
+                      {uploadErrors.map((err, idx) => (
+                        <p
+                          key={idx}
+                          className="rf-text-red-600 rf-text-xs rf-truncate"
+                        >
+                          {err.filePath}: {err.message}
+                        </p>
+                      ))}
+                    </div>
+                  )}
                   <div>
                     <a
                       className="rf-text-blue-600 hover:rf-underline"
@@ -290,52 +351,86 @@ export const useBugReportDialog = (
                 </div>
               ) : (
                 <div className="rf-text-left rf-space-y-3 rf-text-sm">
-                  <p>
-                    Reporting a bug will upload your entire project
-                    {bugReportFileCount > 0
-                      ? ` (${bugReportFileCount} file${
-                          bugReportFileCount === 1 ? "" : "s"
-                        })`
-                      : ""}{" "}
-                    to tscircuit support.
-                  </p>
-                  <div className="rf-space-y-2">
-                    <label
-                      htmlFor="bug-description"
-                      className="rf-block rf-font-medium"
-                    >
-                      Description (optional)
-                    </label>
-                    <textarea
-                      ref={textareaRef}
-                      id="bug-description"
-                      className="rf-w-full rf-min-h-[100px] rf-px-3 rf-py-2 rf-text-sm rf-border rf-border-gray-300 rf-rounded-md focus:rf-outline-none focus:rf-ring-2 focus:rf-ring-blue-500"
-                      placeholder="Describe the issue you're experiencing..."
-                      disabled={isSubmitting}
-                    />
-                  </div>
-                  <p>
-                    Share the generated bug report link privately with tscircuit
-                    staff so we can help debug your issue. You can also reach
-                    out on our
-                    <a
-                      className="rf-ml-1 rf-text-blue-600 hover:rf-underline"
-                      href="https://tscircuit.com/join"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Discord community
-                    </a>
-                    .
-                  </p>
-                  {!isSessionLoggedIn && (
-                    <p className="rf-text-red-600">
-                      You appear to be logged out. Please log in before
-                      reporting a bug or the upload will fail.
-                    </p>
-                  )}
-                  {errorMessage && (
-                    <p className="rf-text-red-600">{errorMessage}</p>
+                  {uploadProgress ? (
+                    <div className="rf-space-y-2">
+                      <div className="rf-flex rf-justify-between rf-text-xs">
+                        <span>Uploading files...</span>
+                        <span>
+                          {uploadProgress.current}/{uploadProgress.total}
+                        </span>
+                      </div>
+                      <div className="rf-w-full rf-h-2 rf-bg-gray-200 rf-rounded-full rf-overflow-hidden">
+                        <div
+                          className="rf-h-full rf-bg-blue-500 rf-transition-all rf-duration-150"
+                          style={{ width: `${progressPercent}%` }}
+                        />
+                      </div>
+                      <p className="rf-text-xs rf-text-gray-500 rf-truncate">
+                        {uploadProgress.currentFile}
+                      </p>
+                      {uploadErrors.length > 0 && (
+                        <div className="rf-bg-red-50 rf-border rf-border-red-200 rf-rounded rf-p-2 rf-max-h-20 rf-overflow-y-auto">
+                          {uploadErrors.map((err, idx) => (
+                            <p
+                              key={idx}
+                              className="rf-text-red-600 rf-text-xs rf-truncate"
+                            >
+                              {err.filePath}: {err.message}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <>
+                      <p>
+                        Reporting a bug will upload your entire project
+                        {bugReportFileCount > 0
+                          ? ` (${bugReportFileCount} file${
+                              bugReportFileCount === 1 ? "" : "s"
+                            })`
+                          : ""}{" "}
+                        to tscircuit support.
+                      </p>
+                      <div className="rf-space-y-2">
+                        <label
+                          htmlFor="bug-description"
+                          className="rf-block rf-font-medium"
+                        >
+                          Description (optional)
+                        </label>
+                        <textarea
+                          ref={textareaRef}
+                          id="bug-description"
+                          className="rf-w-full rf-min-h-[100px] rf-px-3 rf-py-2 rf-text-sm rf-border rf-border-gray-300 rf-rounded-md focus:rf-outline-none focus:rf-ring-2 focus:rf-ring-blue-500"
+                          placeholder="Describe the issue you're experiencing..."
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                      <p>
+                        Share the generated bug report link privately with
+                        tscircuit staff so we can help debug your issue. You can
+                        also reach out on our
+                        <a
+                          className="rf-ml-1 rf-text-blue-600 hover:rf-underline"
+                          href="https://tscircuit.com/join"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Discord community
+                        </a>
+                        .
+                      </p>
+                      {!isSessionLoggedIn && (
+                        <p className="rf-text-red-600">
+                          You appear to be logged out. Please log in before
+                          reporting a bug or the upload will fail.
+                        </p>
+                      )}
+                      {errorMessage && (
+                        <p className="rf-text-red-600">{errorMessage}</p>
+                      )}
+                    </>
                   )}
                 </div>
               )}
@@ -408,6 +503,8 @@ export const useBugReportDialog = (
     isSessionLoggedIn,
     handleConfirmBugReport,
     onLoginRequired,
+    uploadProgress,
+    uploadErrors,
   ])
 
   return {

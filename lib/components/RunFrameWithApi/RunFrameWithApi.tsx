@@ -76,6 +76,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   const hasReceivedInitialFiles = useHasReceivedInitialFilesLoaded()
 
   const fsMap = useRunFrameStore((s) => s.fsMap)
+  const recentlySavedFiles = useRunFrameStore((s) => s.recentlySavedFiles)
   const allFiles = useMemo(() => Array.from(fsMap.keys()), [fsMap])
   const projectConfigContent = useMemo(() => {
     const rawConfig = fsMap.get("tscircuit.config.json")
@@ -245,6 +246,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
                 pinnedFiles={favorites}
                 onToggleFavorite={handleToggleFavorite}
                 fileFilter={activeFileFilter}
+                recentlySavedFiles={recentlySavedFiles}
               />
             </div>
           )}

@@ -433,9 +433,8 @@ export const EnhancedFileSelectorCombobox = ({
                 <>
                   <CommandEmpty>{emptyMessage}</CommandEmpty>
 
-                  {/* Recent Files Section - Show if there are any recent files (viewed or saved) */}
-                  {(recentlyViewedFiles.length > 0 ||
-                    recentlySavedFiles.length > 0) && (
+                  {/* Recent Files Section - Show only if there are filtered recent files to display */}
+                  {recentFiles.length > 0 && (
                     <CommandGroup
                       heading={
                         <div className="rf-flex rf-items-center rf-gap-0">

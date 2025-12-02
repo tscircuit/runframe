@@ -291,8 +291,6 @@ export const EnhancedFileSelectorCombobox = ({
 
   // Show recently viewed files (from localStorage)
   const recentFiles = useMemo(() => {
-    if (!showRecents) return []
-
     // Filter saved files to only include ones that exist in the file list
     const validSavedFiles = recentlySavedFiles.filter((file) =>
       filteredFiles.includes(file),
@@ -321,7 +319,7 @@ export const EnhancedFileSelectorCombobox = ({
     }
 
     return combinedRecent
-  }, [showRecents, recentlySavedFiles, recentlyViewedFiles, filteredFiles])
+  }, [recentlySavedFiles, recentlyViewedFiles, filteredFiles])
 
   const displayPath = currentFolder ?? "/"
   const shortDisplayPath =

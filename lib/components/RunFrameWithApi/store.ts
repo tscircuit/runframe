@@ -3,7 +3,7 @@ import type { ManualEditEvent } from "@tscircuit/props"
 import type { CircuitJson } from "circuit-json"
 import Debug from "lib/utils/debug"
 import { create } from "zustand"
-import { devtools } from "zustand/middleware"
+import { devtools, persist } from "zustand/middleware"
 import { API_BASE } from "./api-base"
 import type {
   File,
@@ -68,6 +68,9 @@ async function getInitialFilesFromApi(): Promise<Map<FilePath, FileContent>> {
   return fileMap
 }
 
+// Files that should not be tracked in recently saved
+const IGNORED_SAVED_FILES = ["manual-edits.json", "manual_edits.json"]
+
 // Create store
 export const useRunFrameStore = create<RunFrameState>()(
   devtools(
@@ -81,6 +84,7 @@ export const useRunFrameStore = create<RunFrameState>()(
       recentEvents: [],
       simulateScenarioOrder: undefined,
       currentMainComponentPath: null,
+      recentlySavedFiles: [],
 
       loadInitialFiles: async () => {
         const fsMap = await getInitialFilesFromApi()
@@ -113,6 +117,21 @@ export const useRunFrameStore = create<RunFrameState>()(
       setCircuitJson: (circuitJson: CircuitJson) => {
         if (circuitJson === get().circuitJson) return
         set({ circuitJson })
+      },
+
+      addRecentlySavedFile: (path: FilePath) => {
+        set((state) => {
+          // Don't track ignored files like manual-edits.json
+          if (IGNORED_SAVED_FILES.includes(path)) return state
+          // Only track actual source files
+          if (!DYNAMIC_FILE_EXTENSIONS.some((ext) => path.endsWith(ext)))
+            return state
+
+          const filtered = state.recentlySavedFiles.filter((f) => f !== path)
+          return {
+            recentlySavedFiles: [path, ...filtered].slice(0, 10),
+          }
+        })
       },
 
       startPolling: () => {
@@ -159,6 +178,8 @@ export const useRunFrameStore = create<RunFrameState>()(
                   } else {
                     updates.set(file.file_path, "__STATIC_ASSET__")
                   }
+                  // Track recently saved files
+                  get().addRecentlySavedFile(event.file_path)
                 } else if (event.event_type === "FILE_DELETED") {
                   fsUpdateCount++
                   updates.delete(event.file_path)

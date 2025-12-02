@@ -24,6 +24,7 @@ import {
   Eye,
   EyeOff,
   Clock,
+  Save,
 } from "lucide-react"
 import { cn } from "lib/utils"
 import {
@@ -70,6 +71,7 @@ export const EnhancedFileSelectorCombobox = ({
   emptyMessage = "No files found in this directory.",
   pinnedFiles = [],
   onToggleFavorite,
+  recentlySavedFiles = [],
 }: {
   files: string[]
   currentFile: string
@@ -88,6 +90,11 @@ export const EnhancedFileSelectorCombobox = ({
    * Callback when a file is toggled as favorite.
    */
   onToggleFavorite?: (filePath: string) => void
+  /**
+   * Array of recently saved file paths (from FILE_UPDATED events).
+   * These will be prioritized in the Recent Files section.
+   */
+  recentlySavedFiles?: string[]
 }) => {
   const [open, setOpen] = useState(false)
   const [file, setFile] = useState(currentFile)
@@ -285,10 +292,36 @@ export const EnhancedFileSelectorCombobox = ({
   // Show recently viewed files (from localStorage)
   const recentFiles = useMemo(() => {
     if (!showRecents) return []
-    return recentlyViewedFiles
-      .filter((file) => filteredFiles.includes(file))
-      .slice(0, 3)
-  }, [showRecents, recentlyViewedFiles, filteredFiles])
+
+    // Filter saved files to only include ones that exist in the file list
+    const validSavedFiles = recentlySavedFiles.filter((file) =>
+      filteredFiles.includes(file),
+    )
+
+    // Filter viewed files to only include ones that exist in the file list
+    const validViewedFiles = recentlyViewedFiles.filter((file) =>
+      filteredFiles.includes(file),
+    )
+
+    // Combine: prioritize saved files first (up to 1), then fill with viewed files
+    // that aren't already in saved, up to 3 total
+    const combinedRecent: Array<{ path: string; type: "saved" | "viewed" }> = []
+
+    // Add most recent saved file (if any)
+    if (validSavedFiles.length > 0) {
+      combinedRecent.push({ path: validSavedFiles[0], type: "saved" })
+    }
+
+    // Fill remaining slots with viewed files (that aren't already added)
+    for (const viewedFile of validViewedFiles) {
+      if (combinedRecent.length >= 3) break
+      if (!combinedRecent.some((item) => item.path === viewedFile)) {
+        combinedRecent.push({ path: viewedFile, type: "viewed" })
+      }
+    }
+
+    return combinedRecent
+  }, [showRecents, recentlySavedFiles, recentlyViewedFiles, filteredFiles])
 
   const displayPath = currentFolder ?? "/"
   const shortDisplayPath =
@@ -400,12 +433,12 @@ export const EnhancedFileSelectorCombobox = ({
                 <>
                   <CommandEmpty>{emptyMessage}</CommandEmpty>
 
-                  {/* Recent Files Section - Always show header if there are recent files */}
-                  {recentlyViewedFiles.length > 0 && (
+                  {/* Recent Files Section - Show only if there are filtered recent files to display */}
+                  {recentFiles.length > 0 && (
                     <CommandGroup
                       heading={
                         <div className="rf-flex rf-items-center rf-gap-0">
-                          <span className="rf-leading-none">Recent</span>
+                          <span className="rf-leading-none">Recent Files</span>
                           <button
                             onClick={() => setShowRecents(!showRecents)}
                             className="rf-flex rf-items-center rf-justify-center rf-text-slate-600 hover:rf-text-slate-800 rf-bg-transparent rf-border-none rf-p-0 rf-w-3.5 rf-h-3.5 rf-ml-2"
@@ -426,24 +459,32 @@ export const EnhancedFileSelectorCombobox = ({
                       className="rf-border-b rf-border-gray-200 rf-pb-1 rf-bg-blue-50/30"
                     >
                       {showRecents &&
-                        recentFiles.map((path, index) => (
+                        recentFiles.map((item, index) => (
                           <CommandItem
-                            key={path}
-                            value={`recent:${path}`}
-                            onSelect={() => selectFile(path, index, true)}
+                            key={item.path}
+                            value={`recent:${item.path}`}
+                            onSelect={() => selectFile(item.path, index, true)}
                             className={cn(
-                              path === currentFile && "rf-font-medium",
+                              item.path === currentFile && "rf-font-medium",
                             )}
                           >
-                            <Clock className="rf-mr-2 rf-h-4 rf-w-4 rf-text-blue-500" />
-                            {getDisplayName(path.split("/").pop() || "")}
+                            {item.type === "saved" ? (
+                              <span title="Recently saved">
+                                <Save className="rf-mr-2 rf-h-4 rf-w-4 rf-text-green-500" />
+                              </span>
+                            ) : (
+                              <span title="Recently viewed">
+                                <Clock className="rf-mr-2 rf-h-4 rf-w-4 rf-text-blue-500" />
+                              </span>
+                            )}
+                            {getDisplayName(item.path.split("/").pop() || "")}
                             <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[40%]">
-                              {getDirectoryPath(path)}
+                              {getDirectoryPath(item.path)}
                             </span>
                             <Check
                               className={cn(
                                 "rf-ml-auto rf-h-4 rf-w-4",
-                                path === currentFile
+                                item.path === currentFile
                                   ? "rf-opacity-100"
                                   : "rf-opacity-0",
                               )}

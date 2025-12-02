@@ -127,6 +127,11 @@ export interface RunFrameState {
   recentEvents: RunFrameEvent[]
   simulateScenarioOrder: string | undefined
   currentMainComponentPath: string | null
+  /**
+   * List of recently saved file paths, with the most recently saved first.
+   * These are files that have been modified/saved (FILE_UPDATED events).
+   */
+  recentlySavedFiles: FilePath[]
   // Actions
   upsertFile: (path: FilePath, content: FileContent) => Promise<void>
   getFile: (path: FilePath) => Promise<void>
@@ -140,6 +145,7 @@ export interface RunFrameState {
   loadInitialFiles: () => Promise<void>
   setSimulateScenarioOrder: (simulateScenarioOrder: string) => void
   setCurrentMainComponentPath: (path: string | null) => void
+  addRecentlySavedFile: (path: FilePath) => void
 }
 
 declare global {

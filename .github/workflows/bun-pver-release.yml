@@ -34,12 +34,16 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.TSCIRCUIT_BOT_GITHUB_TOKEN }}
 
+      - name: Get package version
+        id: get-version
+        run: echo "version=$(node -p \"require('./package.json').version\")" >> $GITHUB_OUTPUT
+
       - name: Create Pull Request
         id: create-pr
         uses: peter-evans/create-pull-request@v5
         with:
-          commit-message: "chore: bump version"
-          title: "chore: bump version"
+          commit-message: "chore: bump version v${{ steps.get-version.outputs.version }}"
+          title: "chore: bump version v${{ steps.get-version.outputs.version }}"
           body: "Automated package update"
           branch: bump-version-${{ github.run_number }}
           base: main

@@ -41,7 +41,7 @@
         "chokidar-cli": "^3.0.0",
         "circuit-json": "0.0.303",
         "circuit-json-to-bom-csv": "^0.0.8",
-        "circuit-json-to-gerber": "^0.0.42",
+        "circuit-json-to-gerber": "^0.0.43",
         "circuit-json-to-gltf": "^0.0.41",
         "circuit-json-to-kicad": "^0.0.25",
         "circuit-json-to-lbrn": "^0.0.4",
@@ -699,7 +699,7 @@
 
     "circuit-json-to-connectivity-map": ["circuit-json-to-connectivity-map@0.0.22", "", { "dependencies": { "@tscircuit/math-utils": "^0.0.9" }, "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-HN8DiISjZZLTglGEkYNRpKeQ/DMG4dDo5j4Hck0UGSJbpux9aFwtJOGszMf06Inh/gu5oKBrpZJIeWxaNacKUg=="],
 
-    "circuit-json-to-gerber": ["circuit-json-to-gerber@0.0.42", "", { "dependencies": { "@tscircuit/alphabet": "^0.0.2", "fast-json-stable-stringify": "^2.1.0", "transformation-matrix": "^3.0.0" }, "peerDependencies": { "circuit-json": "*", "tscircuit": "*", "typescript": "^5.0.0" }, "bin": { "circuit-to-gerber": "dist/cli.js" } }, "sha512-g3Ktki+nWkLycsY0+riiadrsREIm+b2R1/kppZkT7GhPrNAL4DBU3UZu9ftjeh11JPCS28kkWRBNXlRHBXwvmA=="],
+    "circuit-json-to-gerber": ["circuit-json-to-gerber@0.0.43", "", { "dependencies": { "@tscircuit/alphabet": "^0.0.2", "fast-json-stable-stringify": "^2.1.0", "transformation-matrix": "^3.0.0" }, "peerDependencies": { "circuit-json": "*", "tscircuit": "*", "typescript": "^5.0.0" }, "bin": { "circuit-to-gerber": "dist/cli.js" } }, "sha512-kxq2AhCLO7Dm2ZsYQbsFJHZaNAKUQ1fJv/KiHShCkohmYL+MAFJ71xi7waMf+cfts7YnwtVyGhkARPcNDOivhg=="],
 
     "circuit-json-to-gltf": ["circuit-json-to-gltf@0.0.41", "", { "dependencies": { "@jscad/modeling": "^2.12.6", "jscad-electronics": "^0.0.53", "jscad-to-gltf": "^0.0.5" }, "peerDependencies": { "@resvg/resvg-js": "2", "@resvg/resvg-wasm": "2", "@tscircuit/circuit-json-util": "*", "circuit-json": "*", "circuit-to-svg": "*", "typescript": "^5" }, "optionalPeers": ["@resvg/resvg-js", "@resvg/resvg-wasm"] }, "sha512-pSZeKKgkmj+tJXfpzGzzKK29lAMHE1YuyTEXhh3hssXcBv8B2qR208VCXDTKuNMQ2dEquueuyqznZE+KC4rqMw=="],
 

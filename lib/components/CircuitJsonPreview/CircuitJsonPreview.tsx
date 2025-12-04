@@ -134,6 +134,11 @@ export const CircuitJsonPreview = ({
     ) as any
   }, [circuitJson])
 
+  const hasSchematicGroup = useMemo(() => {
+    if (!circuitJson) return true
+    return circuitJson.some((e) => e.type === "schematic_group")
+  }, [circuitJson])
+
   useErrorTelemetry({
     errorMessage,
     errorStack,
@@ -278,7 +283,11 @@ export const CircuitJsonPreview = ({
                 {!availableTabs || availableTabs.includes("schematic") ? (
                   <TabsTrigger
                     value="schematic"
-                    className="rf-whitespace-nowrap"
+                    className={cn(
+                      "rf-whitespace-nowrap",
+                      circuitJson && !hasSchematicGroup && "rf-opacity-50",
+                    )}
+                    disabled={circuitJson ? !hasSchematicGroup : false}
                   >
                     {circuitJson && (
                       <span

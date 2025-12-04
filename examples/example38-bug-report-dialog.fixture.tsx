@@ -48,6 +48,42 @@ export default () => {
           content: "# My Circuit Project\n\nA simple LED driver board.",
         },
         { path: "styles.css", content: ".board { background: #1a1a2e; }" },
+        {
+          path: "../node_modules/components/super-long-component-name-that-should-overflow-the-container.tsx",
+          content: `export const X = () => null`,
+        },
+        {
+          path: "../node_modules/lib/utils/extremely-long-filename-for-testing-overflow-behavior-in-dialog.ts",
+          content: `export const x = 1`,
+        },
+        {
+          path: "../node_modules/src/features/authentication/services/user-session-management-service.tsx",
+          content: `export const auth = {}`,
+        },
+        {
+          path: "../node_modules/config.json",
+          content: JSON.stringify({ test: true }),
+        },
+        {
+          path: "../node_modules/another-really-long-filename-to-test-the-truncation-behavior.css",
+          content: `.x {}`,
+        },
+        {
+          path: "../node_modules/some-package/dist/index.d.ts",
+          content: `declare const x: number`,
+        },
+        {
+          path: "../node_modules/some-package/dist/s/another-really-long-filename-to-test-the-truncation-behavior2.d.ts",
+          content: `declare const x: number`,
+        },
+        {
+          path: "../node_modules/some-package/dist/another-really-long-filename-to-test-the-truncation-behavior.d.ts",
+          content: `declare const x: number`,
+        },
+        {
+          path: "../node_modules/some-packages/another-really-long-filename-to-test-the-truncation-behavior",
+          content: `declare const x: number`,
+        },
       ]
 
       for (const file of files) {

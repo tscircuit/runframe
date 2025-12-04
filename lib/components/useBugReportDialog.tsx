@@ -311,17 +311,23 @@ export const useBugReportDialog = (
                 <div className="rf-text-left rf-space-y-3 rf-text-sm">
                   <p>Bug report created successfully.</p>
                   {uploadErrors.length > 0 && (
-                    <div className="rf-bg-red-50 rf-border rf-border-red-200 rf-rounded rf-p-2 rf-max-h-28 rf-overflow-y-auto no-scrollbar">
+                    <div className="rf-bg-red-50 rf-border rf-border-red-200 rf-rounded rf-p-2 rf-max-h-28 rf-overflow-y-auto rf-overflow-x-hidden">
                       <p className="rf-text-red-700 rf-font-medium rf-text-xs rf-mb-1">
                         {uploadErrors.length} file(s) failed:
                       </p>
                       {uploadErrors.map((err, idx) => (
-                        <p
+                        <div
                           key={idx}
-                          className="rf-text-red-600 rf-text-xs rf-truncate"
+                          className="rf-text-red-600 rf-text-xs rf-mb-0.5"
+                          title={`${err.filePath}: ${err.message}`}
                         >
-                          {err.filePath}: {err.message}
-                        </p>
+                          <span className="rf-font-medium rf-break-all">
+                            {err.filePath.split("/").pop()}
+                          </span>
+                          <span className="rf-text-red-500 rf-block rf-truncate">
+                            {err.message}
+                          </span>
+                        </div>
                       ))}
                     </div>
                   )}
@@ -352,7 +358,7 @@ export const useBugReportDialog = (
               ) : (
                 <div className="rf-text-left rf-space-y-3 rf-text-sm">
                   {uploadProgress ? (
-                    <div className="rf-space-y-2">
+                    <div className="rf-space-y-2 rf-overflow-hidden">
                       <div className="rf-flex rf-justify-between rf-text-xs">
                         <span>Uploading files...</span>
                         <span>
@@ -365,18 +371,24 @@ export const useBugReportDialog = (
                           style={{ width: `${progressPercent}%` }}
                         />
                       </div>
-                      <p className="rf-text-xs rf-text-gray-500 rf-truncate">
-                        {uploadProgress.currentFile}
+                      <p className="rf-text-xs rf-text-gray-500 rf-break-all rf-truncate rf-w-full rf-max-w-full">
+                        {`${uploadProgress.currentFile.slice(0, 60)}${uploadProgress.currentFile.length > 60 ? "..." : ""}`}
                       </p>
                       {uploadErrors.length > 0 && (
-                        <div className="rf-bg-red-50 rf-border rf-border-red-200 rf-rounded rf-p-2 rf-max-h-20 rf-overflow-y-auto">
+                        <div className="rf-bg-red-50 rf-border rf-border-red-200 rf-rounded rf-p-2 rf-max-h-20 rf-overflow-y-auto rf-overflow-x-hidden">
                           {uploadErrors.map((err, idx) => (
-                            <p
+                            <div
                               key={idx}
-                              className="rf-text-red-600 rf-text-xs rf-truncate"
+                              className="rf-text-red-600 rf-text-xs rf-mb-0.5"
+                              title={`${err.filePath}: ${err.message}`}
                             >
-                              {err.filePath}: {err.message}
-                            </p>
+                              <span className="rf-font-medium rf-break-all">
+                                {err.filePath.split("/").pop()}
+                              </span>
+                              <span className="rf-text-red-500 rf-block rf-truncate">
+                                {err.message}
+                              </span>
+                            </div>
                           ))}
                         </div>
                       )}

@@ -135,7 +135,7 @@ export const CircuitJsonPreview = ({
   }, [circuitJson])
 
   const hasSchematicGroup = useMemo(() => {
-    if (!circuitJson) return false
+    if (!circuitJson) return true
     return circuitJson.some((e) => e.type === "schematic_group")
   }, [circuitJson])
 

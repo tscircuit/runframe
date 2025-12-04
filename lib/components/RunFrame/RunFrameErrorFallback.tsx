@@ -1,3 +1,4 @@
+import { AlertTriangle } from "lucide-react"
 import { Button } from "../ui/button"
 
 interface RunFrameErrorFallbackProps {
@@ -15,19 +16,7 @@ export const RunFrameErrorFallback = ({
         <div className="rf-max-w-lg rf-w-full rf-text-center">
           <div className="rf-mb-8">
             <div className="rf-inline-flex rf-items-center rf-justify-center rf-w-20 rf-h-20 rf-bg-red-100 rf-rounded-full rf-mb-6">
-              <svg
-                className="rf-w-10 rf-h-10 rf-text-red-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-                />
-              </svg>
+              <AlertTriangle className="rf-w-10 rf-h-10 rf-text-red-600" />
             </div>
             <h1 className="rf-text-2xl rf-font-bold rf-text-gray-900 rf-mb-3">
               Oops! Something went wrong
@@ -43,7 +32,7 @@ export const RunFrameErrorFallback = ({
                 <summary className="rf-text-xs rf-text-gray-500 rf-cursor-pointer hover:rf-text-gray-700">
                   View stack trace
                 </summary>
-                <pre className="rf-text-xs rf-font-mono no-scrollbar rf-whitespace-pre-wrap rf-text-gray-500 rf-bg-gray-100 rf-p-3 rf-rounded-lg rf-mt-2 rf-overflow-auto rf-max-h-[150px]">
+                <pre className="rf-text-xs rf-font-mono no-scrollbar rf-whitespace-pre-wrap rf-text-gray-500 rf-bg-gray-100 rf-p-3 rf-rounded-lg rf-mt-2 rf-overflow-auto rf-text-left rf-max-h-[150px]">
                   {error.stack}
                 </pre>
               </details>

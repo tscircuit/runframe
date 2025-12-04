@@ -56,10 +56,37 @@ function findNode(nodes: FileNode[], path: string): FileNode | null {
   return null
 }
 
+function flattenFolder(folder: FileNode): {
+  flattenedFolder: FileNode
+  displayName: string
+} {
+  let current = folder
+  const pathParts = [folder.name]
+
+  // Keep traversing while the folder has exactly one child and it's a folder (no files)
+  while (
+    current.children &&
+    current.children.length === 1 &&
+    current.children[0].type === "folder"
+  ) {
+    current = current.children[0]
+    pathParts.push(current.name)
+  }
+
+  return {
+    flattenedFolder: current,
+    displayName: pathParts.join("/"),
+  }
+}
+
+interface FlattenedFolderNode extends FileNode {
+  displayName: string
+}
+
 function getCurrentFolderContents(
   tree: FileNode[],
   currentFolder: string,
-): { files: FileNode[]; folders: FileNode[] } {
+): { files: FileNode[]; folders: FlattenedFolderNode[] } {
   let targetNode: FileNode | null
 
   if (!currentFolder) {
@@ -74,14 +101,25 @@ function getCurrentFolderContents(
   }
 
   const files = targetNode.children.filter((node) => node.type === "file")
-  const folders = targetNode.children.filter((node) => node.type === "folder")
+  const rawFolders = targetNode.children.filter(
+    (node) => node.type === "folder",
+  )
+
+  // Flatten folders that only contain a single subfolder (no files)
+  const folders: FlattenedFolderNode[] = rawFolders.map((folder) => {
+    const { flattenedFolder, displayName } = flattenFolder(folder)
+    return {
+      ...flattenedFolder,
+      displayName,
+    }
+  })
 
   // Sort files first, then folders, using natural sorting
   files.sort((a, b) => naturalSort(a.name, b.name))
-  folders.sort((a, b) => naturalSort(a.name, b.name))
+  folders.sort((a, b) => naturalSort(a.displayName, b.displayName))
 
   return { files, folders }
 }
 
 export { parseFilesToTree, getCurrentFolderContents }
-export type { FileNode }
+export type { FileNode, FlattenedFolderNode }

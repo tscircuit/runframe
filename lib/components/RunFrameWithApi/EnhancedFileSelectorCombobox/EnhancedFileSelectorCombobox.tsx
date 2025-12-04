@@ -624,7 +624,7 @@ export const EnhancedFileSelectorCombobox = ({
                           className="rf-text-slate-600 hover:rf-text-slate-900"
                         >
                           <Folder className="rf-mr-2 rf-h-4 rf-w-4 rf-text-blue-600" />
-                          {folderNode.name}
+                          {folderNode.displayName}
                           <ChevronRight className="rf-ml-auto rf-h-4 rf-w-4" />
                         </CommandItem>
                       ))}

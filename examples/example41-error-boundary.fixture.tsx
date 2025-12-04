@@ -3,7 +3,20 @@ import React, { useState } from "react"
 
 const BrokenComponent = () => {
   throw new Error(
-    "Intentional error to test ErrorBoundary - Component crashed!",
+    `Intentional error to test ErrorBoundary - Component crashed!
+
+This is a multiline error message to test how the error fallback UI handles longer error content.
+
+Error Details:
+- Component: BrokenComponent
+- Location: example41-error-boundary.fixture.tsx
+- Cause: Intentional throw for testing purposes
+
+Additional context that might appear in real-world errors:
+TypeError: Cannot read properties of undefined (reading 'map')
+    at renderCircuitElements (circuit.tsx:142:23)
+    at processQueue (scheduler.js:89:12)
+    at flushWork (scheduler.js:156:7)`,
   )
 }
 

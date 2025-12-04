@@ -24,7 +24,7 @@ export const RunFrameErrorFallback = ({
             <p className="rf-text-gray-600 rf-mb-4">
               RunFrame encountered an unexpected error.
             </p>
-            <pre className="rf-text-xs rf-font-mono rf-text-left rf-whitespace-pre-wrap rf-text-red-600 rf-bg-red-50 rf-border rf-border-red-200 rf-p-3 rf-rounded-lg rf-mb-4 rf-overflow-auto rf-max-h-[120px]">
+            <pre className="rf-text-xs no-scrollbar rf-font-mono rf-text-left rf-whitespace-pre-wrap rf-text-red-600 rf-bg-red-50 rf-border rf-border-red-200 rf-p-3 rf-rounded-lg rf-mb-4 rf-overflow-auto rf-max-h-[120px]">
               {error.message}
             </pre>
             {error.stack && (

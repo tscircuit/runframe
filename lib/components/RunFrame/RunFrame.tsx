@@ -2,11 +2,13 @@ import { createCircuitWebWorker } from "@tscircuit/eval/worker"
 import Debug from "debug"
 import { Loader2, Play, Square } from "lucide-react"
 import { useEffect, useReducer, useRef, useState } from "react"
+import { ErrorBoundary } from "react-error-boundary"
 import {
   CircuitJsonPreview,
   type TabId,
 } from "../CircuitJsonPreview/CircuitJsonPreview"
 import { Button } from "../ui/button"
+import { RunFrameErrorFallback } from "./RunFrameErrorFallback"
 
 // TODO waiting for core PR: https://github.com/tscircuit/core/pull/489
 // import { orderedRenderPhases } from "@tscircuit/core"
@@ -535,95 +537,95 @@ export const RunFrame = (props: RunFrameProps) => {
   }
 
   return (
-    <CircuitJsonPreview
-      code={fsMap.get(props.entrypoint ?? props.mainComponentPath)}
-      fsMap={fsMap}
-      defaultActiveTab={props.defaultActiveTab ?? props.defaultTab}
-      defaultTab={props.defaultTab}
-      availableTabs={props.availableTabs}
-      showToggleFullScreen={props.showToggleFullScreen}
-      autoroutingGraphics={autoroutingGraphics}
-      autoroutingLog={autoroutingLog}
-      onReportAutoroutingLog={
-        props.onReportAutoroutingLog || handleReportAutoroutingLog
-      }
-      leftHeaderContent={
-        <>
-          {props.showRunButton && (
-            <div className="rf-relative rf-inline-flex">
-              <button
-                type="button"
-                onClick={() => {
-                  incRunCountTrigger(1)
-                }}
-                className="rf-flex rf-items-center rf-gap-2 rf-px-4 rf-py-2 rf-bg-blue-600 hover:rf-bg-blue-700 rf-text-white rf-rounded-md disabled:rf-opacity-50 transition-colors duration-200"
-                disabled={isRunning || !dependenciesLoaded}
-              >
-                Run{" "}
-                {isRunning || !dependenciesLoaded ? (
-                  <Loader2 className="rf-w-3 rf-h-3 rf-animate-spin" />
-                ) : (
-                  <Play className="rf-w-3 rf-h-3" />
+    <ErrorBoundary FallbackComponent={RunFrameErrorFallback}>
+      <CircuitJsonPreview
+        code={fsMap.get(props.entrypoint ?? props.mainComponentPath)}
+        fsMap={fsMap}
+        defaultActiveTab={props.defaultActiveTab ?? props.defaultTab}
+        defaultTab={props.defaultTab}
+        availableTabs={props.availableTabs}
+        showToggleFullScreen={props.showToggleFullScreen}
+        autoroutingGraphics={autoroutingGraphics}
+        autoroutingLog={autoroutingLog}
+        onReportAutoroutingLog={
+          props.onReportAutoroutingLog || handleReportAutoroutingLog
+        }
+        leftHeaderContent={
+          <>
+            {props.showRunButton && (
+              <div className="rf-relative rf-inline-flex">
+                <button
+                  type="button"
+                  onClick={() => {
+                    incRunCountTrigger(1)
+                  }}
+                  className="rf-flex rf-items-center rf-gap-2 rf-px-4 rf-py-2 rf-bg-blue-600 hover:rf-bg-blue-700 rf-text-white rf-rounded-md disabled:rf-opacity-50 transition-colors duration-200"
+                  disabled={isRunning || !dependenciesLoaded}
+                >
+                  Run{" "}
+                  {isRunning || !dependenciesLoaded ? (
+                    <Loader2 className="rf-w-3 rf-h-3 rf-animate-spin" />
+                  ) : (
+                    <Play className="rf-w-3 rf-h-3" />
+                  )}
+                </button>
+                {isRunning && (
+                  <div className="rf-flex rf-items-center rf-ml-1">
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setIsRunning(false)
+                        setRenderLog(null)
+                        setError(null)
+                        // Call cleanup to prevent race conditions
+                        if (cancelExecutionRef.current) {
+                          cancelExecutionRef.current()
+                          cancelExecutionRef.current = null
+                        }
+                        // Cancel the mutex to allow next execution
+                        runMutex.cancel()
+                        setActiveAsyncEffects({})
+                        // Kill the worker using the provided kill function
+                        if (globalThis.runFrameWorker) {
+                          globalThis.runFrameWorker.kill()
+                          globalThis.runFrameWorker = null
+                        }
+                      }}
+                      variant="ghost"
+                      size="icon"
+                      className="rf-text-red-300 hover:rf-text-red-400 hover:!rf-bg-transparent [&>svg]:rf-text-red-300 [&>svg]:hover:rf-text-red-400 rf-flex rf-items-center rf-justify-center"
+                    >
+                      <Square
+                        className="!rf-h-2.5 !rf-w-2.5"
+                        fill="currentColor"
+                        stroke="currentColor"
+                      />
+                    </Button>
+                  </div>
                 )}
-              </button>
-              {isRunning && (
-                <div className="rf-flex rf-items-center rf-ml-1">
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setIsRunning(false)
-                      setRenderLog(null)
-                      setError(null)
-                      // Call cleanup to prevent race conditions
-                      if (cancelExecutionRef.current) {
-                        cancelExecutionRef.current()
-                        cancelExecutionRef.current = null
-                      }
-                      // Cancel the mutex to allow next execution
-                      runMutex.cancel()
-                      setActiveAsyncEffects({})
-                      // Kill the worker using the provided kill function
-                      if (globalThis.runFrameWorker) {
-                        globalThis.runFrameWorker.kill()
-                        globalThis.runFrameWorker = null
-                      }
-                    }}
-                    variant="ghost"
-                    size="icon"
-                    className="rf-text-red-300 hover:rf-text-red-400 hover:!rf-bg-transparent [&>svg]:rf-text-red-300 [&>svg]:hover:rf-text-red-400 rf-flex rf-items-center rf-justify-center"
-                  >
-                    <Square
-                      className="!rf-h-2.5 !rf-w-2.5"
-                      fill="currentColor"
-                      stroke="currentColor"
-                    />
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
-          {props.showFileMenu !== false && (
-            <FileMenuLeftHeader isWebEmbedded={props.isWebEmbedded} />
-          )}
-          {props.leftHeaderContent}
-        </>
-      }
-      onActiveTabChange={setActiveTab}
-      circuitJson={circuitJson}
-      renderLog={renderLog}
-      activeEffectName={activeEffectName}
-      isRunningCode={isRunning}
-      errorMessage={error?.error}
-      errorStack={error?.stack}
-      onEditEvent={handleEditEvent}
-      editEvents={props.editEvents}
-      defaultToFullScreen={props.defaultToFullScreen}
-      onRerunWithDebug={(debugOption) => {
-        // Set the current debug option state
-        setCurrentDebugOption(debugOption || "")
-        // Trigger a rerun
-        incRunCountTrigger(1)
-      }}
-    />
+              </div>
+            )}
+            {props.showFileMenu !== false && (
+              <FileMenuLeftHeader isWebEmbedded={props.isWebEmbedded} />
+            )}
+            {props.leftHeaderContent}
+          </>
+        }
+        onActiveTabChange={setActiveTab}
+        circuitJson={circuitJson}
+        renderLog={renderLog}
+        activeEffectName={activeEffectName}
+        isRunningCode={isRunning}
+        errorMessage={error?.error}
+        errorStack={error?.stack}
+        onEditEvent={handleEditEvent}
+        editEvents={props.editEvents}
+        defaultToFullScreen={props.defaultToFullScreen}
+        onRerunWithDebug={(debugOption) => {
+          setCurrentDebugOption(debugOption || "")
+          incRunCountTrigger(1)
+        }}
+      />
+    </ErrorBoundary>
   )
 }

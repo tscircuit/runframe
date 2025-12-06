@@ -1,5 +1,5 @@
 const EASYEDA_BROWSER_URL =
-  "https://cdn.jsdelivr.net/npm/easyeda@0.0.228/dist/browser/index.js"
+  "https://cdn.jsdelivr.net/npm/easyeda@latest/dist/browser/index.js"
 
 type EasyedaBrowserModule = {
   fetchEasyEDAComponent: (

@@ -1,11 +1,14 @@
-import { fetchEasyEDAComponent, convertRawEasyToTsx } from "easyeda/browser"
 import { API_BASE } from "lib/components/RunFrameWithApi/api-base"
+import { loadEasyedaBrowser } from "./load-easyeda-browser"
 import ky from "ky"
 
 export const importComponentFromJlcpcb = async (
   jlcpcbPartNumber: string,
   opts?: { headers?: Record<string, string> },
 ) => {
+  const { fetchEasyEDAComponent, convertRawEasyToTsx } =
+    await loadEasyedaBrowser()
+
   const component = await fetchEasyEDAComponent(jlcpcbPartNumber, {
     // @ts-ignore
     fetch: (url, options: any) => {

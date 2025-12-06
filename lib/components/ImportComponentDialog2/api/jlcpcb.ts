@@ -1,5 +1,5 @@
-import { fetchEasyEDAComponent, convertRawEasyToTsx } from "easyeda/browser"
 import { API_BASE } from "lib/components/RunFrameWithApi/api-base"
+import { loadEasyedaBrowser } from "lib/optional-features/importing/load-easyeda-browser"
 import type { JlcpcbComponentSummary } from "../types"
 
 interface JlcpcbComponentApiResult {
@@ -48,6 +48,9 @@ export const loadJlcpcbComponentTsx = async (
   partNumber: string,
   opts?: { headers?: Record<string, string>; apiBase?: string },
 ): Promise<string> => {
+  const { fetchEasyEDAComponent, convertRawEasyToTsx } =
+    await loadEasyedaBrowser()
+
   const component = await fetchEasyEDAComponent(partNumber, {
     // @ts-ignore
     fetch: (url, options: RequestInit & { headers?: Record<string, string> }) =>

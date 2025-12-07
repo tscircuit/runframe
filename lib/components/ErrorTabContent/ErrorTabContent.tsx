@@ -371,11 +371,19 @@ export const ErrorTabContent = ({
             variant="outline"
             className="rf-p-1"
             onClick={() => {
-              const firstError = unifiedErrors[0]
-              let errorText = `${firstError.type}: ${firstError.message}`
+              const firstIssue =
+                unifiedErrors[0] ??
+                unifiedWarnings[0] ??
+                ({
+                  type: "General Issue",
+                  message: "No error or warning details provided.",
+                  source: "execution",
+                } satisfies UnifiedError)
+
+              let errorText = `${firstIssue.type}: ${firstIssue.message}`
               if (evalVersion) errorText += `\n@tscircuit/eval@${evalVersion}`
               if (softwareUsedString) errorText += `\n${softwareUsedString}`
-              if (firstError.stack) errorText += `\n${firstError.stack}`
+              if (firstIssue.stack) errorText += `\n${firstIssue.stack}`
               navigator.clipboard.writeText(errorText)
               toast.success("Error copied to clipboard!")
             }}
@@ -387,25 +395,33 @@ export const ErrorTabContent = ({
             variant="outline"
             className="rf-p-1"
             onClick={() => {
-              const firstError = unifiedErrors[0]
-              const title = `Error ${firstError.type}`
+              const firstIssue =
+                unifiedErrors[0] ??
+                unifiedWarnings[0] ??
+                ({
+                  type: "General Issue",
+                  message: "No error or warning details provided.",
+                  source: "execution",
+                } satisfies UnifiedError)
+
+              const title = `Error ${firstIssue.type}`
                 .replace(/[^a-zA-Z0-9 ]/g, " ")
                 .replace(/\s+/g, " ")
                 .slice(0, 100)
 
-              let errorDetails = `${firstError.type}: ${firstError.message}`
+              let errorDetails = `${firstIssue.type}: ${firstIssue.message}`
               if (evalVersion)
                 errorDetails += `\n@tscircuit/eval@${evalVersion}`
               if (softwareUsedString) errorDetails += `\n${softwareUsedString}`
-              if (firstError.stack) errorDetails += `\n${firstError.stack}`
+              if (firstIssue.stack) errorDetails += `\n${firstIssue.stack}`
 
               let body = `[Package code to reproduce](${packageUrl()})\n\n### Error\n\`\`\`\n${errorDetails}\n\`\`\`\n`
               if (body.length > 35000) {
                 const truncatedMessage =
-                  firstError.message.length > 500
-                    ? `${firstError.message.slice(0, 500)}...`
-                    : firstError.message
-                body = `[Package code to reproduce](${packageUrl()})\n\n### Error\n\`\`\`\n${firstError.type}: ${truncatedMessage}\n\`\`\``
+                  firstIssue.message.length > 500
+                    ? `${firstIssue.message.slice(0, 500)}...`
+                    : firstIssue.message
+                body = `[Package code to reproduce](${packageUrl()})\n\n### Error\n\`\`\`\n${firstIssue.type}: ${truncatedMessage}\n\`\`\``
               }
 
               openIssue(title, body)

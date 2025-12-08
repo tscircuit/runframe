@@ -47,6 +47,7 @@ export const RunFrameForCli = (props: {
         showFileMenu={false}
         enableFetchProxy={props.enableFetchProxy}
         initialMainComponentPath={initialMainComponentPath}
+        onLoginRequired={openLoginDialog}
         onMainComponentPathChange={updateMainComponentHash}
         leftHeaderContent={
           <div className="rf-flex rf-items-center rf-justify-between">

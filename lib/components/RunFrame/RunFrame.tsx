@@ -1,6 +1,7 @@
 import { createCircuitWebWorker } from "@tscircuit/eval/worker"
 import Debug from "debug"
 import { Loader2, Play, Square } from "lucide-react"
+import { HTTPError } from "ky"
 import { useEffect, useReducer, useRef, useState } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 import {
@@ -524,11 +525,25 @@ export const RunFrame = (props: RunFrameProps) => {
       })
       .catch((error) => {
         console.error("Failed to report autorouting bug", error)
-        if (error.message.includes("401")) {
-          alert("You must be logged in to report autorouting bugs")
-        } else {
-          alert(`Failed to report autorouting bug: ${error.message}`)
+
+        const isUnauthorized =
+          error instanceof HTTPError && error.response?.status === 401
+
+        if (isUnauthorized) {
+          if (props.onLoginRequired) {
+            props.onLoginRequired()
+          } else {
+            alert("You must be logged in to report autorouting bugs")
+          }
+          return
         }
+
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Failed to report autorouting bug"
+
+        alert(`Failed to report autorouting bug: ${message}`)
       })
   }
 
@@ -606,7 +621,10 @@ export const RunFrame = (props: RunFrameProps) => {
               </div>
             )}
             {props.showFileMenu !== false && (
-              <FileMenuLeftHeader isWebEmbedded={props.isWebEmbedded} />
+              <FileMenuLeftHeader
+                isWebEmbedded={props.isWebEmbedded}
+                onLoginRequired={props.onLoginRequired}
+              />
             )}
             {props.leftHeaderContent}
           </>

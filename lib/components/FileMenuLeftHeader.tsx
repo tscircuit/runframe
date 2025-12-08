@@ -238,6 +238,17 @@ export const FileMenuLeftHeader = (props: {
             </>
           )}
 
+          {!props.isWebEmbedded && props.onLoginRequired && (
+            <DropdownMenuItem
+              className="rf-text-xs"
+              onSelect={() => {
+                props.onLoginRequired?.()
+              }}
+            >
+              Sign In
+            </DropdownMenuItem>
+          )}
+
           {!props.isWebEmbedded && (
             <DropdownMenuItem
               className="rf-text-xs"

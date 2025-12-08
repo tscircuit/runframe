@@ -60,6 +60,11 @@ export interface RunFrameWithApiProps {
    * File filter function to determine which files are valid for display in UI.
    */
   fileFilter?: (filename: string) => boolean
+
+  /**
+   * Called when an action requires authentication (e.g. reporting autorouting bugs)
+   */
+  onLoginRequired?: () => void
 }
 
 export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
@@ -317,6 +322,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
           }),
         })
       }}
+      onLoginRequired={props.onLoginRequired}
       {...componentProp}
     />
   )

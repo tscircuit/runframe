@@ -21,6 +21,7 @@ export const tips = [
   "Check out the [GitHub Discussions page](https://github.com/tscircuit/tscircuit/discussions) to upvote features",
   "You can customize the autorouter using the [autorouter prop](https://docs.tscircuit.com/elements/board#setting-the-autorouter)",
   "Use the [<constraint />](https://docs.tscircuit.com/footprints/constraint) element to enforce geometric relationships in PCB designs.",
+  "When working on component placement and circuit design, autorouting can slow down your iteration cycle. Use [routingDisabled](https://docs.tscircuit.com/elements/board#disabling-routing-with-routingdisabled) on the <board /> element to disable autorouting temporarily.",
   "Join the [Discord server](https://tscircuit.com/join) to discuss issues and get help directly from the community.",
 ]
 

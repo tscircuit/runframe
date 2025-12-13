@@ -61,7 +61,6 @@ export const ErrorTabContent = ({
       errors.push({
         type: "Execution Error",
         message: errorMessage,
-        stack: errorStack || undefined,
         source: "execution",
       })
     }

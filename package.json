@@ -117,5 +117,9 @@
     "tsup": "^8.3.5",
     "vite": "^7.1.2",
     "yargs": "^17.7.2"
+  },
+  "dependencies": {
+    "@tscircuit/capacity-autorouter": "^0.0.181",
+    "@tscircuit/solver-utils": "^0.0.4"
   }
 }

@@ -46,6 +46,7 @@ import {
   buildRunCompletedPayload,
   type RunCompletedPayload,
 } from "./run-completion"
+import type { SolverStartedEvent } from "../../types/solver-events"
 
 const fetchLatestEvalVersion = async () => {
   try {
@@ -187,6 +188,7 @@ export const RunFrame = (props: RunFrameProps) => {
 
   const [renderLog, setRenderLog] = useState<RenderLog | null>(null)
   const [autoroutingLog, setAutoroutingLog] = useState<Record<string, any>>({})
+  const [solverEvents, setSolverEvents] = useState<SolverStartedEvent[]>([])
   const [activeTab, setActiveTab] = useState<TabId>(
     props.defaultActiveTab ?? props.defaultTab ?? "pcb",
   )
@@ -253,6 +255,7 @@ export const RunFrame = (props: RunFrameProps) => {
       setError(null)
       setRenderLog(null)
       setActiveAsyncEffects({})
+      setSolverEvents([])
       const renderLog: RenderLog = { progress: 0, debugOutputs: [] }
       let cancelled = false
 
@@ -322,6 +325,9 @@ export const RunFrame = (props: RunFrameProps) => {
             simpleRouteJson: event.simpleRouteJson,
           },
         })
+      })
+      worker.on("solver:started" as any, (event: SolverStartedEvent) => {
+        setSolverEvents((existing) => [...existing, event])
       })
       worker.on("board:renderPhaseStarted", (event: any) => {
         renderLog.lastRenderEvent = event
@@ -632,6 +638,7 @@ export const RunFrame = (props: RunFrameProps) => {
         onActiveTabChange={setActiveTab}
         circuitJson={circuitJson}
         renderLog={renderLog}
+        solverEvents={solverEvents}
         activeEffectName={activeEffectName}
         isRunningCode={isRunning}
         errorMessage={error?.error}

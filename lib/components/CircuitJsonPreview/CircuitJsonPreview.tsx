@@ -6,6 +6,7 @@ import {
 } from "lib/components/ui/tabs"
 import { cn } from "lib/utils"
 import { CadViewer } from "@tscircuit/3d-viewer"
+import { GenericSolverDebugger } from "@tscircuit/solver-utils/react"
 import { useCallback, useEffect, useState, useMemo } from "react"
 import { ErrorFallback } from "../ErrorFallback"
 import { ErrorBoundary } from "react-error-boundary"
@@ -43,6 +44,7 @@ import { useFullscreenBodyScroll } from "lib/hooks/use-fullscreen-body-scroll"
 import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { capitalizeFirstLetters } from "lib/utils"
+import { createSolverFromEvent } from "lib/utils/create-solver-from-event"
 import { useErrorTelemetry } from "lib/hooks/use-error-telemetry"
 import type { PreviewContentProps, TabId } from "./PreviewContentProps"
 import type { CircuitJsonError } from "circuit-json"
@@ -50,6 +52,7 @@ import { version } from "../../../package.json"
 import type { Object3D } from "three"
 import { useEvalVersions } from "lib/hooks/use-eval-versions"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
+import type { SolverStartedEvent } from "lib/types/solver-events"
 
 declare global {
   interface Window {
@@ -64,6 +67,7 @@ const dropdownMenuItems = [
   "circuit_json",
   "errors",
   "render_log",
+  "solvers",
 ]
 
 export type { PreviewContentProps, TabId }
@@ -83,6 +87,7 @@ export const CircuitJsonPreview = ({
   showRenderLogTab = true,
   onActiveTabChange,
   renderLog,
+  solverEvents,
   showImportAndFormatButtons = true,
   className,
   headerClassName,
@@ -145,6 +150,20 @@ export const CircuitJsonPreview = ({
     circuitJsonErrors,
   })
 
+  const solverEventList = solverEvents ?? []
+  const [selectedSolverIndex, setSelectedSolverIndex] = useState(0)
+
+  useEffect(() => {
+    if (solverEventList.length === 0) {
+      setSelectedSolverIndex(0)
+      return
+    }
+
+    if (selectedSolverIndex >= solverEventList.length) {
+      setSelectedSolverIndex(0)
+    }
+  }, [solverEventList, selectedSolverIndex])
+
   const [activeTab, setActiveTabState] = useLocalStorageState<TabId>(
     "runframe-active-tab",
     defaultActiveTab ?? defaultTab ?? availableTabs?.[0] ?? "pcb",
@@ -192,6 +211,19 @@ export const CircuitJsonPreview = ({
   const setCadViewerRef = useCallback((value: Object3D | null) => {
     window.TSCIRCUIT_3D_OBJECT_REF = value === null ? undefined : value
   }, [])
+
+  const selectedSolverEvent = useMemo(() => {
+    if (solverEventList.length === 0) return null
+
+    return solverEventList[selectedSolverIndex] ?? solverEventList[0]
+  }, [selectedSolverIndex, solverEventList])
+
+  const { solver: selectedSolverInstance, error: solverConstructionError } =
+    useMemo(() => {
+      if (!selectedSolverEvent) return { solver: null, error: null }
+
+      return createSolverFromEvent(selectedSolverEvent as SolverStartedEvent)
+    }, [selectedSolverEvent])
 
   return (
     <div
@@ -717,6 +749,85 @@ export const CircuitJsonPreview = ({
                   />
                 ) : (
                   <PreviewEmptyState onRunClicked={onRunClicked} />
+                )}
+              </div>
+            </TabsContent>
+          )}
+          {(!availableTabs || availableTabs.includes("solvers")) && (
+            <TabsContent value="solvers" className="rf-h-full">
+              <div
+                className={cn(
+                  "rf-overflow-auto",
+                  isFullScreen
+                    ? "rf-h-[calc(100vh-60px)]"
+                    : "rf-h-full rf-min-h-[620px]",
+                )}
+              >
+                {solverEventList.length === 0 ? (
+                  <div className="rf-p-4 rf-text-sm rf-text-gray-600">
+                    No solvers have started yet. Run the circuit to debug solver
+                    execution.
+                  </div>
+                ) : (
+                  <div className="rf-p-4 rf-space-y-4">
+                    <div className="rf-flex rf-gap-3 rf-flex-wrap rf-items-center">
+                      <div className="rf-text-sm rf-font-semibold">
+                        Select solver
+                      </div>
+                      <select
+                        value={selectedSolverIndex}
+                        onChange={(e) =>
+                          setSelectedSolverIndex(Number(e.target.value))
+                        }
+                        className="rf-px-3 rf-py-2 rf-border rf-rounded rf-text-xs rf-bg-white"
+                      >
+                        {solverEventList.map((event, index) => (
+                          <option
+                            key={`${event.solverName}-${index}`}
+                            value={index}
+                          >
+                            {event.solverName} ({event.componentName})
+                          </option>
+                        ))}
+                      </select>
+                      {selectedSolverEvent && (
+                        <div className="rf-text-xs rf-text-gray-600 rf-flex rf-gap-2 rf-items-center">
+                          <span className="rf-font-semibold">Component:</span>
+                          <span className="rf-font-mono rf-bg-gray-100 rf-px-2 rf-py-1 rf-rounded">
+                            {selectedSolverEvent.componentName}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {selectedSolverEvent && (
+                      <details className="rf-bg-gray-50 rf-rounded rf-border rf-border-gray-200 rf-p-3 rf-text-xs">
+                        <summary className="rf-font-semibold rf-cursor-pointer rf-select-none">
+                          Solver parameters
+                        </summary>
+                        <pre className="rf-whitespace-pre-wrap rf-mt-2 rf-text-[11px] rf-font-mono rf-text-gray-700">
+                          {JSON.stringify(
+                            selectedSolverEvent.solverParams,
+                            null,
+                            2,
+                          )}
+                        </pre>
+                      </details>
+                    )}
+
+                    {selectedSolverInstance ? (
+                      <div className="rf-border rf-border-gray-200 rf-rounded-md rf-overflow-hidden">
+                        <GenericSolverDebugger
+                          solver={selectedSolverInstance}
+                        />
+                      </div>
+                    ) : (
+                      <div className="rf-p-4 rf-bg-yellow-50 rf-border rf-border-yellow-200 rf-rounded rf-text-sm rf-text-yellow-900">
+                        {solverConstructionError ||
+                          "Unable to construct solver for debugging."}
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             </TabsContent>

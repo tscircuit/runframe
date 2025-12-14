@@ -72,7 +72,7 @@
     "circuit-json-to-kicad": "^0.0.28",
     "circuit-json-to-lbrn": "^0.0.4",
     "circuit-json-to-pnp-csv": "^0.0.7",
-    "circuit-json-to-step": "^0.0.9",
+    "circuit-json-to-step": "^0.0.10",
     "circuit-to-svg": "^0.0.205",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

@@ -114,6 +114,7 @@ if (process.env.STANDALONE === "preview") {
 
 export default defineConfig({
   plugins,
+  assetsInclude: ["**/*.glb"],
   resolve: {
     alias: {
       lib: resolve(__dirname, "./lib"),

@@ -1,6 +1,6 @@
 import { RunFrame } from "lib/components/RunFrame/RunFrame"
+// @ts-ignore
 import testGlbUrl from "./assets/test.glb"
-
 
 export default () => {
   const projectBaseUrl = testGlbUrl.substring(0, testGlbUrl.lastIndexOf("/"))

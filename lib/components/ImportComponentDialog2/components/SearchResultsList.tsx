@@ -18,7 +18,7 @@ const getResultKey = (result: ImportComponentDialogSearchResult) => {
       const pkg = result.package as Package
       const identifier =
         pkg.package_id ??
-        `${pkg.owner_github_username ?? "unknown"}-${
+        `${pkg.org_owner_tscircuit_handle ?? "unknown"}-${
           pkg.unscoped_name ?? pkg.name ?? "package"
         }`
       return `tscircuit-${identifier}`
@@ -48,8 +48,8 @@ const getSecondaryText = (result: ImportComponentDialogSearchResult) => {
     case "tscircuit.com":
       return (
         result.package.description ||
-        (result.package.owner_github_username
-          ? `Component by ${result.package.owner_github_username}`
+        (result.package.org_owner_tscircuit_handle
+          ? `Component by ${result.package.org_owner_tscircuit_handle}`
           : undefined)
       )
     case "jlcpcb":

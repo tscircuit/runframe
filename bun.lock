@@ -1,6 +1,5 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "@tscircuit/runframe",
@@ -23,7 +22,7 @@
         "@tscircuit/checks": "^0.0.78",
         "@tscircuit/create-snippet-url": "^0.0.9",
         "@tscircuit/eval": "^0.0.537",
-        "@tscircuit/fake-snippets": "^0.0.122",
+        "@tscircuit/fake-snippets": "^0.0.163",
         "@tscircuit/file-server": "^0.0.32",
         "@tscircuit/footprinter": "^0.0.236",
         "@tscircuit/math-utils": "^0.0.25",
@@ -485,7 +484,7 @@
 
     "@tscircuit/eval": ["@tscircuit/eval@0.0.537", "", { "peerDependencies": { "@tscircuit/core": "*", "circuit-json": "*", "typescript": "^5.0.0", "zod": "3" } }, "sha512-PgZK9wozFuuethvrqw/VOF5CICdVSL9VBHQvc4l6ztL83i3YEwUnRXLjbSA9zC7KtWeccSXqj7vTCpme6NMNmQ=="],
 
-    "@tscircuit/fake-snippets": ["@tscircuit/fake-snippets@0.0.122", "", {}, "sha512-XRdwpQK+hcRLhtXon5kGyBge9imymg5XmMMEffZcPFUOcvIFhfcKCxLRtUddHltWh+9YffP9TplTdv2I0QQFkA=="],
+    "@tscircuit/fake-snippets": ["@tscircuit/fake-snippets@0.0.163", "", {}, "sha512-E/ZvC5CRfgG/Q6776ovR4oZuLgXbSxpvffminIwpTE1axg+vrNdOz2RzGBHbZCIcDUhs4etmB85kAizuiNJSBw=="],
 
     "@tscircuit/file-server": ["@tscircuit/file-server@0.0.32", "", { "dependencies": { "winterspec": "^0.0.86", "zod": "^3.23.8", "zustand": "^4.5.5", "zustand-hoist": "^2.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "bin": { "file-server": "dist/cli.js" } }, "sha512-RQDYRjwENDvVK/p0Wtw5rWCZAW2ZL2iKYspEhFr/oWiOC54brtQnL4udgwvyibE0qJxg8v3xR0AxOoebn3HeAA=="],
 

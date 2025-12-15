@@ -157,7 +157,7 @@ export const ImportComponentDialog2 = ({
     setDetailsPreviewTab("pcb")
     setIsDetailsDialogOpen(true)
     resetPackageDetails()
-    const owner = component.package.owner_github_username
+    const owner = component.package.org_owner_tscircuit_handle
     const unscopedName = component.package.unscoped_name
     if (owner && unscopedName) {
       const packageName = unscopedName.split("/").pop() ?? unscopedName
@@ -207,7 +207,7 @@ export const ImportComponentDialog2 = ({
         if (!onTscircuitPackageSelected) {
           throw new Error("tscircuit package handler not provided")
         }
-        const owner = result.package.owner_github_username
+        const owner = result.package.org_owner_tscircuit_handle
         const unscopedName = result.package.unscoped_name
         if (!owner || !unscopedName) {
           throw new Error("Missing package metadata")

@@ -58,9 +58,9 @@ export const mapTscircuitSnippetToSearchResult = (
     name: tscircuitSnippet.unscoped_name,
     description:
       tscircuitSnippet.description ||
-      `Component by ${tscircuitSnippet.owner_github_username}`,
+      `Component by ${tscircuitSnippet.org_owner_tscircuit_handle}`,
     source: "tscircuit.com" as const,
     partNumber: tscircuitSnippet.name,
-    owner: String(tscircuitSnippet.owner_github_username),
+    owner: String(tscircuitSnippet.org_owner_tscircuit_handle),
   }
 }

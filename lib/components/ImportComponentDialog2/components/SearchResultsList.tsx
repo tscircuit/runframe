@@ -18,7 +18,7 @@ const getResultKey = (result: ImportComponentDialogSearchResult) => {
       const pkg = result.package as Package
       const identifier =
         pkg.package_id ??
-        `${pkg.owner_github_username ?? "unknown"}-${
+        `${pkg.org_owner_tscircuit_handle ?? "unknown"}-${
           pkg.unscoped_name ?? pkg.name ?? "package"
         }`
       return `tscircuit-${identifier}`
@@ -48,8 +48,8 @@ const getSecondaryText = (result: ImportComponentDialogSearchResult) => {
     case "tscircuit.com":
       return (
         result.package.description ||
-        (result.package.owner_github_username
-          ? `Component by ${result.package.owner_github_username}`
+        (result.package.org_owner_tscircuit_handle
+          ? `Component by ${result.package.org_owner_tscircuit_handle}`
           : undefined)
       )
     case "jlcpcb":
@@ -79,7 +79,7 @@ export const SearchResultsList = ({
   const selectedKey = selected ? getResultKey(selected) : null
 
   return (
-    <div className="rf-divide-y">
+    <div className="rf-divide-y rf-w-full rf-overflow-hidden">
       {results.map((result) => {
         const key = getResultKey(result)
         const isSelected = selectedKey === key
@@ -91,21 +91,21 @@ export const SearchResultsList = ({
         return (
           <div
             key={key}
-            className={`rf-p-3 rf-flex rf-flex-col sm:rf-grid sm:rf-grid-cols-[1fr_auto] rf-items-start sm:rf-items-center rf-cursor-pointer hover:rf-bg-zinc-100 rf-gap-2 ${isSelected ? "rf-bg-zinc-100" : ""}`}
+            className={`rf-p-3 rf-flex rf-flex-col sm:rf-grid sm:rf-grid-cols-[minmax(0,1fr)_auto] rf-items-start sm:rf-items-center rf-cursor-pointer hover:rf-bg-zinc-100 rf-gap-2 rf-overflow-hidden ${isSelected ? "rf-bg-zinc-100" : ""}`}
             onClick={() => onSelect(result)}
           >
             <div className="rf-min-w-0 rf-overflow-hidden rf-w-full">
-              <div className="rf-flex rf-items-start rf-gap-2">
+              <div className="rf-flex rf-items-start rf-gap-2 rf-min-w-0">
                 <div className="rf-font-medium rf-text-sm rf-truncate rf-flex-1 rf-min-w-0">
                   {primary}
                 </div>
                 {result.source === "jlcpcb" && stock != null ? (
-                  <div className="rf-text-xs rf-text-zinc-500 rf-font-medium rf-whitespace-nowrap sm:rf-hidden">
+                  <div className="rf-text-xs rf-text-zinc-500 rf-font-medium rf-whitespace-nowrap rf-flex-shrink-0 sm:rf-hidden">
                     {stock.toLocaleString()} in stock
                   </div>
                 ) : null}
               </div>
-              <div className="rf-text-xs rf-text-zinc-500 rf-truncate">
+              <div className="rf-text-xs rf-text-zinc-500 rf-truncate rf-w-full">
                 {partNumber ? (
                   <span className="rf-mr-2">{partNumber}</span>
                 ) : null}
@@ -114,7 +114,7 @@ export const SearchResultsList = ({
             </div>
 
             {result.source === "tscircuit.com" && onShowDetails ? (
-              <div className="rf-flex rf-gap-2 rf-flex-shrink-0 rf-w-full sm:rf-w-auto">
+              <div className="rf-flex-shrink-0 rf-w-full sm:rf-w-auto">
                 <Button
                   variant="outline"
                   size="sm"
@@ -128,7 +128,7 @@ export const SearchResultsList = ({
                 </Button>
               </div>
             ) : result.source === "jlcpcb" && stock != null ? (
-              <div className="rf-hidden sm:rf-block rf-text-xs rf-text-zinc-500 rf-font-medium rf-w-full sm:rf-w-auto sm:rf-text-right sm:rf-justify-self-end rf-whitespace-nowrap">
+              <div className="rf-hidden sm:rf-block rf-text-xs rf-text-zinc-500 rf-font-medium rf-whitespace-nowrap rf-flex-shrink-0">
                 {stock.toLocaleString()} in stock
               </div>
             ) : null}

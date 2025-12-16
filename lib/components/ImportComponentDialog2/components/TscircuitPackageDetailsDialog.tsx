@@ -43,7 +43,7 @@ export const TscircuitPackageDetailsDialog = ({
   const schematicPreviewUrl = pkg?.latest_sch_preview_image_url
   const cadPreviewUrl = (pkg as any)?.latest_cad_preview_image_url
   const packageName = pkg?.unscoped_name?.split("/").pop() ?? pkg?.unscoped_name
-  const ownerUsername = pkg?.owner_github_username ?? undefined
+  const ownerUsername = pkg?.org_owner_tscircuit_handle ?? undefined
   const ownerUrl = ownerUsername
     ? `https://tscircuit.com/${ownerUsername}`
     : undefined

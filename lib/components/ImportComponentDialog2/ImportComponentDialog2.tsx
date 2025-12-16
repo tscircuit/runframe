@@ -157,7 +157,7 @@ export const ImportComponentDialog2 = ({
     setDetailsPreviewTab("pcb")
     setIsDetailsDialogOpen(true)
     resetPackageDetails()
-    const owner = component.package.owner_github_username
+    const owner = component.package.org_owner_tscircuit_handle
     const unscopedName = component.package.unscoped_name
     if (owner && unscopedName) {
       const packageName = unscopedName.split("/").pop() ?? unscopedName
@@ -207,7 +207,7 @@ export const ImportComponentDialog2 = ({
         if (!onTscircuitPackageSelected) {
           throw new Error("tscircuit package handler not provided")
         }
-        const owner = result.package.owner_github_username
+        const owner = result.package.org_owner_tscircuit_handle
         const unscopedName = result.package.unscoped_name
         if (!owner || !unscopedName) {
           throw new Error("Missing package metadata")
@@ -280,7 +280,7 @@ export const ImportComponentDialog2 = ({
     <Dialog open={isOpen} onOpenChange={handleDialogClose}>
       <DialogContent
         style={{ width: "calc(100vw - 2rem)" }}
-        className="rf-rounded-sm rf-max-h-[90vh] rf-overflow-y-auto rf-flex rf-flex-col"
+        className="rf-rounded-sm rf-max-h-[90vh] rf-overflow-y-auto rf-overflow-x-hidden rf-flex rf-flex-col"
       >
         <DialogHeader>
           <DialogTitle className="rf-text-lg sm:rf-text-xl">
@@ -297,6 +297,7 @@ export const ImportComponentDialog2 = ({
           <Tabs
             value={activeSource}
             onValueChange={(value) => setActiveSource(value as ImportSource)}
+            className="rf-min-w-0 rf-w-full"
           >
             <TabsList className="rf-flex rf-w-full rf-gap-2">
               {availableSources.map((source) => (
@@ -318,7 +319,7 @@ export const ImportComponentDialog2 = ({
               onSubmit={performSearch}
             />
 
-            <div className="no-scrollbar rf-mt-4 rf-flex-1 rf-min-h-[200px] !rf-max-h-[40vh] !rf-overflow-y-auto rf-border rf-rounded-md">
+            <div className="no-scrollbar rf-mt-4 rf-flex-1 rf-min-h-[200px] !rf-max-h-[40vh] !rf-overflow-y-auto rf-overflow-x-hidden rf-border rf-rounded-md rf-min-w-0">
               {isSearching ? (
                 <div className="rf-p-8 rf-text-center rf-text-zinc-500">
                   <Loader2 className="rf-h-8 rf-w-8 rf-animate-spin rf-mx-auto rf-mb-2" />

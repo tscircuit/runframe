@@ -9,6 +9,12 @@ interface SolversTabContentProps {
   solverEvents?: SolverStartedEvent[]
 }
 
+interface SolverResult {
+  instance: any | null
+  error: string | null
+  classFound: boolean
+}
+
 export const SolversTabContent = ({
   solverEvents = [],
 }: SolversTabContentProps) => {
@@ -30,24 +36,33 @@ export const SolversTabContent = ({
     : null
 
   // Reconstruct the solver instance from the event
-  const selectedSolverInstance = useMemo(() => {
-    if (!selectedSolverEvent) return null
+  const solverResult = useMemo<SolverResult>(() => {
+    if (!selectedSolverEvent) {
+      return { instance: null, error: null, classFound: false }
+    }
 
     const SolverClass = (SOLVERS as Record<string, any>)[
       selectedSolverEvent.solverName
     ]
     if (!SolverClass) {
-      console.warn(
-        `Solver class not found for: ${selectedSolverEvent.solverName}`,
-      )
-      return null
+      return {
+        instance: null,
+        error: `Solver class "${selectedSolverEvent.solverName}" not found in SOLVERS registry. Available: ${Object.keys(SOLVERS).join(", ")}`,
+        classFound: false,
+      }
     }
 
     try {
-      return new SolverClass(selectedSolverEvent.solverParams)
+      const instance = new SolverClass(selectedSolverEvent.solverParams)
+      return { instance, error: null, classFound: true }
     } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : String(e)
       console.error("Failed to reconstruct solver:", e)
-      return null
+      return {
+        instance: null,
+        error: `Failed to instantiate solver: ${errorMessage}`,
+        classFound: true,
+      }
     }
   }, [selectedSolverEvent])
 
@@ -108,7 +123,7 @@ export const SolversTabContent = ({
       {/* Solver Details Panel */}
       <div className="rf-flex-1 rf-overflow-hidden">
         {selectedSolverEvent ? (
-          selectedSolverInstance ? (
+          solverResult.instance ? (
             <ErrorBoundary
               fallback={
                 <div className="rf-p-4">
@@ -124,7 +139,7 @@ export const SolversTabContent = ({
                 </div>
               }
             >
-              <GenericSolverDebugger solver={selectedSolverInstance} />
+              <GenericSolverDebugger solver={solverResult.instance} />
             </ErrorBoundary>
           ) : (
             <div className="rf-p-4">
@@ -136,12 +151,25 @@ export const SolversTabContent = ({
                   Component: {selectedSolverEvent.componentName}
                 </p>
               </div>
-              <div className="rf-bg-yellow-50 rf-rounded-md rf-border rf-border-yellow-200 rf-p-4 rf-mb-4">
-                <p className="rf-text-sm rf-text-yellow-700">
-                  Solver class "{selectedSolverEvent.solverName}" not found in
-                  SOLVERS registry. Showing raw parameters instead.
-                </p>
-              </div>
+              {solverResult.error && (
+                <div
+                  className={`rf-rounded-md rf-border rf-p-4 rf-mb-4 ${
+                    solverResult.classFound
+                      ? "rf-bg-red-50 rf-border-red-200"
+                      : "rf-bg-yellow-50 rf-border-yellow-200"
+                  }`}
+                >
+                  <p
+                    className={`rf-text-sm ${
+                      solverResult.classFound
+                        ? "rf-text-red-700"
+                        : "rf-text-yellow-700"
+                    }`}
+                  >
+                    {solverResult.error}
+                  </p>
+                </div>
+              )}
               <div className="rf-border rf-border-gray-200 rf-rounded-md rf-overflow-hidden">
                 <div className="rf-px-3 rf-py-2 rf-bg-gray-50">
                   <span className="rf-text-sm rf-font-medium rf-text-gray-700">

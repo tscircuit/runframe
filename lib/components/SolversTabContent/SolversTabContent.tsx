@@ -53,7 +53,10 @@ export const SolversTabContent = ({
     }
 
     try {
-      const instance = new SolverClass(selectedSolverEvent.solverParams)
+      // HACK: if "input" is in the result, use that as the constructor parameter
+      const params = selectedSolverEvent.solverParams as Record<string, unknown>
+      const constructorArg = params?.input !== undefined ? params.input : params
+      const instance = new SolverClass(constructorArg)
       return { instance, error: null, classFound: true }
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : String(e)

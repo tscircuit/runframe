@@ -15,6 +15,7 @@ import { AssemblyViewer, PinoutViewer } from "@tscircuit/assembly-viewer"
 import PreviewEmptyState from "../PreviewEmptyState"
 import { CircuitJsonTableViewer } from "../CircuitJsonTableViewer/CircuitJsonTableViewer"
 import { BomTable } from "../BomTable"
+import { AnalogSimulationViewer } from "@tscircuit/schematic-viewer"
 import {
   CheckIcon,
   EllipsisIcon,
@@ -65,6 +66,7 @@ declare global {
 const dropdownMenuItems = [
   "assembly",
   "pinout",
+  "analog_simulation",
   "bom",
   "circuit_json",
   "errors",
@@ -642,6 +644,34 @@ export const CircuitJsonPreview = ({
                       ref={setCadViewerRef}
                       circuitJson={circuitJson as any}
                       autoRotateDisabled={autoRotate3dViewerDisabled}
+                    />
+                  ) : (
+                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                  )}
+                </ErrorBoundary>
+              </div>
+            </TabsContent>
+          )}
+
+          {(!availableTabs || availableTabs.includes("analog_simulation")) && (
+            <TabsContent value="analog_simulation">
+              <div
+                className={cn(
+                  "rf-overflow-auto",
+                  isFullScreen
+                    ? "rf-h-[calc(100vh-60px)]"
+                    : "rf-h-full  rf-min-h-[620px]",
+                )}
+              >
+                <ErrorBoundary
+                  fallback={<div>Error loading Analog Simulation</div>}
+                >
+                  {circuitJson ? (
+                    <AnalogSimulationViewer
+                      circuitJson={circuitJson}
+                      containerStyle={{
+                        height: "100%",
+                      }}
                     />
                   ) : (
                     <PreviewEmptyState onRunClicked={onRunClicked} />

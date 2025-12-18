@@ -4,6 +4,7 @@ import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentPro
 import { SOLVERS } from "@tscircuit/core"
 import { GenericSolverDebugger } from "@tscircuit/solver-utils/react"
 import { ErrorBoundary } from "react-error-boundary"
+import { useInjectTailwind } from "../../hooks/useInjectTailwind"
 
 interface SolversTabContentProps {
   solverEvents?: SolverStartedEvent[]
@@ -19,6 +20,8 @@ export const SolversTabContent = ({
   solverEvents = [],
 }: SolversTabContentProps) => {
   const [selectedSolverId, setSelectedSolverId] = useState<string | null>(null)
+
+  useInjectTailwind()
 
   const solversById = useMemo(() => {
     const map = new Map<string, SolverStartedEvent>()

@@ -116,6 +116,6 @@
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "@tscircuit/solver-utils": "^0.0.4"
+    "@tscircuit/solver-utils": "^0.0.7"
   }
 }

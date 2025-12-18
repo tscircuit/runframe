@@ -45,7 +45,11 @@ import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { SolversTabContent } from "../SolversTabContent/SolversTabContent"
 import { capitalizeFirstLetters } from "lib/utils"
 import { useErrorTelemetry } from "lib/hooks/use-error-telemetry"
-import type { PreviewContentProps, TabId, SolverStartedEvent } from "./PreviewContentProps"
+import type {
+  PreviewContentProps,
+  TabId,
+  SolverStartedEvent,
+} from "./PreviewContentProps"
 import type { CircuitJsonError } from "circuit-json"
 import { version } from "../../../package.json"
 import type { Object3D } from "three"

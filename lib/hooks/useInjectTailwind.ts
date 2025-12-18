@@ -9,10 +9,7 @@ export const useInjectTailwind = () => {
     const tailwindScriptId = "tailwind-cdn-script"
 
     // Check if Tailwind is already loaded (look for existing script or tailwind object)
-    if (
-      document.getElementById(tailwindScriptId) ||
-      (window as any).tailwind
-    ) {
+    if (document.getElementById(tailwindScriptId) || (window as any).tailwind) {
       return
     }
 

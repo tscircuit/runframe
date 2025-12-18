@@ -23,21 +23,15 @@ function useGlbBlobUrl(url: string) {
 export default () => {
   const testGlbUrlBlob = useGlbBlobUrl(testGlbUrl)
 
-  console.log("[example43] testGlbUrlBlob:", testGlbUrlBlob, "length:", testGlbUrlBlob.length)
-
   if (!testGlbUrlBlob) {
-    console.log("[example43] Showing loading state because blob URL is empty")
     return <div>Loading GLB file...</div>
   }
-
-  console.log("[example43] Rendering RunFrame with blob URL:", testGlbUrlBlob.substring(0, 50))
 
   return (
     <RunFrame
       fsMap={{
         "main.tsx": `
 import glbUrl from "./test.glb"
-console.log("[example43] glbUrl value:", glbUrl)
 circuit.add(
   <board width="10mm" height="10mm" thickness="0.1mm">
     <chip
@@ -47,7 +41,7 @@ circuit.add(
         gltfUrl: glbUrl,
         rotationOffset: { x: 90, y: 0, z: 0 },
         positionOffset: { x: 0, y: 0, z: 0.6 },
-        modelUnitToMmScale: 1,
+        modelUnitToMmScale: 1000,
       }}
     />
   </board>

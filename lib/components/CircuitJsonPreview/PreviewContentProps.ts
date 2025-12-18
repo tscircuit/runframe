@@ -2,6 +2,13 @@ import type { RenderLog } from "lib/render-logging/RenderLog"
 import type { ManualEditEvent } from "@tscircuit/props"
 import type { CircuitJson } from "circuit-json"
 
+export interface SolverStartedEvent {
+  type: "solver:started"
+  solverName: string
+  solverParams: unknown
+  componentName: string
+}
+
 export type TabId =
   | "code"
   | "pcb"
@@ -13,6 +20,7 @@ export type TabId =
   | "circuit_json"
   | "errors"
   | "render_log"
+  | "solvers"
 
 export interface PreviewContentProps {
   defaultToFullScreen?: boolean
@@ -110,4 +118,9 @@ export interface PreviewContentProps {
    * Callback to rerun render with debug options
    */
   onRerunWithDebug?: (debugOption: string) => void
+
+  /**
+   * List of solver started events tracked during circuit rendering
+   */
+  solverEvents?: SolverStartedEvent[]
 }

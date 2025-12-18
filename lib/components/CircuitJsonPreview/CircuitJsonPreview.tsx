@@ -42,9 +42,14 @@ import { useStyles } from "lib/hooks/use-styles"
 import { useFullscreenBodyScroll } from "lib/hooks/use-fullscreen-body-scroll"
 import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
+import { SolversTabContent } from "../SolversTabContent/SolversTabContent"
 import { capitalizeFirstLetters } from "lib/utils"
 import { useErrorTelemetry } from "lib/hooks/use-error-telemetry"
-import type { PreviewContentProps, TabId } from "./PreviewContentProps"
+import type {
+  PreviewContentProps,
+  TabId,
+  SolverStartedEvent,
+} from "./PreviewContentProps"
 import type { CircuitJsonError } from "circuit-json"
 import { version } from "../../../package.json"
 import type { Object3D } from "three"
@@ -64,9 +69,10 @@ const dropdownMenuItems = [
   "circuit_json",
   "errors",
   "render_log",
+  "solvers",
 ]
 
-export type { PreviewContentProps, TabId }
+export type { PreviewContentProps, TabId, SolverStartedEvent }
 
 export const CircuitJsonPreview = ({
   code,
@@ -108,6 +114,7 @@ export const CircuitJsonPreview = ({
   isWebEmbedded = false,
   projectName,
   onRerunWithDebug,
+  solverEvents,
 }: PreviewContentProps) => {
   useStyles()
 
@@ -359,6 +366,13 @@ export const CircuitJsonPreview = ({
                               errorMessage) && (
                               <span className="rf-inline-flex rf-items-center rf-justify-center rf-w-3 rf-h-3 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full">
                                 {errorMessage ? 1 : circuitJsonErrors?.length}
+                              </span>
+                            )}
+                          {item === "solvers" &&
+                            solverEvents &&
+                            solverEvents.length > 0 && (
+                              <span className="rf-inline-flex rf-items-center rf-justify-center rf-min-w-[12px] rf-h-3 rf-px-1 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-blue-500 rf-rounded-full">
+                                {solverEvents.length}
                               </span>
                             )}
                         </DropdownMenuItem>
@@ -730,6 +744,22 @@ export const CircuitJsonPreview = ({
                 />
               </TabsContent>
             )}
+          {(!availableTabs || availableTabs.includes("solvers")) && (
+            <TabsContent value="solvers">
+              <div
+                className={cn(
+                  "rf-overflow-hidden",
+                  isFullScreen
+                    ? "rf-h-[calc(100vh-60px)]"
+                    : "rf-h-full rf-min-h-[620px]",
+                )}
+              >
+                <ErrorBoundary fallback={<div>Error loading Solvers view</div>}>
+                  <SolversTabContent solverEvents={solverEvents} />
+                </ErrorBoundary>
+              </div>
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </div>

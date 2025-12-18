@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react"
-import { Box } from "lucide-react"
+import { Box, LayoutGrid, Route } from "lucide-react"
 import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentProps"
 import { SOLVERS } from "@tscircuit/core"
 import { GenericSolverDebugger } from "@tscircuit/solver-utils/react"
@@ -14,6 +14,16 @@ interface SolverResult {
   instance: any | null
   error: string | null
   classFound: boolean
+}
+
+const getSolverIcon = (solverName: string) => {
+  if (solverName.toLowerCase().includes("pack")) {
+    return LayoutGrid
+  }
+  if (solverName.toLowerCase().includes("rout")) {
+    return Route
+  }
+  return Box
 }
 
 export const SolversTabContent = ({
@@ -110,17 +120,22 @@ export const SolversTabContent = ({
               }`}
               onClick={() => setSelectedSolverId(id)}
             >
-              <div className="rf-flex rf-items-center rf-gap-2">
-                <Box className="rf-w-4 rf-h-4 rf-text-blue-500 rf-flex-shrink-0" />
-                <div className="rf-flex-1 rf-min-w-0">
-                  <div className="rf-text-sm rf-font-medium rf-text-gray-800 rf-truncate">
-                    {solver.componentName}
+              {(() => {
+                const SolverIcon = getSolverIcon(solver.solverName)
+                return (
+                  <div className="rf-flex rf-items-center rf-gap-2">
+                    <SolverIcon className="rf-w-4 rf-h-4 rf-text-blue-500 rf-flex-shrink-0" />
+                    <div className="rf-flex-1 rf-min-w-0">
+                      <div className="rf-text-sm rf-font-medium rf-text-gray-800 rf-truncate">
+                        {solver.componentName}
+                      </div>
+                      <div className="rf-text-xs rf-text-gray-500 rf-truncate">
+                        {solver.solverName}
+                      </div>
+                    </div>
                   </div>
-                  <div className="rf-text-xs rf-text-gray-500 rf-truncate">
-                    {solver.solverName}
-                  </div>
-                </div>
-              </div>
+                )
+              })()}
             </div>
           )
         })}

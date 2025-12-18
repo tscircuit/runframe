@@ -2,7 +2,7 @@
   "name": "@tscircuit/runframe",
   "main": "dist/preview.js",
   "type": "module",
-  "version": "0.0.1403",
+  "version": "0.0.1406",
   "exports": {
     ".": "./dist/preview.js",
     "./preview": "./dist/preview.js",
@@ -48,7 +48,7 @@
     "@tscircuit/3d-viewer": "^0.0.476",
     "@tscircuit/assembly-viewer": "^0.0.5",
     "@tscircuit/create-snippet-url": "^0.0.9",
-    "@tscircuit/eval": "^0.0.540",
+    "@tscircuit/eval": "^0.0.541",
     "@tscircuit/fake-snippets": "^0.0.163",
     "@tscircuit/file-server": "^0.0.32",
     "@tscircuit/footprinter": "^0.0.236",

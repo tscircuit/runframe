@@ -1,5 +1,6 @@
 import { RunFrame } from "lib/components/RunFrame/RunFrame"
-import testGlbUrl from "./assets/test.glb?url"
+// @ts-ignore
+import testGlbUrl from "./assets/test.glb"
 import { useState, useEffect } from "react"
 
 function useGlbBlobUrl(url: string) {

@@ -1,3 +1,4 @@
+import { Lock } from "lucide-react"
 import { Button } from "../../ui/button"
 import type { Package } from "@tscircuit/fake-snippets/schema"
 import type {
@@ -96,8 +97,12 @@ export const SearchResultsList = ({
           >
             <div className="rf-min-w-0 rf-overflow-hidden rf-w-full">
               <div className="rf-flex rf-items-start rf-gap-2 rf-min-w-0">
-                <div className="rf-font-medium rf-text-sm rf-truncate rf-flex-1 rf-min-w-0">
+                <div className="rf-font-medium rf-text-sm rf-truncate rf-flex-1 rf-min-w-0 rf-flex rf-items-center rf-gap-1.5">
                   {primary}
+                  {result.source === "tscircuit.com" &&
+                    result.package.is_private && (
+                      <Lock className="rf-ml-1 rf-h-3 rf-w-3 rf-text-zinc-400 rf-flex-shrink-0" />
+                    )}
                 </div>
                 {result.source === "jlcpcb" && stock != null ? (
                   <div className="rf-text-xs rf-text-zinc-500 rf-font-medium rf-whitespace-nowrap rf-flex-shrink-0 sm:rf-hidden">

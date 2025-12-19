@@ -273,6 +273,7 @@ export const RunFrame = (props: RunFrameProps) => {
       const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
         globalThis.runFrameWorker ??
         (await createCircuitWebWorker({
+          tscircuitSessionToken: props.tscircuitSessionToken,
           evalVersion: resolvedEvalVersion,
           webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
           verbose: true,
@@ -327,7 +328,7 @@ export const RunFrame = (props: RunFrameProps) => {
         })
       })
       worker.on("solver:started", (event: SolverStartedEvent) => {
-        console.log("solver:started", event)
+        debug("solver:started", event)
         setSolverEvents((prev) => {
           // Deduplicate by componentName-solverName to avoid counting the same solver multiple times
           const id = `${event.componentName}-${event.solverName}`

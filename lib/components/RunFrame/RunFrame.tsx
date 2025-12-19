@@ -646,7 +646,6 @@ export const RunFrame = (props: RunFrameProps) => {
               <FileMenuLeftHeader
                 isWebEmbedded={props.isWebEmbedded}
                 onLoginRequired={props.onLoginRequired}
-                tscircuitSessionToken={props.tscircuitSessionToken}
               />
             )}
             {props.leftHeaderContent}

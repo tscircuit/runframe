@@ -154,4 +154,9 @@ export interface RunFrameProps {
    * Called when an action requires authentication (e.g. reporting autorouting bugs)
    */
   onLoginRequired?: () => void
+
+  /**
+   * The session token to used for the tscircuit registry
+   */
+  tscircuitSessionToken?: string
 }

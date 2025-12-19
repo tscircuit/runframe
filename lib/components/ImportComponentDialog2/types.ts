@@ -49,6 +49,7 @@ export interface ImportComponentDialog2Props {
   onClose: () => void
   jlcpcbProxyRequestHeaders?: Record<string, string>
   jlcpcbProxyApiBase?: string
+  tscircuitSessionToken?: string
   onKicadStringSelected?: (
     payload: KicadStringSelectedPayload,
   ) => void | Promise<void>

@@ -52,6 +52,7 @@ export const ImportComponentDialog2 = ({
   onTscircuitPackageSelected,
   onJlcpcbComponentTsxLoaded,
   jlcpcbProxyApiBase,
+  tscircuitSessionToken,
 }: ImportComponentDialog2Props) => {
   useStyles()
 
@@ -84,7 +85,7 @@ export const ImportComponentDialog2 = ({
     hasSearched: hasTscircuitSearched,
     search: searchTscircuit,
     reset: resetTscircuitSearch,
-  } = useTscircuitPackageSearch()
+  } = useTscircuitPackageSearch(tscircuitSessionToken)
   const {
     results: jlcpcbResults,
     isSearching: isJlcpcbSearching,

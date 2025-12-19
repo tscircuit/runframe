@@ -52,6 +52,7 @@ export const FileMenuLeftHeader = (props: {
   circuitJson?: any
   projectName?: string
   onLoginRequired?: () => void
+  tscircuitSessionToken?: string
 }) => {
   const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
   const currentMainComponentPath = useRunFrameStore(
@@ -411,6 +412,7 @@ export const FileMenuLeftHeader = (props: {
       <ImportComponentDialogForCli
         isOpen={isImportDialogOpen}
         onClose={() => setIsImportDialogOpen(false)}
+        tscircuitSessionToken={props.tscircuitSessionToken}
       />
       <AiReviewDialog
         isOpen={isAiReviewDialogOpen}

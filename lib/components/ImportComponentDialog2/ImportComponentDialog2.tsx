@@ -85,7 +85,9 @@ export const ImportComponentDialog2 = ({
     hasSearched: hasTscircuitSearched,
     search: searchTscircuit,
     reset: resetTscircuitSearch,
-  } = useTscircuitPackageSearch(tscircuitSessionToken)
+  } = useTscircuitPackageSearch({
+    sessionToken: tscircuitSessionToken,
+  })
   const {
     results: jlcpcbResults,
     isSearching: isJlcpcbSearching,

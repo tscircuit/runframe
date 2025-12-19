@@ -2,7 +2,11 @@ import { useCallback, useState } from "react"
 import { searchTscircuitPackages } from "../api/tscircuit"
 import type { TscircuitPackageSearchResult } from "../types"
 
-export const useTscircuitPackageSearch = (sessionToken?: string) => {
+export const useTscircuitPackageSearch = ({
+  sessionToken,
+}: {
+  sessionToken?: string
+}) => {
   const [results, setResults] = useState<TscircuitPackageSearchResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [error, setError] = useState<string | null>(null)

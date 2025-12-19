@@ -166,6 +166,9 @@ export const RunFrame = (props: RunFrameProps) => {
             ...(window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI && {
               disableCdnLoading: true,
             }),
+            ...(props.tscircuitSessionToken && {
+              tscircuitSessionToken: props.tscircuitSessionToken,
+            }),
           })
           if (cancelled) return
           globalThis.runFrameWorker = worker
@@ -184,6 +187,7 @@ export const RunFrame = (props: RunFrameProps) => {
     props.evalVersion,
     props.evalWebWorkerBlobUrl,
     props.forceLatestEvalVersion,
+    props.tscircuitSessionToken,
   ])
 
   const [renderLog, setRenderLog] = useState<RenderLog | null>(null)
@@ -273,7 +277,6 @@ export const RunFrame = (props: RunFrameProps) => {
       const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
         globalThis.runFrameWorker ??
         (await createCircuitWebWorker({
-          tscircuitSessionToken: props.tscircuitSessionToken,
           evalVersion: resolvedEvalVersion,
           webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
           verbose: true,
@@ -288,6 +291,9 @@ export const RunFrame = (props: RunFrameProps) => {
           }),
           ...(window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI && {
             disableCdnLoading: true,
+          }),
+          ...(props.tscircuitSessionToken && {
+            tscircuitSessionToken: props.tscircuitSessionToken,
           }),
         }))
       globalThis.runFrameWorker = worker

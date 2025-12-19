@@ -16,6 +16,7 @@ export type TabId =
   | "assembly"
   | "pinout"
   | "cad"
+  | "analog_simulation"
   | "bom"
   | "circuit_json"
   | "errors"

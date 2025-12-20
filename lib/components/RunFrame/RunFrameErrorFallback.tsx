@@ -1,5 +1,6 @@
 import { AlertTriangle } from "lucide-react"
 import { Button } from "../ui/button"
+import { cleanStackTrace } from "lib/utils/clean-stack-trace"
 
 interface RunFrameErrorFallbackProps {
   error: Error
@@ -33,7 +34,7 @@ export const RunFrameErrorFallback = ({
                   View stack trace
                 </summary>
                 <pre className="rf-text-xs rf-font-mono no-scrollbar rf-whitespace-pre-wrap rf-text-gray-500 rf-bg-gray-100 rf-p-3 rf-rounded-lg rf-mt-2 rf-overflow-auto rf-text-left rf-max-h-[150px]">
-                  {error.stack}
+                  {cleanStackTrace(error.stack)}
                 </pre>
               </details>
             )}

@@ -13,6 +13,7 @@ import { AutoroutingLogOptions } from "./AutoroutingLogOptions"
 import { useState, useMemo, useEffect } from "react"
 import type { CircuitJsonError } from "circuit-json"
 import { toast } from "lib/utils/toast"
+import { cleanStackTrace } from "lib/utils/clean-stack-trace"
 
 declare global {
   interface Window {
@@ -61,6 +62,7 @@ export const ErrorTabContent = ({
       errors.push({
         type: "Execution Error",
         message: errorMessage,
+        stack: cleanStackTrace(errorStack) || undefined,
         source: "execution",
       })
     }
@@ -70,7 +72,7 @@ export const ErrorTabContent = ({
         errors.push({
           type: error.type || "Circuit JSON Error",
           message: error.message || "No error message available",
-          stack: (error as any).stack || "",
+          stack: cleanStackTrace((error as any).stack) || "",
           source: "circuitJson",
         })
       }
@@ -95,7 +97,7 @@ export const ErrorTabContent = ({
         warnings.push({
           type: warning.type || "Circuit JSON Warning",
           message: warning.message || "No warning message available",
-          stack: (warning as any).stack || "",
+          stack: cleanStackTrace((warning as any).stack) || "",
           source: "circuitJson",
         })
       }
@@ -267,7 +269,6 @@ export const ErrorTabContent = ({
                           {error.stack
                             ?.split("\n")
                             .filter((line) => line.trim())
-                            .slice(1)
                             .map((line, i) => (
                               <div key={i} className="rf-px-2 rf-leading-tight">
                                 <span className="rf-text-xs rf-font-mono rf-text-red-500">
@@ -344,7 +345,6 @@ export const ErrorTabContent = ({
                           {warning.stack
                             ?.split("\n")
                             .filter((line) => line.trim())
-                            .slice(1)
                             .map((line, i) => (
                               <div key={i} className="rf-px-2 rf-leading-tight">
                                 <span className="rf-text-xs rf-font-mono rf-text-orange-500">

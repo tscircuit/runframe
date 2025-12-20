@@ -6,14 +6,20 @@ interface SearchResponse {
 
 export const searchTscircuitPackages = async (
   query: string,
+  sessionToken?: string,
 ): Promise<Package[]> => {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  }
+  if (sessionToken) {
+    headers.Authorization = `Bearer ${sessionToken}`
+  }
+
   const response = await fetch(
     "https://registry-api.tscircuit.com/packages/search",
     {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({ query }),
     },
   )

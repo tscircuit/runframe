@@ -4,6 +4,7 @@ import { openForDownload } from "./open-for-download"
 import { exportGlb } from "./formats/export-glb"
 import { exportPinoutSvg } from "./formats/export-pinout-svg"
 import { exportKicadProject } from "./formats/export-kicad-project"
+import { exportKicadLibrary } from "./formats/export-kicad-library"
 import { exportStep } from "./formats/export-step"
 import { exportLbrn } from "./formats/export-lbrn"
 
@@ -11,6 +12,7 @@ export const availableExports = [
   { extension: "json", name: "Circuit JSON" },
   { extension: "zip", name: "Fabrication Files" },
   { extension: "zip", name: "KiCad Project" },
+  { extension: "zip", name: "KiCad Library" },
   { extension: "glb", name: "GLB (Binary GLTF)" },
   { extension: "svg", name: "Pinout SVG" },
   { extension: "step", name: "STEP" },
@@ -38,6 +40,10 @@ export const exportAndDownload = async ({
   }
   if (exportName === "KiCad Project") {
     await exportKicadProject({ circuitJson, projectName })
+    return
+  }
+  if (exportName === "KiCad Library") {
+    await exportKicadLibrary({ circuitJson, projectName })
     return
   }
   if (exportName === "Circuit JSON") {

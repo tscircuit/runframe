@@ -3,7 +3,6 @@ import * as Core from "@tscircuit/core"
 import createNgspiceSpiceEngine from "@tscircuit/ngspice-spice-engine"
 import { CircuitJsonPreview } from "lib/preview"
 
-// TSX circuit definition
 const SwitchCircuitElement = (
   <board schMaxTraceDistance={10} routingDisabled>
     <voltagesource name="V1" voltage="5V" />

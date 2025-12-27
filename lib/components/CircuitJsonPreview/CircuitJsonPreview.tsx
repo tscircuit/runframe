@@ -66,7 +66,6 @@ declare global {
 const dropdownMenuItems = [
   "assembly",
   "pinout",
-  "analog_simulation",
   "bom",
   "circuit_json",
   "errors",
@@ -326,7 +325,28 @@ export const CircuitJsonPreview = ({
                     3D
                   </TabsTrigger>
                 ) : null}
-                {!["pcb", "cad", "schematic"].includes(activeTab) && (
+                {!availableTabs ||
+                availableTabs.includes("analog_simulation") ? (
+                  <TabsTrigger
+                    value="analog_simulation"
+                    className="rf-whitespace-nowrap"
+                  >
+                    {circuitJson && (
+                      <span
+                        className={cn(
+                          "rf-inline-flex rf-items-center rf-justify-center rf-w-2 rf-h-2 rf-mr-1 rf-text-xs rf-font-bold rf-text-white rf-rounded-full",
+                          !hasCodeChangedSinceLastRun
+                            ? "rf-bg-blue-500"
+                            : "rf-bg-gray-500",
+                        )}
+                      />
+                    )}
+                    Simulation
+                  </TabsTrigger>
+                ) : null}
+                {!["pcb", "cad", "schematic", "analog_simulation"].includes(
+                  activeTab,
+                ) && (
                   <TabsTrigger value={activeTab}>
                     {capitalizeFirstLetters(activeTab)}
                   </TabsTrigger>

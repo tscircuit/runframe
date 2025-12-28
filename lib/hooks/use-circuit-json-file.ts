@@ -17,7 +17,6 @@ export interface UseCircuitJsonFileOptions {
 
 /**
  * Hook to handle circuit.json file detection, parsing, and syncing.
- * Handles all side effects internally - the caller just needs to pass callbacks.
  * Returns isCircuitJsonFile so the caller can skip worker execution when true.
  */
 export const useCircuitJsonFile = ({

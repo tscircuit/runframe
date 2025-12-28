@@ -42,6 +42,7 @@ import { registryKy } from "../../utils/get-registry-ky"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 import { LoadingSkeleton } from "../ui/LoadingSkeleton"
 import { useStyles } from "../../hooks/use-styles"
+import { useCircuitJsonFile } from "../../hooks/use-circuit-json-file"
 import { API_BASE } from "../RunFrameWithApi/api-base"
 import {
   buildRunCompletedPayload,
@@ -209,9 +210,20 @@ export const RunFrame = (props: RunFrameProps) => {
         )
   const lastFsMapRef = useRef<Map<string, string> | null>(null)
   const lastEntrypointRef = useRef<string | null>(null)
+  const { isCircuitJsonFile } = useCircuitJsonFile({
+    mainComponentPath: props.mainComponentPath,
+    fsMap,
+    isLoadingFiles: props.isLoadingFiles,
+    onCircuitJsonChange: props.onCircuitJsonChange,
+    setCircuitJson,
+    setError,
+  })
 
   useEffect(() => {
     if (props.isLoadingFiles) return
+
+    if (isCircuitJsonFile) return
+
     // Convert fsMap to object for consistent handling
     const fsMapObj =
       fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap
@@ -480,6 +492,7 @@ export const RunFrame = (props: RunFrameProps) => {
     props.mainComponentPath,
     props.isLoadingFiles,
     currentDebugOption,
+    isCircuitJsonFile,
   ])
 
   // Updated to debounce edit events so only the last event is emitted after dragging ends

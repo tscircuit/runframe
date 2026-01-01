@@ -20,7 +20,7 @@ import {
   Code,
   Folder,
   ArrowUp,
-  Star,
+  // Star, // Commented out - favorites feature disabled
   Clock,
   Save,
 } from "lucide-react"
@@ -423,7 +423,7 @@ export const EnhancedFileSelectorCombobox = ({
             )}
 
             {/* Directory Header */}
-            <div className="rf-px-3 rf-py-2 rf-border-b rf-border-gray-200 rf-bg-slate-50 rf-flex rf-items-center rf-justify-between rf-gap-2">
+            <div className="rf-px-3 rf-py-2 rf-bg-slate-50 rf-flex rf-items-center rf-justify-between rf-gap-2">
               <div className="rf-flex rf-items-center rf-text-xs rf-text-slate-600 rf-min-w-0 rf-flex-1">
                 <div className="rf-flex rf-items-center rf-min-w-0">
                   <button
@@ -485,7 +485,7 @@ export const EnhancedFileSelectorCombobox = ({
                 <>
                   <CommandEmpty>{emptyMessage}</CommandEmpty>
 
-                  {/* Pinned/Favorites Section */}
+                  {/* Pinned/Favorites Section - Commented out for now
                   {pinnedFiles.length > 0 && (
                     <CommandGroup
                       heading="Favorites"
@@ -533,12 +533,11 @@ export const EnhancedFileSelectorCombobox = ({
                         ))}
                     </CommandGroup>
                   )}
+                  */}
 
                   {/* Current Directory Files */}
                   {currentFiles.length > 0 && (
-                    <CommandGroup
-                      className={`rf-border-b rf-border-gray-200 rf-pb-1`}
-                    >
+                    <CommandGroup className="rf-pb-1">
                       {currentFiles.map((fileNode, index) => (
                         <CommandItem
                           key={fileNode.path}
@@ -554,6 +553,7 @@ export const EnhancedFileSelectorCombobox = ({
                           </span>
                           {getDisplayName(fileNode.name)}
                           <div className="rf-ml-auto rf-flex rf-items-center rf-gap-1">
+                            {/* Favorite star button - commented out for now
                             {onToggleFavorite && (
                               <button
                                 type="button"
@@ -588,6 +588,7 @@ export const EnhancedFileSelectorCombobox = ({
                                 />
                               </button>
                             )}
+                            */}
                             <Check
                               className={cn(
                                 "rf-h-4 rf-w-4",
@@ -604,9 +605,7 @@ export const EnhancedFileSelectorCombobox = ({
 
                   {/* Subdirectories */}
                   {currentFolders.length > 0 && (
-                    <CommandGroup
-                      className={`rf-border-b rf-border-gray-200 rf-pb-1`}
-                    >
+                    <CommandGroup className="rf-pb-1">
                       {currentFolders.map((folderNode) => (
                         <CommandItem
                           key={folderNode.path}
@@ -643,7 +642,7 @@ export const EnhancedFileSelectorCombobox = ({
                     <>
                       {/* Current Directory Search Results */}
                       {searchResults.currentDirResults.length > 0 && (
-                        <CommandGroup className="rf-border-b rf-border-gray-200 rf-pb-1">
+                        <CommandGroup className="rf-pb-1">
                           {searchResults.currentDirResults.map(
                             (file, index) => (
                               <CommandItem
@@ -669,6 +668,7 @@ export const EnhancedFileSelectorCombobox = ({
                                   <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[40%]">
                                     {currentFolder || "/"}
                                   </span>
+                                  {/* Favorite star button - commented out for now
                                   {onToggleFavorite && (
                                     <button
                                       type="button"
@@ -703,6 +703,7 @@ export const EnhancedFileSelectorCombobox = ({
                                       />
                                     </button>
                                   )}
+                                  */}
                                   {file.path === currentFile && (
                                     <Check className="rf-ml-2 rf-h-4 rf-w-4 rf-flex-shrink-0" />
                                   )}
@@ -740,6 +741,7 @@ export const EnhancedFileSelectorCombobox = ({
                                 <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[40%]">
                                   {getDirectoryPath(file.path)}
                                 </span>
+                                {/* Favorite star button - commented out for now
                                 {onToggleFavorite && (
                                   <button
                                     onClick={(e) => {
@@ -768,6 +770,7 @@ export const EnhancedFileSelectorCombobox = ({
                                     />
                                   </button>
                                 )}
+                                */}
                                 {file.path === currentFile && (
                                   <Check className="rf-ml-2 rf-h-4 rf-w-4 rf-flex-shrink-0" />
                                 )}

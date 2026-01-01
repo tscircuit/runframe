@@ -354,7 +354,7 @@ export const EnhancedFileSelectorCombobox = ({
         </PopoverTrigger>
         <PopoverContent
           className={cn(
-            "!rf-p-0 !rf-overflow-hidden !rf-z-[200]",
+            "!rf-p-0 !rf-overflow-y-auto !rf-max-h-[80vh] !rf-z-[200]",
             getDropdownWidth(),
           )}
         >
@@ -480,7 +480,7 @@ export const EnhancedFileSelectorCombobox = ({
               </div>
             </div>
 
-            <CommandList className="rf-max-h-[70vh] rf-overflow-y-auto">
+            <CommandList className="rf-overflow-visible rf-max-h-none">
               {!isSearching ? (
                 <>
                   <CommandEmpty>{emptyMessage}</CommandEmpty>

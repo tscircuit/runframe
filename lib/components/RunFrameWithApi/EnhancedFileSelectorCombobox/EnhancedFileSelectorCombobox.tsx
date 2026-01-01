@@ -13,16 +13,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover"
 import {
   ChevronsUpDown,
   Check,
-  ChevronLeft,
   ChevronRight,
+  ChevronDown,
   File,
   FileText,
   Code,
   Folder,
   ArrowUp,
   Star,
-  Eye,
-  EyeOff,
   Clock,
   Save,
 } from "lucide-react"
@@ -107,7 +105,7 @@ export const EnhancedFileSelectorCombobox = ({
   >("runframe:recentlyViewed", [])
   const [showRecents, setShowRecents] = useLocalStorageState(
     "runframe:showRecents",
-    true,
+    false,
   )
 
   // Add global Cmd+K / Ctrl+K hotkey to open file selector
@@ -368,8 +366,64 @@ export const EnhancedFileSelectorCombobox = ({
               onValueChange={setSearchValue}
             />
 
+            {/* Recent Files Section - Collapsible, above directory */}
+            {recentFiles.length > 0 && (
+              <div className="rf-border-b rf-border-gray-200">
+                <button
+                  onClick={() => setShowRecents(!showRecents)}
+                  className="rf-w-full rf-px-3 rf-py-2 rf-flex rf-items-center rf-justify-between rf-text-xs rf-text-slate-600 hover:rf-bg-slate-50 rf-bg-transparent rf-border-none rf-cursor-pointer"
+                >
+                  <span className="rf-font-medium">Recent Files</span>
+                  <ChevronDown
+                    className={cn(
+                      "rf-h-4 rf-w-4 rf-transition-transform",
+                      !showRecents && "-rf-rotate-90",
+                    )}
+                  />
+                </button>
+                {showRecents && (
+                  <div className="rf-pb-1">
+                    {recentFiles.map((item, index) => (
+                      <div
+                        key={item.path}
+                        onClick={() => selectFile(item.path, index, true)}
+                        className={cn(
+                          "rf-flex rf-items-center rf-px-3 rf-py-1.5 rf-cursor-pointer hover:rf-bg-slate-100",
+                          item.path === currentFile && "rf-font-medium",
+                        )}
+                      >
+                        {item.type === "saved" ? (
+                          <span title="Recently saved">
+                            <Save className="rf-mr-2 rf-h-4 rf-w-4 rf-text-green-500" />
+                          </span>
+                        ) : (
+                          <span title="Recently viewed">
+                            <Clock className="rf-mr-2 rf-h-4 rf-w-4 rf-text-blue-500" />
+                          </span>
+                        )}
+                        <span className="rf-text-sm">
+                          {getDisplayName(item.path.split("/").pop() || "")}
+                        </span>
+                        <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[40%]">
+                          {getDirectoryPath(item.path)}
+                        </span>
+                        <Check
+                          className={cn(
+                            "rf-ml-auto rf-h-4 rf-w-4",
+                            item.path === currentFile
+                              ? "rf-opacity-100"
+                              : "rf-opacity-0",
+                          )}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Directory Header */}
-            <div className="rf-px-3 rf-py-2 rf-border-t rf-border-b rf-border-gray-200 rf-bg-slate-50 rf-flex rf-items-center rf-justify-between rf-gap-2">
+            <div className="rf-px-3 rf-py-2 rf-border-b rf-border-gray-200 rf-bg-slate-50 rf-flex rf-items-center rf-justify-between rf-gap-2">
               <div className="rf-flex rf-items-center rf-text-xs rf-text-slate-600 rf-min-w-0 rf-flex-1">
                 <div className="rf-flex rf-items-center rf-min-w-0">
                   <button
@@ -430,67 +484,6 @@ export const EnhancedFileSelectorCombobox = ({
               {!isSearching ? (
                 <>
                   <CommandEmpty>{emptyMessage}</CommandEmpty>
-
-                  {/* Recent Files Section - Show only if there are filtered recent files to display */}
-                  {recentFiles.length > 0 && (
-                    <CommandGroup
-                      heading={
-                        <div className="rf-flex rf-items-center rf-gap-0">
-                          <span className="rf-leading-none">Recent Files</span>
-                          <button
-                            onClick={() => setShowRecents(!showRecents)}
-                            className="rf-flex rf-items-center rf-justify-center rf-text-slate-600 hover:rf-text-slate-800 rf-bg-transparent rf-border-none rf-p-0 rf-w-3.5 rf-h-3.5 rf-ml-2"
-                            title={
-                              showRecents
-                                ? "Hide recent files"
-                                : "Show recent files"
-                            }
-                          >
-                            {showRecents ? (
-                              <Eye className="rf-h-3.5 rf-w-3.5" />
-                            ) : (
-                              <EyeOff className="rf-h-3.5 rf-w-3.5" />
-                            )}
-                          </button>
-                        </div>
-                      }
-                      className="rf-border-b rf-border-gray-200 rf-pb-1 rf-bg-blue-50/30"
-                    >
-                      {showRecents &&
-                        recentFiles.map((item, index) => (
-                          <CommandItem
-                            key={item.path}
-                            value={`recent:${item.path}`}
-                            onSelect={() => selectFile(item.path, index, true)}
-                            className={cn(
-                              item.path === currentFile && "rf-font-medium",
-                            )}
-                          >
-                            {item.type === "saved" ? (
-                              <span title="Recently saved">
-                                <Save className="rf-mr-2 rf-h-4 rf-w-4 rf-text-green-500" />
-                              </span>
-                            ) : (
-                              <span title="Recently viewed">
-                                <Clock className="rf-mr-2 rf-h-4 rf-w-4 rf-text-blue-500" />
-                              </span>
-                            )}
-                            {getDisplayName(item.path.split("/").pop() || "")}
-                            <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[40%]">
-                              {getDirectoryPath(item.path)}
-                            </span>
-                            <Check
-                              className={cn(
-                                "rf-ml-auto rf-h-4 rf-w-4",
-                                item.path === currentFile
-                                  ? "rf-opacity-100"
-                                  : "rf-opacity-0",
-                              )}
-                            />
-                          </CommandItem>
-                        ))}
-                    </CommandGroup>
-                  )}
 
                   {/* Pinned/Favorites Section */}
                   {pinnedFiles.length > 0 && (

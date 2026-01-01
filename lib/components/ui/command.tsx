@@ -62,7 +62,7 @@ const CommandList = React.forwardRef<
   <CommandPrimitive.List
     ref={ref}
     className={cn(
-      "rf-max-h-[300px] rf-overflow-y-auto rf-overflow-x-hidden",
+      "rf-max-h-[300px] rf-overflow-y-auto rf-overflow-x-hidden rf-py-1",
       className,
     )}
     {...props}
@@ -91,7 +91,7 @@ const CommandGroup = React.forwardRef<
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
-      "rf-overflow-hidden rf-p-1 rf-text-zinc-950 [&_[cmdk-group-heading]]:rf-px-2 [&_[cmdk-group-heading]]:rf-py-1.5 [&_[cmdk-group-heading]]:rf-text-xs [&_[cmdk-group-heading]]:rf-font-medium [&_[cmdk-group-heading]]:rf-text-zinc-500 dark:rf-text-zinc-50 dark:[&_[cmdk-group-heading]]:rf-text-zinc-400",
+      "rf-overflow-hidden rf-px-1 rf-py-0 rf-text-zinc-950 [&_[cmdk-group-heading]]:rf-px-2 [&_[cmdk-group-heading]]:rf-py-1.5 [&_[cmdk-group-heading]]:rf-text-xs [&_[cmdk-group-heading]]:rf-font-medium [&_[cmdk-group-heading]]:rf-text-zinc-500 dark:rf-text-zinc-50 dark:[&_[cmdk-group-heading]]:rf-text-zinc-400",
       className,
     )}
     {...props}

@@ -1,71 +1,52 @@
-import { useEffect, useMemo } from "react"
+import { useMemo } from "react"
 import type { CircuitJson } from "circuit-json"
-
-export interface CircuitJsonFileError {
-  error: string
-  stack: string
-}
 
 export interface UseCircuitJsonFileOptions {
   mainComponentPath?: string
   fsMap: Map<string, string>
-  isLoadingFiles?: boolean
-  onCircuitJsonChange?: (circuitJson: CircuitJson) => void
-  setCircuitJson: (circuitJson: CircuitJson) => void
-  setError: (error: CircuitJsonFileError | null) => void
+}
+
+export interface UseCircuitJsonFileResult {
+  isCircuitJsonFile: boolean
+  data: CircuitJson | null
+  error: string | null
 }
 
 /**
- * Hook to handle circuit.json file detection, parsing, and syncing.
- * Returns isCircuitJsonFile so the caller can skip worker execution when true.
+ * Hook to detect and parse circuit.json files.
+ * Returns the parsed data synchronously.
  */
 export const useCircuitJsonFile = ({
   mainComponentPath,
   fsMap,
-  isLoadingFiles,
-  onCircuitJsonChange,
-  setCircuitJson,
-  setError,
-}: UseCircuitJsonFileOptions): { isCircuitJsonFile: boolean } => {
-  const isCircuitJsonFile = useMemo(() => {
-    return (
+}: UseCircuitJsonFileOptions): UseCircuitJsonFileResult => {
+  return useMemo(() => {
+    const isCircuitJsonFile =
       mainComponentPath?.endsWith(".circuit.json") ||
       mainComponentPath?.toLowerCase() === "circuit.json"
-    )
-  }, [mainComponentPath])
 
-  useEffect(() => {
-    if (!isCircuitJsonFile || isLoadingFiles) return
+    if (!isCircuitJsonFile) {
+      return { isCircuitJsonFile: false, data: null, error: null }
+    }
 
     const circuitJsonContent = fsMap.get(mainComponentPath!)
     if (!circuitJsonContent) {
-      setError({
+      return {
+        isCircuitJsonFile: true,
+        data: null,
         error: `Circuit JSON file not found: ${mainComponentPath}`,
-        stack: "",
-      })
-      return
+      }
     }
 
     try {
       const parsed = JSON.parse(circuitJsonContent) as CircuitJson
-      setCircuitJson(parsed)
-      setError(null)
-      onCircuitJsonChange?.(parsed)
+      return { isCircuitJsonFile: true, data: parsed, error: null }
     } catch (e) {
-      setError({
+      return {
+        isCircuitJsonFile: true,
+        data: null,
         error: `Failed to parse circuit.json: ${e instanceof Error ? e.message : String(e)}`,
-        stack: "",
-      })
+      }
     }
-  }, [
-    isCircuitJsonFile,
-    mainComponentPath,
-    fsMap,
-    isLoadingFiles,
-    onCircuitJsonChange,
-    setCircuitJson,
-    setError,
-  ])
-
-  return { isCircuitJsonFile }
+  }, [mainComponentPath, fsMap])
 }

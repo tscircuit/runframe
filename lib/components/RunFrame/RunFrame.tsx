@@ -210,19 +210,27 @@ export const RunFrame = (props: RunFrameProps) => {
         )
   const lastFsMapRef = useRef<Map<string, string> | null>(null)
   const lastEntrypointRef = useRef<string | null>(null)
-  const { isCircuitJsonFile } = useCircuitJsonFile({
+  const circuitJsonFile = useCircuitJsonFile({
     mainComponentPath: props.mainComponentPath,
     fsMap,
-    isLoadingFiles: props.isLoadingFiles,
-    onCircuitJsonChange: props.onCircuitJsonChange,
-    setCircuitJson,
-    setError,
   })
+
+  // Sync circuit.json file to store when detected
+  useEffect(() => {
+    if (!circuitJsonFile.isCircuitJsonFile) return
+
+    if (circuitJsonFile.data) {
+      setCircuitJson(circuitJsonFile.data)
+      setError(null)
+    } else if (circuitJsonFile.error) {
+      setError({ error: circuitJsonFile.error, stack: "" })
+    }
+  }, [circuitJsonFile])
 
   useEffect(() => {
     if (props.isLoadingFiles) return
 
-    if (isCircuitJsonFile) return
+    if (circuitJsonFile.isCircuitJsonFile) return
 
     // Convert fsMap to object for consistent handling
     const fsMapObj =
@@ -492,7 +500,7 @@ export const RunFrame = (props: RunFrameProps) => {
     props.mainComponentPath,
     props.isLoadingFiles,
     currentDebugOption,
-    isCircuitJsonFile,
+    circuitJsonFile.isCircuitJsonFile,
   ])
 
   // Updated to debounce edit events so only the last event is emitted after dragging ends

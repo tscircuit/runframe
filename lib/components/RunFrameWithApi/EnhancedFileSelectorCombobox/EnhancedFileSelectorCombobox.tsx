@@ -537,7 +537,7 @@ export const EnhancedFileSelectorCombobox = ({
 
                   {/* Current Directory Files */}
                   {currentFiles.length > 0 && (
-                    <CommandGroup className="rf-pb-1">
+                    <CommandGroup>
                       {currentFiles.map((fileNode, index) => (
                         <CommandItem
                           key={fileNode.path}
@@ -605,7 +605,7 @@ export const EnhancedFileSelectorCombobox = ({
 
                   {/* Subdirectories */}
                   {currentFolders.length > 0 && (
-                    <CommandGroup className="rf-pb-1">
+                    <CommandGroup>
                       {currentFolders.map((folderNode) => (
                         <CommandItem
                           key={folderNode.path}
@@ -642,7 +642,7 @@ export const EnhancedFileSelectorCombobox = ({
                     <>
                       {/* Current Directory Search Results */}
                       {searchResults.currentDirResults.length > 0 && (
-                        <CommandGroup className="rf-pb-1">
+                        <CommandGroup>
                           {searchResults.currentDirResults.map(
                             (file, index) => (
                               <CommandItem
@@ -716,7 +716,7 @@ export const EnhancedFileSelectorCombobox = ({
 
                       {/* Global Search Results */}
                       {searchResults.globalResults.length > 0 && (
-                        <CommandGroup className="rf-pb-1">
+                        <CommandGroup>
                           {searchResults.globalResults.map((file) => (
                             <CommandItem
                               key={file.path}

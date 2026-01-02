@@ -7,8 +7,8 @@ export interface UseCircuitJsonFileOptions {
 }
 
 export interface UseCircuitJsonFileResult {
-  isCircuitJsonFile: boolean
-  data: CircuitJson | null
+  isStaticCircuitJson: boolean
+  circuitJson: CircuitJson | null
   error: string | null
 }
 
@@ -21,30 +21,30 @@ export const useCircuitJsonFile = ({
   fsMap,
 }: UseCircuitJsonFileOptions): UseCircuitJsonFileResult => {
   return useMemo(() => {
-    const isCircuitJsonFile =
+    const isStaticCircuitJson =
       mainComponentPath?.endsWith(".circuit.json") ||
       mainComponentPath?.toLowerCase() === "circuit.json"
 
-    if (!isCircuitJsonFile) {
-      return { isCircuitJsonFile: false, data: null, error: null }
+    if (!isStaticCircuitJson) {
+      return { isStaticCircuitJson: false, circuitJson: null, error: null }
     }
 
     const circuitJsonContent = fsMap.get(mainComponentPath!)
     if (!circuitJsonContent) {
       return {
-        isCircuitJsonFile: true,
-        data: null,
+        isStaticCircuitJson: true,
+        circuitJson: null,
         error: `Circuit JSON file not found: ${mainComponentPath}`,
       }
     }
 
     try {
       const parsed = JSON.parse(circuitJsonContent) as CircuitJson
-      return { isCircuitJsonFile: true, data: parsed, error: null }
+      return { isStaticCircuitJson: true, circuitJson: parsed, error: null }
     } catch (e) {
       return {
-        isCircuitJsonFile: true,
-        data: null,
+        isStaticCircuitJson: true,
+        circuitJson: null,
         error: `Failed to parse circuit.json: ${e instanceof Error ? e.message : String(e)}`,
       }
     }

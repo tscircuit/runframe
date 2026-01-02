@@ -210,27 +210,31 @@ export const RunFrame = (props: RunFrameProps) => {
         )
   const lastFsMapRef = useRef<Map<string, string> | null>(null)
   const lastEntrypointRef = useRef<string | null>(null)
-  const circuitJsonFile = useCircuitJsonFile({
+  const {
+    isStaticCircuitJson,
+    circuitJson: circuitJsonFileParsedContent,
+    error: circuitJsonFileError,
+  } = useCircuitJsonFile({
     mainComponentPath: props.mainComponentPath,
     fsMap,
   })
 
   // Sync circuit.json file to store when detected
   useEffect(() => {
-    if (!circuitJsonFile.isCircuitJsonFile) return
+    if (!isStaticCircuitJson) return
 
-    if (circuitJsonFile.data) {
-      setCircuitJson(circuitJsonFile.data)
+    if (circuitJsonFileParsedContent) {
+      setCircuitJson(circuitJsonFileParsedContent)
       setError(null)
-    } else if (circuitJsonFile.error) {
-      setError({ error: circuitJsonFile.error, stack: "" })
+    } else if (circuitJsonFileError) {
+      setError({ error: circuitJsonFileError, stack: "" })
     }
-  }, [circuitJsonFile])
+  }, [isStaticCircuitJson, circuitJsonFileParsedContent, circuitJsonFileError])
 
   useEffect(() => {
     if (props.isLoadingFiles) return
 
-    if (circuitJsonFile.isCircuitJsonFile) return
+    if (isStaticCircuitJson) return
 
     // Convert fsMap to object for consistent handling
     const fsMapObj =
@@ -500,7 +504,7 @@ export const RunFrame = (props: RunFrameProps) => {
     props.mainComponentPath,
     props.isLoadingFiles,
     currentDebugOption,
-    circuitJsonFile.isCircuitJsonFile,
+    isStaticCircuitJson,
   ])
 
   // Updated to debounce edit events so only the last event is emitted after dragging ends

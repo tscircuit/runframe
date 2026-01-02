@@ -47,7 +47,12 @@ import {
   buildRunCompletedPayload,
   type RunCompletedPayload,
 } from "./run-completion"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip"
 
 const fetchLatestEvalVersion = async () => {
   try {
@@ -205,9 +210,9 @@ export const RunFrame = (props: RunFrameProps) => {
     props.fsMap instanceof Map
       ? props.fsMap
       : Object.entries(props.fsMap ?? {}).reduce(
-        (m, [k, v]) => m.set(k, v),
-        new Map(),
-      )
+          (m, [k, v]) => m.set(k, v),
+          new Map(),
+        )
   const lastFsMapRef = useRef<Map<string, string> | null>(null)
   const lastEntrypointRef = useRef<string | null>(null)
 
@@ -592,10 +597,8 @@ export const RunFrame = (props: RunFrameProps) => {
           <>
             {props.showRunButton && (
               <TooltipProvider>
-
                 <Tooltip>
                   <TooltipTrigger asChild>
-
                     <div className="rf-relative rf-inline-flex">
                       <button
                         type="button"
@@ -649,16 +652,24 @@ export const RunFrame = (props: RunFrameProps) => {
                     </div>
                   </TooltipTrigger>
 
-                  <TooltipContent sideOffset={8} className="rf-p-0 rf-bg-transparent rf-border-none rf-shadow-none rf-pointer-events-none">
+                  <TooltipContent
+                    sideOffset={8}
+                    className="rf-p-0 rf-bg-transparent rf-border-none rf-shadow-none rf-pointer-events-none"
+                  >
                     <div className="rf-flex rf-items-center rf-gap-2 rf-px-2.5 rf-py-1.5 rf-bg-slate-900 rf-rounded-md rf-shadow-xl rf-border rf-border-slate-800/60">
-                      <kbd className="rf-bg-slate-800 rf-px-1.5 rf-py-0.5 rf-rounded rf-text-[10px] rf-font-sans rf-font-medium rf-border rf-border-slate-700 rf-text-slate-200 rf-leading-none">Ctrl</kbd>
-                      <span className="rf-text-slate-500 rf-text-[11px] rf-font-medium rf-leading-none">+</span>
-                      <kbd className="rf-bg-slate-800 rf-px-1.5 rf-py-0.5 rf-rounded rf-text-[10px] rf-font-sans rf-font-medium rf-border rf-border-slate-700 rf-text-slate-200 rf-leading-none">Enter</kbd>
+                      <kbd className="rf-bg-slate-800 rf-px-1.5 rf-py-0.5 rf-rounded rf-text-[10px] rf-font-sans rf-font-medium rf-border rf-border-slate-700 rf-text-slate-200 rf-leading-none">
+                        Ctrl
+                      </kbd>
+                      <span className="rf-text-slate-500 rf-text-[11px] rf-font-medium rf-leading-none">
+                        +
+                      </span>
+                      <kbd className="rf-bg-slate-800 rf-px-1.5 rf-py-0.5 rf-rounded rf-text-[10px] rf-font-sans rf-font-medium rf-border rf-border-slate-700 rf-text-slate-200 rf-leading-none">
+                        Enter
+                      </kbd>
                     </div>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-
             )}
             {props.showFileMenu !== false && (
               <FileMenuLeftHeader

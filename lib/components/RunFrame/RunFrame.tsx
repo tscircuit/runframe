@@ -42,6 +42,7 @@ import { registryKy } from "../../utils/get-registry-ky"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 import { LoadingSkeleton } from "../ui/LoadingSkeleton"
 import { useStyles } from "../../hooks/use-styles"
+import { useCircuitJsonFile } from "../../hooks/use-circuit-json-file"
 import { API_BASE } from "../RunFrameWithApi/api-base"
 import {
   buildRunCompletedPayload,
@@ -209,9 +210,32 @@ export const RunFrame = (props: RunFrameProps) => {
         )
   const lastFsMapRef = useRef<Map<string, string> | null>(null)
   const lastEntrypointRef = useRef<string | null>(null)
+  const {
+    isStaticCircuitJson,
+    circuitJson: circuitJsonFileParsedContent,
+    error: circuitJsonFileError,
+  } = useCircuitJsonFile({
+    mainComponentPath: props.mainComponentPath,
+    fsMap,
+  })
+
+  // Sync circuit.json file to store when detected
+  useEffect(() => {
+    if (!isStaticCircuitJson) return
+
+    if (circuitJsonFileParsedContent) {
+      setCircuitJson(circuitJsonFileParsedContent)
+      setError(null)
+    } else if (circuitJsonFileError) {
+      setError({ error: circuitJsonFileError, stack: "" })
+    }
+  }, [isStaticCircuitJson, circuitJsonFileParsedContent, circuitJsonFileError])
 
   useEffect(() => {
     if (props.isLoadingFiles) return
+
+    if (isStaticCircuitJson) return
+
     // Convert fsMap to object for consistent handling
     const fsMapObj =
       fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap
@@ -480,6 +504,7 @@ export const RunFrame = (props: RunFrameProps) => {
     props.mainComponentPath,
     props.isLoadingFiles,
     currentDebugOption,
+    isStaticCircuitJson,
   ])
 
   // Updated to debounce edit events so only the last event is emitted after dragging ends

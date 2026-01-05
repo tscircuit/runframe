@@ -283,7 +283,7 @@ export const ImportComponentDialog2 = ({
     <Dialog open={isOpen} onOpenChange={handleDialogClose}>
       <DialogContent
         style={{ width: "calc(100vw - 2rem)" }}
-        className="rf-rounded-sm rf-max-h-[90vh] rf-overflow-y-auto rf-overflow-x-hidden rf-flex rf-flex-col"
+        className="!rf-z-[100] rf-rounded-sm rf-max-h-[90vh] rf-overflow-y-auto rf-overflow-x-hidden rf-flex rf-flex-col"
       >
         <DialogHeader>
           <DialogTitle className="rf-text-lg sm:rf-text-xl">

@@ -26,7 +26,7 @@ import { useTscircuitPackageSearch } from "./hooks/useTscircuitPackageSearch"
 import { useJlcpcbComponentSearch } from "./hooks/useJlcpcbComponentSearch"
 import { useKicadFootprintSearch } from "./hooks/useKicadFootprintSearch"
 import { useStyles } from "../../hooks/use-styles"
-import { zIndexMap } from "../../z-index-map"
+import { zIndexMap } from "lib/utils/z-index-map" 
 
 const computeAvailableSources = ({
   onTscircuitPackageSelected,

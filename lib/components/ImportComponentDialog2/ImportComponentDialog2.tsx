@@ -26,6 +26,7 @@ import { useTscircuitPackageSearch } from "./hooks/useTscircuitPackageSearch"
 import { useJlcpcbComponentSearch } from "./hooks/useJlcpcbComponentSearch"
 import { useKicadFootprintSearch } from "./hooks/useKicadFootprintSearch"
 import { useStyles } from "../../hooks/use-styles"
+import { zIndexMap } from "../../z-index-map"
 
 const computeAvailableSources = ({
   onTscircuitPackageSelected,
@@ -282,8 +283,8 @@ export const ImportComponentDialog2 = ({
   return (
     <Dialog open={isOpen} onOpenChange={handleDialogClose}>
       <DialogContent
-        style={{ width: "calc(100vw - 2rem)" }}
-        className="!rf-z-[100] rf-rounded-sm rf-max-h-[90vh] rf-overflow-y-auto rf-overflow-x-hidden rf-flex rf-flex-col"
+        style={{ width: "calc(100vw - 2rem)", zIndex: zIndexMap.dialog }}
+        className="rf-rounded-sm rf-max-h-[90vh] rf-overflow-y-auto rf-overflow-x-hidden rf-flex rf-flex-col"
       >
         <DialogHeader>
           <DialogTitle className="rf-text-lg sm:rf-text-xl">

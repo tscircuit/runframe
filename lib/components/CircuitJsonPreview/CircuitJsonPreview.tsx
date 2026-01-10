@@ -637,7 +637,14 @@ export const CircuitJsonPreview = ({
                     : "rf-h-full  rf-min-h-[620px]",
                 )}
               >
-                <ErrorBoundary FallbackComponent={ErrorFallback}>
+                <ErrorBoundary
+                  fallbackRender={({ error, resetErrorBoundary }) => (
+                    <ErrorFallback
+                      error={error}
+                      resetErrorBoundary={resetErrorBoundary}
+                    />
+                  )}
+                >
                   {circuitJson ? (
                     <CadViewer
                       key={`cad-${isFullScreen}`}

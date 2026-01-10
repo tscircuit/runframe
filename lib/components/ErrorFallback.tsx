@@ -1,6 +1,15 @@
 import React from "react"
+import { Button } from "./ui/button"
 
-export const ErrorFallback = ({ error }: { error: Error }) => {
+interface ErrorFallbackProps {
+  error: Error
+  resetErrorBoundary?: () => void
+}
+
+export const ErrorFallback = ({
+  error,
+  resetErrorBoundary,
+}: ErrorFallbackProps) => {
   return (
     <div
       data-testid="error-container"
@@ -19,6 +28,18 @@ export const ErrorFallback = ({ error }: { error: Error }) => {
         >
           {error.stack}
         </details>
+        {resetErrorBoundary && (
+          <div className="rf-mt-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={resetErrorBoundary}
+              className="rf-text-red-700 rf-border-red-300 hover:rf-bg-red-100"
+            >
+              Retry
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   )

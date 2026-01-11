@@ -9,6 +9,7 @@ const ErrorThrowingCadViewer = () => {
 
 export default () => {
   const [simulateError, setSimulateError] = useState(true)
+  const [retryCount, setRetryCount] = useState(0)
 
   const circuitJson = [
     {
@@ -32,7 +33,7 @@ export default () => {
 
   return (
     <div className="rf-p-4">
-      <div className="rf-mb-4 rf-flex rf-gap-2">
+      <div className="rf-mb-4 rf-flex rf-gap-2 rf-items-center">
         <button
           onClick={() => setSimulateError(true)}
           className="rf-px-4 rf-py-2 rf-bg-red-100 rf-rounded"
@@ -45,6 +46,9 @@ export default () => {
         >
           Clear Error
         </button>
+        <span className="rf-text-sm rf-text-gray-600">
+          Retries: {retryCount}
+        </span>
       </div>
 
       <div className="rf-h-[600px]">
@@ -53,7 +57,11 @@ export default () => {
           fallbackRender={({ error, resetErrorBoundary }) => (
             <ErrorFallback
               error={error}
-              resetErrorBoundary={resetErrorBoundary}
+              resetErrorBoundary={() => {
+                setRetryCount((c) => c + 1)
+                setSimulateError(false)
+                resetErrorBoundary()
+              }}
             />
           )}
         >

@@ -23,7 +23,7 @@
         "@radix-ui/react-tooltip": "^1.2.8",
         "@react-hook/resize-observer": "^2.0.2",
         "@resvg/resvg-wasm": "^2.6.2",
-        "@tscircuit/3d-viewer": "^0.0.486",
+        "@tscircuit/3d-viewer": "^0.0.487",
         "@tscircuit/assembly-viewer": "^0.0.5",
         "@tscircuit/create-snippet-url": "^0.0.9",
         "@tscircuit/eval": "^0.0.582",
@@ -468,7 +468,7 @@
 
     "@ts-morph/common": ["@ts-morph/common@0.22.0", "", { "dependencies": { "fast-glob": "^3.3.2", "minimatch": "^9.0.3", "mkdirp": "^3.0.1", "path-browserify": "^1.0.1" } }, "sha512-HqNBuV/oIlMKdkLshXd1zKBqNQCsuPEsgQOkfFQ/eUKjRlwndXW1AjN9LVkBEIukm00gGXSRmfkl0Wv5VXLnlw=="],
 
-    "@tscircuit/3d-viewer": ["@tscircuit/3d-viewer@0.0.486", "", { "dependencies": { "@jscad/regl-renderer": "^2.6.12", "@jscad/stl-serializer": "^2.1.20", "circuit-to-canvas": "^0.0.26", "react-hot-toast": "^2.6.0", "three": "^0.165.0", "three-stdlib": "^2.36.0", "troika-three-text": "^0.52.4" }, "peerDependencies": { "@tscircuit/circuit-json-util": "*", "@tscircuit/core": "*", "react": "19.1.0", "react-dom": "19.1.0", "zod": "3" } }, "sha512-4uP9cu1vV170gt8kjVAvShZwD+SlELPUFMxjexcA4BDHqJCBY2Sjy0UKF+DTUwJe/TrKkj+3vYOswFEC78+BoA=="],
+    "@tscircuit/3d-viewer": ["@tscircuit/3d-viewer@0.0.487", "", { "dependencies": { "@jscad/regl-renderer": "^2.6.12", "@jscad/stl-serializer": "^2.1.20", "circuit-to-canvas": "^0.0.26", "react-hot-toast": "^2.6.0", "three": "^0.165.0", "three-stdlib": "^2.36.0", "troika-three-text": "^0.52.4" }, "peerDependencies": { "@tscircuit/circuit-json-util": "*", "@tscircuit/core": "*", "react": "19.1.0", "react-dom": "19.1.0", "zod": "3" } }, "sha512-U1DOwFHk/fKwxa0cE8lrkj0T5+JSvhBkFlkEPmHgWpBXulcItxvqdPX1fJ4edSjL7vIBgXW+zkEepdTjdo+vOQ=="],
 
     "@tscircuit/alphabet": ["@tscircuit/alphabet@0.0.9", "", { "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-3EsDzGhsdx/UFHdK2AQCKWCFFz6mgVAZuAEdBm52N+KVASuvN2qH5nd1bepVW/+LxWyp0jicikoQWMzkS9UMfg=="],
 

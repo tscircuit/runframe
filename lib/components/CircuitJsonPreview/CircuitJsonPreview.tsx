@@ -148,6 +148,10 @@ export const CircuitJsonPreview = ({
     return circuitJson.some((e) => e.type === "schematic_group")
   }, [circuitJson])
 
+  const hasPanels = useMemo(() => {
+    return circuitJson?.some((e) => e.type === "pcb_panel")
+  }, [circuitJson])
+
   useErrorTelemetry({
     errorMessage,
     errorStack,
@@ -296,7 +300,9 @@ export const CircuitJsonPreview = ({
                       "rf-whitespace-nowrap",
                       circuitJson && !hasSchematicGroup && "rf-opacity-50",
                     )}
-                    disabled={circuitJson ? !hasSchematicGroup : false}
+                    disabled={
+                      circuitJson ? !hasSchematicGroup || hasPanels : false
+                    }
                   >
                     {circuitJson && (
                       <span

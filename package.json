@@ -50,6 +50,7 @@
     "@tscircuit/assembly-viewer": "^0.0.5",
     "@tscircuit/create-snippet-url": "^0.0.9",
     "@tscircuit/eval": "^0.0.589",
+    "@tscircuit/circuit-json-util": "^0.0.75",
     "@tscircuit/fake-snippets": "^0.0.163",
     "@tscircuit/file-server": "^0.0.32",
     "@tscircuit/footprinter": "^0.0.236",

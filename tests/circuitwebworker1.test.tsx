@@ -5,7 +5,6 @@ import type { PcbComponent } from "circuit-json"
 
 test(
   "CircuitWebWorker should handle circuit evaluation",
-  { timeout: 120000 },
   async () => {
     const worker = await createCircuitWebWorker({
       webWorkerUrl: evalWebWorkerBlobUrl,
@@ -32,4 +31,5 @@ test(
     const resistor = circuitJson.find((el: any) => el.name === "R1")
     expect(resistor).toBeDefined()
   },
+  { timeout: 120000 },
 )

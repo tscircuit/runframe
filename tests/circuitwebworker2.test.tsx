@@ -5,7 +5,6 @@ import type { PcbComponent } from "circuit-json"
 
 test(
   "CircuitWebWorker should handle manual edits",
-  { timeout: 120000 },
   async () => {
     const worker = await createCircuitWebWorker({
       webWorkerUrl: evalWebWorkerBlobUrl,
@@ -49,4 +48,5 @@ test(
     expect(pcb_component.center.x).toBe(5)
     expect(pcb_component.center.y).toBe(5)
   },
+  { timeout: 120000 },
 )

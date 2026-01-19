@@ -31,7 +31,7 @@
         "@tscircuit/fake-snippets": "^0.0.163",
         "@tscircuit/file-server": "^0.0.32",
         "@tscircuit/footprinter": "^0.0.236",
-        "@tscircuit/pcb-viewer": "1.11.317",
+        "@tscircuit/pcb-viewer": "^1.11.318",
         "@tscircuit/props": "^0.0.429",
         "@tscircuit/schematic-trace-solver": "^0.0.40",
         "@tscircuit/schematic-viewer": "^2.0.52",
@@ -511,7 +511,7 @@
 
     "@tscircuit/ngspice-spice-engine": ["@tscircuit/ngspice-spice-engine@0.0.8", "", { "dependencies": { "eecircuit-engine": "^1.5.6" }, "peerDependencies": { "@tscircuit/props": "*", "circuit-json": "*", "typescript": "^5" } }, "sha512-jubJ8Kgpm9FPRdHBiRBYkf5+B37bqkjDRKpCXOMqS08UZnbS+iCv2k4ACMW+s1zbK0Xa5v+9yjuoHlfKFW1v/Q=="],
 
-    "@tscircuit/pcb-viewer": ["@tscircuit/pcb-viewer@1.11.317", "", { "dependencies": { "@emotion/css": "^11.11.2", "@tscircuit/alphabet": "^0.0.9", "@tscircuit/math-utils": "^0.0.29", "@vitejs/plugin-react": "^5.0.2", "circuit-json": "^0.0.356", "circuit-to-canvas": "^0.0.52", "circuit-to-svg": "^0.0.271", "color": "^4.2.3", "react-supergrid": "^1.0.10", "react-toastify": "^10.0.5", "transformation-matrix": "^2.13.0", "zustand": "^4.5.2" }, "peerDependencies": { "react": "*", "tscircuit": "*" } }, "sha512-ZojdDy7/qfAVZCiRKqC9LXEhgjBPWxpPw3A/JCYt5Chlat93Y3qGJtKC/rKdQsXT7n/c6tMn6vUryDIb/J2hTA=="],
+    "@tscircuit/pcb-viewer": ["@tscircuit/pcb-viewer@1.11.318", "", { "dependencies": { "@emotion/css": "^11.11.2", "@tscircuit/alphabet": "^0.0.9", "@tscircuit/math-utils": "^0.0.29", "@vitejs/plugin-react": "^5.0.2", "circuit-json": "^0.0.356", "circuit-to-canvas": "^0.0.52", "circuit-to-svg": "^0.0.271", "color": "^4.2.3", "react-supergrid": "^1.0.10", "react-toastify": "^10.0.5", "transformation-matrix": "^2.13.0", "zustand": "^4.5.2" }, "peerDependencies": { "react": "*", "tscircuit": "*" } }, "sha512-Mw9io2CvYT1I23E23gCgppUKX1EQQFjDMFxoLYEeJRL31QNibUWHIMcP3h5OGeoAWTX1mgDeBXzx6vL2SD83xA=="],
 
     "@tscircuit/props": ["@tscircuit/props@0.0.429", "", { "peerDependencies": { "circuit-json": "*", "react": "*", "zod": "*" } }, "sha512-G1gafP+EQRXHXmgCIxAUfzD6RyoCPlnsph+jjBx7y/Jt1i7mO2sHRzCBOPQuO0ddpGkHG0vLx+aHMgsorg96xg=="],
 

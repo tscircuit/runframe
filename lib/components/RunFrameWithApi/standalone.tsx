@@ -10,6 +10,7 @@ declare global {
   interface Window {
     TSCIRCUIT_USE_RUNFRAME_FOR_CLI?: boolean
     TSCIRCUIT_RUNFRAME_STATIC_FILE_LIST?: CircuitJsonFileReference[]
+    TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH?: string
   }
 }
 
@@ -80,8 +81,14 @@ const runframeStandaloneProps: ComponentProps<typeof RunFrameWithApi> = {
   const root = createRoot(ensureRoot())
 
   const staticFileList = window.TSCIRCUIT_RUNFRAME_STATIC_FILE_LIST
+  const defaultMainComponentPath = window.TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH
   if (Array.isArray(staticFileList)) {
-    root.render(<RunFrameStaticBuildViewer files={staticFileList} />)
+    root.render(
+      <RunFrameStaticBuildViewer
+        files={staticFileList}
+        initialCircuitPath={defaultMainComponentPath}
+      />,
+    )
   } else if (window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI) {
     root.render(<RunFrameForCli {...runframeStandaloneProps} />)
   } else {

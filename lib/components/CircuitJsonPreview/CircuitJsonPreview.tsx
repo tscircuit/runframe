@@ -158,9 +158,11 @@ export const CircuitJsonPreview = ({
     circuitJsonErrors,
   })
 
+  const fallbackTab = defaultTab ?? availableTabs?.[0] ?? "pcb"
   const [activeTab, setActiveTabState] = useLocalStorageState<TabId>(
     "runframe-active-tab",
-    defaultActiveTab ?? defaultTab ?? availableTabs?.[0] ?? "pcb",
+    defaultActiveTab ?? fallbackTab,
+    defaultActiveTab,
   )
   const [lastActiveTab, setLastActiveTab] = useState<TabId | null>(null)
   const [isFullScreen, setIsFullScreen] = useState(defaultToFullScreen)

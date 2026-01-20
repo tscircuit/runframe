@@ -4,14 +4,17 @@ import { useState, useEffect } from "react"
  * A hook that works like useState but also saves/loads from local storage
  * @param key The key to use for local storage
  * @param initialValue The initial value to use if no value is found in local storage
+ * @param overrideValue Optional value that takes priority over localStorage
  * @returns A tuple of [state, setState] just like useState
  */
 export function useLocalStorageState<T>(
   key: string,
   initialValue: T,
+  overrideValue?: T,
 ): [T, React.Dispatch<React.SetStateAction<T>>] {
   // Get the initial value from local storage or use the provided initialValue
   const [state, setState] = useState<T>(() => {
+    if (overrideValue !== undefined) return overrideValue
     try {
       // Try to get the value from local storage
       const item = window.localStorage.getItem(key)

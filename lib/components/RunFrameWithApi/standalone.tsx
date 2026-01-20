@@ -5,6 +5,7 @@ import { RunFrame } from "../RunFrame/RunFrame"
 import { RunFrameStaticBuildViewer } from "../RunFrameStaticBuildViewer/RunFrameStaticBuildViewer"
 import type { CircuitJsonFileReference } from "../RunFrameStaticBuildViewer/RunFrameStaticBuildViewer"
 import type { ComponentProps } from "react"
+import type { TabId } from "../CircuitJsonPreview/PreviewContentProps"
 
 declare global {
   interface Window {
@@ -22,6 +23,15 @@ const ensureDocumentReady = (): Promise<void> => {
       resolve()
     }
   })
+}
+
+const parseTabFromHash = (): TabId => {
+  const hash = window.location.hash.slice(1)
+  const params = new URLSearchParams(hash)
+  const tab = params.get("tab")?.toLowerCase()?.trim()
+  if (!tab) return "pcb"
+  if (["pcb", "schematic", "cad"].includes(tab)) return tab as TabId
+  return "pcb" as TabId
 }
 
 const ensureRoot = () => {
@@ -83,10 +93,12 @@ const runframeStandaloneProps: ComponentProps<typeof RunFrameWithApi> = {
   const staticFileList = window.TSCIRCUIT_RUNFRAME_STATIC_FILE_LIST
   const defaultMainComponentPath = window.TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH
   if (Array.isArray(staticFileList)) {
+    const tabSelected = parseTabFromHash()
     root.render(
       <RunFrameStaticBuildViewer
         files={staticFileList}
         initialCircuitPath={defaultMainComponentPath}
+        tabSelected={tabSelected}
       />,
     )
   } else if (window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI) {

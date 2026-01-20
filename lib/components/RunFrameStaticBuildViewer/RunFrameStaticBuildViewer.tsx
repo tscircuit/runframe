@@ -6,6 +6,7 @@ import type { CircuitJson } from "circuit-json"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 import { guessEntrypoint } from "lib/runner"
 import { ErrorBoundary } from "react-error-boundary"
+import type { TabId } from "../CircuitJsonPreview/PreviewContentProps"
 
 export interface CircuitJsonFileReference {
   filePath: string
@@ -22,6 +23,7 @@ export interface RunFrameStaticBuildViewerProps {
   showToggleFullScreen?: boolean
   projectName?: string
   showFileMenu?: boolean
+  tabSelected?: TabId
 }
 
 export const RunFrameStaticBuildViewer = (
@@ -243,6 +245,7 @@ export const RunFrameStaticBuildViewer = (
           showFileMenu={false}
           isWebEmbedded={false}
           projectName={props.projectName}
+          defaultActiveTab={props.tabSelected}
           leftHeaderContent={
             <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
               {(props.showFileMenu ?? true) && (

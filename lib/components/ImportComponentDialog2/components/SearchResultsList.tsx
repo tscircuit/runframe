@@ -88,7 +88,8 @@ export const SearchResultsList = ({
         const secondary = getSecondaryText(result)
         const partNumber = getPartNumberLabel(result)
         const stock = result.source === "jlcpcb" ? result.component.stock : null
-        const isBasic = result.source === "jlcpcb" ? result.component.isBasic : null
+        const isBasic =
+          result.source === "jlcpcb" ? result.component.isBasic : null
 
         return (
           <div

@@ -21,6 +21,7 @@ export interface JlcpcbComponentSummary {
   package: string
   price?: number
   stock?: number
+  isBasic?: boolean // true = basic, false = extended
 }
 
 export interface JlcpcbComponentSearchResult {

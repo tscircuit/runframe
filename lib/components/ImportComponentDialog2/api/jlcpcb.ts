@@ -9,6 +9,7 @@ interface JlcpcbComponentApiResult {
   package: string
   price: number
   stock: number
+  is_basic?: boolean
 }
 
 interface SearchResponse {
@@ -42,6 +43,7 @@ export const mapJlcpcbComponentToSummary = (
   package: component.package,
   price: component.price,
   stock: component.stock,
+  isBasic: component.is_basic,
 })
 
 export const loadJlcpcbComponentTsx = async (

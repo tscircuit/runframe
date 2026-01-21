@@ -88,6 +88,7 @@ export const SearchResultsList = ({
         const secondary = getSecondaryText(result)
         const partNumber = getPartNumberLabel(result)
         const stock = result.source === "jlcpcb" ? result.component.stock : null
+        const isBasic = result.source === "jlcpcb" ? result.component.isBasic : null
 
         return (
           <div
@@ -99,6 +100,17 @@ export const SearchResultsList = ({
               <div className="rf-flex rf-items-start rf-gap-2 rf-min-w-0">
                 <div className="rf-font-medium rf-text-sm rf-truncate rf-flex-1 rf-min-w-0 rf-flex rf-items-center rf-gap-1.5">
                   {primary}
+                  {result.source === "jlcpcb" && isBasic != null && (
+                    <span
+                      className={`rf-text-xs rf-px-1.5 rf-py-0.5 rf-rounded rf-font-medium rf-flex-shrink-0 ${
+                        isBasic
+                          ? "rf-bg-green-100 rf-text-green-700"
+                          : "rf-bg-orange-100 rf-text-orange-700"
+                      }`}
+                    >
+                      {isBasic ? "Basic" : "Extended"}
+                    </span>
+                  )}
                   {result.source === "tscircuit.com" &&
                     result.package.is_private && (
                       <Lock className="rf-ml-1 rf-h-3 rf-w-3 rf-text-zinc-400 rf-flex-shrink-0" />

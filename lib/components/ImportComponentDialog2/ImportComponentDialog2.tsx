@@ -303,17 +303,19 @@ export const ImportComponentDialog2 = ({
             onValueChange={(value) => setActiveSource(value as ImportSource)}
             className="rf-min-w-0 rf-w-full"
           >
-            <TabsList className="rf-flex rf-w-full rf-gap-2">
-              {availableSources.map((source) => (
-                <TabsTrigger
-                  key={source}
-                  value={source}
-                  className="rf-flex-1 rf-text-xs sm:rf-text-sm"
-                >
-                  {SOURCE_CONFIG[source].label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+            {availableSources.length > 1 && (
+              <TabsList className="rf-flex rf-w-full rf-gap-2">
+                {availableSources.map((source) => (
+                  <TabsTrigger
+                    key={source}
+                    value={source}
+                    className="rf-flex-1 rf-text-xs sm:rf-text-sm"
+                  >
+                    {SOURCE_CONFIG[source].label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            )}
 
             <SearchBar
               query={searchQuery}

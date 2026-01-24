@@ -72,6 +72,7 @@ export const ImportComponentDialog2 = ({
   )
 
   const hasSources = availableSources.length > 0
+  const singleSource = availableSources.length === 1
   const [activeSource, setActiveSource] = React.useState<ImportSource>(
     availableSources[0] ?? "tscircuit.com",
   )
@@ -288,7 +289,8 @@ export const ImportComponentDialog2 = ({
       >
         <DialogHeader>
           <DialogTitle className="rf-text-lg sm:rf-text-xl">
-            Import Component
+            Import {singleSource ? SOURCE_CONFIG[activeSource].label : ""}{" "}
+            Component
           </DialogTitle>
           <DialogDescription className="rf-text-sm">
             {hasSources
@@ -303,7 +305,7 @@ export const ImportComponentDialog2 = ({
             onValueChange={(value) => setActiveSource(value as ImportSource)}
             className="rf-min-w-0 rf-w-full"
           >
-            {availableSources.length > 1 && (
+            {!singleSource && (
               <TabsList className="rf-flex rf-w-full rf-gap-2">
                 {availableSources.map((source) => (
                   <TabsTrigger

@@ -50,7 +50,7 @@ export const AiReviewViewView = ({
   }, [aiReviewId])
 
   const html = useMemo(
-    () => marked.parse(review.ai_review_text || ""),
+    () => marked.parse(review.ai_review_text || "") as string,
     [review.ai_review_text],
   )
   return (

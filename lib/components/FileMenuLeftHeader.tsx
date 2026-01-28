@@ -419,7 +419,10 @@ export const FileMenuLeftHeader = (props: {
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent>
-                <DropdownMenuItem className="rf-flex rf-items-center rf-gap-2">
+                <DropdownMenuItem
+                  className="rf-flex rf-items-center rf-gap-2"
+                  onSelect={(e) => e.preventDefault()}
+                >
                   <div className="rf-flex rf-items-center rf-gap-2">
                     <Checkbox
                       id="show-schematic-ports"
@@ -436,7 +439,10 @@ export const FileMenuLeftHeader = (props: {
                     </label>
                   </div>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="rf-flex rf-items-center rf-gap-2">
+                <DropdownMenuItem
+                  className="rf-flex rf-items-center rf-gap-2"
+                  onSelect={(e) => e.preventDefault()}
+                >
                   <div className="rf-flex rf-items-center rf-gap-2">
                     <Checkbox
                       id="show-schematic-grid"

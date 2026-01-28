@@ -109,6 +109,8 @@ export const CircuitJsonPreview = ({
   autoRotate3dViewerDisabled,
   showSchematicDebugGrid: showSchematicDebugGridProp = false,
   showSchematicPorts: showSchematicPortsProp = false,
+  onChangeShowSchematicDebugGrid,
+  onChangeShowSchematicPorts,
   showToggleFullScreen = true,
   defaultToFullScreen = false,
   activeEffectName,
@@ -167,12 +169,25 @@ export const CircuitJsonPreview = ({
   )
   const [lastActiveTab, setLastActiveTab] = useState<TabId | null>(null)
   const [isFullScreen, setIsFullScreen] = useState(defaultToFullScreen)
-  const [showSchematicDebugGrid, setShowSchematicDebugGrid] = useState(
-    showSchematicDebugGridProp,
-  )
-  const [showSchematicPorts, setShowSchematicPorts] = useState(
+
+  // Internal state for when CircuitJsonPreview is used standalone (without external state management)
+  const [internalShowSchematicDebugGrid, setInternalShowSchematicDebugGrid] =
+    useState(showSchematicDebugGridProp)
+  const [internalShowSchematicPorts, setInternalShowSchematicPorts] = useState(
     showSchematicPortsProp,
   )
+
+  // Use external state if handlers are provided, otherwise use internal state
+  const showSchematicDebugGrid = onChangeShowSchematicDebugGrid
+    ? showSchematicDebugGridProp
+    : internalShowSchematicDebugGrid
+  const showSchematicPorts = onChangeShowSchematicPorts
+    ? showSchematicPortsProp
+    : internalShowSchematicPorts
+  const setShowSchematicDebugGrid =
+    onChangeShowSchematicDebugGrid ?? setInternalShowSchematicDebugGrid
+  const setShowSchematicPorts =
+    onChangeShowSchematicPorts ?? setInternalShowSchematicPorts
   useFullscreenBodyScroll(isFullScreen)
   const setActiveTab = useCallback(
     (tab: TabId) => {

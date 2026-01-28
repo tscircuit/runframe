@@ -89,8 +89,10 @@ export interface PreviewContentProps {
   autoRotate3dViewerDisabled?: boolean
 
   showSchematicDebugGrid?: boolean
+  onChangeShowSchematicDebugGrid?: (show: boolean) => void
 
   showSchematicPorts?: boolean
+  onChangeShowSchematicPorts?: (show: boolean) => void
 
   onReportAutoroutingLog?: (
     name: string,

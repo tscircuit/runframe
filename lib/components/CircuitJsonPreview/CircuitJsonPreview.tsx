@@ -107,7 +107,8 @@ export const CircuitJsonPreview = ({
   defaultTab,
   availableTabs,
   autoRotate3dViewerDisabled,
-  showSchematicDebugGrid = false,
+  showSchematicDebugGrid: showSchematicDebugGridProp = false,
+  showSchematicPorts: showSchematicPortsProp = false,
   showToggleFullScreen = true,
   defaultToFullScreen = false,
   activeEffectName,
@@ -166,6 +167,12 @@ export const CircuitJsonPreview = ({
   )
   const [lastActiveTab, setLastActiveTab] = useState<TabId | null>(null)
   const [isFullScreen, setIsFullScreen] = useState(defaultToFullScreen)
+  const [showSchematicDebugGrid, setShowSchematicDebugGrid] = useState(
+    showSchematicDebugGridProp,
+  )
+  const [showSchematicPorts, setShowSchematicPorts] = useState(
+    showSchematicPortsProp,
+  )
   useFullscreenBodyScroll(isFullScreen)
   const setActiveTab = useCallback(
     (tab: TabId) => {
@@ -239,6 +246,10 @@ export const CircuitJsonPreview = ({
                 isWebEmbedded={isWebEmbedded}
                 circuitJson={circuitJson}
                 projectName={projectName}
+                showSchematicDebugGrid={showSchematicDebugGrid}
+                onChangeShowSchematicDebugGrid={setShowSchematicDebugGrid}
+                showSchematicPorts={showSchematicPorts}
+                onChangeShowSchematicPorts={setShowSchematicPorts}
               />
             )}
             {(leftHeaderContent || showFileMenu) && (
@@ -626,6 +637,7 @@ export const CircuitJsonPreview = ({
                         onEditEvent?.(ee)
                       }}
                       debugGrid={showSchematicDebugGrid}
+                      showSchematicPorts={showSchematicPorts}
                     />
                   ) : (
                     <PreviewEmptyState onRunClicked={onRunClicked} />

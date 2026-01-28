@@ -90,6 +90,8 @@ export interface PreviewContentProps {
 
   showSchematicDebugGrid?: boolean
 
+  showSchematicPorts?: boolean
+
   onReportAutoroutingLog?: (
     name: string,
     data: { simpleRouteJson: any },

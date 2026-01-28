@@ -127,6 +127,8 @@ export const RunFrame = (props: RunFrameProps) => {
     >
   >({})
   const [currentDebugOption, setCurrentDebugOption] = useState<string>("")
+  const [showSchematicDebugGrid, setShowSchematicDebugGrid] = useState(false)
+  const [showSchematicPorts, setShowSchematicPorts] = useState(false)
 
   const activeEffectName = Object.values(activeAsyncEffects).sort(
     (a, b) => a.startTime - b.startTime,
@@ -700,6 +702,10 @@ export const RunFrame = (props: RunFrameProps) => {
               <FileMenuLeftHeader
                 isWebEmbedded={props.isWebEmbedded}
                 onLoginRequired={props.onLoginRequired}
+                showSchematicDebugGrid={showSchematicDebugGrid}
+                onChangeShowSchematicDebugGrid={setShowSchematicDebugGrid}
+                showSchematicPorts={showSchematicPorts}
+                onChangeShowSchematicPorts={setShowSchematicPorts}
               />
             )}
             {props.leftHeaderContent}
@@ -720,6 +726,8 @@ export const RunFrame = (props: RunFrameProps) => {
           incRunCountTrigger(1)
         }}
         solverEvents={solverEvents}
+        showSchematicDebugGrid={showSchematicDebugGrid}
+        showSchematicPorts={showSchematicPorts}
       />
     </ErrorBoundary>
   )

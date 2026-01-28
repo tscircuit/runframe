@@ -52,6 +52,10 @@ export const FileMenuLeftHeader = (props: {
   circuitJson?: any
   projectName?: string
   onLoginRequired?: () => void
+  showSchematicDebugGrid?: boolean
+  onChangeShowSchematicDebugGrid?: (show: boolean) => void
+  showSchematicPorts?: boolean
+  onChangeShowSchematicPorts?: (show: boolean) => void
 }) => {
   const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
   const currentMainComponentPath = useRunFrameStore(
@@ -415,11 +419,45 @@ export const FileMenuLeftHeader = (props: {
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent>
-                <DropdownMenuItem className="rf-text-xs">
-                  Show Schematic Ports
+                <DropdownMenuItem
+                  className="rf-flex rf-items-center rf-gap-2"
+                  onSelect={(e) => e.preventDefault()}
+                >
+                  <div className="rf-flex rf-items-center rf-gap-2">
+                    <Checkbox
+                      id="show-schematic-ports"
+                      checked={props.showSchematicPorts}
+                      onCheckedChange={(checked) => {
+                        props.onChangeShowSchematicPorts?.(checked === true)
+                      }}
+                    />
+                    <label
+                      htmlFor="show-schematic-ports"
+                      className="rf-text-xs rf-cursor-pointer"
+                    >
+                      Show Schematic Ports
+                    </label>
+                  </div>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="rf-text-xs">
-                  Show Schematic Grid
+                <DropdownMenuItem
+                  className="rf-flex rf-items-center rf-gap-2"
+                  onSelect={(e) => e.preventDefault()}
+                >
+                  <div className="rf-flex rf-items-center rf-gap-2">
+                    <Checkbox
+                      id="show-schematic-grid"
+                      checked={props.showSchematicDebugGrid}
+                      onCheckedChange={(checked) => {
+                        props.onChangeShowSchematicDebugGrid?.(checked === true)
+                      }}
+                    />
+                    <label
+                      htmlFor="show-schematic-grid"
+                      className="rf-text-xs rf-cursor-pointer"
+                    >
+                      Show Schematic Grid
+                    </label>
+                  </div>
                 </DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuPortal>

@@ -402,6 +402,30 @@ export const FileMenuLeftHeader = (props: {
           isOpen={isSelectSnippetDialogOpen}
         />
       </DropdownMenu>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div className="rf-whitespace-nowrap rf-text-xs font-medium rf-p-2 rf-mx-1 rf-cursor-pointer rf-relative">
+            View
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="rf-z-[101]">
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger className="rf-text-xs">
+              Schematic
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem className="rf-text-xs">
+                  Show Schematic Ports
+                </DropdownMenuItem>
+                <DropdownMenuItem className="rf-text-xs">
+                  Show Schematic Grid
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuContent>
+      </DropdownMenu>
       {BugReportDialog}
       <LbrnExportOptionsDialog
         open={isLbrnDialogOpen}

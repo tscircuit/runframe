@@ -728,6 +728,8 @@ export const RunFrame = (props: RunFrameProps) => {
         solverEvents={solverEvents}
         showSchematicDebugGrid={showSchematicDebugGrid}
         showSchematicPorts={showSchematicPorts}
+        onChangeShowSchematicDebugGrid={setShowSchematicDebugGrid}
+        onChangeShowSchematicPorts={setShowSchematicPorts}
       />
     </ErrorBoundary>
   )

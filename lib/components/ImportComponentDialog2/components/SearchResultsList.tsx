@@ -1,5 +1,12 @@
 import { Lock } from "lucide-react"
 import { Button } from "../../ui/button"
+
+const currencyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+})
+
+const formatCurrency = (value: number) => currencyFormatter.format(value)
 import type { Package } from "@tscircuit/fake-snippets/schema"
 import type {
   ImportComponentDialogSearchResult,
@@ -88,6 +95,7 @@ export const SearchResultsList = ({
         const secondary = getSecondaryText(result)
         const partNumber = getPartNumberLabel(result)
         const stock = result.source === "jlcpcb" ? result.component.stock : null
+        const price = result.source === "jlcpcb" ? result.component.price : null
         const isBasic =
           result.source === "jlcpcb" ? result.component.isBasic : null
 
@@ -129,6 +137,11 @@ export const SearchResultsList = ({
                 ) : null}
                 {secondary}
               </div>
+              {price != null && (
+                <div className="rf-text-xs rf-text-zinc-500 rf-font-medium rf-whitespace-nowrap rf-flex-shrink-0">
+                  {formatCurrency(price)}
+                </div>
+              )}
             </div>
 
             {result.source === "tscircuit.com" && onShowDetails ? (

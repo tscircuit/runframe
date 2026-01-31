@@ -28,6 +28,14 @@ import Debug from "debug"
 
 const debug = Debug("run-frame:ImportComponentDialog")
 
+const currencyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+})
+
+const formatPrice = (value?: number) =>
+  value == null ? null : currencyFormatter.format(value)
+
 export interface ComponentSearchResult {
   id: string
   name: string
@@ -315,6 +323,11 @@ export const ImportComponentDialog = ({
                         )}
                         {result.description}
                       </div>
+                      {result.price != null && (
+                        <div className="rf-text-xs rf-text-zinc-500">
+                          Price: {formatPrice(result.price)}
+                        </div>
+                      )}
                     </div>
 
                     <div className="rf-flex rf-gap-2 rf-flex-shrink-0 rf-w-full sm:rf-w-auto">

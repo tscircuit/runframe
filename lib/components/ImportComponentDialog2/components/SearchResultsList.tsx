@@ -6,7 +6,7 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
   currency: "USD",
 })
 
-const formatCurrency = (value: number) => currencyFormatter.format(value)
+const formatPrice = (value: number) => currencyFormatter.format(value)
 import type { Package } from "@tscircuit/fake-snippets/schema"
 import type {
   ImportComponentDialogSearchResult,

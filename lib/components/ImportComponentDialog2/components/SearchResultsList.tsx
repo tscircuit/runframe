@@ -1,17 +1,17 @@
 import { Lock } from "lucide-react"
 import { Button } from "../../ui/button"
+import type { Package } from "@tscircuit/fake-snippets/schema"
+import type {
+  ImportComponentDialogSearchResult,
+  TscircuitPackageSearchResult,
+} from "../types"
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
 })
 
-const formatPrice = (value: number) => currencyFormatter.format(value)
-import type { Package } from "@tscircuit/fake-snippets/schema"
-import type {
-  ImportComponentDialogSearchResult,
-  TscircuitPackageSearchResult,
-} from "../types"
+const formatCurrency = (value: number) => currencyFormatter.format(value)
 
 interface SearchResultsListProps {
   results: ImportComponentDialogSearchResult[]

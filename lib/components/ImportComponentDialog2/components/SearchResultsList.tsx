@@ -11,7 +11,7 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
   currency: "USD",
 })
 
-const formatCurrency = (value: number) => currencyFormatter.format(value)
+const formatPrice = (value: number) => currencyFormatter.format(value)
 
 interface SearchResultsListProps {
   results: ImportComponentDialogSearchResult[]
@@ -139,7 +139,7 @@ export const SearchResultsList = ({
               </div>
               {price != null && (
                 <div className="rf-text-xs rf-text-zinc-500 rf-font-medium rf-whitespace-nowrap rf-flex-shrink-0">
-                  {formatCurrency(price)}
+                  {formatPrice(price)}
                 </div>
               )}
             </div>

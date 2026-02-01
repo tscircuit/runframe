@@ -137,32 +137,33 @@ export const SearchResultsList = ({
                 ) : null}
                 {secondary}
               </div>
+            </div>
+            <div>
+              {result.source === "tscircuit.com" && onShowDetails ? (
+                <div className="rf-flex-shrink-0 rf-w-full sm:rf-w-auto">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rf-text-xs rf-w-full sm:rf-w-auto"
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onShowDetails(result as TscircuitPackageSearchResult)
+                    }}
+                  >
+                    See Details
+                  </Button>
+                </div>
+              ) : result.source === "jlcpcb" && stock != null ? (
+                <div className="rf-hidden sm:rf-block rf-text-xs rf-text-zinc-500 rf-font-medium rf-whitespace-nowrap rf-flex-shrink-0">
+                  {stock.toLocaleString()} in stock
+                </div>
+              ) : null}
               {price != null && (
-                <div className="rf-text-xs rf-text-zinc-500 rf-font-medium rf-whitespace-nowrap rf-flex-shrink-0">
+                <div className="rf-hidden sm:rf-block rf-text-xs rf-text-zinc-500 rf-font-medium rf-whitespace-nowrap rf-flex-shrink-0 rf-text-right">
                   {formatPrice(price)}
                 </div>
               )}
             </div>
-
-            {result.source === "tscircuit.com" && onShowDetails ? (
-              <div className="rf-flex-shrink-0 rf-w-full sm:rf-w-auto">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="rf-text-xs rf-w-full sm:rf-w-auto"
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    onShowDetails(result as TscircuitPackageSearchResult)
-                  }}
-                >
-                  See Details
-                </Button>
-              </div>
-            ) : result.source === "jlcpcb" && stock != null ? (
-              <div className="rf-hidden sm:rf-block rf-text-xs rf-text-zinc-500 rf-font-medium rf-whitespace-nowrap rf-flex-shrink-0">
-                {stock.toLocaleString()} in stock
-              </div>
-            ) : null}
           </div>
         )
       })}

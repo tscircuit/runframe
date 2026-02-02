@@ -6,6 +6,13 @@ import type {
   TscircuitPackageSearchResult,
 } from "../types"
 
+const currencyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+})
+
+const formatPrice = (value: number) => currencyFormatter.format(value)
+
 interface SearchResultsListProps {
   results: ImportComponentDialogSearchResult[]
   selected: ImportComponentDialogSearchResult | null
@@ -88,6 +95,7 @@ export const SearchResultsList = ({
         const secondary = getSecondaryText(result)
         const partNumber = getPartNumberLabel(result)
         const stock = result.source === "jlcpcb" ? result.component.stock : null
+        const price = result.source === "jlcpcb" ? result.component.price : null
         const isBasic =
           result.source === "jlcpcb" ? result.component.isBasic : null
 
@@ -130,26 +138,32 @@ export const SearchResultsList = ({
                 {secondary}
               </div>
             </div>
-
-            {result.source === "tscircuit.com" && onShowDetails ? (
-              <div className="rf-flex-shrink-0 rf-w-full sm:rf-w-auto">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="rf-text-xs rf-w-full sm:rf-w-auto"
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    onShowDetails(result as TscircuitPackageSearchResult)
-                  }}
-                >
-                  See Details
-                </Button>
-              </div>
-            ) : result.source === "jlcpcb" && stock != null ? (
-              <div className="rf-hidden sm:rf-block rf-text-xs rf-text-zinc-500 rf-font-medium rf-whitespace-nowrap rf-flex-shrink-0">
-                {stock.toLocaleString()} in stock
-              </div>
-            ) : null}
+            <div>
+              {result.source === "tscircuit.com" && onShowDetails ? (
+                <div className="rf-flex-shrink-0 rf-w-full sm:rf-w-auto">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rf-text-xs rf-w-full sm:rf-w-auto"
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onShowDetails(result as TscircuitPackageSearchResult)
+                    }}
+                  >
+                    See Details
+                  </Button>
+                </div>
+              ) : result.source === "jlcpcb" && stock != null ? (
+                <div className="rf-hidden sm:rf-block rf-text-xs rf-text-zinc-500 rf-font-medium rf-whitespace-nowrap rf-flex-shrink-0">
+                  {stock.toLocaleString()} in stock
+                </div>
+              ) : null}
+              {price != null && (
+                <div className="rf-hidden sm:rf-block rf-text-xs rf-text-zinc-500 rf-font-medium rf-whitespace-nowrap rf-flex-shrink-0 rf-text-right">
+                  {formatPrice(price)}
+                </div>
+              )}
+            </div>
           </div>
         )
       })}

@@ -642,6 +642,7 @@ export const CircuitJsonPreview = ({
                 >
                   {circuitJson ? (
                     <SchematicViewer
+                      key={`schematic-${showSchematicDebugGrid}-${showSchematicPorts}`}
                       spiceSimulationEnabled
                       circuitJson={circuitJson}
                       containerStyle={{

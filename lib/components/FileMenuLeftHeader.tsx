@@ -189,281 +189,292 @@ export const FileMenuLeftHeader = (props: {
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <div className="rf-whitespace-nowrap rf-text-xs font-medium rf-p-2 rf-mx-1 rf-cursor-pointer rf-relative">
-            File
-          </div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="rf-z-[101]">
-          {/* CLI-only menu items */}
-          {!props.isWebEmbedded && (
-            <>
-              <DropdownMenuItem
-                className="rf-text-xs"
-                onSelect={triggerSaveSnippet}
-                disabled={isSaving}
-              >
-                {isSaving ? "Saving..." : "Push"}
-              </DropdownMenuItem>
+      <div className="rf-flex rf-items-center rf-gap-1 rf-flex-shrink-0">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className="rf-whitespace-nowrap rf-text-xs font-medium rf-p-2 rf-mx-1 rf-cursor-pointer rf-relative">
+              File
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="rf-z-[101]">
+            {/* CLI-only menu items */}
+            {!props.isWebEmbedded && (
+              <>
+                <DropdownMenuItem
+                  className="rf-text-xs"
+                  onSelect={triggerSaveSnippet}
+                  disabled={isSaving}
+                >
+                  {isSaving ? "Saving..." : "Push"}
+                </DropdownMenuItem>
 
-              {/* HACK until ordering is ready, only show in cosmos runframe */}
-              {parseInt(window.location.port) > 5000 && (
+                {/* HACK until ordering is ready, only show in cosmos runframe */}
+                {parseInt(window.location.port) > 5000 && (
+                  <DropdownMenuItem
+                    className="rf-text-xs"
+                    onSelect={() => {
+                      orderDialog.open()
+                    }}
+                  >
+                    Order
+                  </DropdownMenuItem>
+                )}
+
+                <DropdownMenuItem
+                  className="rf-text-xs"
+                  onSelect={() => setIsImportDialogOpen(true)}
+                  disabled={isSaving}
+                >
+                  Import
+                </DropdownMenuItem>
+
                 <DropdownMenuItem
                   className="rf-text-xs"
                   onSelect={() => {
-                    orderDialog.open()
+                    if (!hasRegistryToken()) {
+                      toast.error("Requires tscircuit token")
+                      return
+                    }
+                    setIsAiReviewDialogOpen(true)
                   }}
                 >
-                  Order
+                  AI Review
                 </DropdownMenuItem>
-              )}
+              </>
+            )}
 
-              <DropdownMenuItem
-                className="rf-text-xs"
-                onSelect={() => setIsImportDialogOpen(true)}
-                disabled={isSaving}
-              >
-                Import
-              </DropdownMenuItem>
-
+            {!props.isWebEmbedded && props.onLoginRequired && (
               <DropdownMenuItem
                 className="rf-text-xs"
                 onSelect={() => {
-                  if (!hasRegistryToken()) {
-                    toast.error("Requires tscircuit token")
-                    return
-                  }
-                  setIsAiReviewDialogOpen(true)
+                  props.onLoginRequired?.()
                 }}
               >
-                AI Review
+                Sign In
               </DropdownMenuItem>
-            </>
-          )}
+            )}
 
-          {!props.isWebEmbedded && props.onLoginRequired && (
-            <DropdownMenuItem
-              className="rf-text-xs"
-              onSelect={() => {
-                props.onLoginRequired?.()
-              }}
-            >
-              Sign In
-            </DropdownMenuItem>
-          )}
+            {!props.isWebEmbedded && (
+              <DropdownMenuItem
+                className="rf-text-xs"
+                onSelect={() => {
+                  openBugReportDialog()
+                }}
+              >
+                Report Bug
+              </DropdownMenuItem>
+            )}
 
-          {!props.isWebEmbedded && (
-            <DropdownMenuItem
-              className="rf-text-xs"
-              onSelect={() => {
-                openBugReportDialog()
-              }}
-            >
-              Report Bug
-            </DropdownMenuItem>
-          )}
-
-          {/* Export - always available */}
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger
-              className="rf-text-xs"
-              disabled={isExporting}
-            >
-              {isExporting ? "Exporting..." : "Export"}
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                {availableExports.map((exp, i) => (
-                  <DropdownMenuItem
-                    key={i}
-                    onSelect={() => {
-                      if (!circuitJson) {
-                        toast.error("No Circuit JSON to export")
-                        return
-                      }
-                      let projectNameFromPath = "Untitled"
-                      if (currentMainComponentPath) {
-                        const filename = currentMainComponentPath
-                          .split("/")
-                          .pop()
-                        if (filename) {
-                          projectNameFromPath = filename.replace(/\.[^.]+$/, "")
-                        }
-                      }
-                      const projectName =
-                        props.projectName ?? snippetName ?? projectNameFromPath
-
-                      // Special handling for LightBurn export - show options dialog
-                      if (exp.name === "LightBurn") {
-                        setPendingLbrnExport({
-                          circuitJson,
-                          projectName,
-                        })
-                        setIsLbrnDialogOpen(true)
-                        return
-                      }
-
-                      exportAndDownload({
-                        exportName: exp.name,
-                        circuitJson,
-                        projectName,
-                      })
-                    }}
-                    disabled={isExporting}
-                  >
-                    <span className="rf-text-xs">{exp.name}</span>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-
-          {/* Advanced - CLI only */}
-          {!props.isWebEmbedded && (
+            {/* Export - always available */}
             <DropdownMenuSub>
-              <DropdownMenuSubTrigger className="rf-text-xs">
-                Advanced
+              <DropdownMenuSubTrigger
+                className="rf-text-xs"
+                disabled={isExporting}
+              >
+                {isExporting ? "Exporting..." : "Export"}
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
                 <DropdownMenuSubContent>
-                  <DropdownMenuItem className="rf-flex rf-items-center rf-gap-2">
-                    <div className="rf-flex rf-items-center rf-gap-2">
-                      <Checkbox
-                        id="load-latest-eval"
-                        checked={props.shouldLoadLatestEval}
-                        onCheckedChange={(checked) => {
-                          props.onChangeShouldLoadLatestEval?.(checked === true)
-                        }}
-                      />
-                      <label
-                        htmlFor="load-latest-eval"
-                        className="rf-text-xs rf-cursor-pointer"
-                      >
-                        Force Latest @tscircuit/eval
-                      </label>
-                    </div>
-                  </DropdownMenuItem>
-                  {lastRunEvalVersion && (
+                  {availableExports.map((exp, i) => (
+                    <DropdownMenuItem
+                      key={i}
+                      onSelect={() => {
+                        if (!circuitJson) {
+                          toast.error("No Circuit JSON to export")
+                          return
+                        }
+                        let projectNameFromPath = "Untitled"
+                        if (currentMainComponentPath) {
+                          const filename = currentMainComponentPath
+                            .split("/")
+                            .pop()
+                          if (filename) {
+                            projectNameFromPath = filename.replace(
+                              /\.[^.]+$/,
+                              "",
+                            )
+                          }
+                        }
+                        const projectName =
+                          props.projectName ??
+                          snippetName ??
+                          projectNameFromPath
+
+                        // Special handling for LightBurn export - show options dialog
+                        if (exp.name === "LightBurn") {
+                          setPendingLbrnExport({
+                            circuitJson,
+                            projectName,
+                          })
+                          setIsLbrnDialogOpen(true)
+                          return
+                        }
+
+                        exportAndDownload({
+                          exportName: exp.name,
+                          circuitJson,
+                          projectName,
+                        })
+                      }}
+                      disabled={isExporting}
+                    >
+                      <span className="rf-text-xs">{exp.name}</span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
+
+            {/* Advanced - CLI only */}
+            {!props.isWebEmbedded && (
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="rf-text-xs">
+                  Advanced
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuItem className="rf-flex rf-items-center rf-gap-2">
+                      <div className="rf-flex rf-items-center rf-gap-2">
+                        <Checkbox
+                          id="load-latest-eval"
+                          checked={props.shouldLoadLatestEval}
+                          onCheckedChange={(checked) => {
+                            props.onChangeShouldLoadLatestEval?.(
+                              checked === true,
+                            )
+                          }}
+                        />
+                        <label
+                          htmlFor="load-latest-eval"
+                          className="rf-text-xs rf-cursor-pointer"
+                        >
+                          Force Latest @tscircuit/eval
+                        </label>
+                      </div>
+                    </DropdownMenuItem>
+                    {lastRunEvalVersion && (
+                      <DropdownMenuItem className="rf-flex rf-items-center rf-gap-2">
+                        <div className="rf-flex rf-items-center rf-gap-2">
+                          <span className="rf-text-xs">
+                            @tscircuit/eval@{lastRunEvalVersion}
+                          </span>
+                        </div>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem className="rf-flex rf-items-center rf-gap-2">
                       <div className="rf-flex rf-items-center rf-gap-2">
                         <span className="rf-text-xs">
-                          @tscircuit/eval@{lastRunEvalVersion}
+                          @tscircuit/runframe@{packageJson.version}
                         </span>
                       </div>
                     </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem className="rf-flex rf-items-center rf-gap-2">
+                    <DropdownMenuItem
+                      className="rf-flex rf-items-center rf-gap-2"
+                      onClick={() => {
+                        window.open("/api/admin", "_blank")
+                      }}
+                    >
+                      <div className="rf-flex rf-items-center rf-gap-2">
+                        <span className="rf-text-xs">CLI Admin Panel</span>
+                      </div>
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+            )}
+          </DropdownMenuContent>
+
+          <AlertDialog open={isError} onOpenChange={setIsError}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Error Saving Snippet</AlertDialogTitle>
+                <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setIsError(false)}>
+                  Dismiss
+                </AlertDialogCancel>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          <SelectSnippetDialog
+            snippetNames={availableSnippets ?? []}
+            onSelect={async (name) => {
+              setIsSaving(true)
+              setRequestToSaveSentAt(Date.now())
+              setSnippetName(name)
+              await pushEvent({
+                event_type: "REQUEST_TO_SAVE_SNIPPET",
+                snippet_name: name,
+              } as RequestToSaveSnippetEvent)
+              setIsSelectSnippetDialogOpen(false)
+            }}
+            onCancel={() => setIsSelectSnippetDialogOpen(false)}
+            isOpen={isSelectSnippetDialogOpen}
+          />
+        </DropdownMenu>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className="rf-whitespace-nowrap rf-text-xs font-medium rf-p-2 rf-mx-1 rf-cursor-pointer rf-relative">
+              View
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="rf-z-[101]">
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger className="rf-text-xs">
+                Schematic
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem
+                    className="rf-flex rf-items-center rf-gap-2"
+                    onSelect={(e) => e.preventDefault()}
+                  >
                     <div className="rf-flex rf-items-center rf-gap-2">
-                      <span className="rf-text-xs">
-                        @tscircuit/runframe@{packageJson.version}
-                      </span>
+                      <Checkbox
+                        id="show-schematic-ports"
+                        checked={props.showSchematicPorts}
+                        onCheckedChange={(checked) => {
+                          props.onChangeShowSchematicPorts?.(checked === true)
+                        }}
+                      />
+                      <label
+                        htmlFor="show-schematic-ports"
+                        className="rf-text-xs rf-cursor-pointer"
+                      >
+                        Show Schematic Ports
+                      </label>
                     </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="rf-flex rf-items-center rf-gap-2"
-                    onClick={() => {
-                      window.open("/api/admin", "_blank")
-                    }}
+                    onSelect={(e) => e.preventDefault()}
                   >
                     <div className="rf-flex rf-items-center rf-gap-2">
-                      <span className="rf-text-xs">CLI Admin Panel</span>
+                      <Checkbox
+                        id="show-schematic-grid"
+                        checked={props.showSchematicDebugGrid}
+                        onCheckedChange={(checked) => {
+                          props.onChangeShowSchematicDebugGrid?.(
+                            checked === true,
+                          )
+                        }}
+                      />
+                      <label
+                        htmlFor="show-schematic-grid"
+                        className="rf-text-xs rf-cursor-pointer"
+                      >
+                        Show Schematic Grid
+                      </label>
                     </div>
                   </DropdownMenuItem>
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>
             </DropdownMenuSub>
-          )}
-        </DropdownMenuContent>
-
-        <AlertDialog open={isError} onOpenChange={setIsError}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Error Saving Snippet</AlertDialogTitle>
-              <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setIsError(false)}>
-                Dismiss
-              </AlertDialogCancel>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-
-        <SelectSnippetDialog
-          snippetNames={availableSnippets ?? []}
-          onSelect={async (name) => {
-            setIsSaving(true)
-            setRequestToSaveSentAt(Date.now())
-            setSnippetName(name)
-            await pushEvent({
-              event_type: "REQUEST_TO_SAVE_SNIPPET",
-              snippet_name: name,
-            } as RequestToSaveSnippetEvent)
-            setIsSelectSnippetDialogOpen(false)
-          }}
-          onCancel={() => setIsSelectSnippetDialogOpen(false)}
-          isOpen={isSelectSnippetDialogOpen}
-        />
-      </DropdownMenu>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <div className="rf-whitespace-nowrap rf-text-xs font-medium rf-p-2 rf-mx-1 rf-cursor-pointer rf-relative">
-            View
-          </div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="rf-z-[101]">
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger className="rf-text-xs">
-              Schematic
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem
-                  className="rf-flex rf-items-center rf-gap-2"
-                  onSelect={(e) => e.preventDefault()}
-                >
-                  <div className="rf-flex rf-items-center rf-gap-2">
-                    <Checkbox
-                      id="show-schematic-ports"
-                      checked={props.showSchematicPorts}
-                      onCheckedChange={(checked) => {
-                        props.onChangeShowSchematicPorts?.(checked === true)
-                      }}
-                    />
-                    <label
-                      htmlFor="show-schematic-ports"
-                      className="rf-text-xs rf-cursor-pointer"
-                    >
-                      Show Schematic Ports
-                    </label>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="rf-flex rf-items-center rf-gap-2"
-                  onSelect={(e) => e.preventDefault()}
-                >
-                  <div className="rf-flex rf-items-center rf-gap-2">
-                    <Checkbox
-                      id="show-schematic-grid"
-                      checked={props.showSchematicDebugGrid}
-                      onCheckedChange={(checked) => {
-                        props.onChangeShowSchematicDebugGrid?.(checked === true)
-                      }}
-                    />
-                    <label
-                      htmlFor="show-schematic-grid"
-                      className="rf-text-xs rf-cursor-pointer"
-                    >
-                      Show Schematic Grid
-                    </label>
-                  </div>
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       {BugReportDialog}
       <LbrnExportOptionsDialog
         open={isLbrnDialogOpen}

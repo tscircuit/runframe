@@ -54,7 +54,7 @@
     "@tscircuit/fake-snippets": "^0.0.163",
     "@tscircuit/file-server": "^0.0.32",
     "@tscircuit/footprinter": "^0.0.236",
-    "@tscircuit/pcb-viewer": "1.11.330",
+    "@tscircuit/pcb-viewer": "1.11.332",
     "@tscircuit/props": "^0.0.455",
     "@tscircuit/schematic-trace-solver": "^0.0.40",
     "@tscircuit/schematic-viewer": "^2.0.56",

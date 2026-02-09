@@ -31,7 +31,7 @@
         "@tscircuit/fake-snippets": "^0.0.163",
         "@tscircuit/file-server": "^0.0.32",
         "@tscircuit/footprinter": "^0.0.236",
-        "@tscircuit/pcb-viewer": "^1.11.335",
+        "@tscircuit/pcb-viewer": "1.11.335",
         "@tscircuit/props": "^0.0.455",
         "@tscircuit/schematic-trace-solver": "^0.0.40",
         "@tscircuit/schematic-viewer": "^2.0.56",
@@ -46,7 +46,7 @@
         "circuit-json-to-bom-csv": "^0.0.8",
         "circuit-json-to-gerber": "^0.0.46",
         "circuit-json-to-gltf": "^0.0.56",
-        "circuit-json-to-kicad": "^0.0.69",
+        "circuit-json-to-kicad": "^0.0.71",
         "circuit-json-to-lbrn": "^0.0.4",
         "circuit-json-to-pnp-csv": "^0.0.7",
         "circuit-json-to-step": "^0.0.16",
@@ -785,7 +785,7 @@
 
     "circuit-json-to-gltf": ["circuit-json-to-gltf@0.0.56", "", { "dependencies": { "@jscad/modeling": "^2.12.6", "jscad-electronics": "^0.0.53", "jscad-to-gltf": "^0.0.5" }, "peerDependencies": { "@resvg/resvg-js": "2", "@resvg/resvg-wasm": "2", "@tscircuit/circuit-json-util": "*", "circuit-json": "*", "circuit-to-svg": "*", "typescript": "^5" }, "optionalPeers": ["@resvg/resvg-js", "@resvg/resvg-wasm"] }, "sha512-7k7mHBBfUFanLWL+A+1B/LwrIhfpWt3RzyK3ql2xImGgpnfzkyLq67sucyzgIf5JVxKxY+EmwM/JRmCZ3BjM1w=="],
 
-    "circuit-json-to-kicad": ["circuit-json-to-kicad@0.0.69", "", { "dependencies": { "@tscircuit/props": "^0.0.470", "circuit-json": "^0.0.378" }, "peerDependencies": { "typescript": "^5" } }, "sha512-XoAYrU2D1fUqlbBpx2c6elwYXDkPecB0kzYupby1jSJuvAUm7RwttI4gXWE8RuJA9nCrFcI3vJyFmfLCIRw3Ng=="],
+    "circuit-json-to-kicad": ["circuit-json-to-kicad@0.0.71", "", { "dependencies": { "@tscircuit/props": "^0.0.470", "circuit-json": "^0.0.378" }, "peerDependencies": { "typescript": "^5" } }, "sha512-WpA+MCibBatvM/l3EVRfGjiLjqoBCDRyZ0oHilXyP0GvdNbBS9T53EiOJpCAqFMzThgmlR93N3oXbvuX8mKowQ=="],
 
     "circuit-json-to-lbrn": ["circuit-json-to-lbrn@0.0.4", "", { "dependencies": { "lbrnts": "^0.0.6" }, "peerDependencies": { "typescript": "^5" } }, "sha512-CGh+w3GsB5lxF5JJdARKhXDc6QFCTRKoIB68mCyDqbxSpLAGoBakXDOKBs7TaFOrparWxMiC9YU09E41dvxN0w=="],
 

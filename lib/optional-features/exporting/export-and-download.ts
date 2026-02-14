@@ -7,6 +7,7 @@ import { exportKicadProject } from "./formats/export-kicad-project"
 import { exportKicadLibrary } from "./formats/export-kicad-library"
 import { exportStep } from "./formats/export-step"
 import { exportLbrn } from "./formats/export-lbrn"
+import { sanitizeFileName } from "lib/utils/sanitizeFileName"
 
 export const availableExports = [
   { extension: "json", name: "Circuit JSON" },
@@ -28,12 +29,14 @@ type ExportName = (typeof availableExports)[number]["name"]
 export const exportAndDownload = async ({
   exportName,
   circuitJson,
-  projectName,
+  projectName: rawProjectName,
 }: {
   exportName: ExportName
   circuitJson: CircuitJson
   projectName: string
 }) => {
+  const projectName = sanitizeFileName(rawProjectName)
+
   if (exportName === "Fabrication Files") {
     exportFabricationFiles({ circuitJson, projectName })
     return

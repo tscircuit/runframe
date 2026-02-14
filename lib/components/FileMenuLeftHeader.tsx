@@ -313,7 +313,10 @@ export const FileMenuLeftHeader = (props: {
                         exportAndDownload({
                           exportName: exp.name,
                           circuitJson,
-                          projectName,
+                          projectName: projectName?.replace(
+                            /\.(board|circuit)$/,
+                            "",
+                          ),
                         })
                       }}
                       disabled={isExporting}

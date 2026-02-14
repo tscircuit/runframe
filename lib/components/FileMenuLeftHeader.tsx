@@ -296,7 +296,6 @@ export const FileMenuLeftHeader = (props: {
                           }
                         }
                         const projectName =
-                          (window as any)?.TSCIRCUIT_PACKAGE_NAME ??
                           props.projectName ??
                           snippetName ??
                           projectNameFromPath

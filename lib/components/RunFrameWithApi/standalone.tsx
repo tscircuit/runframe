@@ -12,6 +12,7 @@ declare global {
     TSCIRCUIT_USE_RUNFRAME_FOR_CLI?: boolean
     TSCIRCUIT_RUNFRAME_STATIC_FILE_LIST?: CircuitJsonFileReference[]
     TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH?: string
+    TSCIRCUIT_PACKAGE_NAME?: string
   }
 }
 
@@ -92,6 +93,7 @@ const runframeStandaloneProps: ComponentProps<typeof RunFrameWithApi> = {
 
   const staticFileList = window.TSCIRCUIT_RUNFRAME_STATIC_FILE_LIST
   const defaultMainComponentPath = window.TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH
+  const projectName = window.TSCIRCUIT_PACKAGE_NAME
   if (Array.isArray(staticFileList)) {
     const tabSelected = parseTabFromHash()
     root.render(
@@ -99,6 +101,7 @@ const runframeStandaloneProps: ComponentProps<typeof RunFrameWithApi> = {
         files={staticFileList}
         initialCircuitPath={defaultMainComponentPath}
         tabSelected={tabSelected}
+        projectName={projectName}
       />,
     )
   } else if (window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI) {

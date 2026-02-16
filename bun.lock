@@ -49,7 +49,7 @@
         "circuit-json-to-kicad": "^0.0.72",
         "circuit-json-to-lbrn": "^0.0.4",
         "circuit-json-to-pnp-csv": "^0.0.7",
-        "circuit-json-to-step": "^0.0.16",
+        "circuit-json-to-step": "^0.0.18",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cmdk": "^1.1.1",
@@ -85,7 +85,7 @@
         "schematic-symbols": "^0.0.202",
         "serve": "^14.2.4",
         "source-map-explorer": "^2.5.3",
-        "stepts": "^0.0.2",
+        "stepts": "^0.0.3",
         "tailwind-merge": "^2.6.0",
         "tailwindcss": "^3.4.17",
         "tailwindcss-animate": "^1.0.7",
@@ -795,7 +795,7 @@
 
     "circuit-json-to-spice": ["circuit-json-to-spice@0.0.30", "", { "dependencies": { "circuit-json-to-connectivity-map": "^0.0.22" }, "peerDependencies": { "@tscircuit/circuit-json-util": "*", "circuit-json": "*", "typescript": "^5.0.0" } }, "sha512-ArMfJhxh7lWI1OiZLMNBong7r3tArX9Q6JOprDPirku0bUZwLXr5AY4w/pDlkEivlaRX6yvamqebWja6yIONog=="],
 
-    "circuit-json-to-step": ["circuit-json-to-step@0.0.16", "https://registry.npmmirror.com/circuit-json-to-step/-/circuit-json-to-step-0.0.16.tgz", { "dependencies": { "circuit-json-to-connectivity-map": "^0.0.22", "circuit-json-to-gltf": "^0.0.62", "circuit-to-svg": "^0.0.327", "schematic-symbols": "^0.0.202" }, "peerDependencies": { "@tscircuit/circuit-json-util": "*", "typescript": "^5" } }, "sha512-30ZLv68w6J15v+iI8NO5Jtc+PUaBnmeBGNMGJ823rJCWhs/XcmXP8PnUfI8AK/1NhHwnKK7UzPcAXUbvYn6+fQ=="],
+    "circuit-json-to-step": ["circuit-json-to-step@0.0.18", "", { "dependencies": { "circuit-json-to-connectivity-map": "^0.0.22", "circuit-json-to-gltf": "^0.0.62", "circuit-to-svg": "^0.0.327", "schematic-symbols": "^0.0.202" }, "peerDependencies": { "@tscircuit/circuit-json-util": "*", "typescript": "^5" } }, "sha512-D3vJxl0PYnZvTMChY9r+6z0aZ8PTzKnsZEfO0WVeGFXRTfR/aILDzb7Tjq4evjTDU+78eSPaXR1Qsw4flSCDIA=="],
 
     "circuit-to-canvas": ["circuit-to-canvas@0.0.49", "", { "dependencies": { "transformation-matrix": "^3.1.0" }, "peerDependencies": { "@tscircuit/alphabet": "*", "typescript": "^5" } }, "sha512-lmnRwZBegNprW0IUqcRolP7yF6yyIf/tPSq+Xnhi+K+ngUWTlSB+nikVq/JjinKZZheBH1Wlmt0TmPvuWbGQvA=="],
 
@@ -1727,7 +1727,7 @@
 
     "stdin-discarder": ["stdin-discarder@0.2.2", "", {}, "sha512-UhDfHmA92YAlNnCfhmq0VeNL5bDbiZGg7sZ2IvPsXubGkiNa9EC+tUTsjBRsYUAz87btI6/1wf4XoVvQ3uRnmQ=="],
 
-    "stepts": ["stepts@0.0.2", "", { "peerDependencies": { "typescript": "^5" } }, "sha512-ImfPD3nhktcOMaiXKDcNVmhDhfSBqu4lgugsYVEdgA8aFgDo4SZ0ncsPV4GDHsNxgf4/0DPVs1JvNkdEtQtrtw=="],
+    "stepts": ["stepts@0.0.3", "", { "peerDependencies": { "typescript": "^5" } }, "sha512-n+B1agjLGSR37v5iHpoT7G40M9V0kvhAvTtMJ6auhbarNRSG0XhACgdXC4hkGwk3OFs8rAJGXCS9heJ6nqjVxg=="],
 
     "streamx": ["streamx@2.23.0", "", { "dependencies": { "events-universal": "^1.0.0", "fast-fifo": "^1.3.2", "text-decoder": "^1.1.0" } }, "sha512-kn+e44esVfn2Fa/O0CPFcex27fjIL6MkVae0Mm6q+E6f0hWv578YCERbv+4m02cjxvDsPKLnmxral/rR6lBMAg=="],
 

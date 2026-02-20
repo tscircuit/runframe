@@ -57,7 +57,7 @@
     "@tscircuit/pcb-viewer": "1.11.343",
     "@tscircuit/props": "^0.0.455",
     "@tscircuit/schematic-trace-solver": "^0.0.40",
-    "@tscircuit/schematic-viewer": "^2.0.56",
+    "@tscircuit/schematic-viewer": "^2.0.57",
     "@types/bun": "latest",
     "@types/debug": "^4.1.12",
     "@types/react": "^19.1.10",

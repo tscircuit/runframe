@@ -3,7 +3,7 @@ import { CircuitJsonPreview } from "../CircuitJsonPreview/CircuitJsonPreview"
 import { CircuitJsonFileSelectorCombobox } from "./CircuitJsonFileSelectorCombobox"
 import { useStyles } from "../../hooks/use-styles"
 import type { CircuitJson } from "circuit-json"
-import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
+import { HamburgerMenuLeftHeader } from "../HamburgerMenuLeftHeader"
 import { guessEntrypoint } from "lib/runner"
 import { ErrorBoundary } from "react-error-boundary"
 import type { TabId } from "../CircuitJsonPreview/PreviewContentProps"
@@ -197,7 +197,7 @@ export const RunFrameStaticBuildViewer = (
         <div className="rf-w-full rf-h-full rf-flex rf-flex-col">
           <div className="rf-flex rf-items-center rf-justify-between rf-w-full rf-p-4 rf-border-b rf-border-gray-200">
             {(props.showFileMenu ?? true) && (
-              <FileMenuLeftHeader
+              <HamburgerMenuLeftHeader
                 isWebEmbedded={true}
                 circuitJson={null}
                 projectName={props.projectName}
@@ -249,7 +249,7 @@ export const RunFrameStaticBuildViewer = (
           leftHeaderContent={
             <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
               {(props.showFileMenu ?? true) && (
-                <FileMenuLeftHeader
+                <HamburgerMenuLeftHeader
                   isWebEmbedded={true}
                   circuitJson={circuitJson}
                   projectName={props.projectName}

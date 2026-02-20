@@ -39,7 +39,7 @@ import { useRunnerStore } from "./runner-store/use-runner-store"
 import { useMutex } from "./useMutex"
 import type { ManualEditEvent } from "@tscircuit/props"
 import { registryKy } from "../../utils/get-registry-ky"
-import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
+import { HamburgerMenuLeftHeader } from "../HamburgerMenuLeftHeader"
 import { LoadingSkeleton } from "../ui/LoadingSkeleton"
 import { useStyles } from "../../hooks/use-styles"
 import { useCircuitJsonFile } from "../../hooks/use-circuit-json-file"
@@ -699,7 +699,7 @@ export const RunFrame = (props: RunFrameProps) => {
               </TooltipProvider>
             )}
             {props.showFileMenu !== false && (
-              <FileMenuLeftHeader
+              <HamburgerMenuLeftHeader
                 isWebEmbedded={props.isWebEmbedded}
                 onLoginRequired={props.onLoginRequired}
                 showSchematicDebugGrid={showSchematicDebugGrid}

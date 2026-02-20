@@ -1,7 +1,7 @@
 import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { useCallback, useState } from "react"
 import { RunFrameWithApi } from "../RunFrameWithApi/RunFrameWithApi"
-import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
+import { HamburgerMenuLeftHeader } from "../HamburgerMenuLeftHeader"
 import { useLoginDialog } from "./LoginDialog"
 
 export const RunFrameForCli = (props: {
@@ -51,7 +51,7 @@ export const RunFrameForCli = (props: {
         onMainComponentPathChange={updateMainComponentHash}
         leftHeaderContent={
           <div className="rf-flex rf-items-center rf-justify-between">
-            <FileMenuLeftHeader
+            <HamburgerMenuLeftHeader
               isWebEmbedded={false}
               shouldLoadLatestEval={
                 !props.workerBlobUrl && shouldLoadLatestEval

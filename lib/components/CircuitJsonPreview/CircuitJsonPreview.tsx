@@ -55,7 +55,7 @@ import type { CircuitJsonError } from "circuit-json"
 import { version } from "../../../package.json"
 import type { Object3D } from "three"
 import { useEvalVersions } from "lib/hooks/use-eval-versions"
-import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
+import { HamburgerMenuLeftHeader } from "../HamburgerMenuLeftHeader"
 
 declare global {
   interface Window {
@@ -257,7 +257,7 @@ export const CircuitJsonPreview = ({
           >
             {leftHeaderContent}
             {showFileMenu && !leftHeaderContent && (
-              <FileMenuLeftHeader
+              <HamburgerMenuLeftHeader
                 isWebEmbedded={isWebEmbedded}
                 circuitJson={circuitJson}
                 projectName={projectName}

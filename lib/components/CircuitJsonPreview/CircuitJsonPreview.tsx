@@ -257,7 +257,7 @@ export const CircuitJsonPreview = ({
           >
             {leftHeaderContent}
             {showFileMenu && !leftHeaderContent && (
-              <HamburgerMenuLeftHeader 
+              <HamburgerMenuLeftHeader
                 isWebEmbedded={isWebEmbedded}
                 circuitJson={circuitJson}
                 projectName={projectName}

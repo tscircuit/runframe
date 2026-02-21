@@ -69,6 +69,7 @@ export const HamburgerMenuLeftHeader = (
     (s) => s.currentMainComponentPath,
   )
   const [snippetName, setSnippetName] = useState<string | null>(null)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [requestToSaveSentAt, setRequestToSaveSentAt] = useState<number | null>(
     null,
@@ -95,7 +96,13 @@ export const HamburgerMenuLeftHeader = (
 
   useEventHandler((event) => {
     if (new Date(event.created_at).valueOf() < firstRenderTime + 500) return
+    if (event.event_type === "FILE_UPDATED") {
+      setHasUnsavedChanges(true)
+      return
+    }
     if (event.event_type === "SNIPPET_SAVED") {
+      setHasUnsavedChanges(false)
+      toast.success("Snippet saved successfully.")
       setIsError(false)
       return
     }
@@ -142,6 +149,8 @@ export const HamburgerMenuLeftHeader = (
     if (saveSuccessEvent) {
       setIsSaving(false)
       setRequestToSaveSentAt(null)
+      setHasUnsavedChanges(false)
+      toast.success("Snippet saved successfully.")
       setIsError(false)
     }
   }, [recentEvents, isSaving])

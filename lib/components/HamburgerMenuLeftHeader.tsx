@@ -108,11 +108,13 @@ export const HamburgerMenuLeftHeader = (
     }
     if (event.event_type === "REQUEST_EXPORT") {
       setIsExporting(true)
+      toast.success("Export processing...")
       setIsError(false)
     }
     if (event.event_type === "EXPORT_CREATED") {
       setIsError(false)
       setIsExporting(false)
+      toast.success(`Export created: ${event.exportFilePath}`)
     }
   })
 

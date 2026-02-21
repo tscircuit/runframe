@@ -210,7 +210,7 @@ export const HamburgerMenuLeftHeader = (
             <Menu className="rf-w-4 rf-h-4" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="rf-z-[101] rf-min-w-[180px]">
+        <DropdownMenuContent className="rf-z-[104] rf-min-w-[180px]">
           {/* File Section */}
           <DropdownMenuLabel className="rf-text-xs rf-text-zinc-500 dark:rf-text-zinc-400">
             File

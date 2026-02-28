@@ -1,5 +1,21 @@
-import { useEffect, useState, useRef, useMemo, useCallback } from "react"
-import { useCurrentFolder } from "./useCurrentFolder"
+import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
+import { cn } from "lib/utils"
+import { isCircuitJsonFile } from "lib/utils/file-filters"
+import {
+  ArrowUp,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  ChevronsUpDown,
+  // Star, // Commented out - favorites feature disabled
+  Clock,
+  Code,
+  File,
+  FileText,
+  Folder,
+  Save,
+} from "lucide-react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Button } from "../../ui/button"
 import {
   Command,
@@ -11,26 +27,11 @@ import {
 } from "../../ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover"
 import {
-  ChevronsUpDown,
-  Check,
-  ChevronRight,
-  ChevronDown,
-  File,
-  FileText,
-  Code,
-  Folder,
-  ArrowUp,
-  // Star, // Commented out - favorites feature disabled
-  Clock,
-  Save,
-} from "lucide-react"
-import { cn } from "lib/utils"
-import {
-  parseFilesToTree,
-  getCurrentFolderContents,
   type FileNode,
+  getCurrentFolderContents,
+  parseFilesToTree,
 } from "./parseFilesToTree"
-import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
+import { useCurrentFolder } from "./useCurrentFolder"
 
 const defaultFileIcon = (fileName: string) => {
   if (fileName.endsWith(".tsx") || fileName.endsWith(".jsx")) {
@@ -45,7 +46,7 @@ const defaultFileIcon = (fileName: string) => {
 const defaultFileFilter = (filename: string) => {
   return (
     filename.endsWith(".tsx") ||
-    filename.endsWith(".circuit.json") ||
+    isCircuitJsonFile(filename) ||
     filename.endsWith(".jsx")
   )
 }

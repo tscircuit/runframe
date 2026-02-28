@@ -16,9 +16,11 @@ describe("File extension edge case - default config behavior", () => {
   }
 
   const UI_FILE_FILTER = (filename: string) => {
+    const basename = filename.toLowerCase().split("/").pop()
     return (
       filename.endsWith(".tsx") ||
       filename.endsWith(".circuit.json") ||
+      basename === "circuit.json" ||
       filename.endsWith(".jsx")
     )
   }
@@ -199,7 +201,7 @@ describe("File extension edge case - default config behavior", () => {
     const scenario = {
       configHasIncludeBoardFiles: false,
       backendExtensions: [".tsx", ".ts", ".jsx", ".js", ".circuit.json"],
-      uiExtensions: [".tsx", ".jsx", ".circuit.json"],
+      uiExtensions: [".tsx", ".jsx", ".circuit.json", "circuit.json"],
     }
 
     expect(scenario.configHasIncludeBoardFiles).toBe(false)

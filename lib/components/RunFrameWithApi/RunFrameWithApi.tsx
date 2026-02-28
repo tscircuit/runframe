@@ -1,19 +1,19 @@
+import { applyEditEventsToManualEditsFile } from "@tscircuit/core"
+import type { ManualEditsFile } from "@tscircuit/props"
 import Debug from "debug"
 import { useEditEventController } from "lib/hooks/use-edit-event-controller"
 import { useHasReceivedInitialFilesLoaded } from "lib/hooks/use-has-received-initial-files-loaded"
-import { useSyncPageTitle } from "lib/hooks/use-sync-page-title"
 import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
+import { useSyncPageTitle } from "lib/hooks/use-sync-page-title"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
+import type { RunCompletedPayload } from "../RunFrame/run-completion"
 import { API_BASE } from "./api-base"
 import { useRunFrameStore } from "./store"
-import { applyEditEventsToManualEditsFile } from "@tscircuit/core"
-import type { ManualEditsFile } from "@tscircuit/props"
-import type { RunCompletedPayload } from "../RunFrame/run-completion"
 
-import { EnhancedFileSelectorCombobox } from "./EnhancedFileSelectorCombobox"
-import { getBoardFilesFromConfig } from "lib/utils/get-board-files-from-config"
 import { DEFAULT_UI_FILE_FILTER } from "lib/utils/file-filters"
+import { getBoardFilesFromConfig } from "lib/utils/get-board-files-from-config"
+import { EnhancedFileSelectorCombobox } from "./EnhancedFileSelectorCombobox"
 
 const debug = Debug("run-frame:RunFrameWithApi")
 
@@ -127,8 +127,12 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   )
 
   useEffect(() => {
-    if (componentPath && visibleBoardFiles.includes(componentPath)) {
-      // Retain current selection if it still exists
+    if (
+      componentPath &&
+      (visibleBoardFiles.includes(componentPath) ||
+        boardFiles.includes(componentPath))
+    ) {
+      // Retain current selection if it still exists in the board files list
       return
     }
 
@@ -170,7 +174,12 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     if (firstMatch) {
       setComponentPath(firstMatch)
     }
-  }, [visibleBoardFiles, props.initialMainComponentPath, componentPath])
+  }, [
+    visibleBoardFiles,
+    boardFiles,
+    props.initialMainComponentPath,
+    componentPath,
+  ])
 
   const updateFileHash = useCallback((filePath: string) => {
     if (typeof window === "undefined") return

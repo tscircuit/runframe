@@ -18,6 +18,7 @@ describe("getBoardFilesFromConfig", () => {
 
     expect(getBoardFilesFromConfig(files, config)).toEqual([
       "src/boards/main.board.tsx",
+      "src/boards/helper.ts",
       "src/.hidden/secret.board.tsx",
     ])
   })

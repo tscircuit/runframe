@@ -1,17 +1,14 @@
 import type { ProjectConfig } from "@tscircuit/props"
 import { projectConfig } from "@tscircuit/props"
 import { Minimatch } from "minimatch"
-
-const DEFAULT_BOARD_FILE_EXTENSIONS = [
-  ".tsx",
-  ".ts",
-  ".jsx",
-  ".js",
-  ".circuit.json",
-]
+import { isCircuitJsonFile } from "./file-filters"
 
 const DEFAULT_BOARD_FILE_FILTER = (filename: string) =>
-  DEFAULT_BOARD_FILE_EXTENSIONS.some((ext) => filename.endsWith(ext)) &&
+  (filename.endsWith(".tsx") ||
+    filename.endsWith(".ts") ||
+    filename.endsWith(".jsx") ||
+    filename.endsWith(".js") ||
+    isCircuitJsonFile(filename)) &&
   !filename.endsWith(".d.ts")
 
 const parseProjectConfig = (configContent?: string): ProjectConfig | null => {

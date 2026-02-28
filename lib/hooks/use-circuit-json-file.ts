@@ -1,5 +1,6 @@
-import { useMemo } from "react"
 import type { CircuitJson } from "circuit-json"
+import { isCircuitJsonFile } from "lib/utils/file-filters"
+import { useMemo } from "react"
 
 export interface UseCircuitJsonFileOptions {
   mainComponentPath?: string
@@ -22,8 +23,7 @@ export const useCircuitJsonFile = ({
 }: UseCircuitJsonFileOptions): UseCircuitJsonFileResult => {
   return useMemo(() => {
     const isStaticCircuitJson =
-      mainComponentPath?.endsWith(".circuit.json") ||
-      mainComponentPath?.toLowerCase() === "circuit.json"
+      mainComponentPath != null && isCircuitJsonFile(mainComponentPath)
 
     if (!isStaticCircuitJson) {
       return { isStaticCircuitJson: false, circuitJson: null, error: null }

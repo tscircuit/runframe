@@ -720,7 +720,9 @@ export const RunFrame = (props: RunFrameProps) => {
                 showPcbAllTraceLength={showPcbAllTraceLength}
                 onChangeShowPcbAllTraceLength={setShowPcbAllTraceLength}
                 showPcbAutoroutingAnimation={showPcbAutoroutingAnimation}
-                onChangeShowPcbAutoroutingAnimation={setShowPcbAutoroutingAnimation}
+                onChangeShowPcbAutoroutingAnimation={
+                  setShowPcbAutoroutingAnimation
+                }
                 showPcbDrcError={showPcbDrcError}
                 onChangeShowPcbDrcError={setShowPcbDrcError}
                 showPcbCopperPour={showPcbCopperPour}

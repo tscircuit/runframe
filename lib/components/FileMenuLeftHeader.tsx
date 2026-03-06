@@ -473,7 +473,9 @@ export const FileMenuLeftHeader = (props: {
                         id="show-all-trace-length"
                         checked={props.showPcbAllTraceLength}
                         onCheckedChange={(checked) => {
-                          props.onChangeShowPcbAllTraceLength?.(checked === true)
+                          props.onChangeShowPcbAllTraceLength?.(
+                            checked === true,
+                          )
                         }}
                       />
                       <label

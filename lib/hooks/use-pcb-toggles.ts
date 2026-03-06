@@ -16,7 +16,9 @@ export type PcbToggleSetters = {
   [K in PcbToggleKeys as `set${Capitalize<string & K>}`]: (v: boolean) => void
 }
 export type PcbToggleHandlers = {
-  [K in PcbToggleKeys as `onChange${Capitalize<string & K>}`]?: (v: boolean) => void
+  [K in PcbToggleKeys as `onChange${Capitalize<string & K>}`]?: (
+    v: boolean,
+  ) => void
 }
 
 const toHandlerKey = (k: PcbToggleKeys) =>
@@ -28,16 +30,25 @@ const toSetterKey = (k: PcbToggleKeys) =>
 export function usePcbToggles(
   props: PcbToggleValues & PcbToggleHandlers,
 ): PcbToggleValues & PcbToggleSetters {
-  const [internal, setInternal] = useState<PcbToggleValues>(() =>
-    Object.fromEntries(PCB_TOGGLE_KEYS.map((k) => [k, props[k]])) as PcbToggleValues,
+  const [internal, setInternal] = useState<PcbToggleValues>(
+    () =>
+      Object.fromEntries(
+        PCB_TOGGLE_KEYS.map((k) => [k, props[k]]),
+      ) as PcbToggleValues,
   )
 
   return Object.fromEntries(
     PCB_TOGGLE_KEYS.flatMap((k) => {
-      const handler = props[toHandlerKey(k)] as ((v: boolean) => void) | undefined
+      const handler = props[toHandlerKey(k)] as
+        | ((v: boolean) => void)
+        | undefined
       return [
         [k, handler ? props[k] : internal[k]],
-        [toSetterKey(k), (v: boolean) => handler ? handler(v) : setInternal((s) => ({ ...s, [k]: v }))],
+        [
+          toSetterKey(k),
+          (v: boolean) =>
+            handler ? handler(v) : setInternal((s) => ({ ...s, [k]: v })),
+        ],
       ]
     }),
   ) as PcbToggleValues & PcbToggleSetters

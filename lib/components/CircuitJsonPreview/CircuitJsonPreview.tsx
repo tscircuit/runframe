@@ -191,10 +191,9 @@ export const CircuitJsonPreview = ({
   const [internalShowSchematicPorts, setInternalShowSchematicPorts] = useState(
     showSchematicPortsProp,
   )
-  const showSchematicDebugGrid =
-    onChangeShowSchematicDebugGrid
-      ? showSchematicDebugGridProp
-      : internalShowSchematicDebugGrid
+  const showSchematicDebugGrid = onChangeShowSchematicDebugGrid
+    ? showSchematicDebugGridProp
+    : internalShowSchematicDebugGrid
   const showSchematicPorts = onChangeShowSchematicPorts
     ? showSchematicPortsProp
     : internalShowSchematicPorts
@@ -561,11 +560,13 @@ export const CircuitJsonPreview = ({
                       debugGraphics={autoroutingGraphics}
                       initialState={{
                         is_showing_solder_mask: pcb.showPcbSolderMask,
-                        is_showing_multiple_traces_length: pcb.showPcbAllTraceLength,
+                        is_showing_multiple_traces_length:
+                          pcb.showPcbAllTraceLength,
                         is_showing_autorouting: pcb.showPcbAutoroutingAnimation,
                         is_showing_drc_errors: pcb.showPcbDrcError,
                         is_showing_copper_pours: pcb.showPcbCopperPour,
-                        is_showing_group_anchor_offsets: pcb.showPcbGroupAnchorOffsets,
+                        is_showing_group_anchor_offsets:
+                          pcb.showPcbGroupAnchorOffsets,
                         is_showing_pcb_groups: pcb.showPcbGroup,
                       }}
                       containerClassName={cn(

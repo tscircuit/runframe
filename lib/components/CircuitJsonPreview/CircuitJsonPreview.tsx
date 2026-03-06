@@ -586,7 +586,7 @@ export const CircuitJsonPreview = ({
                 >
                   {circuitJson ? (
                     <PcbViewerWithContainerHeight
-                      key={`pcb-viewer-${showSolderMask ? "mask-on" : "mask-off"}-${showAllTraceLength}-${showAutoroutingAnimation}-${showDrcError}-${showCopperPour}-${showGroupAnchorOffsets}-${showPcbGroup}`}
+                      key={`pcb-viewer-${showSolderMask}-${showAllTraceLength}-${showAutoroutingAnimation}-${showDrcError}-${showCopperPour}-${showGroupAnchorOffsets}-${showPcbGroup}`}
                       focusOnHover={false}
                       circuitJson={circuitJson as any}
                       debugGraphics={autoroutingGraphics}

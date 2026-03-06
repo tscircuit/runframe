@@ -20,9 +20,10 @@ export const checkDevServerConnection = async (
     () => controller.abort(),
     REQUEST_TIMEOUT_MS,
   )
+  const since = encodeURIComponent(new Date().toISOString())
 
   try {
-    await fetch(`${apiBase}/events/list`, {
+    await fetch(`${apiBase}/events/list?since=${since}`, {
       method: "GET",
       signal: controller.signal,
       cache: "no-store",

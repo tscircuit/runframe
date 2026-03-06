@@ -21,15 +21,16 @@ test("isLocalhost only returns true for local hosts", () => {
 })
 
 test("checkDevServerConnection returns true when fetch succeeds", async () => {
-  const fetchMock = mock(() =>
+  const fetchMock = mock((..._args: any[]) =>
     Promise.resolve(new Response("[]", { status: 200 })),
-  ) as unknown as typeof fetch
+  )
 
-  globalThis.fetch = fetchMock
+  globalThis.fetch = fetchMock as unknown as typeof fetch
 
   await expect(checkDevServerConnection("/api")).resolves.toBe(true)
-  expect(fetchMock).toHaveBeenCalledWith(
-    "/api/events/list",
+  expect(fetchMock).toHaveBeenCalledTimes(1)
+  expect(fetchMock.mock.calls[0]?.[0]).toMatch(/^\/api\/events\/list\?since=/)
+  expect(fetchMock.mock.calls[0]?.[1]).toEqual(
     expect.objectContaining({
       method: "GET",
       cache: "no-store",

@@ -56,18 +56,18 @@ export const FileMenuLeftHeader = (props: {
   onChangeShowSchematicDebugGrid?: (show: boolean) => void
   showSchematicPorts?: boolean
   onChangeShowSchematicPorts?: (show: boolean) => void
-  showSolderMask?: boolean
-  onChangeShowSolderMask?: (show: boolean) => void
-  showAllTraceLength?: boolean
-  onChangeShowAllTraceLength?: (show: boolean) => void
-  showAutoroutingAnimation?: boolean
-  onChangeShowAutoroutingAnimation?: (show: boolean) => void
-  showDrcError?: boolean
-  onChangeShowDrcError?: (show: boolean) => void
-  showCopperPour?: boolean
-  onChangeShowCopperPour?: (show: boolean) => void
-  showGroupAnchorOffsets?: boolean
-  onChangeShowGroupAnchorOffsets?: (show: boolean) => void
+  showPcbSolderMask?: boolean
+  onChangeShowPcbSolderMask?: (show: boolean) => void
+  showPcbAllTraceLength?: boolean
+  onChangeShowPcbAllTraceLength?: (show: boolean) => void
+  showPcbAutoroutingAnimation?: boolean
+  onChangeShowPcbAutoroutingAnimation?: (show: boolean) => void
+  showPcbDrcError?: boolean
+  onChangeShowPcbDrcError?: (show: boolean) => void
+  showPcbCopperPour?: boolean
+  onChangeShowPcbCopperPour?: (show: boolean) => void
+  showPcbGroupAnchorOffsets?: boolean
+  onChangeShowPcbGroupAnchorOffsets?: (show: boolean) => void
   showPcbGroup?: boolean
   onChangeShowPcbGroup?: (show: boolean) => void
 }) => {
@@ -451,9 +451,9 @@ export const FileMenuLeftHeader = (props: {
                     <div className="rf-flex rf-items-center rf-gap-2">
                       <Checkbox
                         id="show-solder-mask"
-                        checked={props.showSolderMask}
+                        checked={props.showPcbSolderMask}
                         onCheckedChange={(checked) => {
-                          props.onChangeShowSolderMask?.(checked === true)
+                          props.onChangeShowPcbSolderMask?.(checked === true)
                         }}
                       />
                       <label
@@ -471,9 +471,9 @@ export const FileMenuLeftHeader = (props: {
                     <div className="rf-flex rf-items-center rf-gap-2">
                       <Checkbox
                         id="show-all-trace-length"
-                        checked={props.showAllTraceLength}
+                        checked={props.showPcbAllTraceLength}
                         onCheckedChange={(checked) => {
-                          props.onChangeShowAllTraceLength?.(checked === true)
+                          props.onChangeShowPcbAllTraceLength?.(checked === true)
                         }}
                       />
                       <label
@@ -491,9 +491,9 @@ export const FileMenuLeftHeader = (props: {
                     <div className="rf-flex rf-items-center rf-gap-2">
                       <Checkbox
                         id="show-autorouting-animation"
-                        checked={props.showAutoroutingAnimation}
+                        checked={props.showPcbAutoroutingAnimation}
                         onCheckedChange={(checked) => {
-                          props.onChangeShowAutoroutingAnimation?.(
+                          props.onChangeShowPcbAutoroutingAnimation?.(
                             checked === true,
                           )
                         }}
@@ -513,9 +513,9 @@ export const FileMenuLeftHeader = (props: {
                     <div className="rf-flex rf-items-center rf-gap-2">
                       <Checkbox
                         id="show-drc-error"
-                        checked={props.showDrcError}
+                        checked={props.showPcbDrcError}
                         onCheckedChange={(checked) => {
-                          props.onChangeShowDrcError?.(checked === true)
+                          props.onChangeShowPcbDrcError?.(checked === true)
                         }}
                       />
                       <label
@@ -533,9 +533,9 @@ export const FileMenuLeftHeader = (props: {
                     <div className="rf-flex rf-items-center rf-gap-2">
                       <Checkbox
                         id="show-copper-pour"
-                        checked={props.showCopperPour}
+                        checked={props.showPcbCopperPour}
                         onCheckedChange={(checked) => {
-                          props.onChangeShowCopperPour?.(checked === true)
+                          props.onChangeShowPcbCopperPour?.(checked === true)
                         }}
                       />
                       <label
@@ -553,9 +553,9 @@ export const FileMenuLeftHeader = (props: {
                     <div className="rf-flex rf-items-center rf-gap-2">
                       <Checkbox
                         id="show-group-anchor-offsets"
-                        checked={props.showGroupAnchorOffsets}
+                        checked={props.showPcbGroupAnchorOffsets}
                         onCheckedChange={(checked) => {
-                          props.onChangeShowGroupAnchorOffsets?.(
+                          props.onChangeShowPcbGroupAnchorOffsets?.(
                             checked === true,
                           )
                         }}

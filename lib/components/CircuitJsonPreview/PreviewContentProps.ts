@@ -94,18 +94,18 @@ export interface PreviewContentProps {
   showSchematicPorts?: boolean
   onChangeShowSchematicPorts?: (show: boolean) => void
 
-  showSolderMask?: boolean
-  onChangeShowSolderMask?: (show: boolean) => void
-  showAllTraceLength?: boolean
-  onChangeShowAllTraceLength?: (show: boolean) => void
-  showAutoroutingAnimation?: boolean
-  onChangeShowAutoroutingAnimation?: (show: boolean) => void
-  showDrcError?: boolean
-  onChangeShowDrcError?: (show: boolean) => void
-  showCopperPour?: boolean
-  onChangeShowCopperPour?: (show: boolean) => void
-  showGroupAnchorOffsets?: boolean
-  onChangeShowGroupAnchorOffsets?: (show: boolean) => void
+  showPcbSolderMask?: boolean
+  onChangeShowPcbSolderMask?: (show: boolean) => void
+  showPcbAllTraceLength?: boolean
+  onChangeShowPcbAllTraceLength?: (show: boolean) => void
+  showPcbAutoroutingAnimation?: boolean
+  onChangeShowPcbAutoroutingAnimation?: (show: boolean) => void
+  showPcbDrcError?: boolean
+  onChangeShowPcbDrcError?: (show: boolean) => void
+  showPcbCopperPour?: boolean
+  onChangeShowPcbCopperPour?: (show: boolean) => void
+  showPcbGroupAnchorOffsets?: boolean
+  onChangeShowPcbGroupAnchorOffsets?: (show: boolean) => void
   showPcbGroup?: boolean
   onChangeShowPcbGroup?: (show: boolean) => void
 

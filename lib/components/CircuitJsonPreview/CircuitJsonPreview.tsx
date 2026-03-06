@@ -109,21 +109,21 @@ export const CircuitJsonPreview = ({
   autoRotate3dViewerDisabled,
   showSchematicDebugGrid: showSchematicDebugGridProp = false,
   showSchematicPorts: showSchematicPortsProp = false,
-  showSolderMask: showSolderMaskProp = false,
-  showAllTraceLength: showAllTraceLengthProp = false,
-  showAutoroutingAnimation: showAutoroutingAnimationProp = false,
-  showDrcError: showDrcErrorProp = false,
-  showCopperPour: showCopperPourProp = false,
-  showGroupAnchorOffsets: showGroupAnchorOffsetsProp = false,
+  showPcbSolderMask: showPcbSolderMaskProp = false,
+  showPcbAllTraceLength: showPcbAllTraceLengthProp = false,
+  showPcbAutoroutingAnimation: showPcbAutoroutingAnimationProp = false,
+  showPcbDrcError: showPcbDrcErrorProp = false,
+  showPcbCopperPour: showPcbCopperPourProp = false,
+  showPcbGroupAnchorOffsets: showPcbGroupAnchorOffsetsProp = false,
   showPcbGroup: showPcbGroupProp = false,
   onChangeShowSchematicDebugGrid,
   onChangeShowSchematicPorts,
-  onChangeShowSolderMask,
-  onChangeShowAllTraceLength,
-  onChangeShowAutoroutingAnimation,
-  onChangeShowDrcError,
-  onChangeShowCopperPour,
-  onChangeShowGroupAnchorOffsets,
+  onChangeShowPcbSolderMask,
+  onChangeShowPcbAllTraceLength,
+  onChangeShowPcbAutoroutingAnimation,
+  onChangeShowPcbDrcError,
+  onChangeShowPcbCopperPour,
+  onChangeShowPcbGroupAnchorOffsets,
   onChangeShowPcbGroup,
   showToggleFullScreen = true,
   defaultToFullScreen = false,
@@ -190,21 +190,18 @@ export const CircuitJsonPreview = ({
   const [internalShowSchematicPorts, setInternalShowSchematicPorts] = useState(
     showSchematicPortsProp,
   )
-  const [internalShowSolderMask, setInternalShowSolderMask] =
-    useState(showSolderMaskProp)
-  const [internalShowAllTraceLength, setInternalShowAllTraceLength] = useState(
-    showAllTraceLengthProp,
-  )
-  const [
-    internalShowAutoroutingAnimation,
-    setInternalShowAutoroutingAnimation,
-  ] = useState(showAutoroutingAnimationProp)
-  const [internalShowDrcError, setInternalShowDrcError] =
-    useState(showDrcErrorProp)
-  const [internalShowCopperPour, setInternalShowCopperPour] =
-    useState(showCopperPourProp)
-  const [internalShowGroupAnchorOffsets, setInternalShowGroupAnchorOffsets] =
-    useState(showGroupAnchorOffsetsProp)
+  const [internalShowPcbSolderMask, setInternalShowPcbSolderMask] =
+    useState(showPcbSolderMaskProp)
+  const [internalShowPcbAllTraceLength, setInternalShowPcbAllTraceLength] =
+    useState(showPcbAllTraceLengthProp)
+  const [internalShowPcbAutoroutingAnimation, setInternalShowPcbAutoroutingAnimation] =
+    useState(showPcbAutoroutingAnimationProp)
+  const [internalShowPcbDrcError, setInternalShowPcbDrcError] =
+    useState(showPcbDrcErrorProp)
+  const [internalShowPcbCopperPour, setInternalShowPcbCopperPour] =
+    useState(showPcbCopperPourProp)
+  const [internalShowPcbGroupAnchorOffsets, setInternalShowPcbGroupAnchorOffsets] =
+    useState(showPcbGroupAnchorOffsetsProp)
   const [internalShowPcbGroup, setInternalShowPcbGroup] =
     useState(showPcbGroupProp)
 
@@ -215,24 +212,24 @@ export const CircuitJsonPreview = ({
   const showSchematicPorts = onChangeShowSchematicPorts
     ? showSchematicPortsProp
     : internalShowSchematicPorts
-  const showSolderMask = onChangeShowSolderMask
-    ? showSolderMaskProp
-    : internalShowSolderMask
-  const showAllTraceLength = onChangeShowAllTraceLength
-    ? showAllTraceLengthProp
-    : internalShowAllTraceLength
-  const showAutoroutingAnimation = onChangeShowAutoroutingAnimation
-    ? showAutoroutingAnimationProp
-    : internalShowAutoroutingAnimation
-  const showDrcError = onChangeShowDrcError
-    ? showDrcErrorProp
-    : internalShowDrcError
-  const showCopperPour = onChangeShowCopperPour
-    ? showCopperPourProp
-    : internalShowCopperPour
-  const showGroupAnchorOffsets = onChangeShowGroupAnchorOffsets
-    ? showGroupAnchorOffsetsProp
-    : internalShowGroupAnchorOffsets
+  const showPcbSolderMask = onChangeShowPcbSolderMask
+    ? showPcbSolderMaskProp
+    : internalShowPcbSolderMask
+  const showPcbAllTraceLength = onChangeShowPcbAllTraceLength
+    ? showPcbAllTraceLengthProp
+    : internalShowPcbAllTraceLength
+  const showPcbAutoroutingAnimation = onChangeShowPcbAutoroutingAnimation
+    ? showPcbAutoroutingAnimationProp
+    : internalShowPcbAutoroutingAnimation
+  const showPcbDrcError = onChangeShowPcbDrcError
+    ? showPcbDrcErrorProp
+    : internalShowPcbDrcError
+  const showPcbCopperPour = onChangeShowPcbCopperPour
+    ? showPcbCopperPourProp
+    : internalShowPcbCopperPour
+  const showPcbGroupAnchorOffsets = onChangeShowPcbGroupAnchorOffsets
+    ? showPcbGroupAnchorOffsetsProp
+    : internalShowPcbGroupAnchorOffsets
   const showPcbGroup = onChangeShowPcbGroup
     ? showPcbGroupProp
     : internalShowPcbGroup
@@ -240,15 +237,18 @@ export const CircuitJsonPreview = ({
     onChangeShowSchematicDebugGrid ?? setInternalShowSchematicDebugGrid
   const setShowSchematicPorts =
     onChangeShowSchematicPorts ?? setInternalShowSchematicPorts
-  const setShowSolderMask = onChangeShowSolderMask ?? setInternalShowSolderMask
-  const setShowAllTraceLength =
-    onChangeShowAllTraceLength ?? setInternalShowAllTraceLength
-  const setShowAutoroutingAnimation =
-    onChangeShowAutoroutingAnimation ?? setInternalShowAutoroutingAnimation
-  const setShowDrcError = onChangeShowDrcError ?? setInternalShowDrcError
-  const setShowCopperPour = onChangeShowCopperPour ?? setInternalShowCopperPour
-  const setShowGroupAnchorOffsets =
-    onChangeShowGroupAnchorOffsets ?? setInternalShowGroupAnchorOffsets
+  const setShowPcbSolderMask =
+    onChangeShowPcbSolderMask ?? setInternalShowPcbSolderMask
+  const setShowPcbAllTraceLength =
+    onChangeShowPcbAllTraceLength ?? setInternalShowPcbAllTraceLength
+  const setShowPcbAutoroutingAnimation =
+    onChangeShowPcbAutoroutingAnimation ?? setInternalShowPcbAutoroutingAnimation
+  const setShowPcbDrcError =
+    onChangeShowPcbDrcError ?? setInternalShowPcbDrcError
+  const setShowPcbCopperPour =
+    onChangeShowPcbCopperPour ?? setInternalShowPcbCopperPour
+  const setShowPcbGroupAnchorOffsets =
+    onChangeShowPcbGroupAnchorOffsets ?? setInternalShowPcbGroupAnchorOffsets
   const setShowPcbGroup = onChangeShowPcbGroup ?? setInternalShowPcbGroup
   useFullscreenBodyScroll(isFullScreen)
   const setActiveTab = useCallback(
@@ -586,17 +586,17 @@ export const CircuitJsonPreview = ({
                 >
                   {circuitJson ? (
                     <PcbViewerWithContainerHeight
-                      key={`pcb-viewer-${showSolderMask}-${showAllTraceLength}-${showAutoroutingAnimation}-${showDrcError}-${showCopperPour}-${showGroupAnchorOffsets}-${showPcbGroup}`}
+                      key={`pcb-viewer-${showPcbSolderMask}-${showPcbAllTraceLength}-${showPcbAutoroutingAnimation}-${showPcbDrcError}-${showPcbCopperPour}-${showPcbGroupAnchorOffsets}-${showPcbGroup}`}
                       focusOnHover={false}
                       circuitJson={circuitJson as any}
                       debugGraphics={autoroutingGraphics}
                       initialState={{
-                        is_showing_solder_mask: showSolderMask,
-                        is_showing_multiple_traces_length: showAllTraceLength,
-                        is_showing_autorouting: showAutoroutingAnimation,
-                        is_showing_drc_errors: showDrcError,
-                        is_showing_copper_pours: showCopperPour,
-                        is_showing_group_anchor_offsets: showGroupAnchorOffsets,
+                        is_showing_solder_mask: showPcbSolderMask,
+                        is_showing_multiple_traces_length: showPcbAllTraceLength,
+                        is_showing_autorouting: showPcbAutoroutingAnimation,
+                        is_showing_drc_errors: showPcbDrcError,
+                        is_showing_copper_pours: showPcbCopperPour,
+                        is_showing_group_anchor_offsets: showPcbGroupAnchorOffsets,
                         is_showing_pcb_groups: showPcbGroup,
                       }}
                       containerClassName={cn(

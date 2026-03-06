@@ -129,13 +129,14 @@ export const RunFrame = (props: RunFrameProps) => {
   const [currentDebugOption, setCurrentDebugOption] = useState<string>("")
   const [showSchematicDebugGrid, setShowSchematicDebugGrid] = useState(false)
   const [showSchematicPorts, setShowSchematicPorts] = useState(false)
-  const [showSolderMask, setShowSolderMask] = useState(false)
-  const [showAllTraceLength, setShowAllTraceLength] = useState(false)
-  const [showAutoroutingAnimation, setShowAutoroutingAnimation] =
+  const [showPcbSolderMask, setShowPcbSolderMask] = useState(false)
+  const [showPcbAllTraceLength, setShowPcbAllTraceLength] = useState(false)
+  const [showPcbAutoroutingAnimation, setShowPcbAutoroutingAnimation] =
     useState(false)
-  const [showDrcError, setShowDrcError] = useState(false)
-  const [showCopperPour, setShowCopperPour] = useState(false)
-  const [showGroupAnchorOffsets, setShowGroupAnchorOffsets] = useState(false)
+  const [showPcbDrcError, setShowPcbDrcError] = useState(false)
+  const [showPcbCopperPour, setShowPcbCopperPour] = useState(false)
+  const [showPcbGroupAnchorOffsets, setShowPcbGroupAnchorOffsets] =
+    useState(false)
   const [showPcbGroup, setShowPcbGroup] = useState(false)
 
   const activeEffectName = Object.values(activeAsyncEffects).sort(
@@ -714,18 +715,18 @@ export const RunFrame = (props: RunFrameProps) => {
                 onChangeShowSchematicDebugGrid={setShowSchematicDebugGrid}
                 showSchematicPorts={showSchematicPorts}
                 onChangeShowSchematicPorts={setShowSchematicPorts}
-                showSolderMask={showSolderMask}
-                onChangeShowSolderMask={setShowSolderMask}
-                showAllTraceLength={showAllTraceLength}
-                onChangeShowAllTraceLength={setShowAllTraceLength}
-                showAutoroutingAnimation={showAutoroutingAnimation}
-                onChangeShowAutoroutingAnimation={setShowAutoroutingAnimation}
-                showDrcError={showDrcError}
-                onChangeShowDrcError={setShowDrcError}
-                showCopperPour={showCopperPour}
-                onChangeShowCopperPour={setShowCopperPour}
-                showGroupAnchorOffsets={showGroupAnchorOffsets}
-                onChangeShowGroupAnchorOffsets={setShowGroupAnchorOffsets}
+                showPcbSolderMask={showPcbSolderMask}
+                onChangeShowPcbSolderMask={setShowPcbSolderMask}
+                showPcbAllTraceLength={showPcbAllTraceLength}
+                onChangeShowPcbAllTraceLength={setShowPcbAllTraceLength}
+                showPcbAutoroutingAnimation={showPcbAutoroutingAnimation}
+                onChangeShowPcbAutoroutingAnimation={setShowPcbAutoroutingAnimation}
+                showPcbDrcError={showPcbDrcError}
+                onChangeShowPcbDrcError={setShowPcbDrcError}
+                showPcbCopperPour={showPcbCopperPour}
+                onChangeShowPcbCopperPour={setShowPcbCopperPour}
+                showPcbGroupAnchorOffsets={showPcbGroupAnchorOffsets}
+                onChangeShowPcbGroupAnchorOffsets={setShowPcbGroupAnchorOffsets}
                 showPcbGroup={showPcbGroup}
                 onChangeShowPcbGroup={setShowPcbGroup}
               />
@@ -750,21 +751,21 @@ export const RunFrame = (props: RunFrameProps) => {
         solverEvents={solverEvents}
         showSchematicDebugGrid={showSchematicDebugGrid}
         showSchematicPorts={showSchematicPorts}
-        showSolderMask={showSolderMask}
-        showAllTraceLength={showAllTraceLength}
-        showAutoroutingAnimation={showAutoroutingAnimation}
-        showDrcError={showDrcError}
-        showCopperPour={showCopperPour}
-        showGroupAnchorOffsets={showGroupAnchorOffsets}
+        showPcbSolderMask={showPcbSolderMask}
+        showPcbAllTraceLength={showPcbAllTraceLength}
+        showPcbAutoroutingAnimation={showPcbAutoroutingAnimation}
+        showPcbDrcError={showPcbDrcError}
+        showPcbCopperPour={showPcbCopperPour}
+        showPcbGroupAnchorOffsets={showPcbGroupAnchorOffsets}
         showPcbGroup={showPcbGroup}
         onChangeShowSchematicDebugGrid={setShowSchematicDebugGrid}
         onChangeShowSchematicPorts={setShowSchematicPorts}
-        onChangeShowSolderMask={setShowSolderMask}
-        onChangeShowAllTraceLength={setShowAllTraceLength}
-        onChangeShowAutoroutingAnimation={setShowAutoroutingAnimation}
-        onChangeShowDrcError={setShowDrcError}
-        onChangeShowCopperPour={setShowCopperPour}
-        onChangeShowGroupAnchorOffsets={setShowGroupAnchorOffsets}
+        onChangeShowPcbSolderMask={setShowPcbSolderMask}
+        onChangeShowPcbAllTraceLength={setShowPcbAllTraceLength}
+        onChangeShowPcbAutoroutingAnimation={setShowPcbAutoroutingAnimation}
+        onChangeShowPcbDrcError={setShowPcbDrcError}
+        onChangeShowPcbCopperPour={setShowPcbCopperPour}
+        onChangeShowPcbGroupAnchorOffsets={setShowPcbGroupAnchorOffsets}
         onChangeShowPcbGroup={setShowPcbGroup}
       />
     </ErrorBoundary>

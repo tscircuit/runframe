@@ -3,6 +3,7 @@ import { CircuitJsonPreview } from "../CircuitJsonPreview/CircuitJsonPreview"
 import { CircuitJsonFileSelectorCombobox } from "./CircuitJsonFileSelectorCombobox"
 import { useStyles } from "../../hooks/use-styles"
 import type { CircuitJson } from "circuit-json"
+import { DevServerIndicator } from "../DevServerIndicator"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 import { guessEntrypoint } from "lib/runner"
 import { ErrorBoundary } from "react-error-boundary"
@@ -196,13 +197,16 @@ export const RunFrameStaticBuildViewer = (
       {currentFileFailed ? (
         <div className="rf-w-full rf-h-full rf-flex rf-flex-col">
           <div className="rf-flex rf-items-center rf-justify-between rf-w-full rf-p-4 rf-border-b rf-border-gray-200">
-            {(props.showFileMenu ?? true) && (
-              <FileMenuLeftHeader
-                isWebEmbedded={true}
-                circuitJson={null}
-                projectName={props.projectName}
-              />
-            )}
+            <div className="rf-flex rf-items-center rf-gap-2">
+              <DevServerIndicator />
+              {(props.showFileMenu ?? true) && (
+                <FileMenuLeftHeader
+                  isWebEmbedded={true}
+                  circuitJson={null}
+                  projectName={props.projectName}
+                />
+              )}
+            </div>
             {availableFiles.length > 1 && (
               <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2 rf-flex rf-items-center rf-gap-2">
                 <CircuitJsonFileSelectorCombobox
@@ -223,6 +227,7 @@ export const RunFrameStaticBuildViewer = (
               </p>
               <div className="rf-flex rf-flex-col rf-items-center rf-gap-2">
                 <button
+                  type="button"
                   onClick={() => retryFailedFile(currentCircuitJsonPath)}
                   className="rf-px-4 rf-py-2 rf-bg-blue-500 rf-text-white rf-rounded rf-hover:bg-blue-600"
                 >
@@ -248,13 +253,16 @@ export const RunFrameStaticBuildViewer = (
           defaultActiveTab={props.tabSelected}
           leftHeaderContent={
             <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
-              {(props.showFileMenu ?? true) && (
-                <FileMenuLeftHeader
-                  isWebEmbedded={true}
-                  circuitJson={circuitJson}
-                  projectName={props.projectName}
-                />
-              )}
+              <div className="rf-flex rf-items-center rf-gap-2">
+                <DevServerIndicator />
+                {(props.showFileMenu ?? true) && (
+                  <FileMenuLeftHeader
+                    isWebEmbedded={true}
+                    circuitJson={circuitJson}
+                    projectName={props.projectName}
+                  />
+                )}
+              </div>
               {availableFiles.length > 1 && (
                 <div
                   className={`rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2 rf-flex rf-items-center rf-gap-2 ${isLoadingCurrentFile ? "rf-opacity-50" : ""}`}

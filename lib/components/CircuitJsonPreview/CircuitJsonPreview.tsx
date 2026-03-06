@@ -109,8 +109,22 @@ export const CircuitJsonPreview = ({
   autoRotate3dViewerDisabled,
   showSchematicDebugGrid: showSchematicDebugGridProp = false,
   showSchematicPorts: showSchematicPortsProp = false,
+  showSolderMask: showSolderMaskProp = false,
+  showAllTraceLength: showAllTraceLengthProp = false,
+  showAutoroutingAnimation: showAutoroutingAnimationProp = false,
+  showDrcError: showDrcErrorProp = false,
+  showCopperPour: showCopperPourProp = false,
+  showGroupAnchorOffsets: showGroupAnchorOffsetsProp = false,
+  showPcbGroup: showPcbGroupProp = false,
   onChangeShowSchematicDebugGrid,
   onChangeShowSchematicPorts,
+  onChangeShowSolderMask,
+  onChangeShowAllTraceLength,
+  onChangeShowAutoroutingAnimation,
+  onChangeShowDrcError,
+  onChangeShowCopperPour,
+  onChangeShowGroupAnchorOffsets,
+  onChangeShowPcbGroup,
   showToggleFullScreen = true,
   defaultToFullScreen = false,
   activeEffectName,
@@ -176,6 +190,27 @@ export const CircuitJsonPreview = ({
   const [internalShowSchematicPorts, setInternalShowSchematicPorts] = useState(
     showSchematicPortsProp,
   )
+  const [internalShowSolderMask, setInternalShowSolderMask] = useState( 
+    showSolderMaskProp,
+  )
+  const [internalShowAllTraceLength, setInternalShowAllTraceLength] = useState(
+    showAllTraceLengthProp,
+  )
+  const [internalShowAutoroutingAnimation, setInternalShowAutoroutingAnimation] = useState(
+    showAutoroutingAnimationProp,
+  )
+  const [internalShowDrcError, setInternalShowDrcError] = useState(
+    showDrcErrorProp,
+  )
+  const [internalShowCopperPour, setInternalShowCopperPour] = useState(
+    showCopperPourProp,
+  )
+  const [internalShowGroupAnchorOffsets, setInternalShowGroupAnchorOffsets] = useState(
+    showGroupAnchorOffsetsProp,
+  )
+  const [internalShowPcbGroup, setInternalShowPcbGroup] = useState(
+    showPcbGroupProp,
+  )
 
   // Use external state if handlers are provided, otherwise use internal state
   const showSchematicDebugGrid = onChangeShowSchematicDebugGrid
@@ -184,10 +219,45 @@ export const CircuitJsonPreview = ({
   const showSchematicPorts = onChangeShowSchematicPorts
     ? showSchematicPortsProp
     : internalShowSchematicPorts
+  const showSolderMask = onChangeShowSolderMask
+    ? showSolderMaskProp
+    : internalShowSolderMask
+  const showAllTraceLength = onChangeShowAllTraceLength
+    ? showAllTraceLengthProp
+    : internalShowAllTraceLength
+  const showAutoroutingAnimation = onChangeShowAutoroutingAnimation
+    ? showAutoroutingAnimationProp
+    : internalShowAutoroutingAnimation
+  const showDrcError = onChangeShowDrcError
+    ? showDrcErrorProp
+    : internalShowDrcError
+  const showCopperPour = onChangeShowCopperPour
+    ? showCopperPourProp
+    : internalShowCopperPour
+  const showGroupAnchorOffsets = onChangeShowGroupAnchorOffsets
+    ? showGroupAnchorOffsetsProp
+    : internalShowGroupAnchorOffsets
+  const showPcbGroup = onChangeShowPcbGroup
+    ? showPcbGroupProp
+    : internalShowPcbGroup
   const setShowSchematicDebugGrid =
     onChangeShowSchematicDebugGrid ?? setInternalShowSchematicDebugGrid
   const setShowSchematicPorts =
     onChangeShowSchematicPorts ?? setInternalShowSchematicPorts
+  const setShowSolderMask = 
+    onChangeShowSolderMask ?? setInternalShowSolderMask
+  const setShowAllTraceLength =
+    onChangeShowAllTraceLength ?? setInternalShowAllTraceLength
+  const setShowAutoroutingAnimation =
+    onChangeShowAutoroutingAnimation ?? setInternalShowAutoroutingAnimation
+  const setShowDrcError =
+    onChangeShowDrcError ?? setInternalShowDrcError
+  const setShowCopperPour =
+    onChangeShowCopperPour ?? setInternalShowCopperPour
+  const setShowGroupAnchorOffsets =
+    onChangeShowGroupAnchorOffsets ?? setInternalShowGroupAnchorOffsets
+  const setShowPcbGroup =
+    onChangeShowPcbGroup ?? setInternalShowPcbGroup
   useFullscreenBodyScroll(isFullScreen)
   const setActiveTab = useCallback(
     (tab: TabId) => {
@@ -524,9 +594,19 @@ export const CircuitJsonPreview = ({
                 >
                   {circuitJson ? (
                     <PcbViewerWithContainerHeight
+                      key={`pcb-viewer-${showSolderMask ? "mask-on" : "mask-off"}-${showAllTraceLength}-${showAutoroutingAnimation}-${showDrcError}-${showCopperPour}-${showGroupAnchorOffsets}-${showPcbGroup}`}
                       focusOnHover={false}
                       circuitJson={circuitJson as any}
                       debugGraphics={autoroutingGraphics}
+                      initialState={{
+                        is_showing_solder_mask: showSolderMask,
+                        is_showing_multiple_traces_length: showAllTraceLength,
+                        is_showing_autorouting: showAutoroutingAnimation,
+                        is_showing_drc_errors: showDrcError,
+                        is_showing_copper_pours: showCopperPour,
+                        is_showing_group_anchor_offsets: showGroupAnchorOffsets,
+                        is_showing_pcb_groups: showPcbGroup,
+                      }}
                       containerClassName={cn(
                         "rf-h-full rf-w-full",
                         isFullScreen

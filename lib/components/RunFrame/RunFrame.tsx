@@ -131,7 +131,8 @@ export const RunFrame = (props: RunFrameProps) => {
   const [showSchematicPorts, setShowSchematicPorts] = useState(false)
   const [showSolderMask, setShowSolderMask] = useState(false)
   const [showAllTraceLength, setShowAllTraceLength] = useState(false)
-  const [showAutoroutingAnimation, setShowAutoroutingAnimation] = useState(false)
+  const [showAutoroutingAnimation, setShowAutoroutingAnimation] =
+    useState(false)
   const [showDrcError, setShowDrcError] = useState(false)
   const [showCopperPour, setShowCopperPour] = useState(false)
   const [showGroupAnchorOffsets, setShowGroupAnchorOffsets] = useState(false)

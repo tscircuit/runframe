@@ -493,7 +493,9 @@ export const FileMenuLeftHeader = (props: {
                         id="show-autorouting-animation"
                         checked={props.showAutoroutingAnimation}
                         onCheckedChange={(checked) => {
-                          props.onChangeShowAutoroutingAnimation?.(checked === true)
+                          props.onChangeShowAutoroutingAnimation?.(
+                            checked === true,
+                          )
                         }}
                       />
                       <label
@@ -553,7 +555,9 @@ export const FileMenuLeftHeader = (props: {
                         id="show-group-anchor-offsets"
                         checked={props.showGroupAnchorOffsets}
                         onCheckedChange={(checked) => {
-                          props.onChangeShowGroupAnchorOffsets?.(checked === true)
+                          props.onChangeShowGroupAnchorOffsets?.(
+                            checked === true,
+                          )
                         }}
                       />
                       <label

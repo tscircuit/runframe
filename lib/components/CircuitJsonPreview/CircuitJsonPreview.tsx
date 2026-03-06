@@ -190,27 +190,23 @@ export const CircuitJsonPreview = ({
   const [internalShowSchematicPorts, setInternalShowSchematicPorts] = useState(
     showSchematicPortsProp,
   )
-  const [internalShowSolderMask, setInternalShowSolderMask] = useState( 
-    showSolderMaskProp,
-  )
+  const [internalShowSolderMask, setInternalShowSolderMask] =
+    useState(showSolderMaskProp)
   const [internalShowAllTraceLength, setInternalShowAllTraceLength] = useState(
     showAllTraceLengthProp,
   )
-  const [internalShowAutoroutingAnimation, setInternalShowAutoroutingAnimation] = useState(
-    showAutoroutingAnimationProp,
-  )
-  const [internalShowDrcError, setInternalShowDrcError] = useState(
-    showDrcErrorProp,
-  )
-  const [internalShowCopperPour, setInternalShowCopperPour] = useState(
-    showCopperPourProp,
-  )
-  const [internalShowGroupAnchorOffsets, setInternalShowGroupAnchorOffsets] = useState(
-    showGroupAnchorOffsetsProp,
-  )
-  const [internalShowPcbGroup, setInternalShowPcbGroup] = useState(
-    showPcbGroupProp,
-  )
+  const [
+    internalShowAutoroutingAnimation,
+    setInternalShowAutoroutingAnimation,
+  ] = useState(showAutoroutingAnimationProp)
+  const [internalShowDrcError, setInternalShowDrcError] =
+    useState(showDrcErrorProp)
+  const [internalShowCopperPour, setInternalShowCopperPour] =
+    useState(showCopperPourProp)
+  const [internalShowGroupAnchorOffsets, setInternalShowGroupAnchorOffsets] =
+    useState(showGroupAnchorOffsetsProp)
+  const [internalShowPcbGroup, setInternalShowPcbGroup] =
+    useState(showPcbGroupProp)
 
   // Use external state if handlers are provided, otherwise use internal state
   const showSchematicDebugGrid = onChangeShowSchematicDebugGrid
@@ -244,20 +240,16 @@ export const CircuitJsonPreview = ({
     onChangeShowSchematicDebugGrid ?? setInternalShowSchematicDebugGrid
   const setShowSchematicPorts =
     onChangeShowSchematicPorts ?? setInternalShowSchematicPorts
-  const setShowSolderMask = 
-    onChangeShowSolderMask ?? setInternalShowSolderMask
+  const setShowSolderMask = onChangeShowSolderMask ?? setInternalShowSolderMask
   const setShowAllTraceLength =
     onChangeShowAllTraceLength ?? setInternalShowAllTraceLength
   const setShowAutoroutingAnimation =
     onChangeShowAutoroutingAnimation ?? setInternalShowAutoroutingAnimation
-  const setShowDrcError =
-    onChangeShowDrcError ?? setInternalShowDrcError
-  const setShowCopperPour =
-    onChangeShowCopperPour ?? setInternalShowCopperPour
+  const setShowDrcError = onChangeShowDrcError ?? setInternalShowDrcError
+  const setShowCopperPour = onChangeShowCopperPour ?? setInternalShowCopperPour
   const setShowGroupAnchorOffsets =
     onChangeShowGroupAnchorOffsets ?? setInternalShowGroupAnchorOffsets
-  const setShowPcbGroup =
-    onChangeShowPcbGroup ?? setInternalShowPcbGroup
+  const setShowPcbGroup = onChangeShowPcbGroup ?? setInternalShowPcbGroup
   useFullscreenBodyScroll(isFullScreen)
   const setActiveTab = useCallback(
     (tab: TabId) => {

@@ -56,6 +56,7 @@ import { version } from "../../../package.json"
 import type { Object3D } from "three"
 import { useEvalVersions } from "lib/hooks/use-eval-versions"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
+import { usePcbToggles } from "lib/hooks/use-pcb-toggles"
 
 declare global {
   interface Window {
@@ -109,8 +110,22 @@ export const CircuitJsonPreview = ({
   autoRotate3dViewerDisabled,
   showSchematicDebugGrid: showSchematicDebugGridProp = false,
   showSchematicPorts: showSchematicPortsProp = false,
+  showPcbSolderMask = false,
+  showPcbAllTraceLength = false,
+  showPcbAutoroutingAnimation = false,
+  showPcbDrcError = false,
+  showPcbCopperPour = false,
+  showPcbGroupAnchorOffsets = false,
+  showPcbGroup = false,
   onChangeShowSchematicDebugGrid,
   onChangeShowSchematicPorts,
+  onChangeShowPcbSolderMask,
+  onChangeShowPcbAllTraceLength,
+  onChangeShowPcbAutoroutingAnimation,
+  onChangeShowPcbDrcError,
+  onChangeShowPcbCopperPour,
+  onChangeShowPcbGroupAnchorOffsets,
+  onChangeShowPcbGroup,
   showToggleFullScreen = true,
   defaultToFullScreen = false,
   activeEffectName,
@@ -176,8 +191,6 @@ export const CircuitJsonPreview = ({
   const [internalShowSchematicPorts, setInternalShowSchematicPorts] = useState(
     showSchematicPortsProp,
   )
-
-  // Use external state if handlers are provided, otherwise use internal state
   const showSchematicDebugGrid = onChangeShowSchematicDebugGrid
     ? showSchematicDebugGridProp
     : internalShowSchematicDebugGrid
@@ -188,6 +201,23 @@ export const CircuitJsonPreview = ({
     onChangeShowSchematicDebugGrid ?? setInternalShowSchematicDebugGrid
   const setShowSchematicPorts =
     onChangeShowSchematicPorts ?? setInternalShowSchematicPorts
+
+  const pcb = usePcbToggles({
+    showPcbSolderMask,
+    showPcbAllTraceLength,
+    showPcbAutoroutingAnimation,
+    showPcbDrcError,
+    showPcbCopperPour,
+    showPcbGroupAnchorOffsets,
+    showPcbGroup,
+    onChangeShowPcbSolderMask,
+    onChangeShowPcbAllTraceLength,
+    onChangeShowPcbAutoroutingAnimation,
+    onChangeShowPcbDrcError,
+    onChangeShowPcbCopperPour,
+    onChangeShowPcbGroupAnchorOffsets,
+    onChangeShowPcbGroup,
+  })
   useFullscreenBodyScroll(isFullScreen)
   const setActiveTab = useCallback(
     (tab: TabId) => {
@@ -524,9 +554,21 @@ export const CircuitJsonPreview = ({
                 >
                   {circuitJson ? (
                     <PcbViewerWithContainerHeight
+                      key={`pcb-viewer-${pcb.showPcbSolderMask}-${pcb.showPcbAllTraceLength}-${pcb.showPcbAutoroutingAnimation}-${pcb.showPcbDrcError}-${pcb.showPcbCopperPour}-${pcb.showPcbGroupAnchorOffsets}-${pcb.showPcbGroup}`}
                       focusOnHover={false}
                       circuitJson={circuitJson as any}
                       debugGraphics={autoroutingGraphics}
+                      initialState={{
+                        is_showing_solder_mask: pcb.showPcbSolderMask,
+                        is_showing_multiple_traces_length:
+                          pcb.showPcbAllTraceLength,
+                        is_showing_autorouting: pcb.showPcbAutoroutingAnimation,
+                        is_showing_drc_errors: pcb.showPcbDrcError,
+                        is_showing_copper_pours: pcb.showPcbCopperPour,
+                        is_showing_group_anchor_offsets:
+                          pcb.showPcbGroupAnchorOffsets,
+                        is_showing_pcb_groups: pcb.showPcbGroup,
+                      }}
                       containerClassName={cn(
                         "rf-h-full rf-w-full",
                         isFullScreen

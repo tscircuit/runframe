@@ -56,6 +56,20 @@ export const FileMenuLeftHeader = (props: {
   onChangeShowSchematicDebugGrid?: (show: boolean) => void
   showSchematicPorts?: boolean
   onChangeShowSchematicPorts?: (show: boolean) => void
+  showPcbSolderMask?: boolean
+  onChangeShowPcbSolderMask?: (show: boolean) => void
+  showPcbAllTraceLength?: boolean
+  onChangeShowPcbAllTraceLength?: (show: boolean) => void
+  showPcbAutoroutingAnimation?: boolean
+  onChangeShowPcbAutoroutingAnimation?: (show: boolean) => void
+  showPcbDrcError?: boolean
+  onChangeShowPcbDrcError?: (show: boolean) => void
+  showPcbCopperPour?: boolean
+  onChangeShowPcbCopperPour?: (show: boolean) => void
+  showPcbGroupAnchorOffsets?: boolean
+  onChangeShowPcbGroupAnchorOffsets?: (show: boolean) => void
+  showPcbGroup?: boolean
+  onChangeShowPcbGroup?: (show: boolean) => void
 }) => {
   const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
   const currentMainComponentPath = useRunFrameStore(
@@ -424,6 +438,161 @@ export const FileMenuLeftHeader = (props: {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="rf-z-[104]">
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger className="rf-text-xs">
+                PCB
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem
+                    className="rf-flex rf-items-center rf-gap-2"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <div className="rf-flex rf-items-center rf-gap-2">
+                      <Checkbox
+                        id="show-solder-mask"
+                        checked={props.showPcbSolderMask}
+                        onCheckedChange={(checked) => {
+                          props.onChangeShowPcbSolderMask?.(checked === true)
+                        }}
+                      />
+                      <label
+                        htmlFor="show-solder-mask"
+                        className="rf-text-xs rf-cursor-pointer"
+                      >
+                        Show Solder Mask
+                      </label>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="rf-flex rf-items-center rf-gap-2"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <div className="rf-flex rf-items-center rf-gap-2">
+                      <Checkbox
+                        id="show-all-trace-length"
+                        checked={props.showPcbAllTraceLength}
+                        onCheckedChange={(checked) => {
+                          props.onChangeShowPcbAllTraceLength?.(
+                            checked === true,
+                          )
+                        }}
+                      />
+                      <label
+                        htmlFor="show-all-trace-length"
+                        className="rf-text-xs rf-cursor-pointer"
+                      >
+                        Show All Trace Length
+                      </label>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="rf-flex rf-items-center rf-gap-2"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <div className="rf-flex rf-items-center rf-gap-2">
+                      <Checkbox
+                        id="show-autorouting-animation"
+                        checked={props.showPcbAutoroutingAnimation}
+                        onCheckedChange={(checked) => {
+                          props.onChangeShowPcbAutoroutingAnimation?.(
+                            checked === true,
+                          )
+                        }}
+                      />
+                      <label
+                        htmlFor="show-autorouting-animation"
+                        className="rf-text-xs rf-cursor-pointer"
+                      >
+                        Show Autorouting Animation
+                      </label>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="rf-flex rf-items-center rf-gap-2"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <div className="rf-flex rf-items-center rf-gap-2">
+                      <Checkbox
+                        id="show-drc-error"
+                        checked={props.showPcbDrcError}
+                        onCheckedChange={(checked) => {
+                          props.onChangeShowPcbDrcError?.(checked === true)
+                        }}
+                      />
+                      <label
+                        htmlFor="show-drc-error"
+                        className="rf-text-xs rf-cursor-pointer"
+                      >
+                        Show DRC Errors
+                      </label>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="rf-flex rf-items-center rf-gap-2"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <div className="rf-flex rf-items-center rf-gap-2">
+                      <Checkbox
+                        id="show-copper-pour"
+                        checked={props.showPcbCopperPour}
+                        onCheckedChange={(checked) => {
+                          props.onChangeShowPcbCopperPour?.(checked === true)
+                        }}
+                      />
+                      <label
+                        htmlFor="show-copper-pour"
+                        className="rf-text-xs rf-cursor-pointer"
+                      >
+                        Show Copper Pours
+                      </label>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="rf-flex rf-items-center rf-gap-2"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <div className="rf-flex rf-items-center rf-gap-2">
+                      <Checkbox
+                        id="show-group-anchor-offsets"
+                        checked={props.showPcbGroupAnchorOffsets}
+                        onCheckedChange={(checked) => {
+                          props.onChangeShowPcbGroupAnchorOffsets?.(
+                            checked === true,
+                          )
+                        }}
+                      />
+                      <label
+                        htmlFor="show-group-anchor-offsets"
+                        className="rf-text-xs rf-cursor-pointer"
+                      >
+                        Show Group Anchor Offsets
+                      </label>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="rf-flex rf-items-center rf-gap-2"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <div className="rf-flex rf-items-center rf-gap-2">
+                      <Checkbox
+                        id="show-pcb-group"
+                        checked={props.showPcbGroup}
+                        onCheckedChange={(checked) => {
+                          props.onChangeShowPcbGroup?.(checked === true)
+                        }}
+                      />
+                      <label
+                        htmlFor="show-pcb-group"
+                        className="rf-text-xs rf-cursor-pointer"
+                      >
+                        Show PCB Groups
+                      </label>
+                    </div>
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
             <DropdownMenuSub>
               <DropdownMenuSubTrigger className="rf-text-xs">
                 Schematic

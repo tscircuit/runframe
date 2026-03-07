@@ -94,6 +94,21 @@ export interface PreviewContentProps {
   showSchematicPorts?: boolean
   onChangeShowSchematicPorts?: (show: boolean) => void
 
+  showPcbSolderMask?: boolean
+  onChangeShowPcbSolderMask?: (show: boolean) => void
+  showPcbAllTraceLength?: boolean
+  onChangeShowPcbAllTraceLength?: (show: boolean) => void
+  showPcbAutoroutingAnimation?: boolean
+  onChangeShowPcbAutoroutingAnimation?: (show: boolean) => void
+  showPcbDrcError?: boolean
+  onChangeShowPcbDrcError?: (show: boolean) => void
+  showPcbCopperPour?: boolean
+  onChangeShowPcbCopperPour?: (show: boolean) => void
+  showPcbGroupAnchorOffsets?: boolean
+  onChangeShowPcbGroupAnchorOffsets?: (show: boolean) => void
+  showPcbGroup?: boolean
+  onChangeShowPcbGroup?: (show: boolean) => void
+
   onReportAutoroutingLog?: (
     name: string,
     data: { simpleRouteJson: any },

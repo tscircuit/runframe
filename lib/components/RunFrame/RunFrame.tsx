@@ -39,7 +39,6 @@ import { useRunnerStore } from "./runner-store/use-runner-store"
 import { useMutex } from "./useMutex"
 import type { ManualEditEvent } from "@tscircuit/props"
 import { registryKy } from "../../utils/get-registry-ky"
-import { DevServerIndicator } from "../DevServerIndicator"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 import { LoadingSkeleton } from "../ui/LoadingSkeleton"
 import { useStyles } from "../../hooks/use-styles"
@@ -623,7 +622,6 @@ export const RunFrame = (props: RunFrameProps) => {
         }
         leftHeaderContent={
           <>
-            <DevServerIndicator />
             {props.showRunButton && (
               <TooltipProvider>
                 <Tooltip>

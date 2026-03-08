@@ -56,6 +56,7 @@ import { version } from "../../../package.json"
 import type { Object3D } from "three"
 import { useEvalVersions } from "lib/hooks/use-eval-versions"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
+import { DevServerIndicator } from "../DevServerIndicator"
 
 declare global {
   interface Window {
@@ -306,6 +307,7 @@ export const CircuitJsonPreview = ({
             {showRightHeaderContent && (
               <TabsList>
                 {showCodeTab && <TabsTrigger value="code">Code</TabsTrigger>}
+                <DevServerIndicator />
                 {!availableTabs || availableTabs.includes("pcb") ? (
                   <TabsTrigger value="pcb" className="rf-whitespace-nowrap">
                     {circuitJson && (

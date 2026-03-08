@@ -305,184 +305,188 @@ export const CircuitJsonPreview = ({
               </div>
             )}
             {showRightHeaderContent && (
-              <TabsList>
-                {showCodeTab && <TabsTrigger value="code">Code</TabsTrigger>}
+              <>
                 <DevServerIndicator />
-                {!availableTabs || availableTabs.includes("pcb") ? (
-                  <TabsTrigger value="pcb" className="rf-whitespace-nowrap">
-                    {circuitJson && (
-                      <span
-                        className={cn(
-                          "rf-inline-flex rf-items-center rf-justify-center rf-w-2 rf-h-2 rf-mr-1 rf-text-xs rf-font-bold rf-text-white rf-rounded-full",
-                          !hasCodeChangedSinceLastRun
-                            ? "rf-bg-blue-500"
-                            : "rf-bg-gray-500",
-                        )}
-                      />
-                    )}
-                    PCB
-                  </TabsTrigger>
-                ) : null}
-                {!availableTabs || availableTabs.includes("schematic") ? (
-                  <TabsTrigger
-                    value="schematic"
-                    className={cn(
-                      "rf-whitespace-nowrap",
-                      circuitJson && !hasSchematicGroup && "rf-opacity-50",
-                    )}
-                    disabled={
-                      circuitJson ? !hasSchematicGroup || hasPanels : false
-                    }
-                  >
-                    {circuitJson && (
-                      <span
-                        className={cn(
-                          "rf-inline-flex rf-items-center rf-justify-center rf-w-2 rf-h-2 rf-mr-1 rf-text-xs rf-font-bold rf-text-white rf-rounded-full",
-                          !hasCodeChangedSinceLastRun
-                            ? "rf-bg-blue-500"
-                            : "rf-bg-gray-500",
-                        )}
-                      />
-                    )}
-                    Schematic
-                  </TabsTrigger>
-                ) : null}
-                {!availableTabs || availableTabs.includes("cad") ? (
-                  <TabsTrigger value="cad">
-                    {circuitJson && (
-                      <span
-                        className={cn(
-                          "inline-flex items-center justify-center w-2 h-2 mr-1 text-xs font-bold text-white rounded-full",
-                          !hasCodeChangedSinceLastRun
-                            ? "rf-bg-blue-500"
-                            : "rf-bg-gray-500",
-                        )}
-                      />
-                    )}
-                    3D
-                  </TabsTrigger>
-                ) : null}
-                {!["pcb", "cad", "schematic"].includes(activeTab) && (
-                  <TabsTrigger value={activeTab}>
-                    {capitalizeFirstLetters(activeTab)}
-                  </TabsTrigger>
-                )}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <div className="rf-whitespace-nowrap rf-p-2 rf-mr-1 rf-cursor-pointer rf-relative">
-                      <EllipsisIcon className="rf-w-4 rf-h-4" />
-                      {((circuitJsonErrors && circuitJsonErrors.length > 0) ||
-                        errorMessage) && (
-                        <span className="rf-inline-flex rf-absolute rf-top-[6px] rf-right-[4px] rf-items-center rf-justify-center rf-w-1 rf-h-1 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full" />
+                <TabsList>
+                  {showCodeTab && <TabsTrigger value="code">Code</TabsTrigger>}
+                  {!availableTabs || availableTabs.includes("pcb") ? (
+                    <TabsTrigger value="pcb" className="rf-whitespace-nowrap">
+                      {circuitJson && (
+                        <span
+                          className={cn(
+                            "rf-inline-flex rf-items-center rf-justify-center rf-w-2 rf-h-2 rf-mr-1 rf-text-xs rf-font-bold rf-text-white rf-rounded-full",
+                            !hasCodeChangedSinceLastRun
+                              ? "rf-bg-blue-500"
+                              : "rf-bg-gray-500",
+                          )}
+                        />
                       )}
-                    </div>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="rf-*:text-xs rf-z-[101]">
-                    {dropdownMenuItems
-                      .filter(
-                        (item) =>
-                          !availableTabs ||
-                          availableTabs.includes(item as TabId),
-                      )
-                      .map((item) => (
-                        <DropdownMenuItem
-                          key={item}
-                          onSelect={() => setActiveTab(item as TabId)}
-                        >
-                          {activeTab !== item && (
-                            <Circle className="rf-w-3 rf-h-3 rf-opacity-30" />
-                          )}
-                          {activeTab === item && (
-                            <CheckIcon className="rf-w-3 rf-h-3" />
-                          )}
-                          <div className="rf-pr-2">
-                            {capitalizeFirstLetters(item)}
-                          </div>
-                          {item === "errors" &&
-                            ((circuitJsonErrors &&
-                              circuitJsonErrors.length > 0) ||
-                              errorMessage) && (
-                              <span className="rf-inline-flex rf-items-center rf-justify-center rf-w-3 rf-h-3 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full">
-                                {errorMessage ? 1 : circuitJsonErrors?.length}
-                              </span>
-                            )}
-                          {item === "solvers" &&
-                            solverEvents &&
-                            solverEvents.length > 0 && (
-                              <span className="rf-inline-flex rf-items-center rf-justify-center rf-min-w-[12px] rf-h-3 rf-px-1 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-blue-500 rf-rounded-full">
-                                {solverEvents.length}
-                              </span>
-                            )}
-                        </DropdownMenuItem>
-                      ))}
-                    <DropdownMenuItem
-                      disabled
-                      className="rf-opacity-60 rf-cursor-default rf-select-none"
+                      PCB
+                    </TabsTrigger>
+                  ) : null}
+                  {!availableTabs || availableTabs.includes("schematic") ? (
+                    <TabsTrigger
+                      value="schematic"
+                      className={cn(
+                        "rf-whitespace-nowrap",
+                        circuitJson && !hasSchematicGroup && "rf-opacity-50",
+                      )}
+                      disabled={
+                        circuitJson ? !hasSchematicGroup || hasPanels : false
+                      }
                     >
-                      <div className="rf-pr-2 rf-text-xs rf-text-gray-500">
-                        @tscircuit/runframe@
-                        {version
-                          .split(".")
-                          .map((part, i) =>
-                            i === 2 ? parseInt(part) + 1 : part,
-                          )
-                          .join(".")}
+                      {circuitJson && (
+                        <span
+                          className={cn(
+                            "rf-inline-flex rf-items-center rf-justify-center rf-w-2 rf-h-2 rf-mr-1 rf-text-xs rf-font-bold rf-text-white rf-rounded-full",
+                            !hasCodeChangedSinceLastRun
+                              ? "rf-bg-blue-500"
+                              : "rf-bg-gray-500",
+                          )}
+                        />
+                      )}
+                      Schematic
+                    </TabsTrigger>
+                  ) : null}
+                  {!availableTabs || availableTabs.includes("cad") ? (
+                    <TabsTrigger value="cad">
+                      {circuitJson && (
+                        <span
+                          className={cn(
+                            "inline-flex items-center justify-center w-2 h-2 mr-1 text-xs font-bold text-white rounded-full",
+                            !hasCodeChangedSinceLastRun
+                              ? "rf-bg-blue-500"
+                              : "rf-bg-gray-500",
+                          )}
+                        />
+                      )}
+                      3D
+                    </TabsTrigger>
+                  ) : null}
+                  {!["pcb", "cad", "schematic"].includes(activeTab) && (
+                    <TabsTrigger value={activeTab}>
+                      {capitalizeFirstLetters(activeTab)}
+                    </TabsTrigger>
+                  )}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <div className="rf-whitespace-nowrap rf-p-2 rf-mr-1 rf-cursor-pointer rf-relative">
+                        <EllipsisIcon className="rf-w-4 rf-h-4" />
+                        {((circuitJsonErrors && circuitJsonErrors.length > 0) ||
+                          errorMessage) && (
+                          <span className="rf-inline-flex rf-absolute rf-top-[6px] rf-right-[4px] rf-items-center rf-justify-center rf-w-1 rf-h-1 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full" />
+                        )}
                       </div>
-                    </DropdownMenuItem>
-                    {allowSelectingVersion ? (
-                      <DropdownMenuSub
-                        onOpenChange={(open) => !open && setEvalSearch("")}
-                      >
-                        <DropdownMenuSubTrigger className="rf-text-xs rf-opacity-60">
-                          <div className="rf-pr-2 rf-text-xs rf-text-gray-500">
-                            @tscircuit/eval@
-                            {lastRunEvalVersion ?? latestVersion ?? "latest"}
-                          </div>
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuPortal>
-                          <DropdownMenuSubContent className="rf-*:text-xs rf-w-40 rf-max-h-[200px] rf-overflow-y-auto">
-                            <div className="rf-p-1">
-                              <Input
-                                value={evalSearch}
-                                onChange={(e) => setEvalSearch(e.target.value)}
-                                placeholder="Search..."
-                                className="rf-h-7 rf-text-xs"
-                              />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="rf-*:text-xs rf-z-[101]">
+                      {dropdownMenuItems
+                        .filter(
+                          (item) =>
+                            !availableTabs ||
+                            availableTabs.includes(item as TabId),
+                        )
+                        .map((item) => (
+                          <DropdownMenuItem
+                            key={item}
+                            onSelect={() => setActiveTab(item as TabId)}
+                          >
+                            {activeTab !== item && (
+                              <Circle className="rf-w-3 rf-h-3 rf-opacity-30" />
+                            )}
+                            {activeTab === item && (
+                              <CheckIcon className="rf-w-3 rf-h-3" />
+                            )}
+                            <div className="rf-pr-2">
+                              {capitalizeFirstLetters(item)}
                             </div>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              onSelect={() => selectEvalVersion(null)}
-                            >
-                              {latestVersion
-                                ? `${latestVersion} (latest)`
-                                : "latest"}
-                            </DropdownMenuItem>
-                            {evalVersions.map((v) => (
-                              <DropdownMenuItem
-                                key={v}
-                                onSelect={() => selectEvalVersion(v)}
-                              >
-                                {v}
-                              </DropdownMenuItem>
-                            ))}
-                          </DropdownMenuSubContent>
-                        </DropdownMenuPortal>
-                      </DropdownMenuSub>
-                    ) : (
-                      lastRunEvalVersion && (
-                        <DropdownMenuItem
-                          disabled
-                          className="rf-opacity-60 rf-cursor-default rf-select-none"
+                            {item === "errors" &&
+                              ((circuitJsonErrors &&
+                                circuitJsonErrors.length > 0) ||
+                                errorMessage) && (
+                                <span className="rf-inline-flex rf-items-center rf-justify-center rf-w-3 rf-h-3 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full">
+                                  {errorMessage ? 1 : circuitJsonErrors?.length}
+                                </span>
+                              )}
+                            {item === "solvers" &&
+                              solverEvents &&
+                              solverEvents.length > 0 && (
+                                <span className="rf-inline-flex rf-items-center rf-justify-center rf-min-w-[12px] rf-h-3 rf-px-1 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-blue-500 rf-rounded-full">
+                                  {solverEvents.length}
+                                </span>
+                              )}
+                          </DropdownMenuItem>
+                        ))}
+                      <DropdownMenuItem
+                        disabled
+                        className="rf-opacity-60 rf-cursor-default rf-select-none"
+                      >
+                        <div className="rf-pr-2 rf-text-xs rf-text-gray-500">
+                          @tscircuit/runframe@
+                          {version
+                            .split(".")
+                            .map((part, i) =>
+                              i === 2 ? parseInt(part) + 1 : part,
+                            )
+                            .join(".")}
+                        </div>
+                      </DropdownMenuItem>
+                      {allowSelectingVersion ? (
+                        <DropdownMenuSub
+                          onOpenChange={(open) => !open && setEvalSearch("")}
                         >
-                          <div className="rf-pr-2 rf-text-xs rf-text-gray-500">
-                            @tscircuit/eval@{lastRunEvalVersion}
-                          </div>
-                        </DropdownMenuItem>
-                      )
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TabsList>
+                          <DropdownMenuSubTrigger className="rf-text-xs rf-opacity-60">
+                            <div className="rf-pr-2 rf-text-xs rf-text-gray-500">
+                              @tscircuit/eval@
+                              {lastRunEvalVersion ?? latestVersion ?? "latest"}
+                            </div>
+                          </DropdownMenuSubTrigger>
+                          <DropdownMenuPortal>
+                            <DropdownMenuSubContent className="rf-*:text-xs rf-w-40 rf-max-h-[200px] rf-overflow-y-auto">
+                              <div className="rf-p-1">
+                                <Input
+                                  value={evalSearch}
+                                  onChange={(e) =>
+                                    setEvalSearch(e.target.value)
+                                  }
+                                  placeholder="Search..."
+                                  className="rf-h-7 rf-text-xs"
+                                />
+                              </div>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onSelect={() => selectEvalVersion(null)}
+                              >
+                                {latestVersion
+                                  ? `${latestVersion} (latest)`
+                                  : "latest"}
+                              </DropdownMenuItem>
+                              {evalVersions.map((v) => (
+                                <DropdownMenuItem
+                                  key={v}
+                                  onSelect={() => selectEvalVersion(v)}
+                                >
+                                  {v}
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuSubContent>
+                          </DropdownMenuPortal>
+                        </DropdownMenuSub>
+                      ) : (
+                        lastRunEvalVersion && (
+                          <DropdownMenuItem
+                            disabled
+                            className="rf-opacity-60 rf-cursor-default rf-select-none"
+                          >
+                            <div className="rf-pr-2 rf-text-xs rf-text-gray-500">
+                              @tscircuit/eval@{lastRunEvalVersion}
+                            </div>
+                          </DropdownMenuItem>
+                        )
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TabsList>
+              </>
             )}
             {showToggleFullScreen && (
               <Button onClick={toggleFullScreen} variant="ghost">

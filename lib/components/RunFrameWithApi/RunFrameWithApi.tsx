@@ -31,7 +31,7 @@ const ApiStatusIndicator = () => {
       aria-label={isError ? "API error" : "API connected"}
     />
   )
-})
+}
 
 export const guessEntrypoint = (files: string[]) =>
   files.find((file) => file.includes("entrypoint.")) ??

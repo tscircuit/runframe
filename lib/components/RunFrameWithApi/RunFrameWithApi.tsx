@@ -5,7 +5,7 @@ import { useEditEventController } from "lib/hooks/use-edit-event-controller"
 import { useHasReceivedInitialFilesLoaded } from "lib/hooks/use-has-received-initial-files-loaded"
 import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { useSyncPageTitle } from "lib/hooks/use-sync-page-title"
-import { memo, useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
 import { cn } from "lib/utils"
 import type { RunCompletedPayload } from "../RunFrame/run-completion"
@@ -18,7 +18,7 @@ import { EnhancedFileSelectorCombobox } from "./EnhancedFileSelectorCombobox"
 
 const debug = Debug("run-frame:RunFrameWithApi")
 
-const ApiStatusIndicator = memo(function ApiStatusIndicator() {
+const ApiStatusIndicator = = () => {
   const error = useRunFrameStore((s) => s.error)
   const isError = !!error
   return (

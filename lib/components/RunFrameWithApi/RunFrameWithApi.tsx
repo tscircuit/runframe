@@ -5,8 +5,9 @@ import { useEditEventController } from "lib/hooks/use-edit-event-controller"
 import { useHasReceivedInitialFilesLoaded } from "lib/hooks/use-has-received-initial-files-loaded"
 import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { useSyncPageTitle } from "lib/hooks/use-sync-page-title"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { memo, useCallback, useEffect, useMemo, useState } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
+import { cn } from "lib/utils"
 import type { RunCompletedPayload } from "../RunFrame/run-completion"
 import { API_BASE } from "./api-base"
 import { useRunFrameStore } from "./store"
@@ -16,6 +17,25 @@ import { getBoardFilesFromConfig } from "lib/utils/get-board-files-from-config"
 import { EnhancedFileSelectorCombobox } from "./EnhancedFileSelectorCombobox"
 
 const debug = Debug("run-frame:RunFrameWithApi")
+
+const ApiStatusIndicator = memo(function ApiStatusIndicator() {
+  const isPolling = useRunFrameStore((s) => s.isPolling)
+  const error = useRunFrameStore((s) => s.error)
+  const isError = !!error
+  return (
+    <span
+      className={cn(
+        "rf-inline-flex rf-w-2 rf-h-2 rf-rounded-full rf-flex-shrink-0",
+        isError
+          ? "rf-bg-gradient-to-br rf-from-red-500 rf-to-red-600"
+          : "rf-bg-gradient-to-br rf-from-emerald-500 rf-to-emerald-600",
+        isPolling && !isError && "rf-animate-pulse",
+      )}
+      title={error?.message ?? (isPolling ? "API connected" : "API")}
+      aria-label={isError ? "API error" : "API connected"}
+    />
+  )
+})
 
 export const guessEntrypoint = (files: string[]) =>
   files.find((file) => file.includes("entrypoint.")) ??
@@ -262,7 +282,10 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       enableFetchProxy={props.enableFetchProxy}
       leftHeaderContent={
         <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
-          {props.leftHeaderContent}
+          <div className="rf-flex rf-items-center rf-gap-2">
+            <ApiStatusIndicator />
+            {props.leftHeaderContent}
+          </div>
           {props.showFilesSwitch && (
             <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2">
               <EnhancedFileSelectorCombobox

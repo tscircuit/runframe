@@ -31,7 +31,7 @@ const ApiStatusIndicator = memo(function ApiStatusIndicator() {
           : "rf-bg-gradient-to-br rf-from-emerald-500 rf-to-emerald-600",
         isPolling && !isError && "rf-animate-pulse",
       )}
-      title={error?.message ?? (isPolling ? "API connected" : "API")}
+      title={error?.message ?? "Connected"}
       aria-label={isError ? "API error" : "API connected"}
     />
   )

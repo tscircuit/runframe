@@ -18,7 +18,7 @@ import { EnhancedFileSelectorCombobox } from "./EnhancedFileSelectorCombobox"
 
 const debug = Debug("run-frame:RunFrameWithApi")
 
-const ApiStatusIndicator = = () => {
+const ApiStatusIndicator = () => {
   const error = useRunFrameStore((s) => s.error)
   const isError = !!error
   return (

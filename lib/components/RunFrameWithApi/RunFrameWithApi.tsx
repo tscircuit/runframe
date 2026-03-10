@@ -19,17 +19,13 @@ import { EnhancedFileSelectorCombobox } from "./EnhancedFileSelectorCombobox"
 const debug = Debug("run-frame:RunFrameWithApi")
 
 const ApiStatusIndicator = memo(function ApiStatusIndicator() {
-  const isPolling = useRunFrameStore((s) => s.isPolling)
   const error = useRunFrameStore((s) => s.error)
   const isError = !!error
   return (
     <span
       className={cn(
-        "rf-inline-flex rf-w-2 rf-h-2 rf-rounded-full rf-flex-shrink-0",
-        isError
-          ? "rf-bg-gradient-to-br rf-from-red-500 rf-to-red-600"
-          : "rf-bg-gradient-to-br rf-from-emerald-500 rf-to-emerald-600",
-        isPolling && !isError && "rf-animate-pulse",
+        "rf-inline-flex rf-size-2 rf-rounded-full rf-flex-shrink-0",
+        isError ? " rf-bg-red-600" : " rf-bg-green-600",
       )}
       title={error?.message ?? "Connected"}
       aria-label={isError ? "API error" : "API connected"}
@@ -283,8 +279,8 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       leftHeaderContent={
         <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
           <div className="rf-flex rf-items-center rf-gap-2">
-            <ApiStatusIndicator />
             {props.leftHeaderContent}
+            <ApiStatusIndicator />
           </div>
           {props.showFilesSwitch && (
             <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2">

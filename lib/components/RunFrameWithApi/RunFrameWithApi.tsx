@@ -21,14 +21,17 @@ const debug = Debug("run-frame:RunFrameWithApi")
 const ApiStatusIndicator = () => {
   const error = useRunFrameStore((s) => s.error)
   const isError = !!error
+  const DISCONNECTED_MESSAGE = "Connection to tsci dev server lost"
+  const CONNECTED_MESSAGE = "Connected to tsci dev server"
+
   return (
     <span
       className={cn(
         "rf-inline-flex rf-size-2 rf-rounded-full rf-flex-shrink-0",
-        isError ? " rf-bg-red-600" : " rf-bg-green-600",
+        isError ? "rf-bg-red-600" : "rf-bg-green-600",
       )}
-      title={error?.message ?? "Connected"}
-      aria-label={isError ? "API error" : "API connected"}
+      title={isError ? DISCONNECTED_MESSAGE : CONNECTED_MESSAGE}
+      aria-label={isError ? DISCONNECTED_MESSAGE : CONNECTED_MESSAGE}
     />
   )
 }

@@ -7,6 +7,7 @@ import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { useSyncPageTitle } from "lib/hooks/use-sync-page-title"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
+import { cn } from "lib/utils"
 import type { RunCompletedPayload } from "../RunFrame/run-completion"
 import { API_BASE } from "./api-base"
 import { useRunFrameStore } from "./store"
@@ -16,6 +17,24 @@ import { getBoardFilesFromConfig } from "lib/utils/get-board-files-from-config"
 import { EnhancedFileSelectorCombobox } from "./EnhancedFileSelectorCombobox"
 
 const debug = Debug("run-frame:RunFrameWithApi")
+
+const ApiStatusIndicator = () => {
+  const error = useRunFrameStore((s) => s.error)
+  const isError = !!error
+  const DISCONNECTED_MESSAGE = "Connection to tsci dev server lost"
+  const CONNECTED_MESSAGE = "Connected to tsci dev server"
+
+  return (
+    <span
+      className={cn(
+        "rf-inline-flex rf-size-2 rf-rounded-full rf-flex-shrink-0",
+        isError ? "rf-bg-red-600" : "rf-bg-green-600",
+      )}
+      title={isError ? DISCONNECTED_MESSAGE : CONNECTED_MESSAGE}
+      aria-label={isError ? DISCONNECTED_MESSAGE : CONNECTED_MESSAGE}
+    />
+  )
+}
 
 export const guessEntrypoint = (files: string[]) =>
   files.find((file) => file.includes("entrypoint.")) ??
@@ -262,7 +281,10 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       enableFetchProxy={props.enableFetchProxy}
       leftHeaderContent={
         <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
-          {props.leftHeaderContent}
+          <div className="rf-flex rf-items-center rf-gap-2">
+            {props.leftHeaderContent}
+            <ApiStatusIndicator />
+          </div>
           {props.showFilesSwitch && (
             <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2">
               <EnhancedFileSelectorCombobox

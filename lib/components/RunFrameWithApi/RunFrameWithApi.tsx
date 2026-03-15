@@ -24,17 +24,12 @@ import { EnhancedFileSelectorCombobox } from "./EnhancedFileSelectorCombobox"
 
 const debug = Debug("run-frame:RunFrameWithApi")
 
-const API_CONNECTION_STATUS_TEXT = {
-  connected: "Connected to tsci dev server",
-  disconnected: "Connection to tsci dev server lost",
-} as const
-
 const ApiStatusIndicator = () => {
   const error = useRunFrameStore((s) => s.error)
   const isError = !!error
   const connectionStatusTooltipText = isError
-    ? API_CONNECTION_STATUS_TEXT.disconnected
-    : API_CONNECTION_STATUS_TEXT.connected
+    ? "Connection to tsci dev server lost"
+    : "Connected to tsci dev server"
 
   return (
     <TooltipProvider>

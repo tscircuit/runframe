@@ -265,6 +265,15 @@ export const FileMenuLeftHeader = (props: {
               </DropdownMenuItem>
             )}
 
+            <DropdownMenuItem
+              className="rf-text-xs"
+              onSelect={() => {
+                window.open("https://github.com/tscircuit/tscircuit", "_blank")
+              }}
+            >
+              File GitHub Issue
+            </DropdownMenuItem>
+
             {/* Export - always available */}
             <DropdownMenuSub>
               <DropdownMenuSubTrigger

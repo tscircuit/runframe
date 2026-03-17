@@ -29,7 +29,7 @@
         "@tscircuit/create-snippet-url": "^0.0.9",
         "@tscircuit/fake-snippets": "^0.0.163",
         "@tscircuit/file-server": "^0.0.32",
-        "@tscircuit/pcb-viewer": "1.11.353",
+        "@tscircuit/pcb-viewer": "^1.11.354",
         "@tscircuit/schematic-viewer": "^2.0.58",
         "@types/bun": "latest",
         "@types/debug": "^4.1.12",
@@ -564,7 +564,7 @@
 
     "@tscircuit/ngspice-spice-engine": ["@tscircuit/ngspice-spice-engine@0.0.8", "", { "dependencies": { "eecircuit-engine": "^1.5.6" }, "peerDependencies": { "@tscircuit/props": "*", "circuit-json": "*", "typescript": "^5" } }, "sha512-jubJ8Kgpm9FPRdHBiRBYkf5+B37bqkjDRKpCXOMqS08UZnbS+iCv2k4ACMW+s1zbK0Xa5v+9yjuoHlfKFW1v/Q=="],
 
-    "@tscircuit/pcb-viewer": ["@tscircuit/pcb-viewer@1.11.353", "", { "dependencies": { "@emotion/css": "^11.11.2", "@tscircuit/alphabet": "^0.0.22", "@tscircuit/math-utils": "^0.0.29", "@vitejs/plugin-react": "^5.0.2", "circuit-json": "^0.0.403", "circuit-to-canvas": "^0.0.93", "circuit-to-svg": "^0.0.337", "color": "^4.2.3", "react-supergrid": "^1.0.10", "react-toastify": "^10.0.5", "transformation-matrix": "^2.13.0", "zustand": "^4.5.2" }, "peerDependencies": { "react": "*", "tscircuit": "*" } }, "sha512-iZRArSb5Iau4IUSC87cjBNUWEp8wfCU28Rah4APgy69010wgZVRatIN4JPZvhQakP+C7b4hFEpLdOM6dZGqYcg=="],
+    "@tscircuit/pcb-viewer": ["@tscircuit/pcb-viewer@1.11.354", "", { "dependencies": { "@emotion/css": "^11.11.2", "@tscircuit/alphabet": "^0.0.22", "@tscircuit/math-utils": "^0.0.29", "@vitejs/plugin-react": "^5.0.2", "circuit-json": "^0.0.403", "circuit-to-canvas": "^0.0.93", "circuit-to-svg": "^0.0.337", "color": "^4.2.3", "react-supergrid": "^1.0.10", "react-toastify": "^10.0.5", "transformation-matrix": "^2.13.0", "zustand": "^4.5.2" }, "peerDependencies": { "react": "*", "tscircuit": "*" } }, "sha512-vys5xHggLJ5JRu1PzjC1yUpA7LH/U/OkEQRRFTmm8MmO+R5Kzb2P2ltGRSx/CgOh9Sr0AcNUhsmQYI48SYnPFg=="],
 
     "@tscircuit/props": ["@tscircuit/props@0.0.491", "", { "peerDependencies": { "circuit-json": "*", "react": "*", "zod": "*" } }, "sha512-OIu2I9mFuICnwdPbfmV1VvEKesb3VBzraF3CmQO8GCZKHa+MPhk2SsMW1wU5DloYmP/v6BkPC8QCdKNhuaFCXw=="],
 

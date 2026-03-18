@@ -28,8 +28,8 @@ const ApiStatusIndicator = () => {
   const error = useRunFrameStore((s) => s.error)
   const isError = !!error
   const connectionStatusTooltipText = isError
-    ? "Connection to tsci dev server lost"
-    : "Connected to tsci dev server"
+    ? "Dev server disconnected"
+    : "Dev server connected"
 
   return (
     <TooltipProvider>

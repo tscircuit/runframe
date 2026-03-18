@@ -11,6 +11,12 @@ import { cn } from "lib/utils"
 import type { RunCompletedPayload } from "../RunFrame/run-completion"
 import { API_BASE } from "./api-base"
 import { useRunFrameStore } from "./store"
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "lib/components/ui/tooltip"
 
 import { DEFAULT_UI_FILE_FILTER } from "lib/utils/file-filters"
 import { getBoardFilesFromConfig } from "lib/utils/get-board-files-from-config"
@@ -21,18 +27,34 @@ const debug = Debug("run-frame:RunFrameWithApi")
 const ApiStatusIndicator = () => {
   const error = useRunFrameStore((s) => s.error)
   const isError = !!error
-  const DISCONNECTED_MESSAGE = "Connection to tsci dev server lost"
-  const CONNECTED_MESSAGE = "Connected to tsci dev server"
+  const connectionStatusTooltipText = isError
+    ? "Dev server disconnected"
+    : "Dev server connected"
 
   return (
-    <span
-      className={cn(
-        "rf-inline-flex rf-size-2 rf-rounded-full rf-flex-shrink-0",
-        isError ? "rf-bg-red-600" : "rf-bg-green-600",
-      )}
-      title={isError ? DISCONNECTED_MESSAGE : CONNECTED_MESSAGE}
-      aria-label={isError ? DISCONNECTED_MESSAGE : CONNECTED_MESSAGE}
-    />
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            aria-label={connectionStatusTooltipText}
+            className="rf-inline-flex rf-items-center rf-justify-center rf-p-2 rf-rounded-full rf-outline-none"
+          >
+            <span
+              className={cn(
+                "rf-inline-flex rf-size-2 rf-rounded-full rf-flex-shrink-0",
+                isError ? "rf-bg-red-600" : "rf-bg-green-600 rf-opacity-50",
+              )}
+              aria-hidden="true"
+            />
+          </button>
+        </TooltipTrigger>
+
+        <TooltipContent side="right">
+          {connectionStatusTooltipText}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   )
 }
 
@@ -206,9 +228,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     if (params.get("file") === filePath) return
     params.set("file", filePath)
     const newHash = params.toString()
-    const newUrl =
-      `${window.location.pathname}${window.location.search}` +
-      (newHash.length > 0 ? `#${newHash}` : "")
+    const newUrl = `${window.location.pathname}${window.location.search}${newHash.length > 0 ? `#${newHash}` : ""}`
     window.history.replaceState(null, "", newUrl)
   }, [])
 

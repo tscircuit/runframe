@@ -29,7 +29,7 @@
         "@tscircuit/create-snippet-url": "^0.0.9",
         "@tscircuit/fake-snippets": "^0.0.163",
         "@tscircuit/file-server": "^0.0.32",
-        "@tscircuit/pcb-viewer": "^1.11.356",
+        "@tscircuit/pcb-viewer": "1.11.356",
         "@tscircuit/schematic-viewer": "^2.0.59",
         "@types/bun": "latest",
         "@types/debug": "^4.1.12",
@@ -52,7 +52,7 @@
         "concurrently": "^9.1.2",
         "cssnano": "^7.0.6",
         "debug": "^4.4.0",
-        "easyeda": "^0.0.233",
+        "easyeda": "^0.0.252",
         "fflate": "^0.8.2",
         "fuse.js": "^7.1.0",
         "jose": "^6.1.0",
@@ -950,7 +950,7 @@
 
     "eastasianwidth": ["eastasianwidth@0.2.0", "", {}, "sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA=="],
 
-    "easyeda": ["easyeda@0.0.233", "", { "peerDependencies": { "tscircuit": "^0.0.841", "typescript": "^5.5.2", "zod": "3" }, "bin": { "easyeda": "dist/main.cjs", "easyeda-converter": "dist/main.cjs" } }, "sha512-oYyzg+J8qy5SPVVqAQejZ7tOFZcsXXMft8uwrGkl2RmrpvERNUFDg5BDOCPMdZ/MWxQxBYYa5iCmb6cErE76kA=="],
+    "easyeda": ["easyeda@0.0.252", "", { "peerDependencies": { "typescript": "^5.5.2", "zod": "3" }, "bin": { "easyeda-converter": "dist/main.cjs", "easyeda": "dist/main.cjs" } }, "sha512-YCuJ1xEy37SdoKp9DkMuFYhputs1JWqoDWl6pCH07sNY2PG5/5SiBQWnqKiZEDJmI0jfA1PjHZd0wBzDSnO/ow=="],
 
     "edge-runtime": ["edge-runtime@2.5.10", "", { "dependencies": { "@edge-runtime/format": "2.2.1", "@edge-runtime/ponyfill": "2.4.2", "@edge-runtime/vm": "3.2.0", "async-listen": "3.0.1", "mri": "1.2.0", "picocolors": "1.0.0", "pretty-ms": "7.0.1", "signal-exit": "4.0.2", "time-span": "4.0.0" }, "bin": { "edge-runtime": "dist/cli/index.js" } }, "sha512-oe6JjFbU1MbISzeSBMHqmzBhNEwmy2AYDY0LxStl8FAIWSGdGO+CqzWub9nbgmANuJYPXZA0v3XAlbxeKV/Omw=="],
 

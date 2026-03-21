@@ -73,5 +73,5 @@ export const loadJlcpcbComponentTsx = async (
       }),
   })
 
-  return convertRawEasyToTsx(component)
+  return convertRawEasyToTsx({ rawEasy: component })
 }

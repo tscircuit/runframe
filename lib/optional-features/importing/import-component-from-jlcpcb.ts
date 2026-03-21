@@ -28,7 +28,7 @@ export const importComponentFromJlcpcb = async (
     },
   })
 
-  const tsx = await convertRawEasyToTsx(component)
+  const tsx = await convertRawEasyToTsx({ rawEasy: component })
 
   const fileName = tsx.match(/export const (\w+) = .*/)?.[1]
 

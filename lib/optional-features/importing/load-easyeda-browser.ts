@@ -8,7 +8,7 @@ type EasyedaBrowserModule = {
       fetch?: (url: RequestInfo, init?: RequestInit) => Promise<Response>
     },
   ) => Promise<any>
-  convertRawEasyToTsx: (component: any) => Promise<string>
+  convertRawEasyToTsx: (opts: { rawEasy: any }) => Promise<string>
 }
 
 let easyedaBrowserPromise: Promise<EasyedaBrowserModule> | null = null

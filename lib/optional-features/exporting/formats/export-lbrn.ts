@@ -1,6 +1,6 @@
 import type { CircuitJson } from "circuit-json"
 import { openForDownload } from "../open-for-download"
-import { convertCircuitJsonToLbrn } from "circuit-json-to-lbrn"
+import { loadLbrnConverter } from "../dynamic-converters"
 import { toast } from "lib/utils/toast"
 
 export interface LbrnExportOptions {
@@ -17,6 +17,8 @@ export const exportLbrn = async ({
   options?: LbrnExportOptions
 }) => {
   try {
+    const { convertCircuitJsonToLbrn } = await loadLbrnConverter()
+
     // Convert Circuit JSON to LBRN format
     const lbrnProject = await convertCircuitJsonToLbrn(circuitJson, {
       includeSilkscreen: options.includeSilkscreen ?? false,

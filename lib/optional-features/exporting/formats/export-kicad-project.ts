@@ -1,10 +1,6 @@
 import type { CircuitJson } from "circuit-json"
 import JSZip from "jszip"
-import {
-  CircuitJsonToKicadPcbConverter,
-  CircuitJsonToKicadSchConverter,
-  CircuitJsonToKicadProConverter,
-} from "circuit-json-to-kicad"
+import { loadKicadConverter } from "../dynamic-converters"
 import { openForDownload } from "../open-for-download"
 
 export const createKicadProjectZip = async ({
@@ -14,6 +10,12 @@ export const createKicadProjectZip = async ({
   circuitJson: CircuitJson
   projectName: string
 }) => {
+  const {
+    CircuitJsonToKicadPcbConverter,
+    CircuitJsonToKicadSchConverter,
+    CircuitJsonToKicadProConverter,
+  } = await loadKicadConverter()
+
   const schConverter = new CircuitJsonToKicadSchConverter(circuitJson as any)
   schConverter.runUntilFinished()
   const schContent = schConverter.getOutputString()

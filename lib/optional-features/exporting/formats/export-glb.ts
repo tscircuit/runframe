@@ -1,6 +1,6 @@
 import type { CircuitJson } from "circuit-json"
 import { openForDownload } from "../open-for-download"
-import { convertCircuitJsonToGltf } from "circuit-json-to-gltf"
+import { loadGltfConverter } from "../dynamic-converters"
 
 export const exportGlb = async ({
   circuitJson,
@@ -11,6 +11,8 @@ export const exportGlb = async ({
 }) => {
   let blob: Blob
   try {
+    const { convertCircuitJsonToGltf } = await loadGltfConverter()
+
     // Use lower texture resolution for better performance and compatibility
     const glbArrayBuffer = (await convertCircuitJsonToGltf(circuitJson, {
       format: "glb",

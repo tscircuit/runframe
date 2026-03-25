@@ -8,9 +8,49 @@
  *
  * This reduces the initial bundle size significantly and moves the cost
  * of loading converters to only when they are needed.
+ *
+ * In Node.js / Bun environments (e.g. tests), the CDN URL import is not
+ * supported, so we fall back to a bare package name import which resolves
+ * via the local node_modules when the package is installed.
  */
 
 import type { AnyCircuitElement, CircuitJson } from "circuit-json"
+
+/** True when running in a browser context (window exists). */
+const isBrowser =
+  typeof window !== "undefined" && typeof window.document !== "undefined"
+
+/**
+ * Helper that wraps a CDN `import()` with:
+ *  - version-pinned URL (no `@latest`)
+ *  - cache-bust on failure (rejected promise is cleared so the next
+ *    call can retry)
+ *  - Node/Bun fallback via bare package name
+ */
+async function loadCdnOrFallback<T>(
+  cdnUrl: string,
+  packageName: string,
+  promiseRef: { current: Promise<T> | null },
+): Promise<T> {
+  if (!promiseRef.current) {
+    if (isBrowser) {
+      promiseRef.current = (
+        import(/* @vite-ignore */ cdnUrl) as Promise<T>
+      ).catch((err) => {
+        // Clear the cache so the next call retries
+        promiseRef.current = null
+        throw err
+      })
+    } else {
+      // Node.js / Bun: dynamic bare import (resolved via node_modules)
+      promiseRef.current = (import(packageName) as Promise<T>).catch((err) => {
+        promiseRef.current = null
+        throw err
+      })
+    }
+  }
+  return promiseRef.current
+}
 
 // ─── circuit-json-to-gerber ────────────────────────────────────────────────
 
@@ -28,19 +68,14 @@ export type CircuitJsonToGerberModule = {
   stringifyExcellonDrill: (drillCmds: unknown) => string
 }
 
-let gerberModulePromise: Promise<CircuitJsonToGerberModule> | null = null
+const gerberModuleRef: { current: Promise<CircuitJsonToGerberModule> | null } =
+  { current: null }
 const GERBER_CDN_URL =
-  "https://cdn.jsdelivr.net/npm/circuit-json-to-gerber@latest/+esm"
+  "https://cdn.jsdelivr.net/npm/circuit-json-to-gerber@0.0.48/+esm"
 
 export const loadGerberConverter =
-  async (): Promise<CircuitJsonToGerberModule> => {
-    if (!gerberModulePromise) {
-      gerberModulePromise = import(
-        /* @vite-ignore */ GERBER_CDN_URL
-      ) as Promise<CircuitJsonToGerberModule>
-    }
-    return gerberModulePromise
-  }
+  async (): Promise<CircuitJsonToGerberModule> =>
+    loadCdnOrFallback(GERBER_CDN_URL, "circuit-json-to-gerber", gerberModuleRef)
 
 // ─── circuit-json-to-bom-csv ──────────────────────────────────────────────
 
@@ -51,19 +86,18 @@ export type CircuitJsonToBomCsvModule = {
   convertBomRowsToCsv: (rows: unknown[]) => Promise<string>
 }
 
-let bomCsvModulePromise: Promise<CircuitJsonToBomCsvModule> | null = null
+const bomCsvModuleRef: { current: Promise<CircuitJsonToBomCsvModule> | null } =
+  { current: null }
 const BOM_CSV_CDN_URL =
-  "https://cdn.jsdelivr.net/npm/circuit-json-to-bom-csv@latest/+esm"
+  "https://cdn.jsdelivr.net/npm/circuit-json-to-bom-csv@0.0.8/+esm"
 
 export const loadBomCsvConverter =
-  async (): Promise<CircuitJsonToBomCsvModule> => {
-    if (!bomCsvModulePromise) {
-      bomCsvModulePromise = import(
-        /* @vite-ignore */ BOM_CSV_CDN_URL
-      ) as Promise<CircuitJsonToBomCsvModule>
-    }
-    return bomCsvModulePromise
-  }
+  async (): Promise<CircuitJsonToBomCsvModule> =>
+    loadCdnOrFallback(
+      BOM_CSV_CDN_URL,
+      "circuit-json-to-bom-csv",
+      bomCsvModuleRef,
+    )
 
 // ─── circuit-json-to-pnp-csv ──────────────────────────────────────────────
 
@@ -73,28 +107,31 @@ export type CircuitJsonToPnpCsvModule = {
   ) => Promise<string>
 }
 
-let pnpCsvModulePromise: Promise<CircuitJsonToPnpCsvModule> | null = null
+const pnpCsvModuleRef: { current: Promise<CircuitJsonToPnpCsvModule> | null } =
+  { current: null }
 const PNP_CSV_CDN_URL =
-  "https://cdn.jsdelivr.net/npm/circuit-json-to-pnp-csv@latest/+esm"
+  "https://cdn.jsdelivr.net/npm/circuit-json-to-pnp-csv@0.0.7/+esm"
 
 export const loadPnpCsvConverter =
-  async (): Promise<CircuitJsonToPnpCsvModule> => {
-    if (!pnpCsvModulePromise) {
-      pnpCsvModulePromise = import(
-        /* @vite-ignore */ PNP_CSV_CDN_URL
-      ) as Promise<CircuitJsonToPnpCsvModule>
-    }
-    return pnpCsvModulePromise
-  }
+  async (): Promise<CircuitJsonToPnpCsvModule> =>
+    loadCdnOrFallback(
+      PNP_CSV_CDN_URL,
+      "circuit-json-to-pnp-csv",
+      pnpCsvModuleRef,
+    )
 
 // ─── circuit-json-to-kicad ────────────────────────────────────────────────
 
 export type CircuitJsonToKicadModule = {
-  CircuitJsonToKicadPcbConverter: new (circuitJson: unknown) => {
+  CircuitJsonToKicadPcbConverter: new (
+    circuitJson: unknown,
+  ) => {
     runUntilFinished: () => void
     getOutputString: () => string
   }
-  CircuitJsonToKicadSchConverter: new (circuitJson: unknown) => {
+  CircuitJsonToKicadSchConverter: new (
+    circuitJson: unknown,
+  ) => {
     runUntilFinished: () => void
     getOutputString: () => string
   }
@@ -127,19 +164,14 @@ export type CircuitJsonToKicadModule = {
   }
 }
 
-let kicadModulePromise: Promise<CircuitJsonToKicadModule> | null = null
+const kicadModuleRef: { current: Promise<CircuitJsonToKicadModule> | null } = {
+  current: null,
+}
 const KICAD_CDN_URL =
-  "https://cdn.jsdelivr.net/npm/circuit-json-to-kicad@latest/+esm"
+  "https://cdn.jsdelivr.net/npm/circuit-json-to-kicad@0.0.89/+esm"
 
-export const loadKicadConverter =
-  async (): Promise<CircuitJsonToKicadModule> => {
-    if (!kicadModulePromise) {
-      kicadModulePromise = import(
-        /* @vite-ignore */ KICAD_CDN_URL
-      ) as Promise<CircuitJsonToKicadModule>
-    }
-    return kicadModulePromise
-  }
+export const loadKicadConverter = async (): Promise<CircuitJsonToKicadModule> =>
+  loadCdnOrFallback(KICAD_CDN_URL, "circuit-json-to-kicad", kicadModuleRef)
 
 // ─── circuit-json-to-gltf ─────────────────────────────────────────────────
 
@@ -150,19 +182,14 @@ export type CircuitJsonToGltfModule = {
   ) => Promise<ArrayBuffer>
 }
 
-let gltfModulePromise: Promise<CircuitJsonToGltfModule> | null = null
+const gltfModuleRef: { current: Promise<CircuitJsonToGltfModule> | null } = {
+  current: null,
+}
 const GLTF_CDN_URL =
-  "https://cdn.jsdelivr.net/npm/circuit-json-to-gltf@latest/+esm"
+  "https://cdn.jsdelivr.net/npm/circuit-json-to-gltf@0.0.87/+esm"
 
-export const loadGltfConverter =
-  async (): Promise<CircuitJsonToGltfModule> => {
-    if (!gltfModulePromise) {
-      gltfModulePromise = import(
-        /* @vite-ignore */ GLTF_CDN_URL
-      ) as Promise<CircuitJsonToGltfModule>
-    }
-    return gltfModulePromise
-  }
+export const loadGltfConverter = async (): Promise<CircuitJsonToGltfModule> =>
+  loadCdnOrFallback(GLTF_CDN_URL, "circuit-json-to-gltf", gltfModuleRef)
 
 // ─── circuit-json-to-step ─────────────────────────────────────────────────
 
@@ -180,19 +207,14 @@ export type CircuitJsonToStepModule = {
   ) => Promise<string>
 }
 
-let stepModulePromise: Promise<CircuitJsonToStepModule> | null = null
+const stepModuleRef: { current: Promise<CircuitJsonToStepModule> | null } = {
+  current: null,
+}
 const STEP_CDN_URL =
-  "https://cdn.jsdelivr.net/npm/circuit-json-to-step@latest/+esm"
+  "https://cdn.jsdelivr.net/npm/circuit-json-to-step@0.0.19/+esm"
 
-export const loadStepConverter =
-  async (): Promise<CircuitJsonToStepModule> => {
-    if (!stepModulePromise) {
-      stepModulePromise = import(
-        /* @vite-ignore */ STEP_CDN_URL
-      ) as Promise<CircuitJsonToStepModule>
-    }
-    return stepModulePromise
-  }
+export const loadStepConverter = async (): Promise<CircuitJsonToStepModule> =>
+  loadCdnOrFallback(STEP_CDN_URL, "circuit-json-to-step", stepModuleRef)
 
 // ─── circuit-json-to-lbrn ─────────────────────────────────────────────────
 
@@ -203,16 +225,11 @@ export type CircuitJsonToLbrnModule = {
   ) => Promise<{ toXml: () => string }>
 }
 
-let lbrnModulePromise: Promise<CircuitJsonToLbrnModule> | null = null
+const lbrnModuleRef: { current: Promise<CircuitJsonToLbrnModule> | null } = {
+  current: null,
+}
 const LBRN_CDN_URL =
-  "https://cdn.jsdelivr.net/npm/circuit-json-to-lbrn@latest/+esm"
+  "https://cdn.jsdelivr.net/npm/circuit-json-to-lbrn@0.0.69/+esm"
 
-export const loadLbrnConverter =
-  async (): Promise<CircuitJsonToLbrnModule> => {
-    if (!lbrnModulePromise) {
-      lbrnModulePromise = import(
-        /* @vite-ignore */ LBRN_CDN_URL
-      ) as Promise<CircuitJsonToLbrnModule>
-    }
-    return lbrnModulePromise
-  }
+export const loadLbrnConverter = async (): Promise<CircuitJsonToLbrnModule> =>
+  loadCdnOrFallback(LBRN_CDN_URL, "circuit-json-to-lbrn", lbrnModuleRef)

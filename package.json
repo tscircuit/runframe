@@ -103,7 +103,14 @@
     "tscircuit": "^0.0.1438",
     "tsup": "^8.3.5",
     "vite": "^7.1.2",
-    "yargs": "^17.7.2"
+    "yargs": "^17.7.2",
+    "circuit-json-to-gerber": "^0.0.48",
+    "circuit-json-to-bom-csv": "^0.0.8",
+    "circuit-json-to-pnp-csv": "^0.0.7",
+    "circuit-json-to-kicad": "^0.0.89",
+    "circuit-json-to-lbrn": "^0.0.69",
+    "circuit-json-to-step": "^0.0.19",
+    "circuit-json-to-gltf": "^0.0.87"
   },
   "dependencies": {
     "@tscircuit/eval": "^0.0.724",

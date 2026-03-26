@@ -1,16 +1,10 @@
 import type { AnyCircuitElement } from "circuit-json"
 import JSZip from "jszip"
 import {
-  stringifyGerberCommandLayers,
-  convertSoupToGerberCommands,
-  convertSoupToExcellonDrillCommands,
-  stringifyExcellonDrill,
-} from "circuit-json-to-gerber"
-import {
-  convertCircuitJsonToBomRows,
-  convertBomRowsToCsv,
-} from "circuit-json-to-bom-csv"
-import { convertCircuitJsonToPickAndPlaceCsv } from "circuit-json-to-pnp-csv"
+  loadGerberConverter,
+  loadBomCsvConverter,
+  loadPnpCsvConverter,
+} from "../dynamic-converters"
 import { openForDownload } from "../open-for-download"
 
 export const exportFabricationFiles = async ({
@@ -26,6 +20,22 @@ export const exportFabricationFiles = async ({
   const filteredCircuitJson = circuitJson.filter(
     (element) => !("error_type" in element) && !("warning_type" in element),
   ) as any
+
+  // Dynamically load converters from CDN on demand
+  const [
+    {
+      convertSoupToGerberCommands,
+      stringifyGerberCommandLayers,
+      convertSoupToExcellonDrillCommands,
+      stringifyExcellonDrill,
+    },
+    { convertCircuitJsonToBomRows, convertBomRowsToCsv },
+    { convertCircuitJsonToPickAndPlaceCsv },
+  ] = await Promise.all([
+    loadGerberConverter(),
+    loadBomCsvConverter(),
+    loadPnpCsvConverter(),
+  ])
 
   // Generate Gerber files
   const gerberLayerCmds = convertSoupToGerberCommands(filteredCircuitJson, {

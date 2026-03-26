@@ -1,6 +1,6 @@
 import type { CircuitJson } from "circuit-json"
 import { openForDownload } from "../open-for-download"
-import { circuitJsonToStep } from "circuit-json-to-step"
+import { loadStepConverter } from "../dynamic-converters"
 import { toast } from "lib/utils/toast"
 
 export const exportStep = async ({
@@ -35,6 +35,7 @@ export const exportStep = async ({
   // Convert Circuit JSON to STEP format
   let stepText: string
   try {
+    const { circuitJsonToStep } = await loadStepConverter()
     stepText = await circuitJsonToStep(circuitJson, {
       boardWidth,
       boardHeight,

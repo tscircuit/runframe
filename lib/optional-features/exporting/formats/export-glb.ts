@@ -2,7 +2,7 @@ import type { CircuitJson } from "circuit-json"
 import { openForDownload } from "../open-for-download"
 
 const CIRCUIT_JSON_TO_GLTF_URL =
-  "https://cdn.jsdelivr.net/npm/circuit-json-to-gltf@latest/+esm"
+  "https://cdn.jsdelivr.net/npm/circuit-json-to-gltf@latest/dist/index.js"
 
 type CircuitJsonToGltfModule = {
   convertCircuitJsonToGltf: (

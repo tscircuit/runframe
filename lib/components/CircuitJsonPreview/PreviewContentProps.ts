@@ -9,6 +9,13 @@ export interface SolverStartedEvent {
   componentName: string
 }
 
+export interface ActiveAsyncEffect {
+  effectName: string
+  phase: string
+  componentDisplayName?: string
+  startTime: number
+}
+
 export type TabId =
   | "code"
   | "pcb"
@@ -80,6 +87,11 @@ export interface PreviewContentProps {
    * Name of the currently running async effect from @tscircuit/core, if any
    */
   activeEffectName?: string
+
+  /**
+   * List of currently running async effects with start times
+   */
+  activeAsyncEffects?: ActiveAsyncEffect[]
 
   onEditEvent?: (editEvent: ManualEditEvent) => void
   editEvents?: ManualEditEvent[]

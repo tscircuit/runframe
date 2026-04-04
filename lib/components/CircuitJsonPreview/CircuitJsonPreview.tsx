@@ -56,6 +56,7 @@ import { version } from "../../../package.json"
 import type { Object3D } from "three"
 import { useEvalVersions } from "lib/hooks/use-eval-versions"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
+import { RenderProgressTooltip } from "./RenderProgressTooltip"
 
 declare global {
   interface Window {
@@ -114,6 +115,7 @@ export const CircuitJsonPreview = ({
   showToggleFullScreen = true,
   defaultToFullScreen = false,
   activeEffectName,
+  activeAsyncEffects,
   allowSelectingVersion = true,
   showFileMenu = false,
   isWebEmbedded = false,
@@ -138,7 +140,6 @@ export const CircuitJsonPreview = ({
       (e) => (e && "error_type" in e) || e.type.includes("error"),
     ) as any
   }, [circuitJson])
-
   const circuitJsonWarnings = useMemo<CircuitJsonError[] | null>(() => {
     if (!circuitJson) return null
     return circuitJson.filter(
@@ -277,31 +278,12 @@ export const CircuitJsonPreview = ({
               <div className="rf-flex-grow" />
             )}
             {renderLog && renderLog.progress !== 1 && !errorMessage && (
-              <div className="rf-flex rf-items-center rf-gap-2 rf-min-w-0 rf-max-w-xs">
-                {activeEffectName ? (
-                  <div
-                    className="rf-text-xs rf-text-gray-500 rf-truncate rf-min-w-0"
-                    title={activeEffectName}
-                  >
-                    {activeEffectName}
-                  </div>
-                ) : (
-                  renderLog.lastRenderEvent && (
-                    <div
-                      className="rf-text-xs rf-text-gray-500 rf-truncate rf-min-w-0"
-                      title={renderLog.lastRenderEvent?.phase ?? ""}
-                    >
-                      {renderLog.lastRenderEvent?.phase ?? ""}
-                    </div>
-                  )
-                )}
-                <div className="rf-w-4 rf-h-4 rf-bg-blue-500 rf-opacity-50 rf-rounded-full rf-text-white rf-flex-shrink-0">
-                  <LoaderCircleIcon className="rf-w-4 rf-h-4 rf-animate-spin" />
-                </div>
-                <div className="rf-text-xs rf-font-bold rf-text-gray-700 rf-tabular-nums rf-flex-shrink-0">
-                  {((renderLog.progress ?? 0) * 100).toFixed(1)}%
-                </div>
-              </div>
+              <RenderProgressTooltip
+                renderLog={renderLog}
+                activeEffectName={activeEffectName}
+                activeAsyncEffects={activeAsyncEffects}
+                isRunningCode={isRunningCode}
+              />
             )}
             {showRightHeaderContent && (
               <TabsList>

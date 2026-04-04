@@ -8,7 +8,10 @@ import {
   CircuitJsonPreview,
   type TabId,
 } from "../CircuitJsonPreview/CircuitJsonPreview"
-import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentProps"
+import type {
+  ActiveAsyncEffect,
+  SolverStartedEvent,
+} from "../CircuitJsonPreview/PreviewContentProps"
 import { Button } from "../ui/button"
 import { RunFrameErrorFallback } from "./RunFrameErrorFallback"
 
@@ -116,15 +119,7 @@ export const RunFrame = (props: RunFrameProps) => {
   const [isRunning, setIsRunning] = useState(false)
   const [dependenciesLoaded, setDependenciesLoaded] = useState(false)
   const [activeAsyncEffects, setActiveAsyncEffects] = useState<
-    Record<
-      string,
-      {
-        effectName: string
-        phase: string
-        componentDisplayName?: string
-        startTime: number
-      }
-    >
+    Record<string, ActiveAsyncEffect>
   >({})
   const [currentDebugOption, setCurrentDebugOption] = useState<string>("")
   const [showSchematicDebugGrid, setShowSchematicDebugGrid] = useState(false)
@@ -133,6 +128,7 @@ export const RunFrame = (props: RunFrameProps) => {
   const activeEffectName = Object.values(activeAsyncEffects).sort(
     (a, b) => a.startTime - b.startTime,
   )[0]?.effectName
+  const activeAsyncEffectsList = Object.values(activeAsyncEffects)
 
   const emitRunCompleted = (payload: RunCompletedPayload) => {
     props.onRunCompleted?.(payload)
@@ -715,6 +711,7 @@ export const RunFrame = (props: RunFrameProps) => {
         circuitJson={circuitJson}
         renderLog={renderLog}
         activeEffectName={activeEffectName}
+        activeAsyncEffects={activeAsyncEffectsList}
         isRunningCode={isRunning}
         errorMessage={error?.error}
         errorStack={error?.stack}

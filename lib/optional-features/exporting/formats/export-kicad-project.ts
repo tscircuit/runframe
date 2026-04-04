@@ -1,10 +1,6 @@
 import type { CircuitJson } from "circuit-json"
 import JSZip from "jszip"
-import {
-  CircuitJsonToKicadPcbConverter,
-  CircuitJsonToKicadSchConverter,
-  CircuitJsonToKicadProConverter,
-} from "circuit-json-to-kicad"
+import importer from "@tscircuit/internal-dynamic-import"
 import { openForDownload } from "../open-for-download"
 
 export const createKicadProjectZip = async ({
@@ -14,6 +10,11 @@ export const createKicadProjectZip = async ({
   circuitJson: CircuitJson
   projectName: string
 }) => {
+  const {
+    CircuitJsonToKicadPcbConverter,
+    CircuitJsonToKicadSchConverter,
+    CircuitJsonToKicadProConverter,
+  } = await importer("circuit-json-to-kicad")
   const schConverter = new CircuitJsonToKicadSchConverter(circuitJson as any)
   schConverter.runUntilFinished()
   const schContent = schConverter.getOutputString()

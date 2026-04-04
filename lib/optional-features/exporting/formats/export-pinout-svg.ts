@@ -1,14 +1,15 @@
 import type { CircuitJson } from "circuit-json"
-import { convertCircuitJsonToPinoutSvg } from "circuit-to-svg"
+import importer from "@tscircuit/internal-dynamic-import"
 import { openForDownload } from "../open-for-download"
 
-export const exportPinoutSvg = ({
+export const exportPinoutSvg = async ({
   circuitJson,
   projectName,
 }: {
   circuitJson: CircuitJson
   projectName: string
 }) => {
+  const { convertCircuitJsonToPinoutSvg } = await importer("circuit-to-svg")
   const svgString = convertCircuitJsonToPinoutSvg(circuitJson)
 
   openForDownload(svgString, {

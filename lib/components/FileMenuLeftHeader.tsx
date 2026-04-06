@@ -44,6 +44,7 @@ import {
   type LbrnExportOptions,
 } from "./LbrnExportOptionsDialog"
 import { exportLbrn } from "lib/optional-features/exporting/formats/export-lbrn"
+import { getLatestAutoroutingLogEntry } from "lib/utils/get-latest-autorouting-log-entry"
 
 export const FileMenuLeftHeader = (props: {
   isWebEmbedded?: boolean
@@ -56,6 +57,11 @@ export const FileMenuLeftHeader = (props: {
   onChangeShowSchematicDebugGrid?: (show: boolean) => void
   showSchematicPorts?: boolean
   onChangeShowSchematicPorts?: (show: boolean) => void
+  autoroutingLog?: Record<
+    string,
+    { simpleRouteJson: any; createdAt?: number | string }
+  >
+  onReportAutoroutingLog?: (key: string, data: { simpleRouteJson: any }) => void
 }) => {
   const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
   const currentMainComponentPath = useRunFrameStore(
@@ -187,6 +193,11 @@ export const FileMenuLeftHeader = (props: {
     setPendingLbrnExport(null)
   }
 
+  const latestAutoroutingLogEntry = useMemo(
+    () => getLatestAutoroutingLogEntry(props.autoroutingLog),
+    [props.autoroutingLog],
+  )
+
   return (
     <>
       <div className="rf-flex rf-items-center rf-gap-1 rf-flex-shrink-0">
@@ -255,14 +266,47 @@ export const FileMenuLeftHeader = (props: {
             )}
 
             {!props.isWebEmbedded && (
-              <DropdownMenuItem
-                className="rf-text-xs"
-                onSelect={() => {
-                  openBugReportDialog()
-                }}
-              >
-                Report Bug
-              </DropdownMenuItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="rf-text-xs">
+                  Report Bug
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuItem
+                      className="rf-text-xs"
+                      onSelect={() => {
+                        openBugReportDialog()
+                      }}
+                    >
+                      Report Entire Circuit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="rf-text-xs"
+                      disabled={
+                        !latestAutoroutingLogEntry ||
+                        !props.onReportAutoroutingLog
+                      }
+                      onSelect={() => {
+                        if (
+                          !latestAutoroutingLogEntry ||
+                          !props.onReportAutoroutingLog
+                        ) {
+                          return
+                        }
+                        props.onReportAutoroutingLog(
+                          latestAutoroutingLogEntry.key,
+                          {
+                            simpleRouteJson:
+                              latestAutoroutingLogEntry.value.simpleRouteJson,
+                          },
+                        )
+                      }}
+                    >
+                      Report Autorouter Bug
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
             )}
 
             {/* Export - always available */}

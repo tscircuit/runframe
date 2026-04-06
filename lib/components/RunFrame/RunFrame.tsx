@@ -362,6 +362,7 @@ export const RunFrame = (props: RunFrameProps) => {
           ...autoroutingLog,
           [event.componentDisplayName]: {
             simpleRouteJson: event.simpleRouteJson,
+            createdAt: Date.now(),
           },
         })
       })
@@ -706,6 +707,10 @@ export const RunFrame = (props: RunFrameProps) => {
                 onChangeShowSchematicDebugGrid={setShowSchematicDebugGrid}
                 showSchematicPorts={showSchematicPorts}
                 onChangeShowSchematicPorts={setShowSchematicPorts}
+                autoroutingLog={autoroutingLog}
+                onReportAutoroutingLog={
+                  props.onReportAutoroutingLog || handleReportAutoroutingLog
+                }
               />
             )}
             {props.leftHeaderContent}

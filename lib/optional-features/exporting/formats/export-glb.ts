@@ -14,7 +14,7 @@ export const exportGlb = async ({
     const { convertCircuitJsonToGltf } = await importer("circuit-json-to-gltf")
 
     console.log("convertCircuitJsonToGltf", convertCircuitJsonToGltf)
-    // Use lower texture resolution for better performance and compatibility
+
     const glbArrayBuffer = (await convertCircuitJsonToGltf(circuitJson, {
       format: "glb",
       boardTextureResolution: 1024,

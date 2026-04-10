@@ -2,7 +2,7 @@ import { createCircuitWebWorker } from "@tscircuit/eval/worker"
 import Debug from "debug"
 import { Loader2, Play, Square } from "lucide-react"
 import { HTTPError } from "ky"
-import { useEffect, useReducer, useRef, useState } from "react"
+import { useCallback, useEffect, useReducer, useRef, useState } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 import {
   CircuitJsonPreview,
@@ -112,9 +112,10 @@ export const RunFrame = (props: RunFrameProps) => {
   )
   const setLastRunEvalVersion = useRunnerStore((s) => s.setLastRunEvalVersion)
   const lastRunCountTriggerRef = useRef(0)
-  const runMutex = useMutex()
+  const { runWithMutex, cancel: cancelRunMutex } = useMutex()
   const [isRunning, setIsRunning] = useState(false)
   const [dependenciesLoaded, setDependenciesLoaded] = useState(false)
+  const lastMainComponentPathRef = useRef<string | null>(null)
   const [activeAsyncEffects, setActiveAsyncEffects] = useState<
     Record<
       string,
@@ -137,6 +138,25 @@ export const RunFrame = (props: RunFrameProps) => {
   const emitRunCompleted = (payload: RunCompletedPayload) => {
     props.onRunCompleted?.(payload)
   }
+
+  const stopActiveRender = useCallback(() => {
+    setIsRunning(false)
+    setRenderLog(null)
+    setError(null)
+
+    if (cancelExecutionRef.current) {
+      cancelExecutionRef.current()
+      cancelExecutionRef.current = null
+    }
+
+    cancelRunMutex()
+    setActiveAsyncEffects({})
+
+    if (globalThis.runFrameWorker) {
+      globalThis.runFrameWorker.kill()
+      globalThis.runFrameWorker = null
+    }
+  }, [cancelRunMutex])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -259,8 +279,17 @@ export const RunFrame = (props: RunFrameProps) => {
       return
     }
 
+    const currentMainComponentPath = props.mainComponentPath ?? null
     const wasTriggeredByRunButton =
       runCountTrigger !== lastRunCountTriggerRef.current
+    const wasTriggeredByMainComponentChange =
+      lastMainComponentPathRef.current !== currentMainComponentPath
+
+    if (wasTriggeredByMainComponentChange && isRunning) {
+      debug("mainComponentPath changed during render, cancelling active render")
+      stopActiveRender()
+    }
+
     if (lastFsMapRef.current && circuitJson) {
       const changes = getChangesBetweenFsMaps(lastFsMapRef.current, fsMap)
 
@@ -268,6 +297,8 @@ export const RunFrame = (props: RunFrameProps) => {
         debug("code changes detected")
       } else if (lastEntrypointRef.current !== props.entrypoint) {
         debug("render triggered by entrypoint change")
+      } else if (wasTriggeredByMainComponentChange) {
+        debug("render triggered by mainComponentPath change")
       } else if (!wasTriggeredByRunButton) {
         debug("render triggered without changes to fsMap, skipping")
         return
@@ -283,6 +314,7 @@ export const RunFrame = (props: RunFrameProps) => {
 
     lastFsMapRef.current = fsMap
     lastEntrypointRef.current = props.entrypoint ?? null
+    lastMainComponentPathRef.current = currentMainComponentPath
     lastRunCountTriggerRef.current = runCountTrigger
     setIsRunning(true)
 
@@ -296,9 +328,10 @@ export const RunFrame = (props: RunFrameProps) => {
       let cancelled = false
 
       // Store cleanup function in ref to be called when execution is stopped
-      cancelExecutionRef.current = () => {
+      const cancelCurrentExecution = () => {
         cancelled = true
       }
+      cancelExecutionRef.current = cancelCurrentExecution
 
       const resolvedEvalVersion = await resolveEvalVersion(
         props.evalVersion,
@@ -443,6 +476,10 @@ export const RunFrame = (props: RunFrameProps) => {
           return { success: true }
         })
         .catch((e: any) => {
+          if (cancelled) {
+            debug("execution cancelled")
+            return { success: false }
+          }
           // removing the prefix "Eval compiled js error for "./main.tsx":"
           const message: string = e.message.replace("Error: ", "")
           debug(`eval error: ${message}`)
@@ -455,8 +492,10 @@ export const RunFrame = (props: RunFrameProps) => {
         })
       debug("worker call started")
       if (!evalResult.success) {
-        setIsRunning(false)
-        setActiveAsyncEffects({})
+        if (!cancelled) {
+          setIsRunning(false)
+          setActiveAsyncEffects({})
+        }
         return
       }
 
@@ -464,6 +503,10 @@ export const RunFrame = (props: RunFrameProps) => {
 
       debug("waiting for initial circuit json...")
       let circuitJson = await worker.getCircuitJson().catch((e: any) => {
+        if (cancelled) {
+          debug("initial circuit json request cancelled")
+          return null
+        }
         debug("error getting initial circuit json", e)
         props.onError?.(e)
         emitRunCompleted(buildRunCompletedPayload({ executionError: e }))
@@ -474,15 +517,30 @@ export const RunFrame = (props: RunFrameProps) => {
         return null
       })
       if (!circuitJson) return
+      if (cancelled) return
       debug("got initial circuit json")
       setCircuitJson(circuitJson)
       props.onCircuitJsonChange?.(circuitJson)
       props.onInitialRender?.({ circuitJson })
 
-      await $renderResult
+      await $renderResult.catch((e: any) => {
+        if (cancelled) {
+          debug("render cancelled")
+          return null
+        }
+        throw e
+      })
+      if (cancelled) return
 
       debug("getting final circuit json")
-      circuitJson = await worker.getCircuitJson()
+      circuitJson = await worker.getCircuitJson().catch((e: any) => {
+        if (cancelled) {
+          debug("final circuit json request cancelled")
+          return null
+        }
+        throw e
+      })
+      if (!circuitJson || cancelled) return
       props.onCircuitJsonChange?.(circuitJson)
       setCircuitJson(circuitJson)
       emitRunCompleted(buildRunCompletedPayload({ circuitJson }))
@@ -499,12 +557,16 @@ export const RunFrame = (props: RunFrameProps) => {
       if (!cancelled) {
         setRenderLog({ ...renderLog })
       }
-      setIsRunning(false)
-      setActiveAsyncEffects({})
-      setCurrentDebugOption("") // Clear debug option after render completes
-      cancelExecutionRef.current = null
+      if (!cancelled) {
+        setIsRunning(false)
+        setActiveAsyncEffects({})
+        setCurrentDebugOption("") // Clear debug option after render completes
+      }
+      if (cancelExecutionRef.current === cancelCurrentExecution) {
+        cancelExecutionRef.current = null
+      }
     }
-    runMutex.runWithMutex(runWorker)
+    runWithMutex(runWorker)
   }, [
     props.fsMap,
     props.entrypoint,
@@ -514,6 +576,9 @@ export const RunFrame = (props: RunFrameProps) => {
     props.isLoadingFiles,
     currentDebugOption,
     isStaticCircuitJson,
+    isRunning,
+    runWithMutex,
+    stopActiveRender,
   ])
 
   // Updated to debounce edit events so only the last event is emitted after dragging ends
@@ -648,22 +713,7 @@ export const RunFrame = (props: RunFrameProps) => {
                           <Button
                             onClick={(e) => {
                               e.stopPropagation()
-                              setIsRunning(false)
-                              setRenderLog(null)
-                              setError(null)
-                              // Call cleanup to prevent race conditions
-                              if (cancelExecutionRef.current) {
-                                cancelExecutionRef.current()
-                                cancelExecutionRef.current = null
-                              }
-                              // Cancel the mutex to allow next execution
-                              runMutex.cancel()
-                              setActiveAsyncEffects({})
-                              // Kill the worker using the provided kill function
-                              if (globalThis.runFrameWorker) {
-                                globalThis.runFrameWorker.kill()
-                                globalThis.runFrameWorker = null
-                              }
+                              stopActiveRender()
                             }}
                             variant="ghost"
                             size="icon"

@@ -41,7 +41,7 @@ export const mapKicadFootprintToSearchResult = (
   footprintPath: string,
 ): ComponentSearchResult => {
   const cleanedFootprint = footprintPath
-    .replace(".pretty/", ":")
+    .replace(".pretty/", "/")
     .replace(".kicad_mod", "")
   const footprintString = `kicad:${cleanedFootprint}`
 

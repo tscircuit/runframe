@@ -52,7 +52,7 @@
     "@tscircuit/fake-snippets": "^0.0.163",
     "@tscircuit/file-server": "^0.0.32",
     "@tscircuit/internal-dynamic-import": "^0.0.0",
-    "@tscircuit/pcb-viewer": "1.11.363",
+    "@tscircuit/pcb-viewer": "1.11.365",
     "@tscircuit/schematic-viewer": "^2.0.59",
     "@types/bun": "latest",
     "@types/debug": "^4.1.12",

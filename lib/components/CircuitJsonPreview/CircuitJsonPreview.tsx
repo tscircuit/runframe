@@ -525,7 +525,7 @@ export const CircuitJsonPreview = ({
                   {circuitJson ? (
                     <PcbViewerWithContainerHeight
                       focusOnHover={false}
-                      circuitJson={circuitJson as any}
+                      circuitJson={circuitJson}
                       debugGraphics={autoroutingGraphics}
                       containerClassName={cn(
                         "rf-h-full rf-w-full",
@@ -684,7 +684,7 @@ export const CircuitJsonPreview = ({
                     <CadViewer
                       key={`cad-${isFullScreen}`}
                       ref={setCadViewerRef}
-                      circuitJson={circuitJson as any}
+                      circuitJson={circuitJson}
                       autoRotateDisabled={autoRotate3dViewerDisabled}
                     />
                   ) : (
@@ -768,7 +768,7 @@ export const CircuitJsonPreview = ({
               >
                 <ErrorBoundary fallback={<div>Error loading JSON viewer</div>}>
                   {circuitJson ? (
-                    <CircuitJsonTableViewer elements={circuitJson as any} />
+                    <CircuitJsonTableViewer elements={circuitJson} />
                   ) : (
                     <PreviewEmptyState onRunClicked={onRunClicked} />
                   )}

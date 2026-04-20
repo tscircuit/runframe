@@ -31,6 +31,7 @@ import {
   getCurrentFolderContents,
   parseFilesToTree,
 } from "./parseFilesToTree"
+import { getFilePickerDisplayName } from "./getFilePickerDisplayName"
 import { useCurrentFolder } from "./useCurrentFolder"
 
 const defaultFileIcon = (fileName: string) => {
@@ -52,7 +53,7 @@ const defaultFileFilter = (filename: string) => {
 }
 
 const defaultDisplayName = (filename: string) => {
-  return filename.split("/").pop() || ""
+  return getFilePickerDisplayName(filename)
 }
 
 const getDirectoryPath = (filePath: string) => {

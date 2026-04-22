@@ -56,7 +56,7 @@ export const TscircuitPackageDetailsDialog = ({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
         showOverlay={false}
-        style={{ width: "calc(100vw - 2rem)" }}
+        style={{ width: "calc(100vw - 2rem)", zIndex: 102 }}
         className="rf-max-w-5xl no-scrollbar !rf-overflow-y-auto rf-max-h-[90vh] rf-overflow-hidden rf-flex rf-flex-col rf-rounded-sm"
       >
         <DialogHeader className="rf-pb-4 rf-border-b">

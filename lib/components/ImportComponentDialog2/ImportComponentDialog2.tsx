@@ -284,7 +284,10 @@ export const ImportComponentDialog2 = ({
   return (
     <Dialog open={isOpen} onOpenChange={handleDialogClose}>
       <DialogContent
-        style={{ width: "calc(100vw - 2rem)", zIndex: zIndexMap.importComponentDialog }}
+        style={{
+          width: "calc(100vw - 2rem)",
+          zIndex: zIndexMap.importComponentDialog,
+        }}
         className="rf-rounded-sm rf-max-h-[90vh] rf-overflow-y-auto rf-overflow-x-hidden rf-flex rf-flex-col"
       >
         <DialogHeader>

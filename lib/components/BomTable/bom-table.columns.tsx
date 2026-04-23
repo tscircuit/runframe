@@ -17,9 +17,8 @@ const linkify = (supplier: string, partNumber: string) => {
   return partNumber
 }
 
-const formatManufacturerMpnPairs = (
-  pairs: BomRow["manufacturer_mpn_pairs"],
-) => pairs?.map(({ manufacturer, mpn }) => `${manufacturer}: ${mpn}`).join(", ")
+const formatManufacturerMpnPairs = (pairs: BomRow["manufacturer_mpn_pairs"]) =>
+  pairs?.map(({ manufacturer, mpn }) => `${manufacturer}: ${mpn}`).join(", ")
 
 export const getBomMetadata = (rows: BomRow[]): BomMetadata => {
   const extraColumns = new Set<string>()

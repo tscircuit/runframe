@@ -5,6 +5,7 @@ import { toast } from "lib/utils/toast"
 
 export interface LbrnExportOptions {
   includeSilkscreen?: boolean
+  includeOxidationCleaningLayer?: boolean
 }
 
 export const exportLbrn = async ({
@@ -21,6 +22,8 @@ export const exportLbrn = async ({
     const { convertCircuitJsonToLbrn } = await importer("circuit-json-to-lbrn")
     const lbrnProject = await convertCircuitJsonToLbrn(circuitJson, {
       includeSilkscreen: options.includeSilkscreen ?? false,
+      includeOxidationCleaningLayer:
+        options.includeOxidationCleaningLayer ?? true,
     })
 
     // Convert to XML string

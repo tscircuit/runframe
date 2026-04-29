@@ -178,6 +178,9 @@ export const RunFrame = (props: RunFrameProps) => {
             ...(props.tscircuitSessionToken && {
               tscircuitSessionToken: props.tscircuitSessionToken,
             }),
+            ...(props.easyEdaProxyConfig && {
+              easyEdaProxyConfig: props.easyEdaProxyConfig,
+            }),
           })
           if (cancelled) return
           globalThis.runFrameWorker = worker
@@ -326,6 +329,9 @@ export const RunFrame = (props: RunFrameProps) => {
           }),
           ...(props.tscircuitSessionToken && {
             tscircuitSessionToken: props.tscircuitSessionToken,
+          }),
+          ...(props.easyEdaProxyConfig && {
+            easyEdaProxyConfig: props.easyEdaProxyConfig,
           }),
         }))
       globalThis.runFrameWorker = worker

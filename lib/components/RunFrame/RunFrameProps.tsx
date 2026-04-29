@@ -159,4 +159,13 @@ export interface RunFrameProps {
    * The session token to used for the tscircuit registry
    */
   tscircuitSessionToken?: string
+
+  /**
+   * Configuration for proxying EasyEDA API requests, used by the parts engine
+   * when fetching part circuit JSON (e.g. for connector footprints).
+   */
+  easyEdaProxyConfig?: {
+    proxyEndpointUrl: string
+    headers?: Record<string, string>
+  }
 }

@@ -375,7 +375,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       }}
       onLoginRequired={props.onLoginRequired}
       easyEdaProxyConfig={{
-        proxyEndpointUrl: `${window.location.origin}${API_BASE}/proxy`,
+        proxyEndpointUrl: `${API_BASE}/proxy`,
       }}
       {...componentProp}
     />

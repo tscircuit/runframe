@@ -40,7 +40,7 @@
         "@vitejs/plugin-react": "^5.0.0",
         "autoprefixer": "^10.4.20",
         "chokidar-cli": "^3.0.0",
-        "circuit-json-to-bom-csv": "^0.0.8",
+        "circuit-json-to-bom-csv": "^0.0.9",
         "circuit-json-to-gerber": "^0.0.49",
         "circuit-json-to-kicad": "^0.0.125",
         "circuit-json-to-lbrn": "^0.0.74",
@@ -835,7 +835,7 @@
 
     "circuit-json": ["circuit-json@0.0.421", "", {}, "sha512-1zb0o4gM4fAL+2liV5i/wvom7SCdr/6Nc0hsYLFzSWnQ3yWpQHQxhDgvNEQ/FTZVKIAhhJ3mD9XbwduwfkJCrA=="],
 
-    "circuit-json-to-bom-csv": ["circuit-json-to-bom-csv@0.0.8", "", { "dependencies": { "format-si-prefix": "^0.3.2", "papaparse": "^5.4.1" }, "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-y04yF4TvEMgjFtpkqMkkxcME7apNeIo9q8OPiaj+QeuAWBd+LS7VeYVfFYTj3yKdet6SgE2pzMMVrcSPEd2ucQ=="],
+    "circuit-json-to-bom-csv": ["circuit-json-to-bom-csv@0.0.9", "", { "dependencies": { "format-si-prefix": "^0.3.2", "papaparse": "^5.4.1" }, "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-FbpYQW40WjpTJle1aCzHQ9yu/L0XgIRPWEfCYANcsg7zakP3Q/pEwr80uCJ5PkdnOStF1z3P3SomOH94z26EMg=="],
 
     "circuit-json-to-bpc": ["circuit-json-to-bpc@0.0.13", "", { "peerDependencies": { "bpc-graph": "*", "circuit-json": "*", "typescript": "^5" } }, "sha512-3wSMtPa6tJkiBQN4tsm7f0Mb7Wp90X2c8dNbULoDVE4mGGoFqP1DXqBlyvvZZl+4SjqznzQQ0EioLe2SCQTOcg=="],
 

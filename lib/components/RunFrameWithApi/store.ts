@@ -46,7 +46,17 @@ async function getEvents(since: string | null): Promise<FileUpdatedEvent[]> {
   return data.event_list
 }
 
-const DYNAMIC_FILE_EXTENSIONS = [".tsx", ".ts", ".jsx", ".js", ".json"]
+const DYNAMIC_FILE_EXTENSIONS = [
+  ".tsx",
+  ".ts",
+  ".jsx",
+  ".js",
+  ".json",
+  ".kicad_pcb",
+  ".kicad_sch",
+  ".kicad_prl",
+  ".kicad_pro",
+]
 
 async function getInitialFilesFromApi(): Promise<Map<FilePath, FileContent>> {
   const response = await fetch(`${API_BASE}/files/list`)

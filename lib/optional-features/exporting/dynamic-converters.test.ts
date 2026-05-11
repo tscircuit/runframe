@@ -36,7 +36,10 @@ describe("dynamic converter loading", () => {
     const importedSpecifiers: string[] = []
     const successfulImporter = async <TModule>(specifier: string) => {
       importedSpecifiers.push(specifier)
-      return { convertCircuitJsonToBomRows: () => [] } as TModule
+      return {
+        convertCircuitJsonToBomRows: () => [],
+        convertBomRowsToCsv: () => "",
+      } as TModule
     }
 
     const [firstLoad, secondLoad] = await Promise.all([
@@ -55,7 +58,10 @@ describe("dynamic converter loading", () => {
     const flakyImporter = async <TModule>() => {
       attempts += 1
       if (attempts === 1) throw new Error("temporary CDN failure")
-      return { convertCircuitJsonToBomRows: () => [] } as TModule
+      return {
+        convertCircuitJsonToBomRows: () => [],
+        convertBomRowsToCsv: () => "",
+      } as TModule
     }
 
     await expect(
@@ -64,7 +70,10 @@ describe("dynamic converter loading", () => {
 
     await expect(
       loadConverterModule("circuit-json-to-bom-csv", flakyImporter),
-    ).resolves.toEqual({ convertCircuitJsonToBomRows: expect.any(Function) })
+    ).resolves.toEqual({
+      convertCircuitJsonToBomRows: expect.any(Function),
+      convertBomRowsToCsv: expect.any(Function),
+    })
     expect(attempts).toBe(2)
 
     clearConverterModuleCache()

@@ -1,6 +1,6 @@
 import type { CircuitJson } from "circuit-json"
 import { openForDownload } from "../open-for-download"
-import importer from "@tscircuit/internal-dynamic-import"
+import { loadGltfConverter } from "../dynamic-converters"
 
 export const exportGlb = async ({
   circuitJson,
@@ -11,7 +11,7 @@ export const exportGlb = async ({
 }) => {
   let blob: Blob
   try {
-    const { convertCircuitJsonToGltf } = await importer("circuit-json-to-gltf")
+    const { convertCircuitJsonToGltf } = await loadGltfConverter()
 
     console.log("convertCircuitJsonToGltf", convertCircuitJsonToGltf)
 

@@ -1,9 +1,10 @@
+import DOMPurify from "dompurify"
+import { getRegistryKy } from "lib/utils/get-registry-ky"
+import { marked } from "marked"
 import { useEffect, useMemo, useState } from "react"
 import { Button } from "../ui/button"
 import { DialogHeader, DialogTitle } from "../ui/dialog"
-import { marked } from "marked"
 import type { AiReview } from "./types"
-import { getRegistryKy } from "lib/utils/get-registry-ky"
 
 export const AiReviewViewView = ({
   review,
@@ -49,10 +50,10 @@ export const AiReviewViewView = ({
     return () => clearTimeout(timeout)
   }, [aiReviewId])
 
-  const html = useMemo(
-    () => marked.parse(review.ai_review_text || "") as string,
-    [review.ai_review_text],
-  )
+  const html = useMemo(() => {
+    const dirtyHtml = marked.parse(aiReviewText || "") as string
+    return DOMPurify.sanitize(dirtyHtml)
+  }, [aiReviewText])
   return (
     <>
       <DialogHeader className="rf-flex rf-flex-row rf-items-center rf-justify-between">
@@ -62,10 +63,10 @@ export const AiReviewViewView = ({
         <DialogTitle>AI Review</DialogTitle>
       </DialogHeader>
       {aiReviewText ? (
-        <div
-          className="rf-h-64 rf-overflow-y-auto rf-prose rf-max-w-none rf-mt-2"
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
+        <div className="rf-h-64 rf-overflow-y-auto rf-prose rf-max-w-none rf-mt-2">
+          {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Markdown HTML is sanitized with DOMPurify before rendering. */}
+          <div dangerouslySetInnerHTML={{ __html: html }} />
+        </div>
       ) : (
         <div className="rf-h-64 rf-overflow-y-auto rf-prose rf-max-w-none rf-mt-2">
           <div className="rf-flex rf-items-center rf-justify-center rf-h-full">

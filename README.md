@@ -115,9 +115,13 @@ RunFrame can be embedded in an iframe, allowing you to evaluate tscircuit code f
 
     <script>
       const iframe = document.getElementById("runframe")
+      const iframeOrigin = new URL(iframe.src).origin
 
       // Listen for ready message from iframe
       window.addEventListener("message", (event) => {
+        if (event.source !== iframe.contentWindow) return
+        if (event.origin !== iframeOrigin) return
+
         if (event.data?.runframe_type === "runframe_ready_to_receive") {
           // Send circuit configuration
           iframe.contentWindow.postMessage(
@@ -130,7 +134,7 @@ RunFrame can be embedded in an iframe, allowing you to evaluate tscircuit code f
                 entrypoint: "main.tsx",
               },
             },
-            "*"
+            iframeOrigin
           )
         }
       })
@@ -143,6 +147,9 @@ RunFrame can be embedded in an iframe, allowing you to evaluate tscircuit code f
 
 ```tsx
 window.addEventListener("message", (event) => {
+  if (event.source !== iframe.contentWindow) return
+  if (event.origin !== iframeOrigin) return
+
   if (event.data?.runframe_type === "runframe_event") {
     const { type } = event.data.runframe_event
     if (type === "error") {

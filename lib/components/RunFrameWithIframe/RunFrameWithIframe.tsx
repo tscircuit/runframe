@@ -9,28 +9,63 @@ export interface RunFrameWithIframeProps extends RunFrameProps {
   iframeUrl?: string
 }
 
+export const getRunFrameIframeTargetOrigin = (
+  iframeUrl: string,
+  baseUrl: string,
+) => {
+  const origin = new URL(iframeUrl, baseUrl).origin
+
+  return origin === "null" ? "*" : origin
+}
+
+export const isRunFrameReadyMessageFromIframe = (
+  event: Pick<MessageEvent, "data" | "origin" | "source">,
+  iframeWindow: Window | null,
+  targetOrigin: string,
+) => {
+  if (!iframeWindow || event.source !== iframeWindow) return false
+  if (targetOrigin !== "*" && event.origin !== targetOrigin) return false
+
+  return event.data?.runframe_type === "runframe_ready_to_receive"
+}
+
 export const RunFrameWithIframe = ({
   iframeUrl = "https://runframe.tscircuit.com/iframe.html",
   ...runFrameProps
 }: RunFrameWithIframeProps) => {
   const iframeRef = useRef<HTMLIFrameElement>(null)
+  const runFramePropsRef = useRef(runFrameProps)
+  runFramePropsRef.current = runFrameProps
 
   useEffect(() => {
+    const targetOrigin = getRunFrameIframeTargetOrigin(
+      iframeUrl,
+      window.location.href,
+    )
+
     const handleMessage = (event: MessageEvent) => {
-      if (event.data?.runframe_type === "runframe_ready_to_receive") {
-        iframeRef.current?.contentWindow?.postMessage(
-          {
-            runframe_type: "runframe_props_changed",
-            runframe_props: runFrameProps,
-          },
-          "*",
-        )
+      const iframeWindow = iframeRef.current?.contentWindow ?? null
+
+      if (!iframeWindow) return
+
+      if (
+        !isRunFrameReadyMessageFromIframe(event, iframeWindow, targetOrigin)
+      ) {
+        return
       }
+
+      iframeWindow.postMessage(
+        {
+          runframe_type: "runframe_props_changed",
+          runframe_props: runFramePropsRef.current,
+        },
+        targetOrigin,
+      )
     }
 
     window.addEventListener("message", handleMessage)
     return () => window.removeEventListener("message", handleMessage)
-  }, [])
+  }, [iframeUrl])
 
   return (
     <div>

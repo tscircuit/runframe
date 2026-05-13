@@ -4,7 +4,7 @@
     "": {
       "name": "@tscircuit/runframe",
       "dependencies": {
-        "@tscircuit/eval": "^0.0.844",
+        "@tscircuit/eval": "^0.0.845",
         "@tscircuit/solver-utils": "^0.0.7",
       },
       "devDependencies": {
@@ -46,7 +46,7 @@
         "concurrently": "^9.1.2",
         "cssnano": "^7.0.6",
         "debug": "^4.4.0",
-        "easyeda": "^0.0.266",
+        "easyeda": "^0.0.269",
         "fflate": "^0.8.2",
         "fuse.js": "^7.1.0",
         "jose": "^6.1.0",
@@ -592,7 +592,7 @@
 
     "@tscircuit/create-snippet-url": ["@tscircuit/create-snippet-url@0.0.9", "", { "dependencies": { "fflate": "^0.8.2" }, "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-CI+PDOy28Q9pycIyjx0vLpnh6wuyocYPMAJqhr/uAbOBBdY3sz3zTWHvdy7giqTGo0+v5x0nhN6o60RT82grZA=="],
 
-    "@tscircuit/eval": ["@tscircuit/eval@0.0.844", "", { "peerDependencies": { "@tscircuit/core": "*", "circuit-json": "*", "typescript": "^5.0.0", "zod": "3" } }, "sha512-Zldhj1UHaGHPjDBgR3VpL1skDgNdOJyt4rJT/4T6ZCw94GkhgIKwb8eYu6ddsCeMux2dB1nnmaMTA70tIX0PWA=="],
+    "@tscircuit/eval": ["@tscircuit/eval@0.0.845", "", { "peerDependencies": { "@tscircuit/core": "*", "circuit-json": "*", "typescript": "^5.0.0", "zod": "3" } }, "sha512-0AafGOE73U08M9OqzgxZWHV499HEo3dqHSC+Bw0/9FtLPSCllSVS55JrrebL7km8cUaehseHZfh9HvrrhhFAwQ=="],
 
     "@tscircuit/fake-snippets": ["@tscircuit/fake-snippets@0.0.163", "", {}, "sha512-E/ZvC5CRfgG/Q6776ovR4oZuLgXbSxpvffminIwpTE1axg+vrNdOz2RzGBHbZCIcDUhs4etmB85kAizuiNJSBw=="],
 
@@ -996,7 +996,7 @@
 
     "eastasianwidth": ["eastasianwidth@0.2.0", "", {}, "sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA=="],
 
-    "easyeda": ["easyeda@0.0.266", "", { "peerDependencies": { "typescript": "^5.5.2", "zod": "3" }, "bin": { "easyeda-converter": "dist/main.cjs", "easyeda": "dist/main.cjs" } }, "sha512-pT4PA09jLdVVSL46QaV/aGfcRTGFgEtxIc7axmVzxt4YiavZbhVxyuqGfb1OV3FeMh0TofJqyjPESAxGMPDwNQ=="],
+    "easyeda": ["easyeda@0.0.269", "", { "peerDependencies": { "typescript": "^5.5.2", "zod": "3" }, "bin": { "easyeda-converter": "dist/main.cjs", "easyeda": "dist/main.cjs" } }, "sha512-uhtMsYxs6K3V82CS18cw5pCPJ45KYqoc4HzMnrA0pIFWAPO6fEd1Z/w0QBK803ngEtiD+GIVjIZm4REKxzQiEQ=="],
 
     "edge-runtime": ["edge-runtime@2.5.10", "", { "dependencies": { "@edge-runtime/format": "2.2.1", "@edge-runtime/ponyfill": "2.4.2", "@edge-runtime/vm": "3.2.0", "async-listen": "3.0.1", "mri": "1.2.0", "picocolors": "1.0.0", "pretty-ms": "7.0.1", "signal-exit": "4.0.2", "time-span": "4.0.0" }, "bin": { "edge-runtime": "dist/cli/index.js" } }, "sha512-oe6JjFbU1MbISzeSBMHqmzBhNEwmy2AYDY0LxStl8FAIWSGdGO+CqzWub9nbgmANuJYPXZA0v3XAlbxeKV/Omw=="],
 

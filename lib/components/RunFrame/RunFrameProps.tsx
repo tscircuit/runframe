@@ -102,6 +102,13 @@ export interface RunFrameProps {
    */
   editEvents?: ManualEditEvent[]
 
+  onPcbBoundsSelected?: (bounds: {
+    minX: number
+    minY: number
+    maxX: number
+    maxY: number
+  }) => void
+
   /**
    * If true, turns on debug logging
    */

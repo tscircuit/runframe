@@ -2,7 +2,7 @@
   "name": "@tscircuit/runframe",
   "main": "dist/preview.js",
   "type": "module",
-  "version": "0.0.1953",
+  "version": "0.0.1957",
   "exports": {
     ".": "./dist/preview.js",
     "./preview": "./dist/preview.js",
@@ -52,7 +52,7 @@
     "@tscircuit/fake-snippets": "^0.0.163",
     "@tscircuit/file-server": "^0.0.32",
     "@tscircuit/internal-dynamic-import": "^0.0.0",
-    "@tscircuit/pcb-viewer": "1.11.369",
+    "@tscircuit/pcb-viewer": "1.11.370",
     "@tscircuit/schematic-viewer": "^2.0.61",
     "@types/bun": "latest",
     "@types/debug": "^4.1.12",
@@ -107,7 +107,7 @@
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "@tscircuit/eval": "^0.0.842",
+    "@tscircuit/eval": "^0.0.844",
     "@tscircuit/solver-utils": "^0.0.7"
   }
 }

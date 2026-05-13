@@ -120,6 +120,7 @@ export const CircuitJsonPreview = ({
   projectName,
   onRerunWithDebug,
   solverEvents,
+  onPcbBoundsSelected,
 }: PreviewContentProps) => {
   useStyles()
 
@@ -527,6 +528,7 @@ export const CircuitJsonPreview = ({
                       focusOnHover={false}
                       circuitJson={circuitJson}
                       debugGraphics={autoroutingGraphics}
+                      onBoundsSelected={onPcbBoundsSelected}
                       containerClassName={cn(
                         "rf-h-full rf-w-full",
                         isFullScreen

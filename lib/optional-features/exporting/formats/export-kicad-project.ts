@@ -3,6 +3,10 @@ import JSZip from "jszip"
 import importer from "@tscircuit/internal-dynamic-import"
 import { openForDownload } from "../open-for-download"
 
+const isBuiltinModelPath = (modelPath: string) =>
+  modelPath.startsWith("http://modelcdn.tscircuit.com") ||
+  modelPath.startsWith("https://modelcdn.tscircuit.com")
+
 export const createKicadProjectZip = async ({
   circuitJson,
   projectName,
@@ -19,7 +23,10 @@ export const createKicadProjectZip = async ({
   schConverter.runUntilFinished()
   const schContent = schConverter.getOutputString()
 
-  const pcbConverter = new CircuitJsonToKicadPcbConverter(circuitJson as any)
+  const pcbConverter = new CircuitJsonToKicadPcbConverter(circuitJson as any, {
+    includeBuiltin3dModels: true,
+    projectName,
+  })
   pcbConverter.runUntilFinished()
   const pcbContent = pcbConverter.getOutputString()
 
@@ -36,6 +43,22 @@ export const createKicadProjectZip = async ({
   zip.file(`${projectName}.kicad_sch`, schContent)
   zip.file(`${projectName}.kicad_pcb`, pcbContent)
   zip.file(`${projectName}.kicad_pro`, proContent)
+
+  for (const modelPath of pcbConverter.getModel3dSourcePaths()) {
+    const response = await fetch(modelPath)
+    if (!response.ok) {
+      throw new Error(`Failed to fetch 3D model from ${modelPath}`)
+    }
+
+    let shapesDir = `${projectName}.3dshapes`
+    if (isBuiltinModelPath(modelPath)) {
+      shapesDir = "tscircuit_builtin.3dshapes"
+    }
+
+    const fileName = modelPath.split("/").pop() || modelPath
+
+    zip.file(`3dmodels/${shapesDir}/${fileName}`, await response.arrayBuffer())
+  }
 
   return zip
 }

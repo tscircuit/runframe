@@ -1,6 +1,6 @@
-import type { RenderLog } from "lib/render-logging/RenderLog"
 import type { ManualEditEvent } from "@tscircuit/props"
 import type { CircuitJson } from "circuit-json"
+import type { RenderLog } from "lib/render-logging/RenderLog"
 
 export interface SolverStartedEvent {
   type: "solver:started"
@@ -83,6 +83,12 @@ export interface PreviewContentProps {
 
   onEditEvent?: (editEvent: ManualEditEvent) => void
   editEvents?: ManualEditEvent[]
+  onPcbBoundsSelected?: (bounds: {
+    minX: number
+    minY: number
+    maxX: number
+    maxY: number
+  }) => void
 
   onActiveTabChange?: (tab: TabId) => any
 

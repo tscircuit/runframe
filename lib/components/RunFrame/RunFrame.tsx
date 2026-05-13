@@ -731,6 +731,7 @@ export const RunFrame = (props: RunFrameProps) => {
         errorStack={error?.stack}
         onEditEvent={handleEditEvent}
         editEvents={props.editEvents}
+        onPcbBoundsSelected={props.onPcbBoundsSelected}
         defaultToFullScreen={props.defaultToFullScreen}
         onRerunWithDebug={(debugOption) => {
           setCurrentDebugOption(debugOption || "")

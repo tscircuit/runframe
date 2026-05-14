@@ -29,7 +29,7 @@
         "@tscircuit/create-snippet-url": "^0.0.9",
         "@tscircuit/fake-snippets": "^0.0.163",
         "@tscircuit/file-server": "^0.0.32",
-        "@tscircuit/internal-dynamic-import": "^0.0.0",
+        "@tscircuit/internal-dynamic-import": "^0.0.6",
         "@tscircuit/pcb-viewer": "1.11.370",
         "@tscircuit/schematic-viewer": "^2.0.61",
         "@types/bun": "latest",
@@ -613,7 +613,7 @@
 
     "@tscircuit/infgrid-ijump-astar": ["@tscircuit/infgrid-ijump-astar@0.0.35", "", {}, "sha512-PZx3GyD7mDNEhLJn8+7n8NjrieOvrX03g7Gx1cvwXv9mmgSC4M+yTA0WC4DgOvcRdTnarf0R8xvwtDeJ4tMK9Q=="],
 
-    "@tscircuit/internal-dynamic-import": ["@tscircuit/internal-dynamic-import@0.0.0", "", {}, "sha512-LUv6akmy4sQetfvTG48sTc+jmeSaTcFJc3QpyZRQJbfY1HBa+pQLLnVAbrNnjZBoutkOCuhV9mpInJ/qoFNTVw=="],
+    "@tscircuit/internal-dynamic-import": ["@tscircuit/internal-dynamic-import@0.0.6", "", {}, "sha512-kGuN6dvOJIAra/7+TYWzolzzWOClbS3pr3uKqhRNH24VDGjmUWbB76210tjSZStcZNwYEOtmLJB9PxkflTEXVw=="],
 
     "@tscircuit/krt-wasm": ["@tscircuit/krt-wasm@0.1.0", "", { "peerDependencies": { "tscircuit": ">=0.0.1686" } }, "sha512-LjC9d/pZoA8yhV9TYV3ayfnSGBRznsQmaY+a/hSZeWFFkJ4EFd40DBxaT8BRXpvEmcbiVnkrrBy5FdZBwCqM9g=="],
 

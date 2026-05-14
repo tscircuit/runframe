@@ -76,17 +76,17 @@ export type ConverterPackageName = keyof ConverterModules
 
 const CONVERTER_CDN_URLS: Record<ConverterPackageName, string> = {
   "circuit-json-to-gerber":
-    "https://cdn.jsdelivr.net/npm/circuit-json-to-gerber@0.0.52/+esm",
+    "https://cdn.jsdelivr.net/npm/circuit-json-to-gerber@0.0.54/+esm",
   "circuit-json-to-bom-csv":
     "https://cdn.jsdelivr.net/npm/circuit-json-to-bom-csv@0.0.8/+esm",
   "circuit-json-to-pnp-csv":
     "https://cdn.jsdelivr.net/npm/circuit-json-to-pnp-csv@0.0.7/+esm",
   "circuit-json-to-kicad":
-    "https://cdn.jsdelivr.net/npm/circuit-json-to-kicad@0.0.135/+esm",
+    "https://cdn.jsdelivr.net/npm/circuit-json-to-kicad@0.0.136/+esm",
   "circuit-json-to-gltf":
-    "https://cdn.jsdelivr.net/npm/circuit-json-to-gltf@0.0.62/+esm",
+    "https://cdn.jsdelivr.net/npm/circuit-json-to-gltf@0.0.96/+esm",
   "circuit-json-to-step":
-    "https://cdn.jsdelivr.net/npm/circuit-json-to-step@0.0.18/+esm",
+    "https://cdn.jsdelivr.net/npm/circuit-json-to-step@0.0.28/+esm",
   "circuit-json-to-lbrn":
     "https://cdn.jsdelivr.net/npm/circuit-json-to-lbrn@0.0.74/+esm",
 }

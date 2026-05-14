@@ -8,7 +8,7 @@ import {
 describe("dynamic converter loading", () => {
   it("uses pinned jsDelivr ESM URLs", () => {
     expect(getConverterCdnUrl("circuit-json-to-gerber")).toBe(
-      "https://cdn.jsdelivr.net/npm/circuit-json-to-gerber@0.0.52/+esm",
+      "https://cdn.jsdelivr.net/npm/circuit-json-to-gerber@0.0.54/+esm",
     )
     expect(getConverterCdnUrl("circuit-json-to-bom-csv")).toBe(
       "https://cdn.jsdelivr.net/npm/circuit-json-to-bom-csv@0.0.8/+esm",
@@ -17,13 +17,13 @@ describe("dynamic converter loading", () => {
       "https://cdn.jsdelivr.net/npm/circuit-json-to-pnp-csv@0.0.7/+esm",
     )
     expect(getConverterCdnUrl("circuit-json-to-kicad")).toBe(
-      "https://cdn.jsdelivr.net/npm/circuit-json-to-kicad@0.0.135/+esm",
+      "https://cdn.jsdelivr.net/npm/circuit-json-to-kicad@0.0.136/+esm",
     )
     expect(getConverterCdnUrl("circuit-json-to-gltf")).toBe(
-      "https://cdn.jsdelivr.net/npm/circuit-json-to-gltf@0.0.62/+esm",
+      "https://cdn.jsdelivr.net/npm/circuit-json-to-gltf@0.0.96/+esm",
     )
     expect(getConverterCdnUrl("circuit-json-to-step")).toBe(
-      "https://cdn.jsdelivr.net/npm/circuit-json-to-step@0.0.18/+esm",
+      "https://cdn.jsdelivr.net/npm/circuit-json-to-step@0.0.28/+esm",
     )
     expect(getConverterCdnUrl("circuit-json-to-lbrn")).toBe(
       "https://cdn.jsdelivr.net/npm/circuit-json-to-lbrn@0.0.74/+esm",

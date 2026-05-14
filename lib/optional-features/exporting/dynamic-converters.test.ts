@@ -8,7 +8,7 @@ import {
 describe("dynamic converter loading", () => {
   it("uses pinned jsDelivr ESM URLs", () => {
     expect(getConverterCdnUrl("circuit-json-to-gerber")).toBe(
-      "https://cdn.jsdelivr.net/npm/circuit-json-to-gerber@0.0.55/+esm",
+      "https://cdn.jsdelivr.net/npm/circuit-json-to-gerber@0.0.56/+esm",
     )
     expect(getConverterCdnUrl("circuit-json-to-bom-csv")).toBe(
       "https://cdn.jsdelivr.net/npm/circuit-json-to-bom-csv@0.0.8/+esm",

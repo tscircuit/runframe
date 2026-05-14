@@ -25,6 +25,14 @@ type RunnableStringConverter = new (
   getOutputString: () => string
 }
 
+type KicadPcbConverter = new (
+  ...args: any[]
+) => {
+  runUntilFinished: () => void
+  getOutputString: () => string
+  getModel3dSourcePaths: () => string[]
+}
+
 type KicadLibraryConverter = new (
   ...args: any[]
 ) => {
@@ -42,10 +50,11 @@ type KicadLibraryConverter = new (
 }
 
 type KicadConverterModule = {
-  CircuitJsonToKicadPcbConverter: RunnableStringConverter
+  CircuitJsonToKicadPcbConverter: KicadPcbConverter
   CircuitJsonToKicadSchConverter: RunnableStringConverter
   CircuitJsonToKicadProConverter: RunnableStringConverter
   CircuitJsonToKicadLibraryConverter: KicadLibraryConverter
+  resolveAndLoadKicad3dModelFiles: (...args: any[]) => Promise<void>
 }
 
 type GltfConverterModule = {
@@ -76,7 +85,7 @@ export type ConverterPackageName = keyof ConverterModules
 
 const CONVERTER_CDN_URLS: Record<ConverterPackageName, string> = {
   "circuit-json-to-gerber":
-    "https://cdn.jsdelivr.net/npm/circuit-json-to-gerber@0.0.55/+esm",
+    "https://cdn.jsdelivr.net/npm/circuit-json-to-gerber@0.0.56/+esm",
   "circuit-json-to-bom-csv":
     "https://cdn.jsdelivr.net/npm/circuit-json-to-bom-csv@0.0.8/+esm",
   "circuit-json-to-pnp-csv":

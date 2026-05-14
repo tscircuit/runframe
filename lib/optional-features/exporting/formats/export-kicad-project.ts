@@ -14,12 +14,16 @@ export const createKicadProjectZip = async ({
     CircuitJsonToKicadPcbConverter,
     CircuitJsonToKicadSchConverter,
     CircuitJsonToKicadProConverter,
+    resolveAndLoadKicad3dModelFiles,
   } = await loadKicadConverter()
   const schConverter = new CircuitJsonToKicadSchConverter(circuitJson as any)
   schConverter.runUntilFinished()
   const schContent = schConverter.getOutputString()
 
-  const pcbConverter = new CircuitJsonToKicadPcbConverter(circuitJson as any)
+  const pcbConverter = new CircuitJsonToKicadPcbConverter(circuitJson as any, {
+    includeBuiltin3dModels: true,
+    projectName,
+  })
   pcbConverter.runUntilFinished()
   const pcbContent = pcbConverter.getOutputString()
 
@@ -36,6 +40,24 @@ export const createKicadProjectZip = async ({
   zip.file(`${projectName}.kicad_sch`, schContent)
   zip.file(`${projectName}.kicad_pcb`, pcbContent)
   zip.file(`${projectName}.kicad_pro`, proContent)
+
+  await resolveAndLoadKicad3dModelFiles({
+    projectName,
+    model3dSourcePaths: pcbConverter.getModel3dSourcePaths(),
+    fetch,
+    onModelFile: ({
+      outputPath,
+      content,
+    }: {
+      outputPath: string
+      content: Parameters<typeof zip.file>[1]
+    }) => {
+      zip.file(outputPath, content)
+    },
+    onError: ({ sourcePath }: { sourcePath: string }) => {
+      console.warn(`Failed to load 3D model from ${sourcePath}`)
+    },
+  })
 
   return zip
 }

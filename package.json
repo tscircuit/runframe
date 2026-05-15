@@ -2,7 +2,7 @@
   "name": "@tscircuit/runframe",
   "main": "dist/preview.js",
   "type": "module",
-  "version": "0.0.1966",
+  "version": "0.0.1967",
   "exports": {
     ".": "./dist/preview.js",
     "./preview": "./dist/preview.js",
@@ -107,7 +107,7 @@
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "@tscircuit/eval": "^0.0.847",
+    "@tscircuit/eval": "^0.0.848",
     "@tscircuit/solver-utils": "^0.0.7"
   }
 }

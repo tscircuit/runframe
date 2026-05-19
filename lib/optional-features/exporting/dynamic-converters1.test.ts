@@ -4,7 +4,7 @@ import { getConverterCdnUrl } from "./dynamic-converters"
 describe("dynamic converter URLs", () => {
   it("uses pinned jsDelivr ESM URLs", () => {
     expect(getConverterCdnUrl("circuit-json-to-gerber")).toBe(
-      "https://cdn.jsdelivr.net/npm/circuit-json-to-gerber@0.0.63/+esm",
+      "https://cdn.jsdelivr.net/npm/circuit-json-to-gerber@0.0.64/+esm",
     )
     expect(getConverterCdnUrl("circuit-json-to-bom-csv")).toBe(
       "https://cdn.jsdelivr.net/npm/circuit-json-to-bom-csv@0.0.8/+esm",

@@ -8,7 +8,7 @@ import { cn } from "lib/utils"
 import { CadViewer } from "@tscircuit/3d-viewer"
 import { useCallback, useEffect, useState, useMemo } from "react"
 import { ErrorFallback } from "../ErrorFallback"
-import { ErrorBoundary } from "react-error-boundary"
+import { ErrorBoundary, type FallbackProps } from "react-error-boundary"
 import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
 import { SchematicViewer } from "@tscircuit/schematic-viewer"
 import { AssemblyViewer, PinoutViewer } from "@tscircuit/assembly-viewer"
@@ -75,6 +75,9 @@ const dropdownMenuItems = [
 ]
 
 export type { PreviewContentProps, TabId, SolverStartedEvent }
+
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : "An unknown error occurred"
 
 export const CircuitJsonPreview = ({
   code,
@@ -512,14 +515,14 @@ export const CircuitJsonPreview = ({
                 )}
               >
                 <ErrorBoundary
-                  fallbackRender={({ error }: { error: Error }) => (
+                  fallbackRender={({ error }: FallbackProps) => (
                     <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200">
                       <div className="rf-p-4">
                         <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-3">
                           Error loading PCB viewer
                         </h3>
                         <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600 rf-mt-2">
-                          {error?.message || "An unknown error occurred"}
+                          {getErrorMessage(error)}
                         </p>
                       </div>
                     </div>
@@ -631,14 +634,14 @@ export const CircuitJsonPreview = ({
                 )}
               >
                 <ErrorBoundary
-                  fallbackRender={({ error }: { error: Error }) => (
+                  fallbackRender={({ error }: FallbackProps) => (
                     <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200">
                       <div className="rf-p-4">
                         <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-3">
                           Error loading Schematic
                         </h3>
                         <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600 rf-mt-2">
-                          {error?.message || "An unknown error occurred"}
+                          {getErrorMessage(error)}
                         </p>
                       </div>
                     </div>
@@ -738,14 +741,14 @@ export const CircuitJsonPreview = ({
                 )}
               >
                 <ErrorBoundary
-                  fallbackRender={({ error }: { error: Error }) => (
+                  fallbackRender={({ error }: FallbackProps) => (
                     <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200">
                       <div className="rf-p-4">
                         <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-3">
                           Error loading Bill of Materials
                         </h3>
                         <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600 rf-mt-2">
-                          {error?.message || "An unknown error occurred"}
+                          {getErrorMessage(error)}
                         </p>
                       </div>
                     </div>

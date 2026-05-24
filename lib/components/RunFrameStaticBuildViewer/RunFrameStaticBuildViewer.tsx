@@ -5,7 +5,7 @@ import { useStyles } from "../../hooks/use-styles"
 import type { CircuitJson } from "circuit-json"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 import { guessEntrypoint } from "lib/runner"
-import { ErrorBoundary } from "react-error-boundary"
+import { ErrorBoundary, type FallbackProps } from "react-error-boundary"
 import type { TabId } from "../CircuitJsonPreview/PreviewContentProps"
 
 export interface CircuitJsonFileReference {
@@ -25,6 +25,9 @@ export interface RunFrameStaticBuildViewerProps {
   showFileMenu?: boolean
   tabSelected?: TabId
 }
+
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : "An unknown error occurred"
 
 export const RunFrameStaticBuildViewer = (
   props: RunFrameStaticBuildViewerProps,
@@ -180,14 +183,14 @@ export const RunFrameStaticBuildViewer = (
 
   return (
     <ErrorBoundary
-      fallbackRender={({ error }: { error: Error }) => (
+      fallbackRender={({ error }: FallbackProps) => (
         <div className="rf-mt-4 rf-mx-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200">
           <div className="rf-p-4">
             <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-3">
               Error loading Circuit JSON Preview
             </h3>
             <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600 rf-mt-2">
-              {error.message}
+              {getErrorMessage(error)}
             </p>
           </div>
         </div>

@@ -2,7 +2,7 @@ import React from "react"
 import { Button } from "./ui/button"
 
 interface ErrorFallbackProps {
-  error: Error
+  error: unknown
   resetErrorBoundary?: () => void
 }
 
@@ -10,6 +10,9 @@ export const ErrorFallback = ({
   error,
   resetErrorBoundary,
 }: ErrorFallbackProps) => {
+  const resolvedError =
+    error instanceof Error ? error : new Error(String(error))
+
   return (
     <div
       data-testid="error-container"
@@ -20,13 +23,13 @@ export const ErrorFallback = ({
           Error Loading 3D Viewer
         </h2>
         <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-700">
-          {error.message}
+          {resolvedError.message}
         </p>
         <details
           style={{ whiteSpace: "pre-wrap" }}
           className="rf-text-xs rf-font-mono rf-text-red-600 rf-mt-2"
         >
-          {error.stack}
+          {resolvedError.stack}
         </details>
         {resetErrorBoundary && (
           <div className="rf-mt-4">

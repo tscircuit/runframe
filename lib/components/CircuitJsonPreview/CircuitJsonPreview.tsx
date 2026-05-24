@@ -46,6 +46,7 @@ import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { SolversTabContent } from "../SolversTabContent/SolversTabContent"
 import { capitalizeFirstLetters } from "lib/utils"
 import { useErrorTelemetry } from "lib/hooks/use-error-telemetry"
+import { usePostHogActivity } from "lib/hooks/use-posthog-activity"
 import type {
   PreviewContentProps,
   TabId,
@@ -126,6 +127,12 @@ export const CircuitJsonPreview = ({
   onPcbBoundsSelected,
 }: PreviewContentProps) => {
   useStyles()
+  usePostHogActivity({
+    source: "circuit_json_viewer",
+    component: "CircuitJsonPreview",
+    isWebEmbedded,
+    defaultActiveTab: defaultActiveTab ?? defaultTab,
+  })
 
   const {
     versions: evalVersions,

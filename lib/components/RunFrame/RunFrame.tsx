@@ -43,6 +43,7 @@ import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 import { LoadingSkeleton } from "../ui/LoadingSkeleton"
 import { useStyles } from "../../hooks/use-styles"
 import { useCircuitJsonFile } from "../../hooks/use-circuit-json-file"
+import { usePostHogActivity } from "../../hooks/use-posthog-activity"
 import { API_BASE } from "../RunFrameWithApi/api-base"
 import {
   buildRunCompletedPayload,
@@ -95,6 +96,13 @@ export type { RunFrameProps }
 
 export const RunFrame = (props: RunFrameProps) => {
   useStyles()
+  usePostHogActivity({
+    source: "runframe",
+    sessionToken: props.tscircuitSessionToken,
+    component: "RunFrame",
+    isWebEmbedded: props.isWebEmbedded,
+    defaultActiveTab: props.defaultActiveTab ?? props.defaultTab,
+  })
 
   const circuitJson = useRunFrameStore((s) => s.circuitJson)
   const setCircuitJson = useRunFrameStore((s) => s.setCircuitJson)

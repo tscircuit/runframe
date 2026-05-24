@@ -46,6 +46,7 @@ import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { SolversTabContent } from "../SolversTabContent/SolversTabContent"
 import { capitalizeFirstLetters } from "lib/utils"
 import { useErrorTelemetry } from "lib/hooks/use-error-telemetry"
+import { usePostHogActivity } from "lib/hooks/use-posthog-activity"
 import type {
   PreviewContentProps,
   TabId,
@@ -171,6 +172,12 @@ export const CircuitJsonPreview = ({
     defaultActiveTab ?? fallbackTab,
     defaultActiveTab,
   )
+  usePostHogActivity({
+    source: "runframe",
+    component: "CircuitJsonPreview",
+    isWebEmbedded,
+    activeTab,
+  })
   const [lastActiveTab, setLastActiveTab] = useState<TabId | null>(null)
   const [isFullScreen, setIsFullScreen] = useState(defaultToFullScreen)
 

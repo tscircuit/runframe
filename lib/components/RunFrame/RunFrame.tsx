@@ -43,6 +43,7 @@ import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 import { LoadingSkeleton } from "../ui/LoadingSkeleton"
 import { useStyles } from "../../hooks/use-styles"
 import { useCircuitJsonFile } from "../../hooks/use-circuit-json-file"
+import { usePostHogActivity } from "../../hooks/use-posthog-activity"
 import { API_BASE } from "../RunFrameWithApi/api-base"
 import {
   buildRunCompletedPayload,
@@ -208,6 +209,12 @@ export const RunFrame = (props: RunFrameProps) => {
   const [activeTab, setActiveTab] = useState<TabId>(
     props.defaultActiveTab ?? props.defaultTab ?? "pcb",
   )
+  usePostHogActivity({
+    source: "runframe",
+    component: "RunFrame",
+    isWebEmbedded: props.isWebEmbedded,
+    activeTab,
+  })
   useEffect(() => {
     if (props.debug) Debug.enable("run-frame*")
   }, [props.debug])

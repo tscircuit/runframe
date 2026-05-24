@@ -1,15 +1,14 @@
 import { AlertTriangle } from "lucide-react"
 import { Button } from "../ui/button"
-
-interface RunFrameErrorFallbackProps {
-  error: Error
-  resetErrorBoundary: () => void
-}
+import type { FallbackProps } from "react-error-boundary"
 
 export const RunFrameErrorFallback = ({
   error,
   resetErrorBoundary,
-}: RunFrameErrorFallbackProps) => {
+}: FallbackProps) => {
+  const resolvedError =
+    error instanceof Error ? error : new Error(String(error))
+
   return (
     <section className="rf-h-full rf-w-full rf-grid rf-place-items-center">
       <div className="rf-min-h-full rf-flex rf-items-center rf-justify-center rf-px-4">
@@ -25,15 +24,15 @@ export const RunFrameErrorFallback = ({
               RunFrame encountered an unexpected error.
             </p>
             <pre className="rf-text-xs no-scrollbar rf-font-mono rf-text-left rf-whitespace-pre-wrap rf-text-red-600 rf-bg-red-50 rf-border rf-border-red-200 rf-p-3 rf-rounded-lg rf-mb-4 rf-overflow-auto rf-max-h-[120px]">
-              {error.message}
+              {resolvedError.message}
             </pre>
-            {error.stack && (
+            {resolvedError.stack && (
               <details className="rf-text-center rf-mb-6">
                 <summary className="rf-text-xs rf-text-gray-500 rf-cursor-pointer hover:rf-text-gray-700">
                   View stack trace
                 </summary>
                 <pre className="rf-text-xs rf-font-mono no-scrollbar rf-whitespace-pre-wrap rf-text-gray-500 rf-bg-gray-100 rf-p-3 rf-rounded-lg rf-mt-2 rf-overflow-auto rf-text-left rf-max-h-[150px]">
-                  {error.stack}
+                  {resolvedError.stack}
                 </pre>
               </details>
             )}

@@ -13,9 +13,8 @@ export const usePostHogActivity = (properties: RunFrameActivityProperties) => {
     }
   }, [
     properties.source,
-    properties.sessionToken,
     properties.component,
     properties.isWebEmbedded,
-    properties.defaultActiveTab,
+    properties.activeTab,
   ])
 }

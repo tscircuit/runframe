@@ -96,13 +96,6 @@ export type { RunFrameProps }
 
 export const RunFrame = (props: RunFrameProps) => {
   useStyles()
-  usePostHogActivity({
-    source: "runframe",
-    sessionToken: props.tscircuitSessionToken,
-    component: "RunFrame",
-    isWebEmbedded: props.isWebEmbedded,
-    defaultActiveTab: props.defaultActiveTab ?? props.defaultTab,
-  })
 
   const circuitJson = useRunFrameStore((s) => s.circuitJson)
   const setCircuitJson = useRunFrameStore((s) => s.setCircuitJson)
@@ -216,6 +209,12 @@ export const RunFrame = (props: RunFrameProps) => {
   const [activeTab, setActiveTab] = useState<TabId>(
     props.defaultActiveTab ?? props.defaultTab ?? "pcb",
   )
+  usePostHogActivity({
+    source: "runframe",
+    component: "RunFrame",
+    isWebEmbedded: props.isWebEmbedded,
+    activeTab,
+  })
   useEffect(() => {
     if (props.debug) Debug.enable("run-frame*")
   }, [props.debug])

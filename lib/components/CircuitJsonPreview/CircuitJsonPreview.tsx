@@ -127,12 +127,6 @@ export const CircuitJsonPreview = ({
   onPcbBoundsSelected,
 }: PreviewContentProps) => {
   useStyles()
-  usePostHogActivity({
-    source: "circuit_json_viewer",
-    component: "CircuitJsonPreview",
-    isWebEmbedded,
-    defaultActiveTab: defaultActiveTab ?? defaultTab,
-  })
 
   const {
     versions: evalVersions,
@@ -178,6 +172,12 @@ export const CircuitJsonPreview = ({
     defaultActiveTab ?? fallbackTab,
     defaultActiveTab,
   )
+  usePostHogActivity({
+    source: "runframe",
+    component: "CircuitJsonPreview",
+    isWebEmbedded,
+    activeTab,
+  })
   const [lastActiveTab, setLastActiveTab] = useState<TabId | null>(null)
   const [isFullScreen, setIsFullScreen] = useState(defaultToFullScreen)
 

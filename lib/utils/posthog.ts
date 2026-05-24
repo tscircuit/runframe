@@ -56,34 +56,6 @@ export const getRunFrameAnonymousId = () => {
   }
 }
 
-const decodeJwtPayload = (token: string): Record<string, unknown> | null => {
-  const payload = token.split(".")[1]
-  if (!payload) return null
-
-  try {
-    const normalizedPayload = payload.replace(/-/g, "+").replace(/_/g, "/")
-    const paddedPayload = normalizedPayload.padEnd(
-      Math.ceil(normalizedPayload.length / 4) * 4,
-      "=",
-    )
-    return JSON.parse(atob(paddedPayload))
-  } catch {
-    return null
-  }
-}
-
-export const getAccountIdFromSessionToken = (sessionToken?: string | null) => {
-  if (!sessionToken) return null
-
-  const payload = decodeJwtPayload(sessionToken)
-  const accountId = payload?.account_id ?? payload?.accountId
-
-  if (typeof accountId !== "string") return null
-  if (!accountId.trim()) return null
-
-  return accountId
-}
-
 const shouldTrackOnLocalhost = () =>
   getWindowVar("TSCIRCUIT_USE_RUNFRAME_FOR_CLI") === true
 
@@ -104,30 +76,25 @@ export const initPostHog = () => {
 
 export interface RunFrameActivityProperties {
   source: "runframe" | "circuit_json_viewer"
-  sessionToken?: string | null
   component?: string
   isWebEmbedded?: boolean
-  defaultActiveTab?: string
+  activeTab?: string
 }
 
-const getRunFrameIdentity = (sessionToken?: string | null) => {
+const getRunFrameIdentity = () => {
   if (!initPostHog()) return null
 
-  const accountId = getAccountIdFromSessionToken(sessionToken)
   const embedDomain = getRunFrameEmbedDomain()
   const shouldUseDomainIdentity =
     embedDomain != null && !isLocalHost(embedDomain)
   let anonymousId = null
-  if (!accountId && !shouldUseDomainIdentity) {
+  if (!shouldUseDomainIdentity) {
     anonymousId = getRunFrameAnonymousId()
   }
   let distinctId: string | undefined
-  let identityType: "account_id" | "domain" | "anonymous_id"
+  let identityType: "domain" | "anonymous_id"
 
-  if (accountId) {
-    distinctId = `account:${accountId}`
-    identityType = "account_id"
-  } else if (shouldUseDomainIdentity) {
+  if (shouldUseDomainIdentity) {
     distinctId = `domain:${embedDomain}`
     identityType = "domain"
   } else {
@@ -139,7 +106,6 @@ const getRunFrameIdentity = (sessionToken?: string | null) => {
   }
 
   return {
-    accountId,
     embedDomain,
     anonymousId,
     distinctId,
@@ -149,19 +115,15 @@ const getRunFrameIdentity = (sessionToken?: string | null) => {
 
 export const captureRunFrameTelemetry = (
   eventName: string,
-  { source, sessionToken, ...properties }: RunFrameActivityProperties,
+  { source, ...properties }: RunFrameActivityProperties,
 ) => {
-  const identity = getRunFrameIdentity(sessionToken)
+  const identity = getRunFrameIdentity()
   if (!identity) return
 
-  const { accountId, embedDomain, anonymousId, distinctId, identityType } =
-    identity
+  const { embedDomain, anonymousId, distinctId, identityType } = identity
 
   if (distinctId) {
     const personProperties: Record<string, string> = {}
-    if (accountId) {
-      personProperties.account_id = accountId
-    }
     if (identityType === "domain" && embedDomain) {
       personProperties.embed_domain = embedDomain
     }
@@ -175,7 +137,6 @@ export const captureRunFrameTelemetry = (
   posthog.capture(eventName, {
     ...properties,
     source,
-    account_id: accountId,
     embed_domain: embedDomain,
     runframe_anonymous_id: anonymousId,
     identity_type: identityType,

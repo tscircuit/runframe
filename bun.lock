@@ -42,7 +42,7 @@
         "chokidar-cli": "^3.0.0",
         "circuit-json-to-bom-csv": "^0.0.8",
         "circuit-json-to-gerber": "^0.0.75",
-        "circuit-json-to-kicad": "^0.0.142",
+        "circuit-json-to-kicad": "^0.0.143",
         "circuit-json-to-lbrn": "^0.0.74",
         "circuit-json-to-pnp-csv": "^0.0.7",
         "circuit-json-to-step": "^0.0.28",
@@ -847,7 +847,7 @@
 
     "circuit-json-to-gltf": ["circuit-json-to-gltf@0.0.100", "", { "dependencies": { "@jscad/modeling": "^2.12.6", "earcut": "^3.0.2", "jscad-electronics": "^0.0.129", "jscad-to-gltf": "^0.0.5", "occt-import-js": "^0.0.23" }, "peerDependencies": { "@resvg/resvg-js": "2", "@resvg/resvg-wasm": "2", "@tscircuit/circuit-json-util": "*", "circuit-json": "*", "circuit-to-svg": "*", "typescript": "^5" }, "optionalPeers": ["@resvg/resvg-js", "@resvg/resvg-wasm"] }, "sha512-exyLOQOONmAp7xrahPb811a/kHIWconlG6pTbnFxh4xYD9wZaNP4MU3Shfs79aVa8IDQ1nKI5ilfrZ8CrzUcEA=="],
 
-    "circuit-json-to-kicad": ["circuit-json-to-kicad@0.0.142", "", { "peerDependencies": { "typescript": "^5" } }, "sha512-YlUg0Yh3nmAFwwrnvYp9OIUQ5xDqACYsH+gvSJsiqxCk0jmFb1i02LtBW72PyX4KeMytSZH3HQDSKiBo8B/GaA=="],
+    "circuit-json-to-kicad": ["circuit-json-to-kicad@0.0.143", "", { "peerDependencies": { "typescript": "^5" } }, "sha512-SEqLxE1xmtqgYklACFZNym6LMtYxSSWrL96yGTyQlpSlH2wDuDq7HumUvgxSMzSvhivQ6gzoOZP+rcsgQSPI8g=="],
 
     "circuit-json-to-lbrn": ["circuit-json-to-lbrn@0.0.74", "", { "dependencies": { "lbrnts": "^0.0.18", "manifold-3d": "^3.3.2" }, "peerDependencies": { "typescript": "^5" } }, "sha512-MVdlgj+TYHrTdcE2IN7yk6rkULJ02owAr9zeZg9UeypfrdjNNAjBvhz3Ue24FDGjSmvQdmjiafbUKAOapslxZQ=="],
 

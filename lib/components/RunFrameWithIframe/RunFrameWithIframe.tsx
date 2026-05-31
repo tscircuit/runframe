@@ -4,6 +4,7 @@
  */
 import { useEffect, useRef } from "react"
 import type { RunFrameProps } from "../RunFrame/RunFrameProps"
+import { resolveIframeTargetOrigin } from "lib/utils/resolve-iframe-target-origin"
 
 export interface RunFrameWithIframeProps extends RunFrameProps {
   iframeUrl?: string
@@ -16,14 +17,23 @@ export const RunFrameWithIframe = ({
   const iframeRef = useRef<HTMLIFrameElement>(null)
 
   useEffect(() => {
+    const targetOrigin = resolveIframeTargetOrigin(
+      iframeUrl,
+      window.location.href,
+    )
+
     const handleMessage = (event: MessageEvent) => {
+      // Only respond to the ready signal coming from our own iframe, and never
+      // broadcast the props to an unknown origin.
+      if (event.source !== iframeRef.current?.contentWindow) return
+      if (!targetOrigin) return
       if (event.data?.runframe_type === "runframe_ready_to_receive") {
         iframeRef.current?.contentWindow?.postMessage(
           {
             runframe_type: "runframe_props_changed",
             runframe_props: runFrameProps,
           },
-          "*",
+          targetOrigin,
         )
       }
     }

@@ -541,6 +541,8 @@ export const RunFrame = (props: RunFrameProps) => {
     }
     if (event.in_progress) {
       lastEditEventRef.current = event
+      // Emit event immediately even if in progress to support real-time rendering
+      props.onEditEvent?.(event)
       if (dragTimeout.current) {
         clearTimeout(dragTimeout.current)
         dragTimeout.current = null

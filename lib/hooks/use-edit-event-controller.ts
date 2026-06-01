@@ -74,13 +74,19 @@ export const useEditEventController = () => {
   }, [])
 
   useEffect(() => {
-    if (editEvents.filter((ee) => !ee._applied).length === 0) return
-    const timeout = setTimeout(() => {
-      markAllEditEventsApplied()
-      applyEditEventsAndUpdateManualEditsJson(
-        editEvents, //.filter((ee) => !ee._applied),
-      )
-    }, 1000)
+    const unappliedEvents = editEvents.filter((ee) => !ee._applied)
+    if (unappliedEvents.length === 0) return
+
+    // Immediately apply events if any are in progress or if we want real-time updates
+    const hasInProgress = unappliedEvents.some((ee) => ee.in_progress)
+
+    const timeout = setTimeout(
+      () => {
+        markAllEditEventsApplied()
+        applyEditEventsAndUpdateManualEditsJson(editEvents)
+      },
+      hasInProgress ? 10 : 1000,
+    )
 
     return () => clearTimeout(timeout)
   }, [editEvents])

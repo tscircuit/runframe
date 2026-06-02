@@ -1,14 +1,22 @@
 import type { AnyCircuitElement } from "circuit-json"
-import type { convertCircuitJsonToBomRows } from "circuit-json-to-bom-csv"
 import type React from "react"
 
 export interface BomTableProps {
   circuitJson: AnyCircuitElement[]
 }
 
-export type BomRow = Awaited<
-  ReturnType<typeof convertCircuitJsonToBomRows>
->[number]
+export type BomRow = {
+  designator?: string
+  comment?: string
+  value?: string
+  footprint?: string
+  supplier_part_number_columns?: Record<string, string>
+  extra_columns?: Record<string, string>
+  manufacturer_mpn_pairs?: Array<{
+    manufacturer: string
+    mpn: string
+  }>
+}
 
 export type BomMetadata = {
   extraColumnNames: string[]

@@ -23,6 +23,7 @@ type RunnableStringConverter = new (
 ) => {
   runUntilFinished: () => void
   getOutputString: () => string
+  getModel3dSourcePaths: () => string[]
 }
 
 type KicadLibraryConverter = new (
@@ -46,6 +47,13 @@ type KicadConverterModule = {
   CircuitJsonToKicadSchConverter: RunnableStringConverter
   CircuitJsonToKicadProConverter: RunnableStringConverter
   CircuitJsonToKicadLibraryConverter: KicadLibraryConverter
+  resolveAndLoadKicad3dModelFiles: (args: {
+    projectName: string
+    model3dSourcePaths: string[]
+    fetch: typeof fetch
+    onModelFile: (args: { outputPath: string; content: any }) => void
+    onError: (args: { sourcePath: string }) => void
+  }) => Promise<void>
 }
 
 type GltfConverterModule = {

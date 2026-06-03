@@ -8,7 +8,8 @@ const SwitchCircuitElement = (
   <board schMaxTraceDistance={10} routingDisabled>
     <voltagesource name="V1" voltage="5V" />
     <resistor name="R_base" resistance="10k" schY={2} />
-    <switch name="SW1" simSwitchFrequency="1kHz" schX={1.5} schY={2} />
+    {/* @ts-expect-error */}
+    <switch name="SW1" schX={1.5} schY={2} />
     <transistor
       name="Q1"
       type="npn"

@@ -21,6 +21,7 @@ const debug = Debug("run-frame:RunFrame")
 
 declare global {
   var runFrameWorker: any
+  var runFrameWorkerConfigCacheKey: string | undefined
   interface Window {
     TSCIRCUIT_USE_RUNFRAME_FOR_CLI?: boolean
   }
@@ -44,7 +45,6 @@ import { LoadingSkeleton } from "../ui/LoadingSkeleton"
 import { useStyles } from "../../hooks/use-styles"
 import { useCircuitJsonFile } from "../../hooks/use-circuit-json-file"
 import { usePostHogActivity } from "../../hooks/use-posthog-activity"
-import { API_BASE } from "../RunFrameWithApi/api-base"
 import {
   buildRunCompletedPayload,
   type RunCompletedPayload,
@@ -55,6 +55,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip"
+import {
+  createRunFrameWorkerConfig,
+  getRunFrameWorkerConfigCacheKey,
+} from "./create-run-frame-worker-config"
 
 const fetchLatestEvalVersion = async () => {
   try {
@@ -153,38 +157,35 @@ export const RunFrame = (props: RunFrameProps) => {
     let cancelled = false
     const load = async () => {
       try {
-        if (!globalThis.runFrameWorker) {
-          const evalVersion = await resolveEvalVersion(
-            props.evalVersion,
-            props.forceLatestEvalVersion,
-          )
+        const evalVersion = await resolveEvalVersion(
+          props.evalVersion,
+          props.forceLatestEvalVersion,
+        )
+        const workerConfigOpts = {
+          evalVersion,
+          useRunFrameForCli: window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI,
+        }
+        const workerConfigCacheKey = getRunFrameWorkerConfigCacheKey(
+          props,
+          workerConfigOpts,
+        )
 
-          const worker = await createCircuitWebWorker({
-            evalVersion,
-            webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
-            projectConfig: {
-              projectBaseUrl:
-                props.projectBaseUrl || `${API_BASE}/files/static`,
-            },
-            ...(props.platformConfig && {
-              platformConfig: props.platformConfig,
-            }),
-            verbose: true,
-            ...(props.enableFetchProxy && {
-              enableFetchProxy: props.enableFetchProxy,
-            }),
-            ...(window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI && {
-              disableCdnLoading: true,
-            }),
-            ...(props.tscircuitSessionToken && {
-              tscircuitSessionToken: props.tscircuitSessionToken,
-            }),
-            ...(props.easyEdaProxyConfig && {
-              easyEdaProxyConfig: props.easyEdaProxyConfig,
-            }),
-          })
+        if (
+          globalThis.runFrameWorker &&
+          globalThis.runFrameWorkerConfigCacheKey !== workerConfigCacheKey
+        ) {
+          await globalThis.runFrameWorker.kill?.()
+          globalThis.runFrameWorker = undefined
+          globalThis.runFrameWorkerConfigCacheKey = undefined
+        }
+
+        if (!globalThis.runFrameWorker) {
+          const worker = await createCircuitWebWorker(
+            createRunFrameWorkerConfig(props, workerConfigOpts),
+          )
           if (cancelled) return
           globalThis.runFrameWorker = worker
+          globalThis.runFrameWorkerConfigCacheKey = workerConfigCacheKey
           setLastRunEvalVersion(evalVersion)
         }
         if (!cancelled) setDependenciesLoaded(true)
@@ -200,7 +201,11 @@ export const RunFrame = (props: RunFrameProps) => {
     props.evalVersion,
     props.evalWebWorkerBlobUrl,
     props.forceLatestEvalVersion,
+    props.platformConfig,
+    props.projectBaseUrl,
+    props.enableFetchProxy,
     props.tscircuitSessionToken,
+    props.easyEdaProxyConfig,
   ])
 
   const [renderLog, setRenderLog] = useState<RenderLog | null>(null)
@@ -315,33 +320,31 @@ export const RunFrame = (props: RunFrameProps) => {
         !globalThis.runFrameWorker && props.forceLatestEvalVersion,
       )
       debug("resolvedEvalVersion", resolvedEvalVersion)
+      const workerConfigOpts = {
+        evalVersion: resolvedEvalVersion,
+        useRunFrameForCli: window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI,
+      }
+      const workerConfigCacheKey = getRunFrameWorkerConfigCacheKey(
+        props,
+        workerConfigOpts,
+      )
+
+      if (
+        globalThis.runFrameWorker &&
+        globalThis.runFrameWorkerConfigCacheKey !== workerConfigCacheKey
+      ) {
+        await globalThis.runFrameWorker.kill?.()
+        globalThis.runFrameWorker = undefined
+        globalThis.runFrameWorkerConfigCacheKey = undefined
+      }
 
       const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
         globalThis.runFrameWorker ??
-        (await createCircuitWebWorker({
-          evalVersion: resolvedEvalVersion,
-          webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
-          verbose: true,
-          projectConfig: {
-            projectBaseUrl: props.projectBaseUrl || `${API_BASE}/files/static`,
-          },
-          ...(props.platformConfig && {
-            platformConfig: props.platformConfig,
-          }),
-          ...(props.enableFetchProxy && {
-            enableFetchProxy: props.enableFetchProxy,
-          }),
-          ...(window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI && {
-            disableCdnLoading: true,
-          }),
-          ...(props.tscircuitSessionToken && {
-            tscircuitSessionToken: props.tscircuitSessionToken,
-          }),
-          ...(props.easyEdaProxyConfig && {
-            easyEdaProxyConfig: props.easyEdaProxyConfig,
-          }),
-        }))
+        (await createCircuitWebWorker(
+          createRunFrameWorkerConfig(props, workerConfigOpts),
+        ))
       globalThis.runFrameWorker = worker
+      globalThis.runFrameWorkerConfigCacheKey = workerConfigCacheKey
       setLastRunEvalVersion(resolvedEvalVersion)
 
       // Enable debug mode if a debug option is set
@@ -523,6 +526,13 @@ export const RunFrame = (props: RunFrameProps) => {
     props.entrypoint,
     runCountTrigger,
     props.evalVersion,
+    props.evalWebWorkerBlobUrl,
+    props.forceLatestEvalVersion,
+    props.platformConfig,
+    props.projectBaseUrl,
+    props.enableFetchProxy,
+    props.tscircuitSessionToken,
+    props.easyEdaProxyConfig,
     props.mainComponentPath,
     props.isLoadingFiles,
     currentDebugOption,

@@ -1,5 +1,5 @@
 import { applyEditEventsToManualEditsFile } from "@tscircuit/core"
-import type { ManualEditsFile } from "@tscircuit/props"
+import type { ManualEditsFile, PlatformConfig } from "@tscircuit/props"
 import Debug from "debug"
 import { useEditEventController } from "lib/hooks/use-edit-event-controller"
 import { useHasReceivedInitialFilesLoaded } from "lib/hooks/use-has-received-initial-files-loaded"
@@ -103,6 +103,17 @@ export interface RunFrameWithApiProps {
   fileFilter?: (filename: string) => boolean
 
   /**
+   * Platform config passed to the eval worker.
+   */
+  platformConfig?: PlatformConfig
+
+  /**
+   * Async loader for platform config. Useful for CLI/dev-server integrations
+   * that need to keep function-valued config on the server.
+   */
+  loadPlatformConfig?: () => Promise<PlatformConfig | null | undefined>
+
+  /**
    * Called when an action requires authentication (e.g. reporting autorouting bugs)
    */
   onLoginRequired?: () => void
@@ -125,13 +136,59 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   const fsMap = useRunFrameStore((s) => s.fsMap)
   const recentlySavedFiles = useRunFrameStore((s) => s.recentlySavedFiles)
   const allFiles = useMemo(() => Array.from(fsMap.keys()), [fsMap])
+  const [loadedPlatformConfig, setLoadedPlatformConfig] = useState<
+    PlatformConfig | undefined
+  >(undefined)
+  const [isLoadingPlatformConfig, setIsLoadingPlatformConfig] = useState(
+    Boolean(props.loadPlatformConfig),
+  )
+  const [platformConfigError, setPlatformConfigError] = useState<Error | null>(
+    null,
+  )
+  const platformConfig = loadedPlatformConfig ?? props.platformConfig
+
+  useEffect(() => {
+    if (!props.loadPlatformConfig) {
+      setLoadedPlatformConfig(undefined)
+      setIsLoadingPlatformConfig(false)
+      setPlatformConfigError(null)
+      return
+    }
+
+    let cancelled = false
+    setIsLoadingPlatformConfig(true)
+    setPlatformConfigError(null)
+    props
+      .loadPlatformConfig()
+      .then((config) => {
+        if (cancelled) return
+        setLoadedPlatformConfig(config ?? undefined)
+      })
+      .catch((error) => {
+        if (cancelled) return
+        setPlatformConfigError(
+          error instanceof Error ? error : new Error(String(error)),
+        )
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingPlatformConfig(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [props.loadPlatformConfig])
+
   const projectConfigContent = useMemo(() => {
     const rawConfig = fsMap.get("tscircuit.config.json")
     return typeof rawConfig === "string" ? rawConfig : undefined
   }, [fsMap])
   const boardFiles = useMemo(
-    () => getBoardFilesFromConfig(allFiles, projectConfigContent),
-    [allFiles, projectConfigContent],
+    () =>
+      getBoardFilesFromConfig(allFiles, projectConfigContent, {
+        includeBoardFiles: platformConfig?.includeBoardFiles,
+      }),
+    [allFiles, projectConfigContent, platformConfig?.includeBoardFiles],
   )
   const circuitJson = useRunFrameStore((s) => s.circuitJson)
 
@@ -290,6 +347,22 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     [pushEvent],
   )
 
+  if (isLoadingPlatformConfig) {
+    return (
+      <div className="rf-flex rf-min-h-screen rf-items-center rf-justify-center rf-text-sm rf-text-slate-600">
+        Loading runtime config...
+      </div>
+    )
+  }
+
+  if (platformConfigError) {
+    return (
+      <div className="rf-flex rf-min-h-screen rf-items-center rf-justify-center rf-p-6 rf-text-sm rf-text-red-700">
+        Failed to load runtime config: {platformConfigError.message}
+      </div>
+    )
+  }
+
   return (
     <RunFrame
       fsMap={fsMap}
@@ -335,6 +408,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
         markRenderComplete()
       }}
       onRunCompleted={handleRunCompleted}
+      platformConfig={platformConfig}
       editEvents={editEventsForRender}
       onEditEvent={(ee) => {
         pushEditEvent(ee)

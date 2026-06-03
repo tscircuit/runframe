@@ -1,3 +1,4 @@
+import type { PlatformConfig } from "@tscircuit/props"
 import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { useCallback, useState } from "react"
 import { RunFrameWithApi } from "../RunFrameWithApi/RunFrameWithApi"
@@ -9,6 +10,8 @@ export const RunFrameForCli = (props: {
   scenarioSelectorContent?: React.ReactNode
   workerBlobUrl?: string
   enableFetchProxy?: boolean
+  platformConfig?: PlatformConfig
+  loadPlatformConfig?: () => Promise<PlatformConfig | null | undefined>
 }) => {
   const [shouldLoadLatestEval, setLoadLatestEval] = useLocalStorageState(
     "load-latest-eval",
@@ -46,6 +49,8 @@ export const RunFrameForCli = (props: {
         showFilesSwitch
         showFileMenu={false}
         enableFetchProxy={props.enableFetchProxy}
+        platformConfig={props.platformConfig}
+        loadPlatformConfig={props.loadPlatformConfig}
         initialMainComponentPath={initialMainComponentPath}
         onLoginRequired={openLoginDialog}
         onMainComponentPathChange={updateMainComponentHash}

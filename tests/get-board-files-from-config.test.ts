@@ -22,6 +22,24 @@ describe("getBoardFilesFromConfig", () => {
     ])
   })
 
+  test("prefers runtime includeBoardFiles over synced json config", () => {
+    const files = [
+      "json-config/main.board.tsx",
+      "runtime-config/main.board.tsx",
+      "src/fallback.tsx",
+    ]
+
+    const config = stringifyConfig({
+      includeBoardFiles: ["json-config/**/*.board.tsx"],
+    })
+
+    expect(
+      getBoardFilesFromConfig(files, config, {
+        includeBoardFiles: ["runtime-config/**/*.board.tsx"],
+      }),
+    ).toEqual(["runtime-config/main.board.tsx"])
+  })
+
   test("falls back to default file extensions when config is missing", () => {
     const files = [
       "src/board.tsx",

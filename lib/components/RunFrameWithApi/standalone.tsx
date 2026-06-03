@@ -6,6 +6,7 @@ import { RunFrameStaticBuildViewer } from "../RunFrameStaticBuildViewer/RunFrame
 import type { CircuitJsonFileReference } from "../RunFrameStaticBuildViewer/RunFrameStaticBuildViewer"
 import type { ComponentProps } from "react"
 import type { TabId } from "../CircuitJsonPreview/PreviewContentProps"
+import { loadPlatformConfigFromApi } from "./load-platform-config-from-api"
 
 declare global {
   interface Window {
@@ -13,6 +14,7 @@ declare global {
     TSCIRCUIT_RUNFRAME_STATIC_FILE_LIST?: CircuitJsonFileReference[]
     TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH?: string
     TSCIRCUIT_PACKAGE_NAME?: string
+    TSCIRCUIT_RUNTIME_CONFIG_API_URL?: string
   }
 }
 
@@ -94,6 +96,13 @@ const runframeStandaloneProps: ComponentProps<typeof RunFrameWithApi> = {
   const staticFileList = window.TSCIRCUIT_RUNFRAME_STATIC_FILE_LIST
   const defaultMainComponentPath = window.TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH
   const projectName = window.TSCIRCUIT_PACKAGE_NAME
+  const runtimeConfigApiUrl = window.TSCIRCUIT_RUNTIME_CONFIG_API_URL
+  const propsWithRuntimeConfig = {
+    ...runframeStandaloneProps,
+    ...(runtimeConfigApiUrl && {
+      loadPlatformConfig: () => loadPlatformConfigFromApi(runtimeConfigApiUrl),
+    }),
+  }
   if (Array.isArray(staticFileList)) {
     const tabSelected = parseTabFromHash()
     root.render(
@@ -105,13 +114,13 @@ const runframeStandaloneProps: ComponentProps<typeof RunFrameWithApi> = {
       />,
     )
   } else if (window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI) {
-    root.render(<RunFrameForCli {...runframeStandaloneProps} />)
+    root.render(<RunFrameForCli {...propsWithRuntimeConfig} />)
   } else {
     const { fsMap } = await loadScriptsAsFsMap()
     if (fsMap.size > 0) {
       root.render(<RunFrame {...runframeStandaloneProps} fsMap={fsMap} />)
     } else {
-      root.render(<RunFrameWithApi {...runframeStandaloneProps} />)
+      root.render(<RunFrameWithApi {...propsWithRuntimeConfig} />)
     }
   }
 })()

@@ -26,9 +26,14 @@ const parseProjectConfig = (configContent?: string): ProjectConfig | null => {
 export const getBoardFilesFromConfig = (
   files: string[],
   configContent?: string,
+  options: {
+    includeBoardFiles?: string[]
+  } = {},
 ): string[] => {
   const parsedConfig = parseProjectConfig(configContent)
-  const includeBoardFiles = parsedConfig?.includeBoardFiles?.filter(Boolean)
+  const includeBoardFiles =
+    options.includeBoardFiles?.filter(Boolean) ??
+    parsedConfig?.includeBoardFiles?.filter(Boolean)
 
   if (includeBoardFiles && includeBoardFiles.length > 0) {
     const matchers = includeBoardFiles.map(

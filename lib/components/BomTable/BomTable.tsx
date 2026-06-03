@@ -1,6 +1,6 @@
-import { convertCircuitJsonToBomRows } from "circuit-json-to-bom-csv"
 import { useEffect, useState } from "react"
 import type React from "react"
+import { loadBomCsvConverter } from "../../optional-features/exporting/dynamic-converters"
 import { getBomCellDescriptors, getBomMetadata } from "./bom-table.columns"
 import type { BomRow, BomTableProps } from "./bom-table.types"
 
@@ -16,6 +16,7 @@ export const BomTable: React.FC<BomTableProps> = ({ circuitJson }) => {
         setError(null)
         setRows(null)
 
+        const { convertCircuitJsonToBomRows } = await loadBomCsvConverter()
         const bomRows = await convertCircuitJsonToBomRows({
           circuitJson,
         })

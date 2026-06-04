@@ -13,6 +13,7 @@ import type {
   RunFrameEvent,
   RunFrameState,
 } from "./types"
+import { isDynamicFilePath } from "./isDynamicFilePath"
 
 const debug = Debug.extend("store")
 
@@ -46,18 +47,6 @@ async function getEvents(since: string | null): Promise<FileUpdatedEvent[]> {
   return data.event_list
 }
 
-const DYNAMIC_FILE_EXTENSIONS = [
-  ".tsx",
-  ".ts",
-  ".jsx",
-  ".js",
-  ".json",
-  ".kicad_pcb",
-  ".kicad_sch",
-  ".kicad_prl",
-  ".kicad_pro",
-]
-
 async function getInitialFilesFromApi(): Promise<Map<FilePath, FileContent>> {
   const response = await fetch(`${API_BASE}/files/list`)
   const { file_list } = (await response.json()) as {
@@ -67,7 +56,7 @@ async function getInitialFilesFromApi(): Promise<Map<FilePath, FileContent>> {
   const fileMap = new Map<FilePath, FileContent>()
 
   for (const file of file_list) {
-    if (DYNAMIC_FILE_EXTENSIONS.some((ext) => file.file_path.endsWith(ext))) {
+    if (isDynamicFilePath(file.file_path)) {
       const fullFile = await getFileApi(file.file_path)
       fileMap.set(file.file_path, fullFile.text_content)
       continue
@@ -134,8 +123,7 @@ export const useRunFrameStore = create<RunFrameState>()(
           // Don't track ignored files like manual-edits.json
           if (IGNORED_SAVED_FILES.includes(path)) return state
           // Only track actual source files
-          if (!DYNAMIC_FILE_EXTENSIONS.some((ext) => path.endsWith(ext)))
-            return state
+          if (!isDynamicFilePath(path)) return state
 
           const filtered = state.recentlySavedFiles.filter((f) => f !== path)
           return {
@@ -183,8 +171,8 @@ export const useRunFrameStore = create<RunFrameState>()(
                   ) {
                     continue
                   }
-                  if (file.text_content) {
-                    updates.set(file.file_path, file.text_content)
+                  if (isDynamicFilePath(file.file_path)) {
+                    updates.set(file.file_path, file.text_content ?? "")
                   } else {
                     updates.set(file.file_path, "__STATIC_ASSET__")
                   }

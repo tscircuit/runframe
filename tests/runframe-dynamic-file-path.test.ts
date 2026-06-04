@@ -1,0 +1,16 @@
+import { describe, expect, test } from "bun:test"
+
+import { isDynamicFilePath } from "../lib/components/RunFrameWithApi/isDynamicFilePath"
+
+describe("isDynamicFilePath", () => {
+  test("treats executable ESM files as dynamic content", () => {
+    expect(isDynamicFilePath("node_modules/circuit-json/dist/index.mjs")).toBe(
+      true,
+    )
+  })
+
+  test("keeps static model assets as static assets", () => {
+    expect(isDynamicFilePath("models/connector.step")).toBe(false)
+    expect(isDynamicFilePath("models/board.glb")).toBe(false)
+  })
+})

@@ -160,24 +160,6 @@ export const CircuitJsonPreview = ({
     return circuitJson?.some((e) => e.type === "pcb_panel")
   }, [circuitJson])
 
-  const isAnalogSimulationGraphPending = useMemo(() => {
-    if (!circuitJson || !isRunningCode) return false
-    if (circuitJsonErrors?.length) return false
-
-    const hasSimulationExperiment = circuitJson.some(
-      (e) => e.type === "simulation_experiment",
-    )
-    const hasTransientVoltageGraph = circuitJson.some(
-      (e) => e.type === "simulation_transient_voltage_graph",
-    )
-
-    return hasSimulationExperiment && !hasTransientVoltageGraph
-  }, [circuitJson, circuitJsonErrors, isRunningCode])
-
-  const analogSimulationError = useMemo(() => {
-    return circuitJsonErrors?.find((e) => e.type.startsWith("simulation_"))
-  }, [circuitJsonErrors])
-
   useErrorTelemetry({
     errorMessage,
     errorStack,
@@ -741,32 +723,12 @@ export const CircuitJsonPreview = ({
                   fallback={<div>Error loading Analog Simulation</div>}
                 >
                   {circuitJson ? (
-                    analogSimulationError ? (
-                      <div className="rf-mt-4 rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200">
-                        <div className="rf-p-4">
-                          <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-3">
-                            Error running analog simulation
-                          </h3>
-                          <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-600 rf-mt-2">
-                            {analogSimulationError.message}
-                          </p>
-                        </div>
-                      </div>
-                    ) : isAnalogSimulationGraphPending ? (
-                      <div className="rf-flex rf-h-full rf-min-h-[300px] rf-items-center rf-justify-center rf-bg-slate-50">
-                        <div className="rf-flex rf-items-center rf-gap-2 rf-text-sm rf-text-slate-600">
-                          <Loader2 className="rf-h-4 rf-w-4 rf-animate-spin" />
-                          Running analog simulation...
-                        </div>
-                      </div>
-                    ) : (
-                      <AnalogSimulationViewer
-                        circuitJson={circuitJson}
-                        containerStyle={{
-                          height: "100%",
-                        }}
-                      />
-                    )
+                    <AnalogSimulationViewer
+                      circuitJson={circuitJson}
+                      containerStyle={{
+                        height: "100%",
+                      }}
+                    />
                   ) : (
                     <PreviewEmptyState onRunClicked={onRunClicked} />
                   )}

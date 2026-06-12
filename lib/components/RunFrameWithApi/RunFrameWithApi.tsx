@@ -7,6 +7,7 @@ import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { useSyncPageTitle } from "lib/hooks/use-sync-page-title"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
+import type { RunFrameProps } from "../RunFrame/RunFrameProps"
 import { cn } from "lib/utils"
 import type { RunCompletedPayload } from "../RunFrame/run-completion"
 import { API_BASE } from "./api-base"
@@ -84,6 +85,7 @@ export interface RunFrameWithApiProps {
   workerBlobUrl?: string
   evalWebWorkerBlobUrl?: string
   showFileMenu?: boolean
+  schematicSvgOptions?: RunFrameProps["schematicSvgOptions"]
 
   /**
    * Enable fetch proxy for the web worker (useful for standalone bundles)
@@ -294,6 +296,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     <RunFrame
       fsMap={fsMap}
       showFileMenu={props.showFileMenu}
+      schematicSvgOptions={props.schematicSvgOptions}
       isLoadingFiles={isLoadingFiles}
       evalVersion={props.evalVersion}
       forceLatestEvalVersion={props.forceLatestEvalVersion}

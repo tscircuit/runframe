@@ -628,6 +628,7 @@ export const RunFrame = (props: RunFrameProps) => {
         defaultActiveTab={props.defaultActiveTab ?? props.defaultTab}
         defaultTab={props.defaultTab}
         availableTabs={props.availableTabs}
+        schematicSvgOptions={props.schematicSvgOptions}
         showToggleFullScreen={props.showToggleFullScreen}
         autoroutingGraphics={autoroutingGraphics}
         autoroutingLog={autoroutingLog}

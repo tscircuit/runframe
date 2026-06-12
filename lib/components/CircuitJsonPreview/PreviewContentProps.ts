@@ -35,6 +35,10 @@ export interface PreviewContentProps {
   autoroutingGraphics?: any
   circuitJson: CircuitJson | null
   className?: string
+  schematicSvgOptions?: {
+    css?: string
+    className?: string
+  }
   showCodeTab?: boolean
   showRenderLogTab?: boolean
   codeTabContent?: React.ReactNode

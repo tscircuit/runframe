@@ -126,6 +126,11 @@ export interface RunFrameProps {
    */
   availableTabs?: TabId[]
 
+  schematicSvgOptions?: {
+    css?: string
+    className?: string
+  }
+
   evalWebWorkerBlobUrl?: string
 
   evalVersion?: string

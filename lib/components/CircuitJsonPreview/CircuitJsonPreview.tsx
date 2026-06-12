@@ -6,7 +6,13 @@ import {
 } from "lib/components/ui/tabs"
 import { cn } from "lib/utils"
 import { CadViewer } from "@tscircuit/3d-viewer"
-import { useCallback, useEffect, useState, useMemo } from "react"
+import {
+  useCallback,
+  useEffect,
+  useState,
+  useMemo,
+  type ComponentProps,
+} from "react"
 import { ErrorFallback } from "../ErrorFallback"
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary"
 import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
@@ -122,6 +128,7 @@ export const CircuitJsonPreview = ({
   showFileMenu = false,
   isWebEmbedded = false,
   projectName,
+  schematicSvgOptions,
   onRerunWithDebug,
   solverEvents,
   onPcbBoundsSelected,
@@ -685,6 +692,8 @@ export const CircuitJsonPreview = ({
                       }}
                       debugGrid={showSchematicDebugGrid}
                       showSchematicPorts={showSchematicPorts}
+                      css={schematicSvgOptions?.css}
+                      className={schematicSvgOptions?.className}
                     />
                   ) : (
                     <PreviewEmptyState onRunClicked={onRunClicked} />

@@ -24,7 +24,7 @@ export const useFootprintPreviewCircuitJson = (
   })
 
   React.useEffect(() => {
-    if (!result || !canPreviewFootprint(result, opts)) {
+    if (!result || !canPreviewFootprint(result)) {
       setState({ circuitJson: null, error: null, isLoading: false })
       return
     }

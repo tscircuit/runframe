@@ -3,7 +3,6 @@ import {
   loadJlcpcbComponentCircuitJson,
   type JlcpcbPreviewLoadOptions,
 } from "./jlcpcb"
-import { hasEasyEdaProxyEndpoint } from "lib/optional-features/importing/create-easyeda-proxy-fetch"
 import { loadKicadFootprintCircuitJson } from "./kicad"
 import type { ImportComponentDialogSearchResult } from "../types"
 
@@ -13,14 +12,7 @@ export type FootprintPreviewLoadOptions = {
 
 export const canPreviewFootprint = (
   result: ImportComponentDialogSearchResult | null,
-  opts?: FootprintPreviewLoadOptions,
-) => {
-  if (result?.source === "jlcpcb") {
-    return hasEasyEdaProxyEndpoint(opts?.jlcpcb)
-  }
-
-  return result?.source === "kicad"
-}
+) => result?.source === "jlcpcb" || result?.source === "kicad"
 
 export const loadFootprintPreviewCircuitJson = async (
   result: ImportComponentDialogSearchResult,

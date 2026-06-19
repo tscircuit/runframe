@@ -1,4 +1,5 @@
 import { API_BASE } from "lib/components/RunFrameWithApi/api-base"
+import { createEasyEdaProxyFetch } from "./create-easyeda-proxy-fetch"
 import { loadEasyedaBrowser } from "./load-easyeda-browser"
 import ky from "ky"
 
@@ -10,22 +11,7 @@ export const importComponentFromJlcpcb = async (
     await loadEasyedaBrowser()
 
   const component = await fetchEasyEDAComponent(jlcpcbPartNumber, {
-    // @ts-ignore
-    fetch: (url, options: any) => {
-      return fetch(`${API_BASE}/proxy`, {
-        ...options,
-        headers: {
-          ...options?.headers,
-          "X-Target-Url": url.toString(),
-          "X-Sender-Origin": options?.headers?.origin ?? "",
-          "X-Sender-Host": options?.headers?.host ?? "https://easyeda.com",
-          "X-Sender-Referer": options?.headers?.referer ?? "",
-          "X-Sender-User-Agent": options?.headers?.userAgent ?? "",
-          "X-Sender-Cookie": options?.headers?.cookie ?? "",
-          ...opts?.headers,
-        },
-      })
-    },
+    fetch: createEasyEdaProxyFetch({ headers: opts?.headers }),
   })
 
   const tsx = await convertRawEasyToTsx({ rawEasy: component })

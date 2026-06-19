@@ -142,7 +142,10 @@ export const ImportComponentDialog2 = ({
     selectedSearchResult,
     footprintPreviewOptions,
   )
-  const showFootprintPreview = canPreviewFootprint(selectedSearchResult)
+  const showFootprintPreview = canPreviewFootprint(
+    selectedSearchResult,
+    footprintPreviewOptions,
+  )
 
   React.useEffect(() => {
     setImportErrorMessage(null)

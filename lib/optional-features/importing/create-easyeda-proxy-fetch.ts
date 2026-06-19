@@ -5,7 +5,8 @@ export type EasyEdaProxyFetchOptions = {
   headers?: Record<string, string>
 }
 
-export const createEasyEdaProxyFetch = (opts?: EasyEdaProxyFetchOptions) =>
+export const createEasyEdaProxyFetch =
+  (opts?: EasyEdaProxyFetchOptions) =>
   (url: RequestInfo | URL, options?: RequestInit) => {
     const headers = options?.headers as Record<string, string> | undefined
 

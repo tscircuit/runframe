@@ -135,6 +135,7 @@ export default defineConfig({
         "@resvg/resvg-js",
         "@resvg/resvg-js-darwin-arm64",
         "@resvg/resvg-wasm",
+        "@tscircuit/eecircuit-engine",
       ],
     },
   },
@@ -143,6 +144,7 @@ export default defineConfig({
       "@resvg/resvg-js",
       "@resvg/resvg-js-darwin-arm64",
       "@resvg/resvg-wasm",
+      "@tscircuit/eecircuit-engine",
     ],
   },
 })

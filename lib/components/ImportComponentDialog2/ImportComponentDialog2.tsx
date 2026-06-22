@@ -85,7 +85,7 @@ export const ImportComponentDialog2 = ({
     React.useState<ImportComponentDialogSearchResult | null>(null)
   const searchResultsPanelRef = React.useRef<HTMLDivElement>(null)
   const [searchResultsPanelHeight, setSearchResultsPanelHeight] =
-    React.useState(325)
+    React.useState(320)
   const {
     results: tscircuitResults,
     isSearching: isTscircuitSearching,
@@ -422,7 +422,7 @@ export const ImportComponentDialog2 = ({
                     circuitJson={footprintPreviewCircuitJson}
                     error={footprintPreviewError}
                     isLoading={isFootprintPreviewLoading}
-                    height={searchResultsPanelHeight}
+                    height={Math.min(searchResultsPanelHeight, 320)}
                   />
                 </div>
               ) : null}

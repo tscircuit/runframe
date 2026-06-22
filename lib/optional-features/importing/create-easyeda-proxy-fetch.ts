@@ -5,6 +5,9 @@ export type EasyEdaProxyFetchOptions = {
   headers?: Record<string, string>
 }
 
+export const hasEasyEdaProxyEndpoint = (opts?: EasyEdaProxyFetchOptions) =>
+  Boolean(opts?.apiBase ?? window.TSCIRCUIT_FILESERVER_API_BASE_URL)
+
 export const createEasyEdaProxyFetch =
   (opts?: EasyEdaProxyFetchOptions) =>
   (url: RequestInfo | URL, options?: RequestInit) => {

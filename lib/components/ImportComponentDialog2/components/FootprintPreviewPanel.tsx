@@ -6,22 +6,39 @@ interface FootprintPreviewPanelProps {
   circuitJson: AnyCircuitElement[] | null
   error: string | null
   isLoading: boolean
+  height: number
 }
 
 export const FootprintPreviewPanel = ({
   circuitJson,
   error,
   isLoading,
+  height,
 }: FootprintPreviewPanelProps) => {
   return (
-    <section className="rf-flex rf-min-h-[300px] rf-min-w-0 rf-items-center rf-justify-center">
+    <section
+      className="rf-flex rf-min-w-0 rf-items-center rf-justify-center"
+      data-footprint-preview
+      style={{ height }}
+    >
+      <style>{`
+        [data-footprint-preview] [data-toolbar-overlay] {
+          display: none;
+        }
+      `}</style>
       {isLoading ? (
-        <div className="rf-flex rf-h-[300px] rf-w-full rf-items-center rf-justify-center rf-gap-2 rf-bg-zinc-950 rf-text-sm rf-text-zinc-300">
+        <div
+          className="rf-flex rf-w-full rf-items-center rf-justify-center rf-gap-2 rf-bg-zinc-950 rf-text-sm rf-text-zinc-300"
+          style={{ height }}
+        >
           <Loader2 className="rf-h-4 rf-w-4 rf-animate-spin" />
           Loading preview...
         </div>
       ) : error ? (
-        <div className="rf-flex rf-h-[300px] rf-w-full rf-items-center rf-justify-center rf-bg-zinc-950 rf-p-4">
+        <div
+          className="rf-flex rf-w-full rf-items-center rf-justify-center rf-bg-zinc-950 rf-p-4"
+          style={{ height }}
+        >
           <div className="rf-flex rf-max-w-[320px] rf-items-start rf-gap-2 rf-text-sm rf-text-zinc-300">
             <AlertCircle className="rf-mt-0.5 rf-h-4 rf-w-4 rf-flex-shrink-0" />
             <span>{error}</span>
@@ -31,7 +48,7 @@ export const FootprintPreviewPanel = ({
         <div className="rf-w-full rf-min-w-0 rf-overflow-hidden">
           <PCBViewer
             circuitJson={circuitJson}
-            height={300}
+            height={height}
             allowEditing={false}
             clickToInteractEnabled={false}
             focusOnHover={false}
@@ -39,7 +56,10 @@ export const FootprintPreviewPanel = ({
           />
         </div>
       ) : (
-        <div className="rf-flex rf-h-[300px] rf-w-full rf-items-center rf-justify-center rf-bg-zinc-950 rf-text-sm rf-text-zinc-300">
+        <div
+          className="rf-flex rf-w-full rf-items-center rf-justify-center rf-bg-zinc-950 rf-text-sm rf-text-zinc-300"
+          style={{ height }}
+        >
           No preview
         </div>
       )}

@@ -83,6 +83,9 @@ export const ImportComponentDialog2 = ({
   const [searchQuery, setSearchQuery] = React.useState("")
   const [selectedSearchResult, setSelectedSearchResult] =
     React.useState<ImportComponentDialogSearchResult | null>(null)
+  const searchResultsPanelRef = React.useRef<HTMLDivElement>(null)
+  const [searchResultsPanelHeight, setSearchResultsPanelHeight] =
+    React.useState(325)
   const {
     results: tscircuitResults,
     isSearching: isTscircuitSearching,
@@ -143,6 +146,18 @@ export const ImportComponentDialog2 = ({
     footprintPreviewOptions,
   )
   const showFootprintPreview = canPreviewFootprint(selectedSearchResult)
+
+  React.useLayoutEffect(() => {
+    const panel = searchResultsPanelRef.current
+    if (!panel) return
+
+    const updateHeight = () => setSearchResultsPanelHeight(panel.clientHeight)
+    updateHeight()
+
+    const resizeObserver = new ResizeObserver(updateHeight)
+    resizeObserver.observe(panel)
+    return () => resizeObserver.disconnect()
+  }, [])
 
   React.useEffect(() => {
     setImportErrorMessage(null)
@@ -369,7 +384,10 @@ export const ImportComponentDialog2 = ({
                   onSubmit={performSearch}
                 />
 
-                <div className="no-scrollbar rf-mt-4 rf-flex-1 rf-min-h-[200px] !rf-max-h-[40vh] !rf-overflow-y-auto rf-overflow-x-hidden rf-border rf-rounded-md rf-min-w-0">
+                <div
+                  ref={searchResultsPanelRef}
+                  className="no-scrollbar rf-mt-4 rf-flex-1 rf-min-h-[200px] !rf-max-h-[40vh] !rf-overflow-y-auto rf-overflow-x-hidden rf-border rf-rounded-md rf-min-w-0"
+                >
                   {isSearching ? (
                     <div className="rf-p-8 rf-text-center rf-text-zinc-500">
                       <Loader2 className="rf-h-8 rf-w-8 rf-animate-spin rf-mx-auto rf-mb-2" />
@@ -404,6 +422,7 @@ export const ImportComponentDialog2 = ({
                     circuitJson={footprintPreviewCircuitJson}
                     error={footprintPreviewError}
                     isLoading={isFootprintPreviewLoading}
+                    height={searchResultsPanelHeight}
                   />
                 </div>
               ) : null}

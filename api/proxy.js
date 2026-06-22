@@ -20,6 +20,12 @@ export default async function proxyEasyEdaRequest(request, response) {
     return
   }
 
+  if (!["GET", "POST"].includes(request.method)) {
+    response.setHeader("allow", "GET, POST, OPTIONS")
+    response.status(405).json({ error: "Only GET and POST are allowed" })
+    return
+  }
+
   const targetUrl = getHeader(request.headers, "x-target-url")
   if (!targetUrl) {
     response.status(400).json({ error: "X-Target-Url header is required" })

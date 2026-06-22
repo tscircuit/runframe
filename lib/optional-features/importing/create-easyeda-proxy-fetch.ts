@@ -8,20 +8,24 @@ export type EasyEdaProxyFetchOptions = {
 export const createEasyEdaProxyFetch =
   (opts?: EasyEdaProxyFetchOptions) =>
   (url: RequestInfo | URL, options?: RequestInit) => {
-    const headers = options?.headers as Record<string, string> | undefined
+    const sourceHeaders = new Headers(options?.headers)
+    const headers: Record<string, string> = {}
+    sourceHeaders.forEach((value, key) => {
+      headers[key] = value
+    })
 
     return fetch(`${opts?.apiBase ?? API_BASE}/proxy`, {
       ...options,
       headers: {
         ...headers,
         "X-Target-Url": url.toString(),
-        "X-Sender-Origin": headers?.origin ?? "",
-        "X-Sender-Host": headers?.host ?? "https://easyeda.com",
-        "X-Sender-Referer": headers?.referer ?? "",
-        "X-Sender-User-Agent": headers?.userAgent ?? "",
-        "X-Sender-Cookie": headers?.cookie ?? "",
-        authority: headers?.authority ?? "",
-        "content-type": headers?.["content-type"] ?? "",
+        "X-Sender-Origin": headers.origin ?? "",
+        "X-Sender-Host": headers.host ?? "https://easyeda.com",
+        "X-Sender-Referer": headers.referer ?? "",
+        "X-Sender-User-Agent": headers["user-agent"] ?? "",
+        "X-Sender-Cookie": headers.cookie ?? "",
+        authority: headers.authority ?? "",
+        "content-type": headers["content-type"] ?? "",
         ...opts?.headers,
       },
     })

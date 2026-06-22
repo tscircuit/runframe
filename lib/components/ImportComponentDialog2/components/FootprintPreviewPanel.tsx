@@ -18,14 +18,8 @@ export const FootprintPreviewPanel = ({
   return (
     <section
       className="rf-flex rf-min-w-0 rf-items-center rf-justify-center"
-      data-footprint-preview
       style={{ height }}
     >
-      <style>{`
-        [data-footprint-preview] [data-toolbar-overlay] {
-          display: none;
-        }
-      `}</style>
       {isLoading ? (
         <div
           className="rf-flex rf-w-full rf-items-center rf-justify-center rf-gap-2 rf-bg-zinc-950 rf-text-sm rf-text-zinc-300"

@@ -30,10 +30,7 @@ export const useFootprintPreviewCircuitJson = (
       return
     }
 
-    if (
-      result.source === "jlcpcb" &&
-      !hasEasyEdaProxyEndpoint(opts?.jlcpcb)
-    ) {
+    if (result.source === "jlcpcb" && !hasEasyEdaProxyEndpoint(opts?.jlcpcb)) {
       setState({
         circuitJson: null,
         error: "JLCPCB previews require an EasyEDA proxy from the host app.",

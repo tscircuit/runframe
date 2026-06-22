@@ -9,28 +9,73 @@ export interface RunFrameWithIframeProps extends RunFrameProps {
   iframeUrl?: string
 }
 
+export const getIframeTargetOrigin = (
+  iframeUrl: string,
+  baseUrl?: string,
+): string | null => {
+  try {
+    return new URL(
+      iframeUrl,
+      baseUrl ??
+        (typeof window === "undefined" ? undefined : window.location.href),
+    ).origin
+  } catch {
+    return null
+  }
+}
+
+export const shouldSendRunFramePropsToIframe = ({
+  event,
+  iframeWindow,
+  targetOrigin,
+}: {
+  event: MessageEvent
+  iframeWindow: WindowProxy | null | undefined
+  targetOrigin: string | null
+}): boolean => {
+  return (
+    Boolean(iframeWindow) &&
+    Boolean(targetOrigin) &&
+    event.source === iframeWindow &&
+    event.origin === targetOrigin &&
+    event.data?.runframe_type === "runframe_ready_to_receive"
+  )
+}
+
 export const RunFrameWithIframe = ({
   iframeUrl = "https://runframe.tscircuit.com/iframe.html",
   ...runFrameProps
 }: RunFrameWithIframeProps) => {
   const iframeRef = useRef<HTMLIFrameElement>(null)
+  const runFramePropsRef = useRef(runFrameProps)
 
   useEffect(() => {
+    runFramePropsRef.current = runFrameProps
+  }, [runFrameProps])
+
+  useEffect(() => {
+    const targetOrigin = getIframeTargetOrigin(iframeUrl)
     const handleMessage = (event: MessageEvent) => {
-      if (event.data?.runframe_type === "runframe_ready_to_receive") {
+      if (
+        shouldSendRunFramePropsToIframe({
+          event,
+          iframeWindow: iframeRef.current?.contentWindow,
+          targetOrigin,
+        })
+      ) {
         iframeRef.current?.contentWindow?.postMessage(
           {
             runframe_type: "runframe_props_changed",
-            runframe_props: runFrameProps,
+            runframe_props: runFramePropsRef.current,
           },
-          "*",
+          targetOrigin!,
         )
       }
     }
 
     window.addEventListener("message", handleMessage)
     return () => window.removeEventListener("message", handleMessage)
-  }, [])
+  }, [iframeUrl])
 
   return (
     <div>

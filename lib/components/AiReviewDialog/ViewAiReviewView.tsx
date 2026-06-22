@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react"
 import { Button } from "../ui/button"
 import { DialogHeader, DialogTitle } from "../ui/dialog"
-import { marked } from "marked"
 import type { AiReview } from "./types"
 import { getRegistryKy } from "lib/utils/get-registry-ky"
+import { renderAiReviewMarkdown } from "./render-ai-review-markdown"
 
 export const AiReviewViewView = ({
   review,
@@ -50,8 +50,8 @@ export const AiReviewViewView = ({
   }, [aiReviewId])
 
   const html = useMemo(
-    () => marked.parse(review.ai_review_text || "") as string,
-    [review.ai_review_text],
+    () => renderAiReviewMarkdown(aiReviewText ?? ""),
+    [aiReviewText],
   )
   return (
     <>

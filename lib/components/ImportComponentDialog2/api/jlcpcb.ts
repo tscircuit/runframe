@@ -90,6 +90,7 @@ export const loadJlcpcbComponentCircuitJson = async (
     ...opts,
     includeModelMetadata: false,
   })
+  // Use the supplier's actual footprint data instead of inferring a package.
   const betterEasy = EasyEdaJsonSchema.parse(component)
 
   return convertEasyEdaJsonToCircuitJson(betterEasy, {

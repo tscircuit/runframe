@@ -1,5 +1,7 @@
 const EASYEDA_HOSTNAME = "easyeda.com"
 
+// EasyEDA blocks browser cross-origin requests, so the deployed preview uses this restricted proxy.
+
 const getHeader = (headers, name) => {
   const value = headers[name]
   return Array.isArray(value) ? value[0] : value
@@ -40,6 +42,7 @@ export default async function proxyEasyEdaRequest(request, response) {
     return
   }
 
+  // Never allow this endpoint to become a general-purpose proxy.
   if (target.protocol !== "https:" || target.hostname !== EASYEDA_HOSTNAME) {
     response.status(403).json({ error: "Only EasyEDA requests are allowed" })
     return

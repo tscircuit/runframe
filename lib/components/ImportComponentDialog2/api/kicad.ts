@@ -73,6 +73,7 @@ export const loadKicadFootprintCircuitJson = async (
   }
 
   const footprintContent = await response.text()
+  // Keep the KiCad parser out of the dialog's initial bundle.
   const { KicadFootprintToCircuitJsonConverter } = await import(
     "kicad-to-circuit-json"
   )

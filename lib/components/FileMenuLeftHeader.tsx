@@ -343,6 +343,8 @@ export const FileMenuLeftHeader = (props: {
                           props.projectName ??
                           snippetName ??
                           projectNameFromPath
+                        const simpleRouteJson =
+                          latestAutoroutingLogEntry?.value.simpleRouteJson
 
                         // Special handling for LightBurn export - show options dialog
                         if (exp.name === "LightBurn") {
@@ -357,13 +359,18 @@ export const FileMenuLeftHeader = (props: {
                         exportAndDownload({
                           exportName: exp.name,
                           circuitJson,
+                          simpleRouteJson,
                           projectName: projectName?.replace(
                             /\.(board|circuit)$/,
                             "",
                           ),
                         })
                       }}
-                      disabled={isExporting}
+                      disabled={
+                        isExporting ||
+                        (exp.name === "Simple Route JSON" &&
+                          !latestAutoroutingLogEntry)
+                      }
                     >
                       <span className="rf-text-xs">{exp.name}</span>
                     </DropdownMenuItem>

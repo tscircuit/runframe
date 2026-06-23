@@ -9,6 +9,12 @@ describe("isDynamicFilePath", () => {
     )
   })
 
+  test("treats executable CommonJS (.cjs) files as dynamic content", () => {
+    expect(isDynamicFilePath("node_modules/jscad-planner/dist/index.cjs")).toBe(
+      true,
+    )
+  })
+
   test("keeps static model assets as static assets", () => {
     expect(isDynamicFilePath("models/connector.step")).toBe(false)
     expect(isDynamicFilePath("models/board.glb")).toBe(false)

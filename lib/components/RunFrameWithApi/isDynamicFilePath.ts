@@ -4,6 +4,7 @@ export const DYNAMIC_FILE_EXTENSIONS = [
   ".jsx",
   ".js",
   ".mjs",
+  ".cjs",
   ".json",
   ".kicad_pcb",
   ".kicad_sch",

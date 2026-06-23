@@ -105,7 +105,17 @@ const runframeStandaloneProps: ComponentProps<typeof RunFrameWithApi> = {
       />,
     )
   } else if (window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI) {
-    root.render(<RunFrameForCli {...runframeStandaloneProps} />)
+    // RunFrameForCli reads the embedded eval worker from `workerBlobUrl`, while the
+    // standalone build injects it as `evalWebWorkerBlobUrl` — map it explicitly so
+    // the embedded worker is used instead of forcing a CDN eval fetch.
+    // Props are forwarded by name (not spread), so any new standalone prop that
+    // RunFrameForCli should receive must be added here.
+    root.render(
+      <RunFrameForCli
+        workerBlobUrl={runframeStandaloneProps.evalWebWorkerBlobUrl}
+        enableFetchProxy={runframeStandaloneProps.enableFetchProxy}
+      />,
+    )
   } else {
     const { fsMap } = await loadScriptsAsFsMap()
     if (fsMap.size > 0) {

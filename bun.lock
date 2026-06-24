@@ -5,7 +5,7 @@
     "": {
       "name": "@tscircuit/runframe",
       "dependencies": {
-        "@tscircuit/eval": "^0.0.948",
+        "@tscircuit/eval": "^0.0.949",
         "@tscircuit/solver-utils": "^0.0.7",
       },
       "devDependencies": {
@@ -556,7 +556,7 @@
 
     "@tscircuit/create-snippet-url": ["@tscircuit/create-snippet-url@0.0.9", "", { "dependencies": { "fflate": "^0.8.2" }, "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-CI+PDOy28Q9pycIyjx0vLpnh6wuyocYPMAJqhr/uAbOBBdY3sz3zTWHvdy7giqTGo0+v5x0nhN6o60RT82grZA=="],
 
-    "@tscircuit/eval": ["@tscircuit/eval@0.0.948", "", { "peerDependencies": { "@tscircuit/core": "*", "circuit-json": "*", "typescript": "^5.0.0", "zod": "3" } }, "sha512-4RQZA10dNB1H3oY5CWok/2ftnhHZbTGswsosu9ZCH3wRSUurfIk6TXPwIx5uw2Kp2fYFuQIEAhz0+b0R7XwQ0A=="],
+    "@tscircuit/eval": ["@tscircuit/eval@0.0.949", "", { "peerDependencies": { "@tscircuit/core": "*", "circuit-json": "*", "typescript": "^5.0.0", "zod": "3" } }, "sha512-SEM2xTI9r5sNX6h8fKoMnN/YwldLYlHkP4BznExTEmYPWmVUDqg1q/PnjjL01w2wsf0vRbzjFh6nuXjlw2ZFZw=="],
 
     "@tscircuit/fake-snippets": ["@tscircuit/fake-snippets@0.0.163", "", {}, "sha512-E/ZvC5CRfgG/Q6776ovR4oZuLgXbSxpvffminIwpTE1axg+vrNdOz2RzGBHbZCIcDUhs4etmB85kAizuiNJSBw=="],
 
@@ -2157,6 +2157,8 @@
     "three-stdlib/fflate": ["fflate@0.6.10", "", {}, "sha512-IQrh3lEPM93wVCEczc9SaAOvkmcoQn/G8Bo1e8ZPlY3X3bnAxWaBdvTdvM1hP62iZp0BXWDy4vTAy4fF0+Dlpg=="],
 
     "tscircuit/@tscircuit/alphabet": ["@tscircuit/alphabet@0.0.25", "", { "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-PWLjptI6AlLEtF/wjN1N8uC+n3G7vtg0j3xKE1fgWHDhahtnlQRqHDrtPSLlkIR9aJjRfjplzLuaUEaCRvJmZA=="],
+
+    "tscircuit/@tscircuit/eval": ["@tscircuit/eval@0.0.948", "", { "peerDependencies": { "@tscircuit/core": "*", "circuit-json": "*", "typescript": "^5.0.0", "zod": "3" } }, "sha512-4RQZA10dNB1H3oY5CWok/2ftnhHZbTGswsosu9ZCH3wRSUurfIk6TXPwIx5uw2Kp2fYFuQIEAhz0+b0R7XwQ0A=="],
 
     "tscircuit/@tscircuit/internal-dynamic-import": ["@tscircuit/internal-dynamic-import@0.0.2", "", {}, "sha512-cflWt1v+3O//e6jAQgHqmzPfgcu1QP0gDefhl1YxeTHWdginlecuvbGdFZ1V9ETxo4+xAwbHDfV+6fyXpvzK8A=="],
 

@@ -29,6 +29,41 @@ export interface RunFrameStaticBuildViewerProps {
 const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "An unknown error occurred"
 
+const getUrlSelectedFile = (): string | null => {
+  if (typeof window === "undefined") return null
+
+  const searchParams = new URLSearchParams(window.location.search)
+  const hashParams = new URLSearchParams(window.location.hash.slice(1))
+
+  // Treat the hash as canonical for in-app navigation once it exists.
+  return (
+    hashParams.get("file") ??
+    hashParams.get("main_component") ??
+    searchParams.get("file") ??
+    searchParams.get("main_component")
+  )
+}
+
+const updateFileHash = (filePath: string) => {
+  if (typeof window === "undefined") return
+
+  const params = new URLSearchParams(window.location.hash.slice(1))
+  if (
+    params.get("file") === filePath &&
+    (!params.has("main_component") || params.get("main_component") === filePath)
+  ) {
+    return
+  }
+
+  params.set("file", filePath)
+  if (params.has("main_component")) {
+    params.set("main_component", filePath)
+  }
+  const newHash = params.toString()
+  const newUrl = `${window.location.pathname}${window.location.search}${newHash.length > 0 ? `#${newHash}` : ""}`
+  window.history.replaceState(null, "", newUrl)
+}
+
 export const RunFrameStaticBuildViewer = (
   props: RunFrameStaticBuildViewerProps,
 ) => {
@@ -36,7 +71,7 @@ export const RunFrameStaticBuildViewer = (
 
   const [currentCircuitJsonPath, setCurrentCircuitJsonPath] = useState<string>(
     () => {
-      return props.initialCircuitPath ?? ""
+      return getUrlSelectedFile() ?? props.initialCircuitPath ?? ""
     },
   )
 
@@ -146,7 +181,26 @@ export const RunFrameStaticBuildViewer = (
     if (selectedPath && availableFiles.includes(selectedPath)) {
       loadCircuitJsonFile(selectedPath)
     }
+  }, [availableFiles, currentCircuitJsonPath, loadCircuitJsonFile])
+
+  useEffect(() => {
+    if (!currentCircuitJsonPath) return
+    updateFileHash(currentCircuitJsonPath)
   }, [currentCircuitJsonPath])
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    const handleHashChange = () => {
+      const nextPath = getUrlSelectedFile()
+      if (!nextPath || nextPath === currentCircuitJsonPath) return
+      if (!availableFiles.includes(nextPath)) return
+      setCurrentCircuitJsonPath(nextPath)
+    }
+
+    window.addEventListener("hashchange", handleHashChange)
+    return () => window.removeEventListener("hashchange", handleHashChange)
+  }, [availableFiles, currentCircuitJsonPath])
 
   const handleFileChange = useCallback((newPath: string) => {
     setCurrentCircuitJsonPath(newPath)

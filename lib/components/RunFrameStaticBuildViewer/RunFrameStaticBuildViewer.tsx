@@ -36,7 +36,14 @@ export const RunFrameStaticBuildViewer = (
 
   const [currentCircuitJsonPath, setCurrentCircuitJsonPath] = useState<string>(
     () => {
-      return props.initialCircuitPath ?? ""
+      if (typeof window === "undefined") return props.initialCircuitPath ?? ""
+      const params = new URLSearchParams(window.location.hash.slice(1))
+      return (
+        params.get("file") ??
+        params.get("main_component") ??
+        props.initialCircuitPath ??
+        ""
+      )
     },
   )
 
@@ -69,10 +76,31 @@ export const RunFrameStaticBuildViewer = (
     [],
   )
 
+  const updateFileHash = useCallback((filePath: string) => {
+    if (typeof window === "undefined") return
+    const params = new URLSearchParams(window.location.hash.slice(1))
+    if (
+      params.get("file") === filePath &&
+      (!params.has("main_component") ||
+        params.get("main_component") === filePath)
+    ) {
+      return
+    }
+    params.set("file", filePath)
+    if (params.has("main_component")) {
+      params.set("main_component", filePath)
+    }
+    const newHash = params.toString() ? `#${params.toString()}` : ""
+    if (newHash === window.location.hash) return
+    const newUrl = `${window.location.pathname}${window.location.search}${newHash}`
+    window.history.replaceState(null, "", newUrl)
+  }, [])
+
   const loadCircuitJsonFile = useCallback(
     async (filePath: string) => {
       if (fileCache[filePath]) {
         setCircuitJson(fileCache[filePath])
+        updateFileHash(filePath)
         props.onCircuitJsonPathChange?.(filePath)
         return
       }
@@ -102,6 +130,7 @@ export const RunFrameStaticBuildViewer = (
 
         setFileCache((prev) => ({ ...prev, [filePath]: circuitJsonData }))
         setCircuitJson(circuitJsonData)
+        updateFileHash(filePath)
         props.onCircuitJsonPathChange?.(filePath)
 
         setFailedFiles((prev) => {
@@ -130,6 +159,7 @@ export const RunFrameStaticBuildViewer = (
       props.onFetchFile,
       props.onCircuitJsonPathChange,
       defaultFetchFile,
+      updateFileHash,
     ],
   )
 

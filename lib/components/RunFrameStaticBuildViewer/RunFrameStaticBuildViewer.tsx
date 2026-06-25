@@ -7,6 +7,7 @@ import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 import { guessEntrypoint } from "lib/runner"
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary"
 import type { TabId } from "../CircuitJsonPreview/PreviewContentProps"
+import { useStaticCircuitJsonPathHash } from "./use-static-circuit-json-path-hash"
 
 export interface CircuitJsonFileReference {
   filePath: string
@@ -34,18 +35,8 @@ export const RunFrameStaticBuildViewer = (
 ) => {
   useStyles()
 
-  const [currentCircuitJsonPath, setCurrentCircuitJsonPath] = useState<string>(
-    () => {
-      if (typeof window === "undefined") return props.initialCircuitPath ?? ""
-      const params = new URLSearchParams(window.location.hash.slice(1))
-      return (
-        params.get("file") ??
-        params.get("main_component") ??
-        props.initialCircuitPath ??
-        ""
-      )
-    },
-  )
+  const { currentCircuitJsonPath, setCurrentCircuitJsonPath, updateFileHash } =
+    useStaticCircuitJsonPathHash(props.initialCircuitPath)
 
   const [circuitJson, setCircuitJson] = useState<CircuitJson | null>(null)
   const [isLoadingCurrentFile, setIsLoadingCurrentFile] = useState(false)
@@ -75,26 +66,6 @@ export const RunFrameStaticBuildViewer = (
     },
     [],
   )
-
-  const updateFileHash = useCallback((filePath: string) => {
-    if (typeof window === "undefined") return
-    const params = new URLSearchParams(window.location.hash.slice(1))
-    if (
-      params.get("file") === filePath &&
-      (!params.has("main_component") ||
-        params.get("main_component") === filePath)
-    ) {
-      return
-    }
-    params.set("file", filePath)
-    if (params.has("main_component")) {
-      params.set("main_component", filePath)
-    }
-    const newHash = params.toString() ? `#${params.toString()}` : ""
-    if (newHash === window.location.hash) return
-    const newUrl = `${window.location.pathname}${window.location.search}${newHash}`
-    window.history.replaceState(null, "", newUrl)
-  }, [])
 
   const loadCircuitJsonFile = useCallback(
     async (filePath: string) => {

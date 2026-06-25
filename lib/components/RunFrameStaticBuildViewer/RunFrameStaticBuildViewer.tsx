@@ -7,6 +7,10 @@ import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 import { guessEntrypoint } from "lib/runner"
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary"
 import type { TabId } from "../CircuitJsonPreview/PreviewContentProps"
+import {
+  getUpdatedHashForFileSelection,
+  getUrlSelectedFileFromLocation,
+} from "./url-selection"
 
 export interface CircuitJsonFileReference {
   filePath: string
@@ -31,36 +35,18 @@ const getErrorMessage = (error: unknown) =>
 
 const getUrlSelectedFile = (): string | null => {
   if (typeof window === "undefined") return null
-
-  const searchParams = new URLSearchParams(window.location.search)
-  const hashParams = new URLSearchParams(window.location.hash.slice(1))
-
-  // Treat the hash as canonical for in-app navigation once it exists.
-  return (
-    hashParams.get("file") ??
-    hashParams.get("main_component") ??
-    searchParams.get("file") ??
-    searchParams.get("main_component")
+  return getUrlSelectedFileFromLocation(
+    window.location.search,
+    window.location.hash,
   )
 }
 
 const updateFileHash = (filePath: string) => {
   if (typeof window === "undefined") return
 
-  const params = new URLSearchParams(window.location.hash.slice(1))
-  if (
-    params.get("file") === filePath &&
-    (!params.has("main_component") || params.get("main_component") === filePath)
-  ) {
-    return
-  }
-
-  params.set("file", filePath)
-  if (params.has("main_component")) {
-    params.set("main_component", filePath)
-  }
-  const newHash = params.toString()
-  const newUrl = `${window.location.pathname}${window.location.search}${newHash.length > 0 ? `#${newHash}` : ""}`
+  const newHash = getUpdatedHashForFileSelection(window.location.hash, filePath)
+  if (newHash === null) return
+  const newUrl = `${window.location.pathname}${window.location.search}${newHash}`
   window.history.replaceState(null, "", newUrl)
 }
 

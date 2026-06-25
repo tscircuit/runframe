@@ -3,7 +3,9 @@ export const getUrlSelectedFileFromLocation = (
   hash: string,
 ): string | null => {
   const searchParams = new URLSearchParams(search)
-  const hashParams = new URLSearchParams(hash.startsWith("#") ? hash.slice(1) : hash)
+  const hashParams = new URLSearchParams(
+    hash.startsWith("#") ? hash.slice(1) : hash,
+  )
 
   return (
     hashParams.get("file") ??
@@ -17,7 +19,9 @@ export const getUpdatedHashForFileSelection = (
   hash: string,
   filePath: string,
 ): string | null => {
-  const params = new URLSearchParams(hash.startsWith("#") ? hash.slice(1) : hash)
+  const params = new URLSearchParams(
+    hash.startsWith("#") ? hash.slice(1) : hash,
+  )
 
   if (
     params.get("file") === filePath &&

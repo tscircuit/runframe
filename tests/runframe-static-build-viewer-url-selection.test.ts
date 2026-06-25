@@ -23,7 +23,10 @@ describe("RunFrameStaticBuildViewer URL selection", () => {
 
   test("falls back to query params when hash has no file selection", () => {
     expect(
-      getUrlSelectedFileFromLocation("?main_component=lib%2Fmain.circuit.tsx", ""),
+      getUrlSelectedFileFromLocation(
+        "?main_component=lib%2Fmain.circuit.tsx",
+        "",
+      ),
     ).toBe("lib/main.circuit.tsx")
   })
 

@@ -1,5 +1,6 @@
 import Fuse from "fuse.js"
 import type { AnyCircuitElement } from "circuit-json"
+import importer from "@tscircuit/internal-dynamic-import"
 import type { KicadFootprintSummary } from "../types"
 
 const KICAD_MOD_CACHE_BASE_URL = "https://kicad-mod-cache.tscircuit.com"
@@ -73,8 +74,8 @@ export const loadKicadFootprintCircuitJson = async (
   }
 
   const footprintContent = await response.text()
-  // Keep the KiCad parser out of the dialog's initial bundle.
-  const { KicadFootprintToCircuitJsonConverter } = await import(
+  // Use the shared runtime importer so this converter loads correctly after deploy.
+  const { KicadFootprintToCircuitJsonConverter } = await importer(
     "kicad-to-circuit-json"
   )
   const converter = new KicadFootprintToCircuitJsonConverter()

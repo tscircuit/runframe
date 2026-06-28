@@ -1,5 +1,9 @@
 import Fuse from "fuse.js"
+import type { AnyCircuitElement } from "circuit-json"
+import importer from "@tscircuit/internal-dynamic-import"
 import type { KicadFootprintSummary } from "../types"
+
+const KICAD_MOD_CACHE_BASE_URL = "https://kicad-mod-cache.tscircuit.com"
 
 let footprintsCache: string[] | null = null
 let footprintsPromise: Promise<string[]> | null = null
@@ -49,4 +53,38 @@ export const mapKicadFootprintToSummary = (
     qualifiedName: footprintString,
     description: cleanedFootprint,
   }
+}
+
+const encodeFootprintPath = (footprintPath: string) =>
+  footprintPath
+    .replace(/^\/+/, "")
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/")
+
+export const loadKicadFootprintCircuitJson = async (
+  footprintPath: string,
+): Promise<AnyCircuitElement[]> => {
+  const response = await fetch(
+    `${KICAD_MOD_CACHE_BASE_URL}/${encodeFootprintPath(footprintPath)}`,
+  )
+
+  if (!response.ok) {
+    throw new Error(`KiCad footprint fetch failed: ${response.status}`)
+  }
+
+  const footprintContent = await response.text()
+  // Use the shared runtime importer so this converter loads correctly after deploy.
+  const { KicadFootprintToCircuitJsonConverter } = await importer(
+    "kicad-to-circuit-json",
+  )
+  const converter = new KicadFootprintToCircuitJsonConverter()
+
+  converter.addFile(
+    footprintPath.split("/").pop() ?? "selected-footprint.kicad_mod",
+    footprintContent,
+  )
+  converter.runUntilFinished()
+
+  return converter.getOutput()
 }

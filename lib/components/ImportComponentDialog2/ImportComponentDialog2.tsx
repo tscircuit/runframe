@@ -12,10 +12,13 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import { SOURCE_CONFIG } from "./config"
 import { loadJlcpcbComponentTsx } from "./api/jlcpcb"
+import { canPreviewFootprint } from "./api/footprint-preview"
 import { SearchBar } from "./components/SearchBar"
 import { SearchResultsList } from "./components/SearchResultsList"
+import { FootprintPreviewPanel } from "./components/FootprintPreviewPanel"
 import { TscircuitPackageDetailsDialog } from "./components/TscircuitPackageDetailsDialog"
 import { useTscircuitPackageDetails } from "./hooks/useTscircuitPackageDetails"
+import { useFootprintPreviewCircuitJson } from "./hooks/useFootprintPreviewCircuitJson"
 import type {
   ImportComponentDialog2Props,
   ImportComponentDialogSearchResult,
@@ -122,6 +125,24 @@ export const ImportComponentDialog2 = ({
     string | null
   >(null)
   const [isSubmittingImport, setIsSubmittingImport] = React.useState(false)
+  const footprintPreviewOptions = React.useMemo(
+    () => ({
+      jlcpcb: {
+        headers: jlcpcbProxyRequestHeaders,
+        apiBase: jlcpcbProxyApiBase,
+      },
+    }),
+    [jlcpcbProxyApiBase, jlcpcbProxyRequestHeaders],
+  )
+  const {
+    circuitJson: footprintPreviewCircuitJson,
+    error: footprintPreviewError,
+    isLoading: isFootprintPreviewLoading,
+  } = useFootprintPreviewCircuitJson(
+    selectedSearchResult,
+    footprintPreviewOptions,
+  )
+  const showFootprintPreview = canPreviewFootprint(selectedSearchResult)
 
   React.useEffect(() => {
     setImportErrorMessage(null)
@@ -286,6 +307,9 @@ export const ImportComponentDialog2 = ({
       <DialogContent
         style={{
           width: "calc(100vw - 2rem)",
+          maxWidth: showFootprintPreview
+            ? "min(1120px, calc(100vw - 2rem))"
+            : "min(672px, calc(100vw - 2rem))",
           zIndex: zIndexMap.importComponentDialog,
         }}
         className="rf-rounded-sm rf-max-h-[90vh] rf-overflow-y-auto rf-overflow-x-hidden rf-flex rf-flex-col"
@@ -322,40 +346,68 @@ export const ImportComponentDialog2 = ({
               </TabsList>
             )}
 
-            <SearchBar
-              query={searchQuery}
-              placeholder={SOURCE_CONFIG[activeSource].placeholder}
-              isSearching={isSearching}
-              onQueryChange={setSearchQuery}
-              onSubmit={performSearch}
-            />
-
-            <div className="no-scrollbar rf-mt-4 rf-flex-1 rf-min-h-[200px] !rf-max-h-[40vh] !rf-overflow-y-auto rf-overflow-x-hidden rf-border rf-rounded-md rf-min-w-0">
-              {isSearching ? (
-                <div className="rf-p-8 rf-text-center rf-text-zinc-500">
-                  <Loader2 className="rf-h-8 rf-w-8 rf-animate-spin rf-mx-auto rf-mb-2" />
-                  <p>Searching...</p>
-                </div>
-              ) : searchResults.length > 0 ? (
-                <SearchResultsList
-                  results={searchResults}
-                  selected={selectedSearchResult}
-                  onSelect={setSelectedSearchResult}
-                  onShowDetails={
-                    activeSource === "tscircuit.com"
-                      ? handleShowDetails
-                      : undefined
-                  }
+            <div
+              className="rf-min-w-0"
+              style={
+                showFootprintPreview
+                  ? {
+                      display: "grid",
+                      gridTemplateColumns:
+                        "minmax(0, 1fr) minmax(360px, 0.95fr)",
+                      gap: "1.5rem",
+                      alignItems: "start",
+                    }
+                  : undefined
+              }
+            >
+              <div className="rf-min-w-0">
+                <SearchBar
+                  query={searchQuery}
+                  placeholder={SOURCE_CONFIG[activeSource].placeholder}
+                  isSearching={isSearching}
+                  onQueryChange={setSearchQuery}
+                  onSubmit={performSearch}
                 />
-              ) : (
-                <div className="rf-p-8 rf-text-center rf-text-zinc-500">
-                  {searchError
-                    ? `Error: ${searchError}`
-                    : hasExecutedSearch
-                      ? SOURCE_CONFIG[activeSource].emptyMessage
-                      : "Enter a search term to find components"}
+
+                <div className="no-scrollbar rf-mt-4 rf-flex-1 rf-min-h-[200px] !rf-max-h-[40vh] !rf-overflow-y-auto rf-overflow-x-hidden rf-border rf-rounded-md rf-min-w-0">
+                  {isSearching ? (
+                    <div className="rf-p-8 rf-text-center rf-text-zinc-500">
+                      <Loader2 className="rf-h-8 rf-w-8 rf-animate-spin rf-mx-auto rf-mb-2" />
+                      <p>Searching...</p>
+                    </div>
+                  ) : searchResults.length > 0 ? (
+                    <SearchResultsList
+                      results={searchResults}
+                      selected={selectedSearchResult}
+                      onSelect={setSelectedSearchResult}
+                      onShowDetails={
+                        activeSource === "tscircuit.com"
+                          ? handleShowDetails
+                          : undefined
+                      }
+                    />
+                  ) : (
+                    <div className="rf-p-8 rf-text-center rf-text-zinc-500">
+                      {searchError
+                        ? `Error: ${searchError}`
+                        : hasExecutedSearch
+                          ? SOURCE_CONFIG[activeSource].emptyMessage
+                          : "Enter a search term to find components"}
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
+
+              {showFootprintPreview ? (
+                <div className="rf-mt-4">
+                  <FootprintPreviewPanel
+                    circuitJson={footprintPreviewCircuitJson}
+                    error={footprintPreviewError}
+                    isLoading={isFootprintPreviewLoading}
+                    height={325}
+                  />
+                </div>
+              ) : null}
             </div>
           </Tabs>
         ) : null}

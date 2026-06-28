@@ -1,5 +1,6 @@
-import { API_BASE } from "lib/components/RunFrameWithApi/api-base"
 import { loadEasyedaBrowser } from "lib/optional-features/importing/load-easyeda-browser"
+import { createEasyEdaProxyFetch } from "lib/optional-features/importing/create-easyeda-proxy-fetch"
+import type { AnyCircuitElement } from "circuit-json"
 import type { JlcpcbComponentSummary } from "../types"
 
 interface JlcpcbComponentApiResult {
@@ -46,32 +47,55 @@ export const mapJlcpcbComponentToSummary = (
   isBasic: component.is_basic,
 })
 
+export type JlcpcbPreviewLoadOptions = {
+  headers?: Record<string, string>
+  apiBase?: string
+}
+
+type EasyEdaFetchOptions = JlcpcbPreviewLoadOptions & {
+  includeModelMetadata?: boolean
+}
+
+const fetchEasyEdaComponentForJlcpcbPart = async (
+  partNumber: string,
+  opts?: EasyEdaFetchOptions,
+) => {
+  const { fetchEasyEDAComponent } = await loadEasyedaBrowser()
+
+  return fetchEasyEDAComponent(partNumber, {
+    fetch: createEasyEdaProxyFetch(opts),
+    includeModelMetadata: opts?.includeModelMetadata,
+  })
+}
+
 export const loadJlcpcbComponentTsx = async (
   partNumber: string,
   opts?: { headers?: Record<string, string>; apiBase?: string },
 ): Promise<string> => {
-  const { fetchEasyEDAComponent, convertRawEasyToTsx } =
-    await loadEasyedaBrowser()
+  const { convertRawEasyToTsx } = await loadEasyedaBrowser()
 
-  const component = await fetchEasyEDAComponent(partNumber, {
-    // @ts-ignore
-    fetch: (url, options: RequestInit & { headers?: Record<string, string> }) =>
-      fetch(`${opts?.apiBase ?? API_BASE}/proxy`, {
-        ...options,
-        headers: {
-          ...options?.headers,
-          "X-Target-Url": url.toString(),
-          "X-Sender-Origin": options?.headers?.origin ?? "",
-          "X-Sender-Host": options?.headers?.host ?? "https://easyeda.com",
-          "X-Sender-Referer": options?.headers?.referer ?? "",
-          "X-Sender-User-Agent": options?.headers?.userAgent ?? "",
-          "X-Sender-Cookie": options?.headers?.cookie ?? "",
-          authority: options?.headers?.authority ?? "",
-          "content-type": options?.headers?.["content-type"] ?? "",
-          ...opts?.headers,
-        },
-      }),
-  })
+  const component = await fetchEasyEdaComponentForJlcpcbPart(partNumber, opts)
 
   return convertRawEasyToTsx({ rawEasy: component })
+}
+
+export const loadJlcpcbComponentCircuitJson = async (
+  partNumber: string,
+  opts?: { headers?: Record<string, string>; apiBase?: string },
+): Promise<AnyCircuitElement[]> => {
+  const { EasyEdaJsonSchema, convertEasyEdaJsonToCircuitJson } =
+    await loadEasyedaBrowser()
+
+  const component = await fetchEasyEdaComponentForJlcpcbPart(partNumber, {
+    ...opts,
+    includeModelMetadata: false,
+  })
+  // Use the supplier's actual footprint data instead of inferring a package.
+  const betterEasy = EasyEdaJsonSchema.parse(component)
+
+  return convertEasyEdaJsonToCircuitJson(betterEasy, {
+    shouldRecenter: true,
+    showDesignator: true,
+    useModelCdn: false,
+  })
 }

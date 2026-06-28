@@ -76,7 +76,7 @@ export const loadKicadFootprintCircuitJson = async (
   const footprintContent = await response.text()
   // Use the shared runtime importer so this converter loads correctly after deploy.
   const { KicadFootprintToCircuitJsonConverter } = await importer(
-    "kicad-to-circuit-json"
+    "kicad-to-circuit-json",
   )
   const converter = new KicadFootprintToCircuitJsonConverter()
 

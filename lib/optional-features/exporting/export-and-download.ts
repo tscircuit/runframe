@@ -11,6 +11,7 @@ import { sanitizeFileName } from "lib/utils/sanitizeFileName"
 
 export const availableExports = [
   { extension: "json", name: "Circuit JSON" },
+  { extension: "json", name: "Simple Route JSON" },
   { extension: "zip", name: "Fabrication Files" },
   { extension: "zip", name: "KiCad Project" },
   { extension: "zip", name: "KiCad Library" },
@@ -29,10 +30,12 @@ type ExportName = (typeof availableExports)[number]["name"]
 export const exportAndDownload = async ({
   exportName,
   circuitJson,
+  simpleRouteJson,
   projectName: rawProjectName,
 }: {
   exportName: ExportName
   circuitJson: CircuitJson
+  simpleRouteJson?: any
   projectName: string
 }) => {
   const projectName = sanitizeFileName(rawProjectName)
@@ -52,6 +55,16 @@ export const exportAndDownload = async ({
   if (exportName === "Circuit JSON") {
     openForDownload(JSON.stringify(circuitJson, null, 2), {
       fileName: `${projectName}.circuit.json`,
+      mimeType: "application/json",
+    })
+    return
+  }
+  if (exportName === "Simple Route JSON") {
+    if (!simpleRouteJson) {
+      throw new Error("No Simple Route JSON available to export")
+    }
+    openForDownload(JSON.stringify(simpleRouteJson, null, 2), {
+      fileName: `${projectName}.simple-route.json`,
       mimeType: "application/json",
     })
     return

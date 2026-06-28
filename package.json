@@ -64,7 +64,7 @@
     "chokidar-cli": "^3.0.0",
     "circuit-json-to-bom-csv": "^0.0.9",
     "circuit-json-to-gerber": "^0.0.78",
-    "circuit-json-to-kicad": "^0.0.153",
+    "circuit-json-to-kicad": "^0.0.155",
     "circuit-json-to-lbrn": "^0.0.74",
     "circuit-json-to-pnp-csv": "^0.0.7",
     "circuit-json-to-step": "^0.0.36",

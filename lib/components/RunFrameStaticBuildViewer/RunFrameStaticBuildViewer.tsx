@@ -7,6 +7,7 @@ import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 import { guessEntrypoint } from "lib/runner"
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary"
 import type { TabId } from "../CircuitJsonPreview/PreviewContentProps"
+import { useStaticCircuitJsonPathHash } from "./use-static-circuit-json-path-hash"
 
 export interface CircuitJsonFileReference {
   filePath: string
@@ -34,11 +35,8 @@ export const RunFrameStaticBuildViewer = (
 ) => {
   useStyles()
 
-  const [currentCircuitJsonPath, setCurrentCircuitJsonPath] = useState<string>(
-    () => {
-      return props.initialCircuitPath ?? ""
-    },
-  )
+  const { currentCircuitJsonPath, setCurrentCircuitJsonPath, updateFileHash } =
+    useStaticCircuitJsonPathHash(props.initialCircuitPath)
 
   const [circuitJson, setCircuitJson] = useState<CircuitJson | null>(null)
   const [isLoadingCurrentFile, setIsLoadingCurrentFile] = useState(false)
@@ -73,6 +71,7 @@ export const RunFrameStaticBuildViewer = (
     async (filePath: string) => {
       if (fileCache[filePath]) {
         setCircuitJson(fileCache[filePath])
+        updateFileHash(filePath)
         props.onCircuitJsonPathChange?.(filePath)
         return
       }
@@ -102,6 +101,7 @@ export const RunFrameStaticBuildViewer = (
 
         setFileCache((prev) => ({ ...prev, [filePath]: circuitJsonData }))
         setCircuitJson(circuitJsonData)
+        updateFileHash(filePath)
         props.onCircuitJsonPathChange?.(filePath)
 
         setFailedFiles((prev) => {
@@ -130,6 +130,7 @@ export const RunFrameStaticBuildViewer = (
       props.onFetchFile,
       props.onCircuitJsonPathChange,
       defaultFetchFile,
+      updateFileHash,
     ],
   )
 

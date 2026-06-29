@@ -1,14 +1,12 @@
 import type { AnyCircuitElement } from "circuit-json"
-import type { convertCircuitJsonToBomRows } from "circuit-json-to-bom-csv"
 import type React from "react"
+import type { BomRow } from "../../optional-features/exporting/dynamic-converters"
+
+export type { BomRow } from "../../optional-features/exporting/dynamic-converters"
 
 export interface BomTableProps {
   circuitJson: AnyCircuitElement[]
 }
-
-export type BomRow = Awaited<
-  ReturnType<typeof convertCircuitJsonToBomRows>
->[number]
 
 export type BomMetadata = {
   extraColumnNames: string[]

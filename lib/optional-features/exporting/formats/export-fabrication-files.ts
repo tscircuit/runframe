@@ -1,11 +1,10 @@
 import type { AnyCircuitElement } from "circuit-json"
 import JSZip from "jszip"
-import importer from "@tscircuit/internal-dynamic-import"
 import {
-  convertCircuitJsonToBomRows,
-  convertBomRowsToCsv,
-} from "circuit-json-to-bom-csv"
-import { convertCircuitJsonToPickAndPlaceCsv } from "circuit-json-to-pnp-csv"
+  loadBomCsvConverter,
+  loadGerberConverter,
+  loadPnpCsvConverter,
+} from "../dynamic-converters"
 import { openForDownload } from "../open-for-download"
 
 export const exportFabricationFiles = async ({
@@ -17,12 +16,9 @@ export const exportFabricationFiles = async ({
 }) => {
   const zip = new JSZip()
 
-  const {
-    stringifyGerberCommandLayers,
-    convertSoupToGerberCommands,
-    convertSoupToExcellonDrillCommands,
-    stringifyExcellonDrill,
-  } = await importer("circuit-json-to-gerber")
+  const [gerberConverter, bomCsvConverter, pnpCsvConverter] = await Promise.all(
+    [loadGerberConverter(), loadBomCsvConverter(), loadPnpCsvConverter()],
+  )
 
   // Filter out error and warning elements for gerber/drill generation
   const filteredCircuitJson = circuitJson.filter(
@@ -30,31 +26,38 @@ export const exportFabricationFiles = async ({
   ) as any
 
   // Generate Gerber files
-  const gerberLayerCmds = convertSoupToGerberCommands(filteredCircuitJson, {
-    flip_y_axis: false,
-  })
-  const gerberFileContents = stringifyGerberCommandLayers(gerberLayerCmds)
+  const gerberLayerCmds = gerberConverter.convertSoupToGerberCommands(
+    filteredCircuitJson,
+    {
+      flip_y_axis: false,
+    },
+  )
+  const gerberFileContents =
+    gerberConverter.stringifyGerberCommandLayers(gerberLayerCmds)
 
   for (const [fileName, fileContents] of Object.entries(gerberFileContents)) {
     zip.file(`gerber/${fileName}.gbr`, fileContents)
   }
 
   // Generate Drill files
-  const drillCmds = convertSoupToExcellonDrillCommands({
+  const drillCmds = gerberConverter.convertSoupToExcellonDrillCommands({
     circuitJson: filteredCircuitJson,
     is_plated: true,
     flip_y_axis: false,
   })
-  const drillFileContents = stringifyExcellonDrill(drillCmds)
+  const drillFileContents = gerberConverter.stringifyExcellonDrill(drillCmds)
   zip.file("gerber/drill.drl", drillFileContents)
 
   // Generate BOM CSV
-  const bomRows = await convertCircuitJsonToBomRows({ circuitJson })
-  const bomCsv = await convertBomRowsToCsv(bomRows)
+  const bomRows = await bomCsvConverter.convertCircuitJsonToBomRows({
+    circuitJson,
+  })
+  const bomCsv = await bomCsvConverter.convertBomRowsToCsv(bomRows)
   zip.file("bom.csv", bomCsv)
 
   // Generate Pick and Place CSV
-  const pnpCsv = await convertCircuitJsonToPickAndPlaceCsv(circuitJson)
+  const pnpCsv =
+    await pnpCsvConverter.convertCircuitJsonToPickAndPlaceCsv(circuitJson)
   zip.file("pick_and_place.csv", pnpCsv)
 
   // Generate and download the zip file

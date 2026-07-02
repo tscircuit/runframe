@@ -77,9 +77,19 @@ export const useEditEventController = () => {
     if (editEvents.filter((ee) => !ee._applied).length === 0) return
     const timeout = setTimeout(() => {
       markAllEditEventsApplied()
+      // Fire-and-forget, but catch rejections so a briefly unreachable file
+      // server surfaces as a handled warning + retry instead of an unhandled
+      // "TypeError: Failed to fetch". On failure, re-mark the events as
+      // unapplied so the save is retried once the server is back.
       applyEditEventsAndUpdateManualEditsJson(
         editEvents, //.filter((ee) => !ee._applied),
-      )
+      ).catch((error) => {
+        debug(
+          "failed to persist manual edits, will retry on next change",
+          error,
+        )
+        setEditEvents((prev) => prev.map((ee) => ({ ...ee, _applied: false })))
+      })
     }, 1000)
 
     return () => clearTimeout(timeout)

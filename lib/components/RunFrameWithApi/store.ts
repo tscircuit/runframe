@@ -17,11 +17,32 @@ import { isDynamicFilePath } from "./isDynamicFilePath"
 
 const debug = Debug.extend("store")
 
+/**
+ * Wrapper around `fetch` that converts network-level failures (e.g. the local
+ * file server being briefly unreachable) into a clear, handled error instead
+ * of a bare `TypeError: Failed to fetch`. Callers are expected to catch this so
+ * a transient outage surfaces as a handled warning/retry rather than an
+ * unhandled promise rejection.
+ */
+async function apiFetch(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<Response> {
+  try {
+    return await fetch(input, init)
+  } catch (error) {
+    throw new Error(
+      `RunFrame could not reach the file server at ${API_BASE}. Is it running?`,
+      { cause: error },
+    )
+  }
+}
+
 async function upsertFileApi(
   path: FilePath,
   content: FileContent,
 ): Promise<File> {
-  const response = await fetch(`${API_BASE}/files/upsert`, {
+  const response = await apiFetch(`${API_BASE}/files/upsert`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ file_path: path, text_content: content }),
@@ -31,7 +52,7 @@ async function upsertFileApi(
 }
 
 async function getFileApi(path: FilePath): Promise<File> {
-  const response = await fetch(
+  const response = await apiFetch(
     `${API_BASE}/files/get?file_path=${encodeURIComponent(path)}`,
   )
   const data = await response.json()
@@ -42,13 +63,13 @@ async function getEvents(since: string | null): Promise<FileUpdatedEvent[]> {
   const url = since
     ? `${API_BASE}/events/list?since=${encodeURIComponent(since)}`
     : `${API_BASE}/events/list`
-  const response = await fetch(url)
+  const response = await apiFetch(url)
   const data = await response.json()
   return data.event_list
 }
 
 async function getInitialFilesFromApi(): Promise<Map<FilePath, FileContent>> {
-  const response = await fetch(`${API_BASE}/files/list`)
+  const response = await apiFetch(`${API_BASE}/files/list`)
   const { file_list } = (await response.json()) as {
     file_list: Array<{ file_id: string; file_path: string }>
   }
@@ -210,7 +231,7 @@ export const useRunFrameStore = create<RunFrameState>()(
       pushEvent: async (
         event: Omit<RunFrameEvent, "event_id" | "created_at">,
       ) => {
-        await fetch(`${API_BASE}/events/create`, {
+        await apiFetch(`${API_BASE}/events/create`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -245,10 +266,19 @@ export const useRunFrameStore = create<RunFrameState>()(
           ),
         }))
 
-        await upsertFileApi(
-          "manual-edits.json",
-          JSON.stringify(updatedManualEditsFileContent, null, 2),
-        )
+        try {
+          await upsertFileApi(
+            "manual-edits.json",
+            JSON.stringify(updatedManualEditsFileContent, null, 2),
+          )
+        } catch (error) {
+          // The file server may be briefly unreachable (stopped/restarted/blip
+          // mid-edit). Surface this as a handled error and let the caller retry
+          // instead of leaking an unhandled "Failed to fetch" rejection.
+          debug("failed to persist manual-edits.json", error)
+          set({ error: error as Error })
+          throw error
+        }
       },
 
       setSimulateScenarioOrder: (scenarioOrder?: string) =>

@@ -24,6 +24,7 @@ import {
 import { useRunFrameStore } from "../RunFrameWithApi/store"
 import { importComponentFromJlcpcb } from "lib/optional-features/importing/import-component-from-jlcpcb"
 import { toast } from "lib/utils/toast"
+import { copyToClipboard } from "lib/utils"
 import Debug from "debug"
 
 const debug = Debug("run-frame:ImportComponentDialog")
@@ -113,7 +114,7 @@ export const ImportComponentDialog = ({
 
               return { filePath }
             } else if (component.source === "kicad") {
-              await navigator.clipboard.writeText(component.name)
+              await copyToClipboard(component.name)
               return { footprint: component.name }
             }
           },

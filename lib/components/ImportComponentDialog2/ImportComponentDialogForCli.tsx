@@ -8,6 +8,7 @@ import type {
 } from "./types"
 import { useRunFrameStore } from "../RunFrameWithApi/store"
 import { toast } from "lib/utils/toast"
+import { copyToClipboard } from "lib/utils"
 
 type CliImportDialogProps = Omit<
   ImportComponentDialog2Props,
@@ -54,7 +55,7 @@ export const ImportComponentDialogForCli = (props: CliImportDialogProps) => {
   const handleKicadStringSelected = async ({
     footprint,
   }: KicadStringSelectedPayload) => {
-    await toast.promise(navigator.clipboard.writeText(footprint), {
+    await toast.promise(copyToClipboard(footprint), {
       loading: `Copying "${footprint}"`,
       success: `Copied "${footprint}" to clipboard`,
       error: (error) =>

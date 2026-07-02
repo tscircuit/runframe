@@ -20,22 +20,24 @@ const debug = Debug.extend("store")
 async function upsertFileApi(
   path: FilePath,
   content: FileContent,
-): Promise<File> {
+): Promise<File | null> {
   const response = await fetch(`${API_BASE}/files/upsert`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ file_path: path, text_content: content }),
   })
   const data = await response.json()
-  return data.file
+  return data.file ?? null
 }
 
-async function getFileApi(path: FilePath): Promise<File> {
+// Returns null when the file has been deleted or gone missing between the
+// /files/list call and this per-file fetch (the API responds with a null file).
+async function getFileApi(path: FilePath): Promise<File | null> {
   const response = await fetch(
     `${API_BASE}/files/get?file_path=${encodeURIComponent(path)}`,
   )
   const data = await response.json()
-  return data.file
+  return data.file ?? null
 }
 
 async function getEvents(since: string | null): Promise<FileUpdatedEvent[]> {
@@ -58,7 +60,9 @@ async function getInitialFilesFromApi(): Promise<Map<FilePath, FileContent>> {
   for (const file of file_list) {
     if (isDynamicFilePath(file.file_path)) {
       const fullFile = await getFileApi(file.file_path)
-      fileMap.set(file.file_path, fullFile.text_content)
+      // The file may have been deleted between /files/list and /files/get
+      if (!fullFile) continue
+      fileMap.set(file.file_path, fullFile.text_content ?? "")
       continue
     }
     fileMap.set(file.file_path, "__STATIC_ASSET__")
@@ -94,8 +98,12 @@ export const useRunFrameStore = create<RunFrameState>()(
       upsertFile: async (path, content) => {
         try {
           const file = await upsertFileApi(path, content)
+          if (!file) return
           set((state) => ({
-            fsMap: new Map(state.fsMap).set(file.file_path, file.text_content),
+            fsMap: new Map(state.fsMap).set(
+              file.file_path,
+              file.text_content ?? "",
+            ),
           }))
         } catch (error) {
           set({ error: error as Error })
@@ -105,8 +113,12 @@ export const useRunFrameStore = create<RunFrameState>()(
       getFile: async (path) => {
         try {
           const file = await getFileApi(path)
+          if (!file) return
           set((state) => ({
-            fsMap: new Map(state.fsMap).set(file.file_path, file.text_content),
+            fsMap: new Map(state.fsMap).set(
+              file.file_path,
+              file.text_content ?? "",
+            ),
           }))
         } catch (error) {
           set({ error: error as Error })
@@ -164,6 +176,8 @@ export const useRunFrameStore = create<RunFrameState>()(
                 if (event.event_type === "FILE_UPDATED") {
                   fsUpdateCount++
                   const file = await getFileApi(event.file_path)
+                  // The file may have been deleted between the event and this fetch
+                  if (!file) continue
                   // Don't update the manual edits file if we're the ones who changed it
                   if (
                     event.file_path === "manual_edits.json" &&

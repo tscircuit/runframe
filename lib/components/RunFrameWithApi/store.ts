@@ -86,9 +86,17 @@ export const useRunFrameStore = create<RunFrameState>()(
       recentlySavedFiles: [],
 
       loadInitialFiles: async () => {
-        const fsMap = await getInitialFilesFromApi()
-        debug("loaded initial files", { fsMap })
-        set({ fsMap })
+        try {
+          const fsMap = await getInitialFilesFromApi()
+          debug("loaded initial files", { fsMap })
+          set({ fsMap })
+        } catch (error) {
+          // The dev/standalone API server can be briefly unreachable on boot,
+          // in which case fetch throws "TypeError: Failed to fetch". Store the
+          // error in state like the sibling API calls (upsertFile/getFile/
+          // polling) instead of letting it surface as an unhandled rejection.
+          set({ error: error as Error })
+        }
       },
 
       upsertFile: async (path, content) => {

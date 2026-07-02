@@ -86,9 +86,14 @@ export const useRunFrameStore = create<RunFrameState>()(
       recentlySavedFiles: [],
 
       loadInitialFiles: async () => {
-        const fsMap = await getInitialFilesFromApi()
-        debug("loaded initial files", { fsMap })
-        set({ fsMap })
+        try {
+          const fsMap = await getInitialFilesFromApi()
+          debug("loaded initial files", { fsMap })
+          set({ fsMap })
+        } catch (error) {
+          debug("failed to load initial files", error)
+          set({ error: error as Error })
+        }
       },
 
       upsertFile: async (path, content) => {

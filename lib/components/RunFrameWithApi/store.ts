@@ -210,13 +210,17 @@ export const useRunFrameStore = create<RunFrameState>()(
       pushEvent: async (
         event: Omit<RunFrameEvent, "event_id" | "created_at">,
       ) => {
-        await fetch(`${API_BASE}/events/create`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(event),
-        })
+        try {
+          await fetch(`${API_BASE}/events/create`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(event),
+          })
+        } catch (err) {
+          debug("Failed to create event", err)
+        }
       },
 
       applyEditEventsAndUpdateManualEditsJson: async (

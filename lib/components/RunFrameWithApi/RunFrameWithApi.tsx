@@ -348,6 +348,8 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
             event_type: "USER_CREATED_MANUAL_EDIT",
             ...ee,
           }),
+        }).catch((err) => {
+          debug("Failed to create USER_CREATED_MANUAL_EDIT event", err)
         })
 
         const manualEditsFilePath =
@@ -374,6 +376,8 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
             text_content: JSON.stringify(updatedManualEdits),
             initiator: "runframe",
           }),
+        }).catch((err) => {
+          debug("Failed to upsert manual edits file", err)
         })
       }}
       onLoginRequired={props.onLoginRequired}

@@ -32,7 +32,11 @@ export const useHasReceivedInitialFilesLoaded = () => {
       debug("No INITIAL_FILES_UPLOADED in history, waiting for polling.")
     }
 
-    initialize()
+    initialize().catch((e) => {
+      // A transient unreachable API during startup should degrade
+      // gracefully instead of surfacing as an unhandled rejection.
+      console.error("Failed to load initial files", e)
+    })
   }, [loadInitialFiles])
 
   useEffect(() => {

@@ -69,6 +69,14 @@ export const initPostHog = () => {
   posthog.init(POSTHOG_PROJECT_API_KEY, {
     api_host: POSTHOG_API_HOST,
     person_profiles: "always",
+    // RunFrame is embedded as a library inside host apps. Page-wide exception
+    // autocapture would attribute the *host* app's unhandled errors (e.g. a
+    // @typescript/ata type-acquisition fetch failure in an unrelated editor)
+    // to this project. RunFrame never intentionally captures exceptions, so we
+    // scope autocapture off here. This overrides the project's server-side
+    // autocapture-exceptions setting for RunFrame's client only and does not
+    // affect other apps' PostHog clients sharing the same project.
+    capture_exceptions: false,
   })
 
   return true

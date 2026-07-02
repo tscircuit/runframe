@@ -8,7 +8,7 @@ import {
 } from "lucide-react"
 import { Button } from "lib/components/ui/button"
 import { createSnippetUrl } from "@tscircuit/create-snippet-url"
-import { encodeFsMapToUrlHash } from "lib/utils"
+import { encodeFsMapToUrlHash, copyToClipboard } from "lib/utils"
 import { AutoroutingLogOptions } from "./AutoroutingLogOptions"
 import { useState, useMemo, useEffect } from "react"
 import type { CircuitJsonError } from "circuit-json"
@@ -384,8 +384,9 @@ export const ErrorTabContent = ({
               if (evalVersion) errorText += `\n@tscircuit/eval@${evalVersion}`
               if (softwareUsedString) errorText += `\n${softwareUsedString}`
               if (firstIssue.stack) errorText += `\n${firstIssue.stack}`
-              navigator.clipboard.writeText(errorText)
-              toast.success("Error copied to clipboard!")
+              copyToClipboard(errorText)
+                .then(() => toast.success("Error copied to clipboard!"))
+                .catch(() => toast.error("Failed to copy error to clipboard"))
             }}
           >
             <ClipboardIcon className="rf-w-4 rf-h-4" />

@@ -17,7 +17,11 @@ function IframeApp() {
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      if (event.data && "runframe_props" in event.data) {
+      if (
+        typeof event.data === "object" &&
+        event.data !== null &&
+        "runframe_props" in event.data
+      ) {
         setPropsFromParent(event.data.runframe_props)
         setPropsReceived(true)
       }

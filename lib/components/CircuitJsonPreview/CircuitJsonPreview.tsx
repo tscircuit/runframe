@@ -19,6 +19,7 @@ import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
 import { SchematicViewer } from "@tscircuit/schematic-viewer"
 import { AssemblyViewer, PinoutViewer } from "@tscircuit/assembly-viewer"
 import PreviewEmptyState from "../PreviewEmptyState"
+import PreviewLoadingState from "../PreviewLoadingState"
 import { CircuitJsonTableViewer } from "../CircuitJsonTableViewer/CircuitJsonTableViewer"
 import { BomTable } from "../BomTable"
 import { AnalogSimulationViewer } from "@tscircuit/schematic-viewer"
@@ -265,6 +266,24 @@ export const CircuitJsonPreview = ({
   const setCadViewerRef = useCallback((value: Object3D | null) => {
     window.TSCIRCUIT_3D_OBJECT_REF = value === null ? undefined : value
   }, [])
+
+  // A render is underway when the worker is running, or when we have a
+  // render_log that hasn't reached 100% yet. In that case the canvas should
+  // show a loading/progress indicator instead of the static "Tip:" empty state,
+  // so users can tell a render is in progress (or stuck) rather than not started.
+  const isRendering =
+    Boolean(isRunningCode) ||
+    (renderLog != null && (renderLog.progress ?? 0) < 1)
+
+  const renderEmptyState = () =>
+    isRendering ? (
+      <PreviewLoadingState
+        renderLog={renderLog}
+        activeEffectName={activeEffectName}
+      />
+    ) : (
+      <PreviewEmptyState onRunClicked={onRunClicked} />
+    )
 
   return (
     <div
@@ -594,7 +613,7 @@ export const CircuitJsonPreview = ({
                       // }}
                     />
                   ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                    renderEmptyState()
                   )}
                 </ErrorBoundary>
               </div>
@@ -622,7 +641,7 @@ export const CircuitJsonPreview = ({
                       debugGrid
                     />
                   ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                    renderEmptyState()
                   )}
                 </ErrorBoundary>
               </div>
@@ -649,7 +668,7 @@ export const CircuitJsonPreview = ({
                       }}
                     />
                   ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                    renderEmptyState()
                   )}
                 </ErrorBoundary>
               </div>
@@ -696,7 +715,7 @@ export const CircuitJsonPreview = ({
                       className={schematicSvgOptions?.className}
                     />
                   ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                    renderEmptyState()
                   )}
                 </ErrorBoundary>
               </div>
@@ -729,7 +748,7 @@ export const CircuitJsonPreview = ({
                       autoRotateDisabled={autoRotate3dViewerDisabled}
                     />
                   ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                    renderEmptyState()
                   )}
                 </ErrorBoundary>
               </div>
@@ -777,7 +796,7 @@ export const CircuitJsonPreview = ({
                       />
                     )
                   ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                    renderEmptyState()
                   )}
                 </ErrorBoundary>
               </div>
@@ -811,7 +830,7 @@ export const CircuitJsonPreview = ({
                   {circuitJson ? (
                     <BomTable circuitJson={circuitJson} />
                   ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                    renderEmptyState()
                   )}
                 </ErrorBoundary>
               </div>
@@ -831,7 +850,7 @@ export const CircuitJsonPreview = ({
                   {circuitJson ? (
                     <CircuitJsonTableViewer elements={circuitJson} />
                   ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                    renderEmptyState()
                   )}
                 </ErrorBoundary>
               </div>
@@ -863,7 +882,7 @@ export const CircuitJsonPreview = ({
                     onReportAutoroutingLog={onReportAutoroutingLog}
                   />
                 ) : (
-                  <PreviewEmptyState onRunClicked={onRunClicked} />
+                  renderEmptyState()
                 )}
               </div>
             </TabsContent>

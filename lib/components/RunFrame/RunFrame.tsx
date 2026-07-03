@@ -50,6 +50,10 @@ import {
   type RunCompletedPayload,
 } from "./run-completion"
 import {
+  EMPTY_FSMAP_ERROR_DELAY_MS,
+  shouldDeferNoFilesError,
+} from "./should-defer-no-files-error"
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -258,15 +262,35 @@ export const RunFrame = (props: RunFrameProps) => {
     const fsMapObj =
       fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap
 
-    // Check if no files are provided
+    // Check if no files are provided. An empty fsMap can be transient: even
+    // once `isLoadingFiles` is false, the "initial files loaded" signal and the
+    // file map are populated by separate updates, so files may still be en
+    // route while the map is momentarily empty (a loading race).
     if (!fsMapObj || Object.keys(fsMapObj).length === 0) {
-      setError({
-        error:
-          "No files provided. Please provide at least one file with code to execute.",
-        stack: "",
-      })
-      setIsRunning(false)
-      return
+      // A specific file was requested (entrypoint / main component). An empty
+      // map almost certainly means it hasn't loaded yet — stay quiet and let
+      // the loading state render instead of flashing a misleading error.
+      if (
+        shouldDeferNoFilesError({
+          entrypoint: props.entrypoint,
+          mainComponentPath: props.mainComponentPath,
+        })
+      ) {
+        return
+      }
+
+      // No file was explicitly requested. Wait a beat for loading to genuinely
+      // settle before surfacing the error, cancelling if the map populates (the
+      // effect re-runs on fsMap changes and this cleanup clears the timer).
+      const noFilesErrorTimeout = setTimeout(() => {
+        setError({
+          error:
+            "No files provided. Please provide at least one file with code to execute.",
+          stack: "",
+        })
+        setIsRunning(false)
+      }, EMPTY_FSMAP_ERROR_DELAY_MS)
+      return () => clearTimeout(noFilesErrorTimeout)
     }
 
     const wasTriggeredByRunButton =

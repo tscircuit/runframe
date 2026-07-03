@@ -63,6 +63,7 @@ import { version } from "../../../package.json"
 import type { Object3D } from "three"
 import { useEvalVersions } from "lib/hooks/use-eval-versions"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
+import { CrispFeedbackButton } from "./CrispFeedbackButton"
 
 declare global {
   interface Window {
@@ -341,6 +342,7 @@ export const CircuitJsonPreview = ({
                 </div>
               </div>
             )}
+            {showRightHeaderContent && <CrispFeedbackButton />}
             {showRightHeaderContent && (
               <TabsList>
                 {showCodeTab && <TabsTrigger value="code">Code</TabsTrigger>}

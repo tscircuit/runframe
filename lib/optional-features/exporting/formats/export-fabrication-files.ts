@@ -1,11 +1,6 @@
+import importer from "@tscircuit/internal-dynamic-import"
 import type { AnyCircuitElement } from "circuit-json"
 import JSZip from "jszip"
-import importer from "@tscircuit/internal-dynamic-import"
-import {
-  convertCircuitJsonToBomRows,
-  convertBomRowsToCsv,
-} from "circuit-json-to-bom-csv"
-import { convertCircuitJsonToPickAndPlaceCsv } from "circuit-json-to-pnp-csv"
 import { openForDownload } from "../open-for-download"
 
 export const exportFabricationFiles = async ({
@@ -17,12 +12,20 @@ export const exportFabricationFiles = async ({
 }) => {
   const zip = new JSZip()
 
-  const {
-    stringifyGerberCommandLayers,
-    convertSoupToGerberCommands,
-    convertSoupToExcellonDrillCommands,
-    stringifyExcellonDrill,
-  } = await importer("circuit-json-to-gerber")
+  const [
+    {
+      stringifyGerberCommandLayers,
+      convertSoupToGerberCommands,
+      convertSoupToExcellonDrillCommands,
+      stringifyExcellonDrill,
+    },
+    { convertCircuitJsonToBomRows, convertBomRowsToCsv },
+    { convertCircuitJsonToPickAndPlaceCsv },
+  ] = await Promise.all([
+    importer("circuit-json-to-gerber"),
+    importer("circuit-json-to-bom-csv"),
+    importer("circuit-json-to-pnp-csv"),
+  ])
 
   // Filter out error and warning elements for gerber/drill generation
   const filteredCircuitJson = circuitJson.filter(

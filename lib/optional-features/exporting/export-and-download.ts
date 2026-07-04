@@ -1,13 +1,13 @@
 import type { CircuitJson } from "circuit-json"
-import { exportFabricationFiles } from "./formats/export-fabrication-files"
-import { openForDownload } from "./open-for-download"
-import { exportGlb } from "./formats/export-glb"
-import { exportPinoutSvg } from "./formats/export-pinout-svg"
-import { exportKicadProject } from "./formats/export-kicad-project"
-import { exportKicadLibrary } from "./formats/export-kicad-library"
-import { exportStep } from "./formats/export-step"
-import { exportLbrn } from "./formats/export-lbrn"
 import { sanitizeFileName } from "lib/utils/sanitizeFileName"
+import { exportFabricationFiles } from "./formats/export-fabrication-files"
+import { exportGlb } from "./formats/export-glb"
+import { exportKicadLibrary } from "./formats/export-kicad-library"
+import { exportKicadProject } from "./formats/export-kicad-project"
+import { exportLbrn } from "./formats/export-lbrn"
+import { exportPinoutSvg } from "./formats/export-pinout-svg"
+import { exportStep } from "./formats/export-step"
+import { openForDownload } from "./open-for-download"
 
 export const availableExports = [
   { extension: "json", name: "Circuit JSON" },
@@ -41,7 +41,7 @@ export const exportAndDownload = async ({
   const projectName = sanitizeFileName(rawProjectName)
 
   if (exportName === "Fabrication Files") {
-    exportFabricationFiles({ circuitJson, projectName })
+    await exportFabricationFiles({ circuitJson, projectName })
     return
   }
   if (exportName === "KiCad Project") {

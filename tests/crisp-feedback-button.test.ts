@@ -5,12 +5,18 @@ test("shows Crisp feedback button in the CLI", () => {
   expect(shouldShowCrispFeedbackButton({ isCli: true })).toBe(true)
 })
 
-test("shows Crisp feedback button only on exact tscircuit.com host", () => {
+test("hides Crisp feedback button on tscircuit.com", () => {
   expect(shouldShowCrispFeedbackButton({ hostname: "tscircuit.com" })).toBe(
-    true,
+    false,
   )
+  expect(
+    shouldShowCrispFeedbackButton({
+      hostname: "tscircuit.com",
+      isCli: true,
+    }),
+  ).toBe(false)
   expect(shouldShowCrispFeedbackButton({ hostname: "TSCIRCUIT.COM" })).toBe(
-    true,
+    false,
   )
   expect(shouldShowCrispFeedbackButton({ hostname: "app.tscircuit.com" })).toBe(
     false,

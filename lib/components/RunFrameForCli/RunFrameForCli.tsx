@@ -43,6 +43,7 @@ export const RunFrameForCli = (props: {
         defaultToFullScreen={true}
         showToggleFullScreen={false}
         workerBlobUrl={props.workerBlobUrl}
+        isCli={true}
         showFilesSwitch
         showFileMenu={false}
         enableFetchProxy={props.enableFetchProxy}

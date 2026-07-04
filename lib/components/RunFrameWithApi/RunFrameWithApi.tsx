@@ -86,6 +86,7 @@ export interface RunFrameWithApiProps {
   evalWebWorkerBlobUrl?: string
   showFileMenu?: boolean
   schematicSvgOptions?: RunFrameProps["schematicSvgOptions"]
+  isCli?: boolean
 
   /**
    * Enable fetch proxy for the web worker (useful for standalone bundles)
@@ -296,6 +297,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     <RunFrame
       fsMap={fsMap}
       showFileMenu={props.showFileMenu}
+      isCli={props.isCli}
       schematicSvgOptions={props.schematicSvgOptions}
       isLoadingFiles={isLoadingFiles}
       evalVersion={props.evalVersion}

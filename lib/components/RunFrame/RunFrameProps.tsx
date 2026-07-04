@@ -53,6 +53,11 @@ export interface RunFrameProps {
   isWebEmbedded?: boolean
 
   /**
+   * Whether the run frame is running in the tscircuit CLI surface.
+   */
+  isCli?: boolean
+
+  /**
    * Whether to show the file menu
    */
   showFileMenu?: boolean

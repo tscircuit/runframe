@@ -9,6 +9,7 @@ import {
 
 const CRISP_WEBSITE_ID = "24b58135-86c7-4e4b-bf6e-cca862bc4b26"
 const CRISP_SCRIPT_ID = "runframe-crisp-chat-script"
+const TSCIRCUIT_HOSTNAME = "tscircuit.com"
 
 declare global {
   interface Window {
@@ -50,6 +51,23 @@ const openCrispChat = () => {
   configureCrisp()
   pushCrispCommand(["do", "chat:show"])
   pushCrispCommand(["do", "chat:open"])
+}
+
+export const shouldShowCrispFeedbackButton = ({
+  isCli,
+  hostname = typeof window !== "undefined"
+    ? window.location.hostname
+    : undefined,
+}: {
+  isCli?: boolean
+  hostname?: string
+} = {}) => {
+  if (isCli) return true
+  if (!hostname) return false
+
+  const normalizedHostname = hostname.toLowerCase()
+
+  return normalizedHostname === TSCIRCUIT_HOSTNAME
 }
 
 export const CrispFeedbackButton = () => {

@@ -63,7 +63,10 @@ import { version } from "../../../package.json"
 import type { Object3D } from "three"
 import { useEvalVersions } from "lib/hooks/use-eval-versions"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
-import { CrispFeedbackButton } from "./CrispFeedbackButton"
+import {
+  CrispFeedbackButton,
+  shouldShowCrispFeedbackButton,
+} from "./CrispFeedbackButton"
 
 declare global {
   interface Window {
@@ -128,6 +131,7 @@ export const CircuitJsonPreview = ({
   allowSelectingVersion = true,
   showFileMenu = false,
   isWebEmbedded = false,
+  isCli = false,
   projectName,
   schematicSvgOptions,
   onRerunWithDebug,
@@ -342,7 +346,10 @@ export const CircuitJsonPreview = ({
                 </div>
               </div>
             )}
-            {showRightHeaderContent && <CrispFeedbackButton />}
+            {showRightHeaderContent &&
+              shouldShowCrispFeedbackButton({ isCli }) && (
+                <CrispFeedbackButton />
+              )}
             {showRightHeaderContent && (
               <TabsList>
                 {showCodeTab && <TabsTrigger value="code">Code</TabsTrigger>}

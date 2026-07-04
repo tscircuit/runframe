@@ -125,6 +125,11 @@ export interface PreviewContentProps {
   isWebEmbedded?: boolean
 
   /**
+   * Whether the preview is running in the tscircuit CLI surface.
+   */
+  isCli?: boolean
+
+  /**
    * Project name to use for exports
    */
   projectName?: string

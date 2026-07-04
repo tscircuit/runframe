@@ -746,6 +746,7 @@ export const RunFrame = (props: RunFrameProps) => {
           incRunCountTrigger(1)
         }}
         solverEvents={solverEvents}
+        isCli={props.isCli}
         showSchematicDebugGrid={showSchematicDebugGrid}
         showSchematicPorts={showSchematicPorts}
         onChangeShowSchematicDebugGrid={setShowSchematicDebugGrid}

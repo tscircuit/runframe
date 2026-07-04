@@ -1,11 +1,7 @@
+import importer from "@tscircuit/internal-dynamic-import"
 import type { AnyCircuitElement } from "circuit-json"
 import JSZip from "jszip"
-import importer from "@tscircuit/internal-dynamic-import"
-import {
-  convertCircuitJsonToBomRows,
-  convertBomRowsToCsv,
-} from "circuit-json-to-bom-csv"
-import { convertCircuitJsonToPickAndPlaceCsv } from "circuit-json-to-pnp-csv"
+import { toast } from "lib/utils/toast"
 import { openForDownload } from "../open-for-download"
 
 export const exportFabricationFiles = async ({
@@ -15,52 +11,74 @@ export const exportFabricationFiles = async ({
   circuitJson: AnyCircuitElement[]
   projectName: string
 }) => {
-  const zip = new JSZip()
+  await toast.promise(
+    (async () => {
+      const zip = new JSZip()
 
-  const {
-    stringifyGerberCommandLayers,
-    convertSoupToGerberCommands,
-    convertSoupToExcellonDrillCommands,
-    stringifyExcellonDrill,
-  } = await importer("circuit-json-to-gerber")
+      const [
+        {
+          stringifyGerberCommandLayers,
+          convertSoupToGerberCommands,
+          convertSoupToExcellonDrillCommands,
+          stringifyExcellonDrill,
+        },
+        { convertCircuitJsonToBomRows, convertBomRowsToCsv },
+        { convertCircuitJsonToPickAndPlaceCsv },
+      ] = await Promise.all([
+        importer("circuit-json-to-gerber"),
+        importer("circuit-json-to-bom-csv"),
+        importer("circuit-json-to-pnp-csv"),
+      ])
 
-  // Filter out error and warning elements for gerber/drill generation
-  const filteredCircuitJson = circuitJson.filter(
-    (element) => !("error_type" in element) && !("warning_type" in element),
-  ) as any
+      // Filter out error and warning elements for gerber/drill generation
+      const filteredCircuitJson = circuitJson.filter(
+        (element) => !("error_type" in element) && !("warning_type" in element),
+      ) as any
 
-  // Generate Gerber files
-  const gerberLayerCmds = convertSoupToGerberCommands(filteredCircuitJson, {
-    flip_y_axis: false,
-  })
-  const gerberFileContents = stringifyGerberCommandLayers(gerberLayerCmds)
+      // Generate Gerber files
+      const gerberLayerCmds = convertSoupToGerberCommands(filteredCircuitJson, {
+        flip_y_axis: false,
+      })
+      const gerberFileContents = stringifyGerberCommandLayers(gerberLayerCmds)
 
-  for (const [fileName, fileContents] of Object.entries(gerberFileContents)) {
-    zip.file(`gerber/${fileName}.gbr`, fileContents)
-  }
+      for (const [fileName, fileContents] of Object.entries(
+        gerberFileContents,
+      )) {
+        zip.file(`gerber/${fileName}.gbr`, fileContents)
+      }
 
-  // Generate Drill files
-  const drillCmds = convertSoupToExcellonDrillCommands({
-    circuitJson: filteredCircuitJson,
-    is_plated: true,
-    flip_y_axis: false,
-  })
-  const drillFileContents = stringifyExcellonDrill(drillCmds)
-  zip.file("gerber/drill.drl", drillFileContents)
+      // Generate Drill files
+      const drillCmds = convertSoupToExcellonDrillCommands({
+        circuitJson: filteredCircuitJson,
+        is_plated: true,
+        flip_y_axis: false,
+      })
+      const drillFileContents = stringifyExcellonDrill(drillCmds)
+      zip.file("gerber/drill.drl", drillFileContents)
 
-  // Generate BOM CSV
-  const bomRows = await convertCircuitJsonToBomRows({ circuitJson })
-  const bomCsv = await convertBomRowsToCsv(bomRows)
-  zip.file("bom.csv", bomCsv)
+      // Generate BOM CSV
+      const bomRows = await convertCircuitJsonToBomRows({ circuitJson })
+      const bomCsv = await convertBomRowsToCsv(bomRows)
+      zip.file("bom.csv", bomCsv)
 
-  // Generate Pick and Place CSV
-  const pnpCsv = await convertCircuitJsonToPickAndPlaceCsv(circuitJson)
-  zip.file("pick_and_place.csv", pnpCsv)
+      // Generate Pick and Place CSV
+      const pnpCsv = await convertCircuitJsonToPickAndPlaceCsv(circuitJson)
+      zip.file("pick_and_place.csv", pnpCsv)
 
-  // Generate and download the zip file
-  const zipBlob = await zip.generateAsync({ type: "blob" })
+      // Generate and download the zip file
+      const zipBlob = await zip.generateAsync({ type: "blob" })
 
-  openForDownload(zipBlob, {
-    fileName: `${projectName}_fabrication_files.zip`,
-  })
+      openForDownload(zipBlob, {
+        fileName: `${projectName}_fabrication_files.zip`,
+      })
+    })(),
+    {
+      loading: "Generating fabrication files...",
+      success: "Fabrication ZIP ready",
+      error: (error) =>
+        `Failed to generate fabrication files: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+    },
+  )
 }

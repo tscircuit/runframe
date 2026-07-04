@@ -67,10 +67,7 @@ export const shouldShowCrispFeedbackButton = ({
 
   const normalizedHostname = hostname.toLowerCase()
 
-  return (
-    normalizedHostname === TSCIRCUIT_HOSTNAME ||
-    normalizedHostname.endsWith(`.${TSCIRCUIT_HOSTNAME}`)
-  )
+  return normalizedHostname === TSCIRCUIT_HOSTNAME
 }
 
 export const CrispFeedbackButton = () => {

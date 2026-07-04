@@ -62,12 +62,9 @@ export const shouldShowCrispFeedbackButton = ({
   isCli?: boolean
   hostname?: string
 } = {}) => {
+  if (hostname?.toLowerCase() === TSCIRCUIT_HOSTNAME) return false
   if (isCli) return true
-  if (!hostname) return false
-
-  const normalizedHostname = hostname.toLowerCase()
-
-  return normalizedHostname === TSCIRCUIT_HOSTNAME
+  return false
 }
 
 export const CrispFeedbackButton = () => {
@@ -79,14 +76,16 @@ export const CrispFeedbackButton = () => {
             type="button"
             variant="ghost"
             size="icon"
-            aria-label="Give feeback"
+            aria-label="Get Support or Give Feedback"
             onClick={openCrispChat}
             className="rf-h-8 rf-w-8"
           >
             <MessageCircleQuestion className="rf-h-4 rf-w-4 rf-text-gray-500" />
           </Button>
         </TooltipTrigger>
-        <TooltipContent side="bottom">Give feeback</TooltipContent>
+        <TooltipContent side="bottom">
+          Get Support or Give Feedback
+        </TooltipContent>
       </Tooltip>
     </TooltipProvider>
   )

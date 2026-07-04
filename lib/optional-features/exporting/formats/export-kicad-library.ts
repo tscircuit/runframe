@@ -1,6 +1,7 @@
+import importer from "@tscircuit/internal-dynamic-import"
 import type { CircuitJson } from "circuit-json"
 import JSZip from "jszip"
-import importer from "@tscircuit/internal-dynamic-import"
+import { toast } from "lib/utils/toast"
 import { openForDownload } from "../open-for-download"
 
 export const createKicadLibraryZip = async ({
@@ -72,13 +73,25 @@ export const exportKicadLibrary = async ({
   circuitJson: CircuitJson
   projectName: string
 }) => {
-  const zip = await createKicadLibraryZip({
-    circuitJson,
-    libraryName: projectName,
-  })
-  const zipBlob = await zip.generateAsync({ type: "blob" })
+  await toast.promise(
+    (async () => {
+      const zip = await createKicadLibraryZip({
+        circuitJson,
+        libraryName: projectName,
+      })
+      const zipBlob = await zip.generateAsync({ type: "blob" })
 
-  openForDownload(zipBlob, {
-    fileName: `${projectName}_kicad_library.zip`,
-  })
+      openForDownload(zipBlob, {
+        fileName: `${projectName}_kicad_library.zip`,
+      })
+    })(),
+    {
+      loading: "Generating KiCad library...",
+      success: "KiCad library ZIP ready",
+      error: (error) =>
+        `Failed to generate KiCad library: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+    },
+  )
 }

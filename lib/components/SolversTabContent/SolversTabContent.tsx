@@ -122,6 +122,44 @@ const SolverDebuggerActions = ({
   )
 }
 
+const SolverReportIconButton = ({
+  solverEvent,
+}: {
+  solverEvent: SolverStartedEvent
+}) => {
+  const reportLink = getSolverReportLink(solverEvent.solverName)
+
+  if (!reportLink) {
+    return (
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="rf-h-8 rf-w-8"
+        disabled
+        title="No report link configured for this solver"
+        aria-label="Report solver bug"
+      >
+        <BugIcon className="rf-w-4 rf-h-4" />
+      </Button>
+    )
+  }
+
+  return (
+    <Button asChild variant="ghost" size="icon" className="rf-h-8 rf-w-8">
+      <a
+        href={reportLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Report solver bug"
+        aria-label="Report solver bug"
+      >
+        <BugIcon className="rf-w-4 rf-h-4" />
+      </a>
+    </Button>
+  )
+}
+
 export const SolversTabContent = ({
   solverEvents = [],
 }: SolversTabContentProps) => {
@@ -241,7 +279,7 @@ export const SolversTabContent = ({
       <div className="rf-flex-1 rf-overflow-hidden">
         {selectedSolverEvent ? (
           solverResult.instance ? (
-            <div className="rf-flex rf-h-full rf-flex-col">
+            <div className="rf-flex rf-h-full rf-flex-col rf-overflow-y-auto">
               <SolverDebuggerActions solverEvent={selectedSolverEvent} />
               <div className="rf-min-h-0 rf-flex-1">
                 <ErrorBoundary
@@ -297,17 +335,20 @@ export const SolversTabContent = ({
                   <span className="rf-text-sm rf-font-medium rf-text-gray-700">
                     Solver Parameters
                   </span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="rf-h-8 rf-w-8"
-                    aria-label="Download solver input JSON"
-                    title="Download solver input JSON"
-                    onClick={() => downloadSolverInput(selectedSolverEvent)}
-                  >
-                    <DownloadIcon className="rf-w-4 rf-h-4" />
-                  </Button>
+                  <div className="rf-flex rf-items-center rf-gap-1">
+                    <SolverReportIconButton solverEvent={selectedSolverEvent} />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="rf-h-8 rf-w-8"
+                      aria-label="Download solver input JSON"
+                      title="Download solver input JSON"
+                      onClick={() => downloadSolverInput(selectedSolverEvent)}
+                    >
+                      <DownloadIcon className="rf-w-4 rf-h-4" />
+                    </Button>
+                  </div>
                 </div>
                 <div className="rf-p-3 rf-bg-white rf-border-t rf-border-gray-200">
                   <pre className="rf-text-xs rf-font-mono rf-text-gray-600 rf-whitespace-pre-wrap rf-overflow-x-auto">

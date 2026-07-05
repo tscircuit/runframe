@@ -1,10 +1,13 @@
-import { useState, useMemo } from "react"
-import { Box, LayoutGrid, Route } from "lucide-react"
-import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentProps"
 import { SOLVERS } from "@tscircuit/core"
 import { GenericSolverDebugger } from "@tscircuit/solver-utils/react"
+import { Box, DownloadIcon, LayoutGrid, Route } from "lucide-react"
+import { useMemo, useState } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 import { useInjectTailwind } from "../../hooks/useInjectTailwind"
+import { openForDownload } from "../../optional-features/exporting/open-for-download"
+import { sanitizeFileName } from "../../utils/sanitizeFileName"
+import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentProps"
+import { Button } from "../ui/button"
 
 interface SolversTabContentProps {
   solverEvents?: SolverStartedEvent[]
@@ -24,6 +27,16 @@ const getSolverIcon = (solverName: string) => {
     return Route
   }
   return Box
+}
+
+const getSolverInputFileName = (solverEvent: SolverStartedEvent) =>
+  `${sanitizeFileName(`${solverEvent.componentName}-${solverEvent.solverName}`)}-solver-input.json`
+
+const downloadSolverInput = (solverEvent: SolverStartedEvent) => {
+  openForDownload(JSON.stringify(solverEvent.solverParams, null, 2), {
+    fileName: getSolverInputFileName(solverEvent),
+    mimeType: "application/json",
+  })
 }
 
 export const SolversTabContent = ({
@@ -192,10 +205,21 @@ export const SolversTabContent = ({
                 </div>
               )}
               <div className="rf-border rf-border-gray-200 rf-rounded-md rf-overflow-hidden">
-                <div className="rf-px-3 rf-py-2 rf-bg-gray-50">
+                <div className="rf-px-3 rf-py-2 rf-bg-gray-50 rf-flex rf-items-center rf-justify-between rf-gap-2">
                   <span className="rf-text-sm rf-font-medium rf-text-gray-700">
                     Solver Parameters
                   </span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="rf-h-8 rf-w-8"
+                    aria-label="Download solver input JSON"
+                    title="Download solver input JSON"
+                    onClick={() => downloadSolverInput(selectedSolverEvent)}
+                  >
+                    <DownloadIcon className="rf-w-4 rf-h-4" />
+                  </Button>
                 </div>
                 <div className="rf-p-3 rf-bg-white rf-border-t rf-border-gray-200">
                   <pre className="rf-text-xs rf-font-mono rf-text-gray-600 rf-whitespace-pre-wrap rf-overflow-x-auto">

@@ -1,6 +1,9 @@
-import { AlertCircle, Loader2 } from "lucide-react"
 import { PCBViewer } from "@tscircuit/pcb-viewer"
 import type { AnyCircuitElement } from "circuit-json"
+import { AlertCircle, Loader2 } from "lucide-react"
+import type { ComponentProps } from "react"
+
+type PCBViewerProps = ComponentProps<typeof PCBViewer>
 
 interface FootprintPreviewPanelProps {
   circuitJson: AnyCircuitElement[] | null
@@ -41,7 +44,7 @@ export const FootprintPreviewPanel = ({
       ) : circuitJson ? (
         <div className="rf-w-full rf-min-w-0 rf-overflow-hidden">
           <PCBViewer
-            circuitJson={circuitJson}
+            circuitJson={circuitJson as PCBViewerProps["circuitJson"]}
             height={height}
             allowEditing={false}
             clickToInteractEnabled={false}

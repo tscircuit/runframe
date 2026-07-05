@@ -1,10 +1,13 @@
-import { useState, useMemo } from "react"
-import { Box, LayoutGrid, Route } from "lucide-react"
-import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentProps"
 import { SOLVERS } from "@tscircuit/core"
 import { GenericSolverDebugger } from "@tscircuit/solver-utils/react"
+import { Box, BugIcon, DownloadIcon, LayoutGrid, Route } from "lucide-react"
+import { useMemo, useState } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 import { useInjectTailwind } from "../../hooks/useInjectTailwind"
+import { openForDownload } from "../../optional-features/exporting/open-for-download"
+import { sanitizeFileName } from "../../utils/sanitizeFileName"
+import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentProps"
+import { Button } from "../ui/button"
 
 interface SolversTabContentProps {
   solverEvents?: SolverStartedEvent[]
@@ -16,6 +19,30 @@ interface SolverResult {
   classFound: boolean
 }
 
+const AUTOROUTER_REPORT_LINK =
+  "https://github.com/tscircuit/tscircuit-autorouter/issues/new"
+const COPPER_POUR_REPORT_LINK =
+  "https://github.com/tscircuit/copper-pour-solver/issues/new"
+const PACK_SOLVER_REPORT_LINK =
+  "https://github.com/tscircuit/calculate-packing/issues/new"
+const SCHEMATIC_TRACE_REPORT_LINK =
+  "https://github.com/tscircuit/schematic-trace-solver/issues/new?template=json-bug-report.yml"
+
+const SOLVER_REPORT_LINKS: Record<string, string> = {
+  PackSolver2: PACK_SOLVER_REPORT_LINK,
+  AutoroutingPipelineSolver: AUTOROUTER_REPORT_LINK,
+  AssignableAutoroutingPipeline2: AUTOROUTER_REPORT_LINK,
+  AssignableAutoroutingPipeline3: AUTOROUTER_REPORT_LINK,
+  AutoroutingPipeline1_OriginalUnravel: AUTOROUTER_REPORT_LINK,
+  AutoroutingPipelineSolver3_HgPortPointPathing: AUTOROUTER_REPORT_LINK,
+  AutoroutingPipelineSolver4: AUTOROUTER_REPORT_LINK,
+  AutoroutingPipelineSolver5: AUTOROUTER_REPORT_LINK,
+  AutoroutingPipelineSolver7_MultiGraph: AUTOROUTER_REPORT_LINK,
+  AutoroutingPipelineSolver8: AUTOROUTER_REPORT_LINK,
+  CopperPourPipelineSolver: COPPER_POUR_REPORT_LINK,
+  SchematicTracePipelineSolver: SCHEMATIC_TRACE_REPORT_LINK,
+}
+
 const getSolverIcon = (solverName: string) => {
   if (solverName.toLowerCase().includes("pack")) {
     return LayoutGrid
@@ -24,6 +51,113 @@ const getSolverIcon = (solverName: string) => {
     return Route
   }
   return Box
+}
+
+const getSolverReportLink = (solverName: string) => {
+  const explicitLink = SOLVER_REPORT_LINKS[solverName]
+  if (explicitLink) return explicitLink
+
+  const normalizedName = solverName.toLowerCase()
+  if (normalizedName.includes("autorout")) return AUTOROUTER_REPORT_LINK
+  if (
+    normalizedName.includes("schematic") &&
+    normalizedName.includes("trace")
+  ) {
+    return SCHEMATIC_TRACE_REPORT_LINK
+  }
+  if (normalizedName.includes("copperpour")) return COPPER_POUR_REPORT_LINK
+  if (normalizedName.includes("pack")) return PACK_SOLVER_REPORT_LINK
+
+  return null
+}
+
+const getSolverInputFileName = (solverEvent: SolverStartedEvent) =>
+  `${sanitizeFileName(`${solverEvent.componentName}-${solverEvent.solverName}`)}-solver-input.json`
+
+const downloadSolverInput = (solverEvent: SolverStartedEvent) => {
+  openForDownload(JSON.stringify(solverEvent.solverParams, null, 2), {
+    fileName: getSolverInputFileName(solverEvent),
+    mimeType: "application/json",
+  })
+}
+
+const SolverDebuggerActions = ({
+  solverEvent,
+}: {
+  solverEvent: SolverStartedEvent
+}) => {
+  const reportLink = getSolverReportLink(solverEvent.solverName)
+
+  return (
+    <div className="rf-flex rf-items-center rf-justify-end rf-gap-2 rf-border-b rf-border-gray-200 rf-bg-gray-50 rf-px-4 rf-py-2">
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => downloadSolverInput(solverEvent)}
+      >
+        <DownloadIcon className="rf-w-4 rf-h-4" />
+        Download
+      </Button>
+      {reportLink ? (
+        <Button asChild variant="outline" size="sm">
+          <a href={reportLink} target="_blank" rel="noopener noreferrer">
+            <BugIcon className="rf-w-4 rf-h-4" />
+            Report
+          </a>
+        </Button>
+      ) : (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled
+          title="No report link configured for this solver"
+        >
+          <BugIcon className="rf-w-4 rf-h-4" />
+          Report
+        </Button>
+      )}
+    </div>
+  )
+}
+
+const SolverReportIconButton = ({
+  solverEvent,
+}: {
+  solverEvent: SolverStartedEvent
+}) => {
+  const reportLink = getSolverReportLink(solverEvent.solverName)
+
+  if (!reportLink) {
+    return (
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="rf-h-8 rf-w-8"
+        disabled
+        title="No report link configured for this solver"
+        aria-label="Report solver bug"
+      >
+        <BugIcon className="rf-w-4 rf-h-4" />
+      </Button>
+    )
+  }
+
+  return (
+    <Button asChild variant="ghost" size="icon" className="rf-h-8 rf-w-8">
+      <a
+        href={reportLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Report solver bug"
+        aria-label="Report solver bug"
+      >
+        <BugIcon className="rf-w-4 rf-h-4" />
+      </a>
+    </Button>
+  )
 }
 
 export const SolversTabContent = ({
@@ -145,23 +279,28 @@ export const SolversTabContent = ({
       <div className="rf-flex-1 rf-overflow-hidden">
         {selectedSolverEvent ? (
           solverResult.instance ? (
-            <ErrorBoundary
-              fallback={
-                <div className="rf-p-4">
-                  <div className="rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200 rf-p-4">
-                    <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-2">
-                      Error Loading Solver Debugger
-                    </h3>
-                    <p className="rf-text-sm rf-text-red-600">
-                      Failed to render the solver debugger for{" "}
-                      {selectedSolverEvent.solverName}
-                    </p>
-                  </div>
-                </div>
-              }
-            >
-              <GenericSolverDebugger solver={solverResult.instance} />
-            </ErrorBoundary>
+            <div className="rf-flex rf-h-full rf-flex-col rf-overflow-y-auto">
+              <SolverDebuggerActions solverEvent={selectedSolverEvent} />
+              <div className="rf-min-h-0 rf-flex-1">
+                <ErrorBoundary
+                  fallback={
+                    <div className="rf-p-4">
+                      <div className="rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200 rf-p-4">
+                        <h3 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-2">
+                          Error Loading Solver Debugger
+                        </h3>
+                        <p className="rf-text-sm rf-text-red-600">
+                          Failed to render the solver debugger for{" "}
+                          {selectedSolverEvent.solverName}
+                        </p>
+                      </div>
+                    </div>
+                  }
+                >
+                  <GenericSolverDebugger solver={solverResult.instance} />
+                </ErrorBoundary>
+              </div>
+            </div>
           ) : (
             <div className="rf-p-4">
               <div className="rf-mb-4">
@@ -192,10 +331,24 @@ export const SolversTabContent = ({
                 </div>
               )}
               <div className="rf-border rf-border-gray-200 rf-rounded-md rf-overflow-hidden">
-                <div className="rf-px-3 rf-py-2 rf-bg-gray-50">
+                <div className="rf-px-3 rf-py-2 rf-bg-gray-50 rf-flex rf-items-center rf-justify-between rf-gap-2">
                   <span className="rf-text-sm rf-font-medium rf-text-gray-700">
                     Solver Parameters
                   </span>
+                  <div className="rf-flex rf-items-center rf-gap-1">
+                    <SolverReportIconButton solverEvent={selectedSolverEvent} />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="rf-h-8 rf-w-8"
+                      aria-label="Download solver input JSON"
+                      title="Download solver input JSON"
+                      onClick={() => downloadSolverInput(selectedSolverEvent)}
+                    >
+                      <DownloadIcon className="rf-w-4 rf-h-4" />
+                    </Button>
+                  </div>
                 </div>
                 <div className="rf-p-3 rf-bg-white rf-border-t rf-border-gray-200">
                   <pre className="rf-text-xs rf-font-mono rf-text-gray-600 rf-whitespace-pre-wrap rf-overflow-x-auto">

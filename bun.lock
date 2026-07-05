@@ -8,6 +8,7 @@
         "@tscircuit/core": "^0.0.1393",
         "@tscircuit/eval": "^0.0.977",
         "@tscircuit/solver-utils": "^0.0.7",
+        "circuit-json": "^0.0.446",
       },
       "devDependencies": {
         "@babel/standalone": "^7.26.10",
@@ -794,7 +795,7 @@
 
     "chownr": ["chownr@1.1.4", "", {}, "sha512-jJ0bqzaylmJtVnNgzTeSOs8DPavpbYgEr/b0YL8/2GO3xJEhInFmhKMUnEJQjZumK7KXGFhUy89PrsJWlakBVg=="],
 
-    "circuit-json": ["circuit-json@0.0.421", "", {}, "sha512-1zb0o4gM4fAL+2liV5i/wvom7SCdr/6Nc0hsYLFzSWnQ3yWpQHQxhDgvNEQ/FTZVKIAhhJ3mD9XbwduwfkJCrA=="],
+    "circuit-json": ["circuit-json@0.0.446", "", {}, "sha512-QH4nzxdUXe3T4znluJZSCgFZM/CEswOTCPetAaJ1tPpbiF2mDVuG92qJ94YRyT6dyWH1bwTAO3JzwMEoHcXdaA=="],
 
     "circuit-json-to-bom-csv": ["circuit-json-to-bom-csv@0.0.9", "", { "dependencies": { "format-si-prefix": "^0.3.2", "papaparse": "^5.4.1" }, "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-FbpYQW40WjpTJle1aCzHQ9yu/L0XgIRPWEfCYANcsg7zakP3Q/pEwr80uCJ5PkdnOStF1z3P3SomOH94z26EMg=="],
 
@@ -1956,7 +1957,11 @@
 
     "@ts-morph/common/mkdirp": ["mkdirp@3.0.1", "", { "bin": { "mkdirp": "dist/cjs/src/bin.js" } }, "sha512-+NsyUUAZDmo6YVHzL/stxSu3t9YS1iljliy3BSDrXJ/dkn1KYdmtZODGGjLcc9XLgVVpH4KshHB8XmZgMhaBXg=="],
 
+    "@tscircuit/3d-viewer/circuit-json": ["circuit-json@0.0.421", "", {}, "sha512-1zb0o4gM4fAL+2liV5i/wvom7SCdr/6Nc0hsYLFzSWnQ3yWpQHQxhDgvNEQ/FTZVKIAhhJ3mD9XbwduwfkJCrA=="],
+
     "@tscircuit/core/nanoid": ["nanoid@5.1.16", "", { "bin": { "nanoid": "bin/nanoid.js" } }, "sha512-kVrnsrJqMR8+oLJnGEmSWw9BivK5mt7H3FZatVRjrc5wGqFYuBxX1yG7+A7Gi5AefkX6t/oCkizcQgpu0cY1dQ=="],
+
+    "@tscircuit/pcb-viewer/circuit-json": ["circuit-json@0.0.421", "", {}, "sha512-1zb0o4gM4fAL+2liV5i/wvom7SCdr/6Nc0hsYLFzSWnQ3yWpQHQxhDgvNEQ/FTZVKIAhhJ3mD9XbwduwfkJCrA=="],
 
     "@tscircuit/runframe/@tscircuit/eval": ["@tscircuit/eval@0.0.974", "", { "peerDependencies": { "@tscircuit/core": "*", "circuit-json": "*", "typescript": "^5.0.0", "zod": "3" } }, "sha512-HdokYqmZ93ymR3ULetVBF2sBqk6wXE4ZJqOhtI5SM5WS53r2HgGtxZRlMOoCvcrvw/gRAalwfWzxlxZ5BWI9Ww=="],
 
@@ -2057,8 +2062,6 @@
     "is-inside-container/is-docker": ["is-docker@3.0.0", "", { "bin": { "is-docker": "cli.js" } }, "sha512-eljcgEDlEns/7AXFosB5K/2nCM4P7FQPkGc/DWLy5rmFEWvZayGrik1d9/QIY5nJ4f9YsVvBkA6kJpHn9rISdQ=="],
 
     "jscad-electronics/@tscircuit/alphabet": ["@tscircuit/alphabet@0.0.25", "", { "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-PWLjptI6AlLEtF/wjN1N8uC+n3G7vtg0j3xKE1fgWHDhahtnlQRqHDrtPSLlkIR9aJjRfjplzLuaUEaCRvJmZA=="],
-
-    "jscad-electronics/circuit-json": ["circuit-json@0.0.443", "", {}, "sha512-DEZHyM9aTKd7Kew3wXROIK6xIXPDE4NMUISF6BRlGwsY6/xlJSX0qkIpdbMvGbD2uMX3G4/psfaeCG2M9CsCGA=="],
 
     "kicad-to-circuit-json/schematic-symbols": ["schematic-symbols@0.0.202", "", { "peerDependencies": { "typescript": "^5.5.4" } }, "sha512-zMdY7VaEg2Sc25T0h9LkWttEoyxGamgBfFDQKUXtYRoLSChrNDOKbNLaxU/GH2L2GbsasV8OLiHyHGb5u7NUpg=="],
 

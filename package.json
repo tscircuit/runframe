@@ -115,6 +115,7 @@
   "dependencies": {
     "@tscircuit/core": "^0.0.1393",
     "@tscircuit/eval": "^0.0.977",
-    "@tscircuit/solver-utils": "^0.0.7"
+    "@tscircuit/solver-utils": "^0.0.7",
+    "circuit-json": "^0.0.446"
   }
 }

@@ -1,5 +1,7 @@
+const OBJECT_URL_CLEANUP_DELAY_MS = 1_000
+
 /**
- * Opens content for download in the browser
+ * Triggers a browser download for the provided content.
  * @param content The content to be downloaded (string or Blob)
  * @param opts Options for the download
  */
@@ -22,21 +24,20 @@ export const openForDownload = (
   const blob =
     content instanceof Blob ? content : new Blob([content], { type: mimeType })
 
-  // Create a URL for the blob
   const url = URL.createObjectURL(blob)
 
-  // Create a temporary anchor element
   const a = document.createElement("a")
   a.href = url
   a.download = fileName
+  a.target = "_blank"
+  a.rel = "noopener noreferrer"
+  a.style.display = "none"
 
-  // Append to the document, click, and remove
   document.body.appendChild(a)
   a.click()
+  document.body.removeChild(a)
 
-  // Clean up
   setTimeout(() => {
-    document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  }, 0)
+  }, OBJECT_URL_CLEANUP_DELAY_MS)
 }

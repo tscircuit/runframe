@@ -24,7 +24,7 @@
         "@radix-ui/react-tooltip": "^1.2.8",
         "@react-hook/resize-observer": "^2.0.2",
         "@resvg/resvg-wasm": "^2.6.2",
-        "@tscircuit/3d-viewer": "^0.0.575",
+        "@tscircuit/3d-viewer": "^0.0.576",
         "@tscircuit/assembly-viewer": "^0.0.6",
         "@tscircuit/create-snippet-url": "^0.0.9",
         "@tscircuit/fake-snippets": "^0.0.163",
@@ -533,7 +533,7 @@
 
     "@ts-morph/common": ["@ts-morph/common@0.22.0", "", { "dependencies": { "fast-glob": "^3.3.2", "minimatch": "^9.0.3", "mkdirp": "^3.0.1", "path-browserify": "^1.0.1" } }, "sha512-HqNBuV/oIlMKdkLshXd1zKBqNQCsuPEsgQOkfFQ/eUKjRlwndXW1AjN9LVkBEIukm00gGXSRmfkl0Wv5VXLnlw=="],
 
-    "@tscircuit/3d-viewer": ["@tscircuit/3d-viewer@0.0.575", "", { "dependencies": { "@jscad/regl-renderer": "^2.6.12", "@jscad/stl-serializer": "^2.1.20", "circuit-json": "^0.0.421", "circuit-to-canvas": "^0.0.111", "react-hot-toast": "^2.6.0", "three": "^0.165.0", "three-stdlib": "^2.36.0", "troika-three-text": "^0.52.4" }, "peerDependencies": { "@tscircuit/circuit-json-util": "*", "@tscircuit/core": "*", "react": "19.1.0", "react-dom": "19.1.0", "zod": "3" } }, "sha512-c1ZKWz6NvtwW2/khzBMwUnWkoR7J9QODNqvinvIDX9sc7b/FU5xyWDMouPFBL6OksIZaG8MAv1DUUTx91i0H6w=="],
+    "@tscircuit/3d-viewer": ["@tscircuit/3d-viewer@0.0.576", "", { "dependencies": { "@jscad/regl-renderer": "^2.6.12", "@jscad/stl-serializer": "^2.1.20", "circuit-json": "^0.0.421", "circuit-to-canvas": "^0.0.111", "react-hot-toast": "^2.6.0", "three": "^0.165.0", "three-stdlib": "^2.36.0", "troika-three-text": "^0.52.4" }, "peerDependencies": { "@tscircuit/circuit-json-util": "*", "@tscircuit/core": "*", "react": "19.1.0", "react-dom": "19.1.0", "zod": "3" } }, "sha512-/1KO84LqysergycyC/k3B0vfo5G4j3H2Z4EOlbUdWWZD1UC+lNlRwY63rpQFewvOA0vXRHqh589m1hfCe5Hdww=="],
 
     "@tscircuit/alphabet": ["@tscircuit/alphabet@0.0.23", "", { "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-7ue0Wp1/kptJ11mNRT/tttSeL6K3qFUVlIIu8SQaEVnf3mlnqZV83jBdteGHQNRwLLSjgG24sZEvCVhZBIrW1Q=="],
 

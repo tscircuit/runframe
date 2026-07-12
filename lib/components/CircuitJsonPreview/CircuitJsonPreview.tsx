@@ -19,6 +19,7 @@ import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
 import { SchematicViewer } from "@tscircuit/schematic-viewer"
 import { AssemblyViewer, PinoutViewer } from "@tscircuit/assembly-viewer"
 import PreviewEmptyState from "../PreviewEmptyState"
+import { EmptyGeometryState } from "./EmptyGeometryState"
 import { CircuitJsonTableViewer } from "../CircuitJsonTableViewer/CircuitJsonTableViewer"
 import { BomTable } from "../BomTable"
 import { AnalogSimulationViewer } from "@tscircuit/schematic-viewer"
@@ -52,6 +53,7 @@ import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { SolversTabContent } from "../SolversTabContent/SolversTabContent"
 import { capitalizeFirstLetters } from "lib/utils"
 import { useErrorTelemetry } from "lib/hooks/use-error-telemetry"
+import { getRenderableGeometrySummary } from "lib/utils/get-renderable-geometry-summary"
 import { usePostHogActivity } from "lib/hooks/use-posthog-activity"
 import type {
   PreviewContentProps,
@@ -168,6 +170,35 @@ export const CircuitJsonPreview = ({
     return circuitJson.some((e) => e.type === "schematic_group")
   }, [circuitJson])
 
+  // Which viewers actually have something to draw. Used to replace the
+  // blank/black canvas that a viewer shows when the render produced no
+  // geometry with an explicit message.
+  const renderGeometry = useMemo(
+    () => getRenderableGeometrySummary(circuitJson),
+    [circuitJson],
+  )
+
+  // A render has completed but drew nothing anywhere - a silent blank preview.
+  const isRenderComplete = Boolean(circuitJson) && !isRunningCode
+  const hasEmptyRenderResult =
+    isRenderComplete &&
+    !errorMessage &&
+    !(circuitJsonErrors && circuitJsonErrors.length > 0) &&
+    !!renderGeometry &&
+    !renderGeometry.hasAny
+
+  const showPcbEmptyState =
+    isRenderComplete &&
+    !errorMessage &&
+    !!renderGeometry &&
+    !renderGeometry.hasPcb
+  const showCadEmptyState =
+    isRenderComplete &&
+    !errorMessage &&
+    !!renderGeometry &&
+    !renderGeometry.hasPcb &&
+    !renderGeometry.hasCad
+
   const hasPanels = useMemo(() => {
     return circuitJson?.some((e) => e.type === "pcb_panel")
   }, [circuitJson])
@@ -194,6 +225,8 @@ export const CircuitJsonPreview = ({
     errorMessage,
     errorStack,
     circuitJsonErrors,
+    hasEmptyRenderResult,
+    emptyRenderElementCount: circuitJson?.length,
   })
 
   const fallbackTab = defaultTab ?? availableTabs?.[0] ?? "pcb"
@@ -569,7 +602,16 @@ export const CircuitJsonPreview = ({
                     </div>
                   )}
                 >
-                  {circuitJson ? (
+                  {!circuitJson ? (
+                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                  ) : showPcbEmptyState ? (
+                    <EmptyGeometryState
+                      viewerLabel="PCB"
+                      warnings={circuitJsonWarnings}
+                      onViewErrors={() => setActiveTab("errors")}
+                      onRunClicked={onRunClicked}
+                    />
+                  ) : (
                     <PcbViewerWithContainerHeight
                       focusOnHover={false}
                       circuitJson={circuitJson}
@@ -602,8 +644,6 @@ export const CircuitJsonPreview = ({
                       //   )
                       // }}
                     />
-                  ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
                   )}
                 </ErrorBoundary>
               </div>
@@ -730,15 +770,22 @@ export const CircuitJsonPreview = ({
                     />
                   )}
                 >
-                  {circuitJson ? (
+                  {!circuitJson ? (
+                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                  ) : showCadEmptyState ? (
+                    <EmptyGeometryState
+                      viewerLabel="3D"
+                      warnings={circuitJsonWarnings}
+                      onViewErrors={() => setActiveTab("errors")}
+                      onRunClicked={onRunClicked}
+                    />
+                  ) : (
                     <CadViewer
                       key={`cad-${isFullScreen}`}
                       ref={setCadViewerRef}
                       circuitJson={circuitJson}
                       autoRotateDisabled={autoRotate3dViewerDisabled}
                     />
-                  ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
                   )}
                 </ErrorBoundary>
               </div>

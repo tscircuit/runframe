@@ -28,12 +28,18 @@ export const useErrorTelemetry = ({
   useEffect(() => {
     if (circuitJsonErrors && circuitJsonErrors.length > 0) {
       for (const error of circuitJsonErrors) {
-        const err = new Error(error.message || "Circuit JSON Error")
-        if ((error as any).stack) {
-          ;(err as any).stack = (error as any).stack
-        }
+        // Circuit-JSON / DRC errors are expected design feedback (e.g. "component
+        // extends outside board boundaries", "no footprint specified",
+        // unconnected nets) rather than application crashes. Capturing them via
+        // captureException pollutes error tracking with dozens of expected
+        // errors per session, burying real exceptions. Report them as a
+        // distinct, non-exception `circuit_json_error` event instead so they
+        // stay observable without being counted as $exceptions.
         try {
-          posthog.captureException(err, { error_type: error.type })
+          posthog.capture("circuit_json_error", {
+            error_type: error.type,
+            message: error.message ?? null,
+          })
         } catch {
           // ignore analytics errors
         }

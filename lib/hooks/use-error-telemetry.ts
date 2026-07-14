@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { posthog } from "lib/utils"
+import { getCircuitJsonErrorFingerprint } from "lib/utils/get-circuit-json-error-fingerprint"
 import type { CircuitJsonError } from "circuit-json"
 
 interface UseErrorTelemetryParams {
@@ -33,7 +34,15 @@ export const useErrorTelemetry = ({
           ;(err as any).stack = (error as any).stack
         }
         try {
-          posthog.captureException(err, { error_type: error.type })
+          // Group every circuit-JSON DRC error of the same type into a single
+          // error-tracking issue. Without an explicit fingerprint, messages that
+          // interpolate per-trace / per-component display names each produce a
+          // unique fingerprint, spawning thousands of issues for what is really
+          // one DRC condition (e.g. a trace the autorouter couldn't route).
+          posthog.captureException(err, {
+            error_type: error.type,
+            $exception_fingerprint: getCircuitJsonErrorFingerprint(error),
+          })
         } catch {
           // ignore analytics errors
         }

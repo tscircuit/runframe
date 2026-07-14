@@ -210,13 +210,27 @@ export const useRunFrameStore = create<RunFrameState>()(
       pushEvent: async (
         event: Omit<RunFrameEvent, "event_id" | "created_at">,
       ) => {
-        await fetch(`${API_BASE}/events/create`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(event),
-        })
+        // The fileserver API may not be reachable (e.g. the standalone bundle
+        // running in a pure-browser/CDN context with no `/api` backend). A
+        // failed telemetry POST must never bubble up as a user-visible error,
+        // so swallow network/HTTP failures and just log them via debug.
+        try {
+          const response = await fetch(`${API_BASE}/events/create`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(event),
+          })
+          if (!response.ok) {
+            debug("pushEvent failed", {
+              status: response.status,
+              statusText: response.statusText,
+            })
+          }
+        } catch (error) {
+          debug("pushEvent failed", error)
+        }
       },
 
       applyEditEventsAndUpdateManualEditsJson: async (

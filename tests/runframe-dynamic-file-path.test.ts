@@ -9,6 +9,10 @@ describe("isDynamicFilePath", () => {
     )
   })
 
+  test("treats KiCad symbol libraries as dynamic content", () => {
+    expect(isDynamicFilePath("symbols/part.kicad_sym")).toBe(true)
+  })
+
   test("keeps static model assets as static assets", () => {
     expect(isDynamicFilePath("models/connector.step")).toBe(false)
     expect(isDynamicFilePath("models/board.glb")).toBe(false)

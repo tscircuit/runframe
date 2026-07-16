@@ -6,6 +6,7 @@ import {
   type ConverterPackageName,
   type ConverterModuleImporter,
 } from "../lib/optional-features/exporting/dynamic-converters"
+import { loadStepExportConverter } from "../lib/optional-features/exporting/formats/export-step"
 
 describe("dynamic converter CDN URLs", () => {
   test("all converter packages have pinned jsdelivr ESM URLs", () => {
@@ -184,5 +185,20 @@ describe("no static converter imports in export paths", () => {
         content.includes(`from 'circuit-json-to-bom-csv'`)
       expect(hasStaticImport).toBe(false)
     }
+  })
+
+  test("STEP exports tolerate optional GLTF preload failures", async () => {
+    const stepConverter = {
+      circuitJsonToStep: () => "STEP output",
+    }
+
+    const loaded = await loadStepExportConverter(
+      async () => stepConverter,
+      async () => {
+        throw new Error("GLTF CDN blocked")
+      },
+    )
+
+    expect(loaded).toBe(stepConverter)
   })
 })

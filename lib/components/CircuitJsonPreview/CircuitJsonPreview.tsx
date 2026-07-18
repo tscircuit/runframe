@@ -134,6 +134,7 @@ export const CircuitJsonPreview = ({
   isCli = false,
   projectName,
   schematicSvgOptions,
+  hideSchematicInAnalogSimulation = false,
   onRerunWithDebug,
   solverEvents,
   onPcbBoundsSelected,
@@ -779,6 +780,7 @@ export const CircuitJsonPreview = ({
                     ) : (
                       <AnalogSimulationViewer
                         circuitJson={circuitJson}
+                        hideSchematic={hideSchematicInAnalogSimulation}
                         containerStyle={{
                           height: "100%",
                         }}

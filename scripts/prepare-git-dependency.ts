@@ -15,6 +15,18 @@ import path from "node:path"
 
 const packageDirectory = path.resolve(import.meta.dirname, "..")
 
+const resolveDependencyPackageJson = (dependencyName: string) => {
+  const nestedPackageJsonPath = path.join(
+    packageDirectory,
+    "node_modules",
+    ...dependencyName.split("/"),
+    "package.json",
+  )
+  if (existsSync(nestedPackageJsonPath)) return nestedPackageJsonPath
+
+  return Bun.resolveSync(`${dependencyName}/package.json`, packageDirectory)
+}
+
 const publishDirectoryAtomically = (
   sourceDirectory: string,
   destinationDirectory: string,
@@ -74,10 +86,7 @@ const branchDependencies = [
 ]
 
 for (const dependencyName of branchDependencies) {
-  const packageJsonPath = Bun.resolveSync(
-    `${dependencyName}/package.json`,
-    packageDirectory,
-  )
+  const packageJsonPath = resolveDependencyPackageJson(dependencyName)
   const dependencyDirectory = path.dirname(packageJsonPath)
   const dependencyPackage = JSON.parse(readFileSync(packageJsonPath, "utf8"))
   const hasDeclarations = ["index.d.mts", "index.d.ts"].some((fileName) =>

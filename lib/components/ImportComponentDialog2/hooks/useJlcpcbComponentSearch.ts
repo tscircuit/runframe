@@ -3,6 +3,7 @@ import {
   mapJlcpcbComponentToSummary,
   searchJlcpcbComponents,
 } from "../api/jlcpcb"
+import { addDirectJlcpcbLookupResult } from "../direct-jlcpcb-lookup"
 import type { JlcpcbComponentSearchResult } from "../types"
 
 const normalizeQuery = (query: string) => {
@@ -29,21 +30,27 @@ export const useJlcpcbComponentSearch = () => {
 
     try {
       const components = await searchJlcpcbComponents(normalizedQuery, 10)
-      const mappedResults = components.map((component) => ({
-        source: "jlcpcb" as const,
-        component: mapJlcpcbComponentToSummary(component),
-      }))
+      const mappedResults = addDirectJlcpcbLookupResult(
+        query,
+        components.map((component) => ({
+          source: "jlcpcb" as const,
+          component: mapJlcpcbComponentToSummary(component),
+        })),
+      )
       setResults(mappedResults)
       return mappedResults
     } catch (error) {
       console.error("Error searching JLCPCB components", error)
-      setResults([])
+      const directResults = addDirectJlcpcbLookupResult(query, [])
+      setResults(directResults)
       setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to search JLCPCB components",
+        directResults.length > 0
+          ? null
+          : error instanceof Error
+            ? error.message
+            : "Failed to search JLCPCB components",
       )
-      return []
+      return directResults
     } finally {
       setIsSearching(false)
       setHasSearched(true)

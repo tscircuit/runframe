@@ -1,7 +1,16 @@
-import { useQuery } from "react-query"
+import type { OrderQuote } from "@tscircuit/fake-snippets/schema"
 import { getOrderQuote } from "lib/api/order-quotes"
+import { useQuery } from "react-query"
 
-export const useOrderQuotePolling = (orderQuoteId: string | undefined) => {
+interface UseOrderQuotePollingResult {
+  status: "loading" | "error" | "success"
+  data: OrderQuote | null
+  error: Error | null
+}
+
+export const useOrderQuotePolling = (
+  orderQuoteId: string | undefined,
+): UseOrderQuotePollingResult => {
   const {
     data: orderQuote,
     error,

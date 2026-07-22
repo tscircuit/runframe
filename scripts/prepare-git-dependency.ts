@@ -1,8 +1,12 @@
 import {
+  copyFileSync,
   cpSync,
   existsSync,
+  mkdirSync,
   mkdtempSync,
   readFileSync,
+  readdirSync,
+  renameSync,
   rmSync,
   symlinkSync,
 } from "node:fs"
@@ -10,6 +14,29 @@ import { tmpdir } from "node:os"
 import path from "node:path"
 
 const packageDirectory = path.resolve(import.meta.dirname, "..")
+
+const publishDirectoryAtomically = (
+  sourceDirectory: string,
+  destinationDirectory: string,
+) => {
+  mkdirSync(destinationDirectory, { recursive: true })
+
+  for (const entry of readdirSync(sourceDirectory, { withFileTypes: true })) {
+    const sourcePath = path.join(sourceDirectory, entry.name)
+    const destinationPath = path.join(destinationDirectory, entry.name)
+    if (entry.isDirectory()) {
+      publishDirectoryAtomically(sourcePath, destinationPath)
+      continue
+    }
+
+    const temporaryPath = path.join(
+      destinationDirectory,
+      `.${entry.name}.${process.pid}.tmp`,
+    )
+    copyFileSync(sourcePath, temporaryPath)
+    renameSync(temporaryPath, destinationPath)
+  }
+}
 
 const runCommand = ({
   command,
@@ -65,49 +92,66 @@ for (const dependencyName of branchDependencies) {
 }
 
 runCommand({ command: ["bun", "run", "build:css"], cwd: packageDirectory })
-runCommand({
-  command: ["bun", "run", "build:standalone"],
-  cwd: packageDirectory,
-  env: { ...process.env, NODE_OPTIONS: "--max-old-space-size=8192" },
-})
-runCommand({
-  command: ["bun", "run", "build:standalone-preview"],
-  cwd: packageDirectory,
-  env: { ...process.env, NODE_OPTIONS: "--max-old-space-size=8192" },
-})
 
-const stagingDirectory = mkdtempSync(path.join(tmpdir(), "runframe-build-"))
+const bundleStagingDirectory = mkdtempSync(
+  path.join(tmpdir(), "runframe-bundles-"),
+)
+const libraryStagingDirectory = mkdtempSync(
+  path.join(tmpdir(), "runframe-library-"),
+)
+const bundleOutputDirectory = path.join(bundleStagingDirectory, "dist")
 try {
+  const bundleBuildEnvironment = {
+    ...process.env,
+    NODE_OPTIONS: "--max-old-space-size=8192",
+    RUNFRAME_BUILD_OUTPUT: bundleOutputDirectory,
+  }
+  runCommand({
+    command: ["bun", "run", "build:standalone"],
+    cwd: packageDirectory,
+    env: bundleBuildEnvironment,
+  })
+  runCommand({
+    command: ["bun", "run", "build:standalone-preview"],
+    cwd: packageDirectory,
+    env: bundleBuildEnvironment,
+  })
+
   cpSync(
     path.join(packageDirectory, "lib"),
-    path.join(stagingDirectory, "lib"),
+    path.join(libraryStagingDirectory, "lib"),
     {
       recursive: true,
     },
   )
   cpSync(
     path.join(packageDirectory, "package.json"),
-    path.join(stagingDirectory, "package.json"),
+    path.join(libraryStagingDirectory, "package.json"),
   )
   cpSync(
     path.join(packageDirectory, "tsconfig.json"),
-    path.join(stagingDirectory, "tsconfig.json"),
+    path.join(libraryStagingDirectory, "tsconfig.json"),
   )
   symlinkSync(
     path.join(packageDirectory, "node_modules"),
-    path.join(stagingDirectory, "node_modules"),
+    path.join(libraryStagingDirectory, "node_modules"),
     "dir",
   )
   runCommand({
     command: ["bun", "run", "build:lib"],
-    cwd: stagingDirectory,
+    cwd: libraryStagingDirectory,
     env: { ...process.env, NODE_OPTIONS: "--max-old-space-size=8192" },
   })
-  cpSync(
-    path.join(stagingDirectory, "dist"),
+
+  publishDirectoryAtomically(
+    path.join(libraryStagingDirectory, "dist"),
     path.join(packageDirectory, "dist"),
-    { recursive: true },
+  )
+  publishDirectoryAtomically(
+    bundleOutputDirectory,
+    path.join(packageDirectory, "dist"),
   )
 } finally {
-  rmSync(stagingDirectory, { recursive: true, force: true })
+  rmSync(bundleStagingDirectory, { recursive: true, force: true })
+  rmSync(libraryStagingDirectory, { recursive: true, force: true })
 }

@@ -1,4 +1,12 @@
-import { existsSync, readFileSync } from "node:fs"
+import {
+  cpSync,
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+} from "node:fs"
+import { tmpdir } from "node:os"
 import path from "node:path"
 
 const packageDirectory = path.resolve(import.meta.dirname, "..")
@@ -56,8 +64,50 @@ for (const dependencyName of branchDependencies) {
   })
 }
 
+runCommand({ command: ["bun", "run", "build:css"], cwd: packageDirectory })
 runCommand({
-  command: ["bun", "run", "build"],
+  command: ["bun", "run", "build:standalone"],
   cwd: packageDirectory,
   env: { ...process.env, NODE_OPTIONS: "--max-old-space-size=8192" },
 })
+runCommand({
+  command: ["bun", "run", "build:standalone-preview"],
+  cwd: packageDirectory,
+  env: { ...process.env, NODE_OPTIONS: "--max-old-space-size=8192" },
+})
+
+const stagingDirectory = mkdtempSync(path.join(tmpdir(), "runframe-build-"))
+try {
+  cpSync(
+    path.join(packageDirectory, "lib"),
+    path.join(stagingDirectory, "lib"),
+    {
+      recursive: true,
+    },
+  )
+  cpSync(
+    path.join(packageDirectory, "package.json"),
+    path.join(stagingDirectory, "package.json"),
+  )
+  cpSync(
+    path.join(packageDirectory, "tsconfig.json"),
+    path.join(stagingDirectory, "tsconfig.json"),
+  )
+  symlinkSync(
+    path.join(packageDirectory, "node_modules"),
+    path.join(stagingDirectory, "node_modules"),
+    "dir",
+  )
+  runCommand({
+    command: ["bun", "run", "build:lib"],
+    cwd: stagingDirectory,
+    env: { ...process.env, NODE_OPTIONS: "--max-old-space-size=8192" },
+  })
+  cpSync(
+    path.join(stagingDirectory, "dist"),
+    path.join(packageDirectory, "dist"),
+    { recursive: true },
+  )
+} finally {
+  rmSync(stagingDirectory, { recursive: true, force: true })
+}

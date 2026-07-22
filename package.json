@@ -14,7 +14,7 @@
     "dist"
   ],
   "scripts": {
-    "prepare": "NODE_OPTIONS=--max-old-space-size=8192 bun run build",
+    "prepare": "bun install --ignore-scripts --frozen-lockfile && NODE_OPTIONS=--max-old-space-size=8192 bun run build",
     "start": "bun run build:css && concurrently 'bun run cosmos' 'bun run build:css:watch'",
     "build": "bun run build:css && bun run build:standalone && bun run build:standalone-preview && bun run build:lib",
     "build:lib": "tsup-node lib/preview.ts lib/runner.ts --external react-query schematic-symbols lucide-react circuit-to-svg @tscircuit/props --platform browser --format esm --dts",

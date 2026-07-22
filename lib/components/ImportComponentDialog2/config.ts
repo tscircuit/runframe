@@ -14,7 +14,7 @@ export const SOURCE_CONFIG: Record<ImportSource, SourceConfig> = {
   },
   jlcpcb: {
     label: "JLCPCB Parts",
-    placeholder: "Search JLCPCB parts or enter an exact LCSC ID...",
+    placeholder: "Search JLCPCB parts (e.g. C14663)...",
     emptyMessage: "No parts found",
   },
   kicad: {

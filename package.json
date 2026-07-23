@@ -14,7 +14,6 @@
     "dist"
   ],
   "scripts": {
-    "prepare": "bun run scripts/prepare-git-dependency.ts",
     "start": "bun run build:css && concurrently 'bun run cosmos' 'bun run build:css:watch'",
     "build": "bun run build:css && bun run build:standalone && bun run build:standalone-preview && bun run build:lib",
     "build:lib": "tsup-node lib/preview.ts lib/runner.ts --external react-query schematic-symbols lucide-react circuit-to-svg @tscircuit/props --platform browser --format esm --dts",
@@ -54,7 +53,7 @@
     "@tscircuit/file-server": "^0.0.32",
     "@tscircuit/internal-dynamic-import": "^0.0.8",
     "@tscircuit/pcb-viewer": "1.11.374",
-    "@tscircuit/schematic-viewer": "github:tscircuit/schematic-viewer#7f3ec6e9505e5c7fac7ae3b852b0a9af3773015c",
+    "@tscircuit/schematic-viewer": "github:tscircuit/schematic-viewer#dcc2915efcdea6d5d08f34a962611646b864fbd8",
     "@types/bun": "latest",
     "@types/debug": "^4.1.12",
     "@types/react": "^19.1.10",
@@ -69,8 +68,8 @@
     "circuit-json-to-lbrn": "^0.0.74",
     "circuit-json-to-pnp-csv": "^0.0.7",
     "circuit-json-to-step": "^0.0.36",
-    "circuit-json": "github:tscircuit/circuit-json#6804b9a31f4944cec30250004f7dda8539e720ed",
-    "circuit-to-svg": "github:tscircuit/circuit-to-svg#3ac42774aabf1da74d7dc93c2cf12b632294451d",
+    "circuit-json": "github:tscircuit/circuit-json#3d2b4b96bd8aa8a310ce52631bae7cc16b37a096",
+    "circuit-to-svg": "github:tscircuit/circuit-to-svg#d16ffdf7339e25c5332a33b9986f8775d6b048e5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -117,11 +116,5 @@
   "dependencies": {
     "@tscircuit/eval": "^0.0.1046",
     "@tscircuit/solver-utils": "^0.0.7"
-  },
-  "trustedDependencies": [
-    "@tscircuit/schematic-viewer",
-    "circuit-json",
-    "circuit-to-svg",
-    "esbuild"
-  ]
+  }
 }

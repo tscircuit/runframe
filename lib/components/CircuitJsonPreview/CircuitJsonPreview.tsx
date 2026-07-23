@@ -1,73 +1,73 @@
-import { CadViewer } from "@tscircuit/3d-viewer"
-import { AssemblyViewer, PinoutViewer } from "@tscircuit/assembly-viewer"
-import { SchematicViewer } from "@tscircuit/schematic-viewer"
-import { AnalogSimulationViewer } from "@tscircuit/schematic-viewer"
-import type { CircuitJsonError } from "circuit-json"
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "lib/components/ui/tabs"
-import { useErrorTelemetry } from "lib/hooks/use-error-telemetry"
-import { useEvalVersions } from "lib/hooks/use-eval-versions"
-import { useFullscreenBodyScroll } from "lib/hooks/use-fullscreen-body-scroll"
-import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
-import { usePostHogActivity } from "lib/hooks/use-posthog-activity"
-import { useStyles } from "lib/hooks/use-styles"
 import { cn } from "lib/utils"
-import { capitalizeFirstLetters } from "lib/utils"
-import { hasSimulationAnalysisResult } from "lib/utils/has-simulation-analysis-result"
+import { CadViewer } from "@tscircuit/3d-viewer"
+import {
+  useCallback,
+  useEffect,
+  useState,
+  useMemo,
+  type ComponentProps,
+} from "react"
+import { ErrorFallback } from "../ErrorFallback"
+import { ErrorBoundary, type FallbackProps } from "react-error-boundary"
+import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
+import { SchematicViewer } from "@tscircuit/schematic-viewer"
+import { AssemblyViewer, PinoutViewer } from "@tscircuit/assembly-viewer"
+import PreviewEmptyState from "../PreviewEmptyState"
+import { CircuitJsonTableViewer } from "../CircuitJsonTableViewer/CircuitJsonTableViewer"
+import { BomTable } from "../BomTable"
+import { AnalogSimulationViewer } from "@tscircuit/schematic-viewer"
 import {
   CheckIcon,
-  Circle,
   EllipsisIcon,
   FullscreenIcon,
   Loader2,
   LoaderCircleIcon,
   MinimizeIcon,
+  Circle,
 } from "lucide-react"
-import {
-  type ComponentProps,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react"
-import { ErrorBoundary, type FallbackProps } from "react-error-boundary"
-import type { Object3D } from "three"
-import { version } from "../../../package.json"
-import { BomTable } from "../BomTable"
-import { CircuitJsonTableViewer } from "../CircuitJsonTableViewer/CircuitJsonTableViewer"
-import { ErrorFallback } from "../ErrorFallback"
-import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
-import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
-import { PcbViewerWithContainerHeight } from "../PcbViewerWithContainerHeight"
-import PreviewEmptyState from "../PreviewEmptyState"
-import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
-import { SolversTabContent } from "../SolversTabContent/SolversTabContent"
-import { Button } from "../ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
 } from "../ui/dropdown-menu"
+import { Button } from "../ui/button"
 import { Input } from "../ui/input"
+import { PcbViewerWithContainerHeight } from "../PcbViewerWithContainerHeight"
+import { useStyles } from "lib/hooks/use-styles"
+import { useFullscreenBodyScroll } from "lib/hooks/use-fullscreen-body-scroll"
+import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
+import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
+import { SolversTabContent } from "../SolversTabContent/SolversTabContent"
+import { capitalizeFirstLetters } from "lib/utils"
+import { useErrorTelemetry } from "lib/hooks/use-error-telemetry"
+import { usePostHogActivity } from "lib/hooks/use-posthog-activity"
+import type {
+  PreviewContentProps,
+  TabId,
+  SolverStartedEvent,
+} from "./PreviewContentProps"
+import type { CircuitJsonError } from "circuit-json"
+import { version } from "../../../package.json"
+import type { Object3D } from "three"
+import { useEvalVersions } from "lib/hooks/use-eval-versions"
+import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
+import { hasSimulationAnalysisResult } from "lib/utils/has-simulation-analysis-result"
 import {
   CrispFeedbackButton,
   shouldShowCrispFeedbackButton,
 } from "./CrispFeedbackButton"
-import type {
-  PreviewContentProps,
-  SolverStartedEvent,
-  TabId,
-} from "./PreviewContentProps"
 
 declare global {
   interface Window {

@@ -1,11 +1,11 @@
-import { resolve } from "node:path"
-import { createDatabase } from "@tscircuit/fake-snippets"
-import fakeRegistryBundle from "@tscircuit/fake-snippets/bundle"
 import winterspecBundle from "@tscircuit/file-server/dist/bundle"
 import react from "@vitejs/plugin-react"
-import ky from "ky"
+import { resolve } from "node:path"
 import { type Plugin, defineConfig } from "vite"
 import { getNodeHandler } from "winterspec/adapters/node"
+import fakeRegistryBundle from "@tscircuit/fake-snippets/bundle"
+import { createDatabase } from "@tscircuit/fake-snippets"
+import ky from "ky"
 
 const registryDb = createDatabase()
 
@@ -130,9 +130,6 @@ export default defineConfig({
   publicDir: "public",
   build: {
     ...build,
-    ...(process.env.RUNFRAME_BUILD_OUTPUT
-      ? { outDir: process.env.RUNFRAME_BUILD_OUTPUT }
-      : {}),
     rollupOptions: {
       external: [
         "@resvg/resvg-js",

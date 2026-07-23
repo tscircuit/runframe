@@ -1,6 +1,6 @@
+import { registryKy } from "lib/utils/get-registry-ky"
 import type { OrderQuote } from "@tscircuit/fake-snippets/schema"
 import { HTTPError } from "ky"
-import { registryKy } from "lib/utils/get-registry-ky"
 
 export interface OrderQuoteError {
   error: {
@@ -41,9 +41,7 @@ export const createOrderQuote = async (
   }
 }
 
-export const getOrderQuote = async (
-  orderQuoteId: string,
-): Promise<OrderQuote> => {
+export const getOrderQuote = async (orderQuoteId: string) => {
   const { order_quote } = await registryKy
     .get(`order_quotes/get`, {
       searchParams: {

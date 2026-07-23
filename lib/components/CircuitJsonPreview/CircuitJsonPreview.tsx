@@ -5,6 +5,7 @@ import {
   TabsTrigger,
 } from "lib/components/ui/tabs"
 import { cn } from "lib/utils"
+import { hasSimulationAnalysisResult } from "lib/utils/has-simulation-analysis-result"
 import { CadViewer } from "@tscircuit/3d-viewer"
 import {
   useCallback,
@@ -63,7 +64,6 @@ import { version } from "../../../package.json"
 import type { Object3D } from "three"
 import { useEvalVersions } from "lib/hooks/use-eval-versions"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
-import { hasSimulationAnalysisResult } from "lib/utils/has-simulation-analysis-result"
 import {
   CrispFeedbackButton,
   shouldShowCrispFeedbackButton,

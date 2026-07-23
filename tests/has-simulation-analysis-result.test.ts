@@ -11,7 +11,7 @@ test("recognizes every analog simulation analysis result", () => {
     "simulation_dc_sweep_current_graph",
     "simulation_ac_sweep_voltage_graph",
     "simulation_ac_sweep_current_graph",
-  ]
+  ] as const
 
   for (const resultType of resultTypes) {
     expect(hasSimulationAnalysisResult([{ type: resultType }])).toBe(true)

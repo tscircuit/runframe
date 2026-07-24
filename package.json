@@ -2,7 +2,7 @@
   "name": "@tscircuit/runframe",
   "main": "dist/preview.js",
   "type": "module",
-  "version": "0.0.2258",
+  "version": "0.0.2271",
   "exports": {
     ".": "./dist/preview.js",
     "./preview": "./dist/preview.js",
@@ -53,7 +53,7 @@
     "@tscircuit/file-server": "^0.0.32",
     "@tscircuit/internal-dynamic-import": "^0.0.8",
     "@tscircuit/pcb-viewer": "1.11.374",
-    "@tscircuit/schematic-viewer": "github:tscircuit/schematic-viewer#0ae4897fbe2d66b6508a00234e2e46fa7318ad31",
+    "@tscircuit/schematic-viewer": "^2.0.75",
     "@types/bun": "latest",
     "@types/debug": "^4.1.12",
     "@types/react": "^19.1.10",
@@ -68,8 +68,8 @@
     "circuit-json-to-lbrn": "^0.0.74",
     "circuit-json-to-pnp-csv": "^0.0.7",
     "circuit-json-to-step": "^0.0.36",
-    "circuit-json": "github:tscircuit/circuit-json#e6f1ff54e7782e6086c539000d5fb84db1c2495e",
-    "circuit-to-svg": "github:tscircuit/circuit-to-svg#47b0b425759cd6da1a445ef132668fe2148c7701",
+    "circuit-json": "^0.0.454",
+    "circuit-to-svg": "^0.0.393",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -101,20 +101,20 @@
     "redaxios": "^0.5.1",
     "rollup-plugin-visualizer": "^5.12.0",
     "s-expression": "^3.1.1",
-    "schematic-symbols": "^0.0.231",
+    "schematic-symbols": "^0.0.233",
     "serve": "^14.2.4",
     "source-map-explorer": "^2.5.3",
     "stepts": "^0.0.3",
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
-    "tscircuit": "^0.0.2083",
+    "tscircuit": "^0.0.2142",
     "tsup": "^8.3.5",
     "vite": "^7.1.2",
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "@tscircuit/eval": "^0.0.1046",
+    "@tscircuit/eval": "^0.0.1058",
     "@tscircuit/solver-utils": "^0.0.7"
   }
 }

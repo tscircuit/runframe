@@ -1,7 +1,18 @@
 import type { CircuitJson } from "circuit-json"
 import { openForDownload } from "../open-for-download"
 import { toast } from "lib/utils/toast"
-import importer from "@tscircuit/internal-dynamic-import"
+import { loadGltfConverter, loadStepConverter } from "../dynamic-converters"
+
+export const loadStepExportConverter = async (
+  stepLoader = loadStepConverter,
+  gltfLoader = loadGltfConverter,
+) => {
+  const [stepConverter] = await Promise.all([
+    stepLoader(),
+    gltfLoader().catch(() => undefined),
+  ])
+  return stepConverter
+}
 
 export const exportStep = async ({
   circuitJson,
@@ -10,7 +21,7 @@ export const exportStep = async ({
   circuitJson: CircuitJson
   projectName: string
 }) => {
-  const { circuitJsonToStep } = await importer("circuit-json-to-step")
+  const { circuitJsonToStep } = await loadStepExportConverter()
   // Extract board dimensions from circuit JSON
   const pcbBoard = circuitJson.find((el) => el.type === "pcb_board")
 

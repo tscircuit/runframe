@@ -1,6 +1,6 @@
 import type { RunFrameIframeEvent } from "lib/components/RunFrameWithIframe/RunFrameIframeEvent"
 import { RunFrame, type RunFrameProps } from "lib/runner"
-import React, { useEffect, useReducer, useState } from "react"
+import { useEffect, useReducer, useState } from "react"
 import { createRoot } from "react-dom/client"
 
 const root = createRoot(document.getElementById("root")!)
@@ -58,8 +58,4 @@ function IframeApp() {
   )
 }
 
-root.render(
-  <React.StrictMode>
-    <IframeApp />
-  </React.StrictMode>,
-)
+root.render(<IframeApp />)

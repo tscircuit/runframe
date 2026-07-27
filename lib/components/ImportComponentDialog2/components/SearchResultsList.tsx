@@ -1,6 +1,6 @@
+import type { Package } from "@tscircuit/fake-snippets/schema"
 import { Lock } from "lucide-react"
 import { Button } from "../../ui/button"
-import type { Package } from "@tscircuit/fake-snippets/schema"
 import type {
   ImportComponentDialogSearchResult,
   TscircuitPackageSearchResult,
@@ -45,7 +45,9 @@ const getPrimaryText = (result: ImportComponentDialogSearchResult) => {
     case "tscircuit.com":
       return result.package.unscoped_name
     case "jlcpcb":
-      return result.component.manufacturer
+      return result.component.isDirectLookup
+        ? result.component.partNumber
+        : result.component.manufacturer
     case "kicad":
       return result.footprint.qualifiedName
   }
@@ -72,7 +74,9 @@ const getPartNumberLabel = (result: ImportComponentDialogSearchResult) => {
     case "tscircuit.com":
       return result.package.name
     case "jlcpcb":
-      return result.component.partNumber
+      return result.component.isDirectLookup
+        ? undefined
+        : result.component.partNumber
     case "kicad":
       return undefined
   }
@@ -98,6 +102,8 @@ export const SearchResultsList = ({
         const price = result.source === "jlcpcb" ? result.component.price : null
         const isBasic =
           result.source === "jlcpcb" ? result.component.isBasic : null
+        const isDirectLookup =
+          result.source === "jlcpcb" ? result.component.isDirectLookup : false
 
         return (
           <div
@@ -118,6 +124,11 @@ export const SearchResultsList = ({
                       }`}
                     >
                       {isBasic ? "Basic" : "Extended"}
+                    </span>
+                  )}
+                  {isDirectLookup && (
+                    <span className="rf-text-xs rf-px-1.5 rf-py-0.5 rf-rounded rf-font-medium rf-flex-shrink-0 rf-bg-blue-100 rf-text-blue-700">
+                      Direct lookup
                     </span>
                   )}
                   {result.source === "tscircuit.com" &&

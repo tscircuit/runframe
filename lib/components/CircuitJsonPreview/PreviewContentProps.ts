@@ -39,6 +39,11 @@ export interface PreviewContentProps {
     css?: string
     className?: string
   }
+  /**
+   * Hide the schematic in the analog simulation view and show only the graph.
+   * Defaults to false.
+   */
+  hideSchematicInAnalogSimulation?: boolean
   showCodeTab?: boolean
   showRenderLogTab?: boolean
   codeTabContent?: React.ReactNode

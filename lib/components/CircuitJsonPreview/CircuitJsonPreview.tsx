@@ -5,6 +5,7 @@ import {
   TabsTrigger,
 } from "lib/components/ui/tabs"
 import { cn } from "lib/utils"
+import { hasSimulationAnalysisResult } from "lib/utils/has-simulation-analysis-result"
 import { CadViewer } from "@tscircuit/3d-viewer"
 import {
   useCallback,
@@ -134,6 +135,7 @@ export const CircuitJsonPreview = ({
   isCli = false,
   projectName,
   schematicSvgOptions,
+  hideSchematicInAnalogSimulation = false,
   onRerunWithDebug,
   solverEvents,
   onPcbBoundsSelected,
@@ -179,11 +181,7 @@ export const CircuitJsonPreview = ({
     const hasSimulationExperiment = circuitJson.some(
       (e) => e.type === "simulation_experiment",
     )
-    const hasTransientVoltageGraph = circuitJson.some(
-      (e) => e.type === "simulation_transient_voltage_graph",
-    )
-
-    return hasSimulationExperiment && !hasTransientVoltageGraph
+    return hasSimulationExperiment && !hasSimulationAnalysisResult(circuitJson)
   }, [circuitJson, circuitJsonErrors, isRunningCode])
 
   const analogSimulationError = useMemo(() => {
@@ -779,6 +777,7 @@ export const CircuitJsonPreview = ({
                     ) : (
                       <AnalogSimulationViewer
                         circuitJson={circuitJson}
+                        hideSchematic={hideSchematicInAnalogSimulation}
                         containerStyle={{
                           height: "100%",
                         }}

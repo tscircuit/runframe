@@ -79,7 +79,7 @@
         "redaxios": "^0.5.1",
         "rollup-plugin-visualizer": "^5.12.0",
         "s-expression": "^3.1.1",
-        "schematic-symbols": "^0.0.233",
+        "schematic-symbols": "^0.0.237",
         "serve": "^14.2.4",
         "source-map-explorer": "^2.5.3",
         "stepts": "^0.0.3",
@@ -1702,7 +1702,7 @@
 
     "scheduler": ["scheduler@0.26.0", "", {}, "sha512-NlHwttCI/l5gCPR3D1nNXtWABUmBwvZpEQiD4IXSbIDq8BzLIK/7Ir5gTFSGZDUu37K5cMNp0hFtzO38sC7gWA=="],
 
-    "schematic-symbols": ["schematic-symbols@0.0.233", "", { "peerDependencies": { "typescript": "^5.5.4" } }, "sha512-RW+gYkjqIEvB/9sEvkz0WeakAgVhrP0i1WpVnMi9Blblkrm3p4aQoc4oLgotbv3dlyXGPdjIiNED96wzky1ong=="],
+    "schematic-symbols": ["schematic-symbols@0.0.237", "", { "peerDependencies": { "typescript": "^5.5.4" } }, "sha512-An+CT6RROY9UFre/M1eBbmV/h+XiqVda5b8KhMasqMXV3LQUppQSXgtKtItb56PyUAJUewggO0TNMar24W0MSQ=="],
 
     "semver": ["semver@6.3.1", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA=="],
 

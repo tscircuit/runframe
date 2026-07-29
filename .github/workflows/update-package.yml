@@ -26,6 +26,17 @@ on:
 
 env:
   PACKAGE_NAMES: ${{ inputs.package_names }}
+  REPO_MAP: |
+    @tscircuit/core=tscircuit/core
+    @tscircuit/eval=tscircuit/eval
+    @tscircuit/runframe=tscircuit/runframe
+    @tscircuit/schematic-viewer=tscircuit/schematic-viewer
+    @tscircuit/cli=tscircuit/cli
+    @tscircuit/tscircuit.com=tscircuit/tscircuit.com
+    @tscircuit/props=tscircuit/props
+    @tscircuit/footprinter=tscircuit/footprinter
+
+
 
 jobs:
   update-package:
@@ -49,24 +60,113 @@ jobs:
             fi
           done
 
-      - name: Close existing PRs
+      - name: Ensure package labels exist
         run: |
-          gh pr list --repo ${{ github.repository }} --state open --author "tscircuitbot" --json number,title --jq '.[] | select(.title | startswith("chore:")) | .number' | xargs -I{} gh pr close {} --comment "Closing in favor of a new update PR"
+          IFS=',' read -ra PACKAGES <<< "${{ env.PACKAGE_NAMES }}"
+          for package in "${PACKAGES[@]}"; do
+            if [[ -n "$package" ]]; then
+              LABEL_NAME=$(echo "$package" | sed 's/@//g' | sed 's/\//-/g')
+              gh label create "$LABEL_NAME" --color "E99695" --description "Package update for $package" 2>/dev/null || true
+            fi
+          done
         env:
           GH_TOKEN: ${{ secrets.TSCIRCUIT_BOT_GITHUB_TOKEN }}
 
-      - name: Create Pull Request
+      - name: Close existing PRs for these packages only
+        run: |
+          IFS=',' read -ra PACKAGES <<< "${{ env.PACKAGE_NAMES }}"
+
+          for package in "${PACKAGES[@]}"; do
+            if [[ -n "$package" ]]; then
+              # Clean package name for label (remove @ and /)
+              LABEL_NAME=$(echo "$package" | sed 's/@//g' | sed 's/\//-/g')
+
+              echo "🔍 Closing PRs for package: $package (label: $LABEL_NAME)"
+
+              # ONLY close PRs with this specific package label
+              PRS=$(gh pr list --repo ${{ github.repository }} --state open \
+                --author "tscircuitbot" \
+                --label "$LABEL_NAME" \
+                --json number,title \
+                --jq '.[] | select(.title | startswith("chore: update packages")) | .number')
+
+              if [ -n "$PRS" ]; then
+                echo "📦 Found PRs: $PRS"
+                echo "$PRS" | xargs -I{} gh pr close {} \
+                  --comment "🔄 Closing in favor of new update PR for $package"
+              else
+                echo "✅ No existing PRs found for $package"
+              fi
+            fi
+          done
+        env:
+          GH_TOKEN: ${{ secrets.TSCIRCUIT_BOT_GITHUB_TOKEN }}
+
+      - name: Get repository links from mapping
+        id: get-repo-info
+        run: |
+          IFS=',' read -ra PACKAGES <<< "${{ env.PACKAGE_NAMES }}"
+          REPO_LINKS=""
+
+          # Read the mapping into an array
+          IFS=$'\n' read -d '' -ra MAPPINGS <<< "${{ env.REPO_MAP }}" || true
+
+          for package in "${PACKAGES[@]}"; do
+            if [[ -n "$package" ]]; then
+              # Trim whitespace
+              package=$(echo "$package" | xargs)
+
+              # Find the repo in the mapping
+              REPO=""
+              for mapping in "${MAPPINGS[@]}"; do
+                # Trim whitespace from mapping
+                mapping=$(echo "$mapping" | xargs)
+                if [[ -n "$mapping" && "$mapping" == "$package="* ]]; then
+                  REPO="${mapping#*=}"
+                  break
+                fi
+              done
+
+              if [[ -n "$REPO" ]]; then
+                REPO_LINKS="$REPO_LINKS\n- [$package](https://github.com/$REPO)"
+              else
+                # Fallback: use npm page
+                REPO_LINKS="$REPO_LINKS\n- [$package](https://www.npmjs.com/package/$package)"
+              fi
+            fi
+          done
+
+          # Store in output
+          echo "repo_links<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$REPO_LINKS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request with labels for ${{ env.PACKAGE_NAMES }}
         id: create-pr
         uses: peter-evans/create-pull-request@v5
         with:
           commit-message: "chore: update packages ${{ env.PACKAGE_NAMES }}"
           title: "chore: update packages ${{ env.PACKAGE_NAMES }}"
-          body: "Automated package update"
+          body: |
+            ## 🤖 Automated Package Update
+
+            **Packages updated:** ${{ env.PACKAGE_NAMES }}
+
+            **Upstream triggers:**
+            ${{ steps.get-repo-info.outputs.repo_links }}
+
+            **Workflow run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            <!-- PACKAGES: ${{ env.PACKAGE_NAMES }} -->
+            <!-- AUTO-UPDATE-PR -->
           branch: update-packages-${{ github.run_number }}
           base: main
           token: ${{ secrets.TSCIRCUIT_BOT_GITHUB_TOKEN }}
           committer: tscircuitbot <githubbot@tscircuit.com>
           author: tscircuitbot <githubbot@tscircuit.com>
+          labels: |
+            automated-update
+            ${{ env.PACKAGE_NAMES }}
 
       - name: Enable auto-merge with CI checks
         if: steps.create-pr.outputs.pull-request-number != ''

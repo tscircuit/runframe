@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  UPSTREAM_REPOS: "cli,tscircuit.com" # for example: "eval"
+  DOWNSTREAM_REPOS: "cli,tscircuit.com" # for example: "eval"
   PACKAGE_NAMES: "@tscircuit/runframe" # comma-separated list, e.g. "@tscircuit/core,@tscircuit/props"
 
 jobs:
@@ -60,10 +60,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.TSCIRCUIT_BOT_GITHUB_TOKEN }} 
           
-      - name: Trigger upstream repo updates
-        if: env.UPSTREAM_REPOS && env.PACKAGE_NAMES
+      - name: Trigger downstream repo updates
+        if: env.DOWNSTREAM_REPOS && env.PACKAGE_NAMES
         run: |
-          IFS=',' read -ra REPOS <<< "${{ env.UPSTREAM_REPOS }}"
+          IFS=',' read -ra REPOS <<< "${{ env.DOWNSTREAM_REPOS }}"
           for repo in "${REPOS[@]}"; do
             if [[ -n "$repo" ]]; then
               echo "Triggering update for repo: $repo"

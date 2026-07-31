@@ -1,4 +1,3 @@
-import { SOLVERS } from "@tscircuit/core"
 import { GenericSolverDebugger } from "@tscircuit/solver-utils/react"
 import { Box, BugIcon, DownloadIcon, LayoutGrid, Route } from "lucide-react"
 import { useMemo, useState } from "react"
@@ -8,6 +7,7 @@ import { openForDownload } from "../../optional-features/exporting/open-for-down
 import { sanitizeFileName } from "../../utils/sanitizeFileName"
 import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentProps"
 import { Button } from "../ui/button"
+import { getRunframeSolverClass, RUNFRAME_SOLVERS } from "./solver-registry"
 
 interface SolversTabContentProps {
   solverEvents?: SolverStartedEvent[]
@@ -25,11 +25,14 @@ const COPPER_POUR_REPORT_LINK =
   "https://github.com/tscircuit/copper-pour-solver/issues/new"
 const PACK_SOLVER_REPORT_LINK =
   "https://github.com/tscircuit/calculate-packing/issues/new"
+const MATCHPACK_REPORT_LINK =
+  "https://github.com/tscircuit/matchpack/issues/new"
 const SCHEMATIC_TRACE_REPORT_LINK =
   "https://github.com/tscircuit/schematic-trace-solver/issues/new?template=json-bug-report.yml"
 
 const SOLVER_REPORT_LINKS: Record<string, string> = {
   PackSolver2: PACK_SOLVER_REPORT_LINK,
+  LayoutPipelineSolver: MATCHPACK_REPORT_LINK,
   AutoroutingPipelineSolver: AUTOROUTER_REPORT_LINK,
   AssignableAutoroutingPipeline2: AUTOROUTER_REPORT_LINK,
   AssignableAutoroutingPipeline3: AUTOROUTER_REPORT_LINK,
@@ -188,13 +191,11 @@ export const SolversTabContent = ({
       return { instance: null, error: null, classFound: false }
     }
 
-    const SolverClass = (SOLVERS as Record<string, any>)[
-      selectedSolverEvent.solverName
-    ]
+    const SolverClass = getRunframeSolverClass(selectedSolverEvent.solverName)
     if (!SolverClass) {
       return {
         instance: null,
-        error: `Solver class "${selectedSolverEvent.solverName}" not found in SOLVERS registry. Available: ${Object.keys(SOLVERS).join(", ")}`,
+        error: `Solver class "${selectedSolverEvent.solverName}" not found in solver registry. Available: ${Object.keys(RUNFRAME_SOLVERS).join(", ")}`,
         classFound: false,
       }
     }
@@ -203,7 +204,7 @@ export const SolversTabContent = ({
       // HACK: if "input" is in the result, use that as the constructor parameter
       const params = selectedSolverEvent.solverParams as Record<string, unknown>
       const constructorArg = params?.input !== undefined ? params.input : params
-      const instance = new SolverClass(constructorArg)
+      const instance = new SolverClass(constructorArg as never)
       return { instance, error: null, classFound: true }
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : String(e)

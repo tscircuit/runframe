@@ -6,6 +6,7 @@
       "name": "@tscircuit/runframe",
       "dependencies": {
         "@tscircuit/eval": "^0.0.1106",
+        "@tscircuit/matchpack": "^0.0.64",
         "@tscircuit/solver-utils": "^0.0.7",
         "debug": "^4.4.0",
       },
@@ -578,7 +579,7 @@
 
     "@tscircuit/manifold-2d": ["@tscircuit/manifold-2d@0.0.6", "", {}, "sha512-kYny1hDwPHOwRfMQtbfLh0nvCQ7nM91kkHy7pnj1UrqM6rcgDymZVCZB7ib5Cx1aZFIs8xCCF7lA51tq+giDcw=="],
 
-    "@tscircuit/matchpack": ["@tscircuit/matchpack@0.0.43", "", { "peerDependencies": { "typescript": "^5" } }, "sha512-X0V2d9N1TiJncjB4jhsqrHUSX0HfQ1IAfsHxVZTV4h1wEbTtrO5tluX22Pjlul6pQecKBBCzt3Nje5O5eEAZHQ=="],
+    "@tscircuit/matchpack": ["@tscircuit/matchpack@0.0.64", "", { "peerDependencies": { "typescript": "^5" } }, "sha512-p6YM1Aicv/CfSMuO9qX9UFdKQemFg8GXLG7Kb7CnkNOWefbt8Z3k+AmaGB6OlIG3ZJUckeY241YgxD9tgei3wA=="],
 
     "@tscircuit/math-utils": ["@tscircuit/math-utils@0.0.36", "", { "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-HwHS3do6CLQFnLGd0f3+kQzGfENFllpt5ZFWF9gfw2k5Rc5VSxSJi8/MLfHEgaMgrnMCZ5Hqh3DlUD6U3pMXyg=="],
 
@@ -2181,6 +2182,8 @@
     "tscircuit/@tscircuit/eval": ["@tscircuit/eval@0.0.1050", "", { "peerDependencies": { "@tscircuit/core": "*", "circuit-json": "*", "typescript": "^5.0.0", "zod": "3" } }, "sha512-xuOkFjYLNIDpig2hcGcI0mQs39p1P+icZuBvgiRf+oZZnw8VfGzVwMU/erIrLpOFmlqg4X1PUIFZZ13L5NpPEg=="],
 
     "tscircuit/@tscircuit/internal-dynamic-import": ["@tscircuit/internal-dynamic-import@0.0.11", "", {}, "sha512-Tr72DhEGXwysbe2PZ0+GiLC8/pGp0BA9Dl+2xTXxaukwcGam08+PMJF+AJpIOfXjafP6S1OZf1HmciDeD8PydA=="],
+
+    "tscircuit/@tscircuit/matchpack": ["@tscircuit/matchpack@0.0.43", "", { "peerDependencies": { "typescript": "^5" } }, "sha512-X0V2d9N1TiJncjB4jhsqrHUSX0HfQ1IAfsHxVZTV4h1wEbTtrO5tluX22Pjlul6pQecKBBCzt3Nje5O5eEAZHQ=="],
 
     "tscircuit/@tscircuit/solver-utils": ["@tscircuit/solver-utils@0.0.16", "", { "peerDependencies": { "graphics-debug": "*", "typescript": "^5" } }, "sha512-paeEsPt+NOrIdeEb1PQpoNGjl9bD5MfcDaBuhFkn7Hdsxez4cXhKUyxWj3WbJsZzq9nUDW3Utr/Dl3GD4UURZQ=="],
 

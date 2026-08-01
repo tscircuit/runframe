@@ -23,7 +23,7 @@ jobs:
           bun-version: canary
 
       - name: Install dependencies
-        run: bun install
+        run: bun install --frozen-lockfile --omit=optional
 
       - name: Build package
         run: bun run build
@@ -42,7 +42,7 @@ jobs:
           # Maybe fixed by https://github.com/oven-sh/bun/pull/33156
           npm install ${{ github.workspace }}/tscircuit-runframe-*.tgz --no-package-lock
           bun pm cache rm
-          bun install --offline
+          bun install --offline --omit=optional
           
           
           cat > src/App.tsx <<'EOF'

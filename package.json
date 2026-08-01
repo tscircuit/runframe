@@ -38,6 +38,12 @@
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.20",
     "chokidar-cli": "^3.0.0",
+    "circuit-json-to-bom-csv": "^0.0.9",
+    "circuit-json-to-gerber": "^0.0.87",
+    "circuit-json-to-kicad": "^0.0.171",
+    "circuit-json-to-lbrn": "^0.0.74",
+    "circuit-json-to-pnp-csv": "^0.0.7",
+    "circuit-json-to-step": "^0.0.36",
     "comlink": "^4.4.2",
     "concurrently": "^9.1.2",
     "cssnano": "^7.0.6",
@@ -107,14 +113,6 @@
     "tailwindcss-animate": "^1.0.7",
     "tscircuit": "^0.0.2142"
   },
-  "optionalDependencies": {
-    "circuit-json-to-bom-csv": "^0.0.9",
-    "circuit-json-to-gerber": "^0.0.87",
-    "circuit-json-to-kicad": "^0.0.171",
-    "circuit-json-to-lbrn": "^0.0.74",
-    "circuit-json-to-pnp-csv": "^0.0.7",
-    "circuit-json-to-step": "^0.0.36"
-  },  
   "peerDependencies": {
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",

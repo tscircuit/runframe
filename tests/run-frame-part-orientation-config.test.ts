@@ -8,6 +8,6 @@ test("RunFrame enables part orientation analysis in its project config", () => {
     }),
   ).toMatchObject({
     projectBaseUrl: "https://example.com/files",
-    usePartOrientationAnalysis: true,
+    enablePartOrientationAnalysis: true,
   })
 })

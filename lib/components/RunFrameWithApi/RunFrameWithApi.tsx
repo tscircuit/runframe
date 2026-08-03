@@ -86,6 +86,7 @@ export interface RunFrameWithApiProps {
   evalWebWorkerBlobUrl?: string
   showFileMenu?: boolean
   schematicSvgOptions?: RunFrameProps["schematicSvgOptions"]
+  platformConfig?: RunFrameProps["platformConfig"]
   isCli?: boolean
 
   /**
@@ -303,6 +304,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       evalVersion={props.evalVersion}
       forceLatestEvalVersion={props.forceLatestEvalVersion}
       evalWebWorkerBlobUrl={props.evalWebWorkerBlobUrl ?? props.workerBlobUrl}
+      platformConfig={props.platformConfig}
       enableFetchProxy={props.enableFetchProxy}
       leftHeaderContent={
         <div className="rf-flex rf-items-center rf-justify-between rf-w-full">

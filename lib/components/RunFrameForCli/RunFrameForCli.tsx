@@ -1,18 +1,39 @@
 import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
-import { useCallback, useState } from "react"
-import { RunFrameWithApi } from "../RunFrameWithApi/RunFrameWithApi"
+import { useCallback, useMemo, useState } from "react"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
+import {
+  RunFrameWithApi,
+  type RunFrameWithApiProps,
+} from "../RunFrameWithApi/RunFrameWithApi"
+import { API_BASE } from "../RunFrameWithApi/api-base"
 import { useLoginDialog } from "./LoginDialog"
+import { createCliLocalCacheEngine } from "./create-cli-local-cache-engine"
 
-export const RunFrameForCli = (props: {
+export interface RunFrameForCliProps {
   debug?: boolean
   scenarioSelectorContent?: React.ReactNode
   workerBlobUrl?: string
+  evalWebWorkerBlobUrl?: string
   enableFetchProxy?: boolean
-}) => {
+  apiBaseUrl?: string
+  platformConfig?: RunFrameWithApiProps["platformConfig"]
+}
+
+export const RunFrameForCli = (props: RunFrameForCliProps) => {
   const [shouldLoadLatestEval, setLoadLatestEval] = useLocalStorageState(
     "load-latest-eval",
     true,
+  )
+  const evalWebWorkerBlobUrl = props.evalWebWorkerBlobUrl ?? props.workerBlobUrl
+  const cacheApiBaseUrl = props.apiBaseUrl ?? API_BASE
+  const platformConfig = useMemo(
+    () => ({
+      ...props.platformConfig,
+      localCacheEngine:
+        props.platformConfig?.localCacheEngine ??
+        createCliLocalCacheEngine({ apiBaseUrl: cacheApiBaseUrl }),
+    }),
+    [cacheApiBaseUrl, props.platformConfig],
   )
   const [initialMainComponentPath] = useState<string | undefined>(() => {
     if (typeof window === "undefined") return undefined
@@ -26,9 +47,9 @@ export const RunFrameForCli = (props: {
     if (params.get("main_component") === mainComponentPath) return
     params.set("main_component", mainComponentPath)
     const newHash = params.toString()
-    const newUrl =
-      `${window.location.pathname}${window.location.search}` +
-      (newHash.length > 0 ? `#${newHash}` : "")
+    const newUrl = `${window.location.pathname}${window.location.search}${
+      newHash.length > 0 ? `#${newHash}` : ""
+    }`
     window.history.replaceState(null, "", newUrl)
   }, [])
 
@@ -39,10 +60,12 @@ export const RunFrameForCli = (props: {
       {LoginDialog}
       <RunFrameWithApi
         debug={props.debug}
-        forceLatestEvalVersion={!props.workerBlobUrl && shouldLoadLatestEval}
+        forceLatestEvalVersion={!evalWebWorkerBlobUrl && shouldLoadLatestEval}
         defaultToFullScreen={true}
         showToggleFullScreen={false}
-        workerBlobUrl={props.workerBlobUrl}
+        evalWebWorkerBlobUrl={evalWebWorkerBlobUrl}
+        apiBaseUrl={props.apiBaseUrl}
+        platformConfig={platformConfig}
         isCli={true}
         showFilesSwitch
         showFileMenu={false}
@@ -55,7 +78,7 @@ export const RunFrameForCli = (props: {
             <FileMenuLeftHeader
               isWebEmbedded={false}
               shouldLoadLatestEval={
-                !props.workerBlobUrl && shouldLoadLatestEval
+                !evalWebWorkerBlobUrl && shouldLoadLatestEval
               }
               onChangeShouldLoadLatestEval={(newShouldLoadLatestEval) => {
                 setLoadLatestEval(newShouldLoadLatestEval)

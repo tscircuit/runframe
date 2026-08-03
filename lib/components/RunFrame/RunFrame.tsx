@@ -105,6 +105,7 @@ export const RunFrame = (props: RunFrameProps) => {
     error?: string
     stack?: string
   } | null>(null)
+  const [componentStack, setComponentStack] = useState<string | null>(null)
   const cancelExecutionRef = useRef<(() => void) | null>(null)
   const [autoroutingGraphics, setAutoroutingGraphics] = useState<any>(null)
   const [runCountTrigger, incRunCountTrigger] = useReducer(
@@ -624,7 +625,18 @@ export const RunFrame = (props: RunFrameProps) => {
   }
 
   return (
-    <ErrorBoundary FallbackComponent={RunFrameErrorFallback}>
+    <ErrorBoundary
+      onError={(_error, info) => {
+        setComponentStack(info.componentStack ?? null)
+      }}
+      onReset={() => setComponentStack(null)}
+      fallbackRender={(fallbackProps) => (
+        <RunFrameErrorFallback
+          {...fallbackProps}
+          componentStack={componentStack}
+        />
+      )}
+    >
       <CircuitJsonPreview
         code={fsMap.get(props.entrypoint ?? props.mainComponentPath)}
         fsMap={fsMap}

@@ -123,6 +123,32 @@ export const ErrorTabContent = ({
     window.open(issueUrl, "_blank")
   }
 
+  // Store execution error globally so bug report dialog can access it
+  useEffect(() => {
+    if (errorMessage) {
+      let errorText = errorMessage
+      if (errorStack) {
+        errorText += `\n\n${errorStack}`
+      }
+      if (typeof window !== "undefined") {
+        window.__TSCIRCUIT_LAST_EXECUTION_ERROR = errorText
+      }
+    }
+  }, [errorMessage, errorStack])
+
+  const [expandedErrors, setExpandedErrors] = useState<Set<number>>(() => {
+    const allIndexes = new Set<number>()
+    unifiedErrors.forEach((_, i) => allIndexes.add(i))
+    return allIndexes
+  })
+  const [expandedWarnings, setExpandedWarnings] = useState<Set<number>>(() => {
+    const allIndexes = new Set<number>()
+    unifiedWarnings.forEach((_, i) => allIndexes.add(i))
+    return allIndexes
+  })
+  const [errorsCollapsed, setErrorsCollapsed] = useState(false)
+  const [warningsCollapsed, setWarningsCollapsed] = useState(false)
+
   if (unifiedErrors.length === 0 && unifiedWarnings.length === 0) {
     return (
       <div className="px-2">
@@ -156,32 +182,6 @@ export const ErrorTabContent = ({
       </div>
     )
   }
-
-  // Store execution error globally so bug report dialog can access it
-  useEffect(() => {
-    if (errorMessage) {
-      let errorText = errorMessage
-      if (errorStack) {
-        errorText += `\n\n${errorStack}`
-      }
-      if (typeof window !== "undefined") {
-        window.__TSCIRCUIT_LAST_EXECUTION_ERROR = errorText
-      }
-    }
-  }, [errorMessage, errorStack])
-
-  const [expandedErrors, setExpandedErrors] = useState<Set<number>>(() => {
-    const allIndexes = new Set<number>()
-    unifiedErrors.forEach((_, i) => allIndexes.add(i))
-    return allIndexes
-  })
-  const [expandedWarnings, setExpandedWarnings] = useState<Set<number>>(() => {
-    const allIndexes = new Set<number>()
-    unifiedWarnings.forEach((_, i) => allIndexes.add(i))
-    return allIndexes
-  })
-  const [errorsCollapsed, setErrorsCollapsed] = useState(false)
-  const [warningsCollapsed, setWarningsCollapsed] = useState(false)
 
   const toggleError = (index: number) => {
     setExpandedErrors((prev) => {

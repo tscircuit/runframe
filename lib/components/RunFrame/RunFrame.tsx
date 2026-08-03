@@ -1,7 +1,7 @@
 import { createCircuitWebWorker } from "@tscircuit/eval/worker"
 import Debug from "debug"
-import { Loader2, Play, Square } from "lucide-react"
 import { HTTPError } from "ky"
+import { Loader2, Play, Square } from "lucide-react"
 import { useEffect, useReducer, useRef, useState } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 import {
@@ -27,34 +27,35 @@ declare global {
 }
 
 import {
-  orderedRenderPhases,
   type AutoroutingStartEvent,
+  orderedRenderPhases,
 } from "@tscircuit/core"
+import type { ManualEditEvent } from "@tscircuit/props"
 import type { RenderLog } from "lib/render-logging/RenderLog"
 import { getPhaseTimingsFromRenderEvents } from "lib/render-logging/getPhaseTimingsFromRenderEvents"
-import { getChangesBetweenFsMaps } from "../../utils/getChangesBetweenFsMaps"
-import { useRunFrameStore } from "../RunFrameWithApi/store"
-import type { RunFrameProps } from "./RunFrameProps"
-import { useRunnerStore } from "./runner-store/use-runner-store"
-import { useMutex } from "./useMutex"
-import type { ManualEditEvent } from "@tscircuit/props"
-import { registryKy } from "../../utils/get-registry-ky"
-import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
-import { LoadingSkeleton } from "../ui/LoadingSkeleton"
-import { useStyles } from "../../hooks/use-styles"
 import { useCircuitJsonFile } from "../../hooks/use-circuit-json-file"
 import { usePostHogActivity } from "../../hooks/use-posthog-activity"
+import { useStyles } from "../../hooks/use-styles"
+import { registryKy } from "../../utils/get-registry-ky"
+import { getChangesBetweenFsMaps } from "../../utils/getChangesBetweenFsMaps"
+import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 import { API_BASE } from "../RunFrameWithApi/api-base"
-import {
-  buildRunCompletedPayload,
-  type RunCompletedPayload,
-} from "./run-completion"
+import { useRunFrameStore } from "../RunFrameWithApi/store"
+import { LoadingSkeleton } from "../ui/LoadingSkeleton"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip"
+import type { RunFrameProps } from "./RunFrameProps"
+import { getRunFrameProjectConfig } from "./get-run-frame-project-config"
+import {
+  type RunCompletedPayload,
+  buildRunCompletedPayload,
+} from "./run-completion"
+import { useRunnerStore } from "./runner-store/use-runner-store"
+import { useMutex } from "./useMutex"
 
 const fetchLatestEvalVersion = async () => {
   try {
@@ -165,12 +166,10 @@ export const RunFrame = (props: RunFrameProps) => {
           const worker = await createCircuitWebWorker({
             evalVersion,
             webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
-            projectConfig: {
+            projectConfig: getRunFrameProjectConfig({
+              platformConfig: props.platformConfig,
               projectBaseUrl:
                 props.projectBaseUrl || `${API_BASE}/files/static`,
-            },
-            ...(props.platformConfig && {
-              platformConfig: props.platformConfig,
             }),
             verbose: true,
             ...(props.enableFetchProxy && {
@@ -325,11 +324,9 @@ export const RunFrame = (props: RunFrameProps) => {
           evalVersion: resolvedEvalVersion,
           webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
           verbose: true,
-          projectConfig: {
-            projectBaseUrl: props.projectBaseUrl || `${API_BASE}/files/static`,
-          },
-          ...(props.platformConfig && {
+          projectConfig: getRunFrameProjectConfig({
             platformConfig: props.platformConfig,
+            projectBaseUrl: props.projectBaseUrl || `${API_BASE}/files/static`,
           }),
           ...(props.enableFetchProxy && {
             enableFetchProxy: props.enableFetchProxy,

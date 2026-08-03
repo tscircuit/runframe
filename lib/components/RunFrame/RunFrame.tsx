@@ -170,7 +170,7 @@ export const RunFrame = (props: RunFrameProps) => {
                 props.projectBaseUrl || `${API_BASE}/files/static`,
             },
             ...(props.platformConfig && {
-              platformConfig: props.platformConfig,
+              platform: props.platformConfig,
             }),
             verbose: true,
             ...(props.enableFetchProxy && {
@@ -329,7 +329,7 @@ export const RunFrame = (props: RunFrameProps) => {
             projectBaseUrl: props.projectBaseUrl || `${API_BASE}/files/static`,
           },
           ...(props.platformConfig && {
-            platformConfig: props.platformConfig,
+            platform: props.platformConfig,
           }),
           ...(props.enableFetchProxy && {
             enableFetchProxy: props.enableFetchProxy,

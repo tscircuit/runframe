@@ -142,11 +142,14 @@ export const RunFrame = (props: RunFrameProps) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter" && !isRunning) {
+        e.preventDefault()
+        e.stopPropagation()
         incRunCountTrigger(1)
       }
     }
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
+    window.addEventListener("keydown", handleKeyDown, { capture: true })
+    return () =>
+      window.removeEventListener("keydown", handleKeyDown, { capture: true })
   }, [isRunning])
 
   useEffect(() => {

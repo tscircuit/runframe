@@ -8,7 +8,7 @@ test("RunFrame enables part orientation analysis while preserving platform overr
   } satisfies PartsEngine
   const platformConfig = {
     partsEngine,
-    usePartOrientationAnalysis: false,
+    enablePartOrientationAnalysis: false,
   } satisfies PlatformConfig
 
   expect(
@@ -19,6 +19,6 @@ test("RunFrame enables part orientation analysis while preserving platform overr
   ).toMatchObject({
     partsEngine,
     projectBaseUrl: "https://example.com/files",
-    usePartOrientationAnalysis: true,
+    enablePartOrientationAnalysis: true,
   })
 })

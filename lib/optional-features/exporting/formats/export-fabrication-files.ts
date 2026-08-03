@@ -1,13 +1,15 @@
 import importer from "@tscircuit/internal-dynamic-import"
 import type { AnyCircuitElement } from "circuit-json"
-import type { PickAndPlaceConversionOptions } from "circuit-json-to-pnp-csv"
 import JSZip from "jszip"
 import { toast } from "lib/utils/toast"
 import { openForDownload } from "../open-for-download"
 
 type PnpCsvConverter = (
   circuitJson: AnyCircuitElement[],
-  options?: PickAndPlaceConversionOptions,
+  options?: {
+    flip_y_axis?: boolean
+    supplier?: string
+  },
 ) => string
 
 export const exportFabricationFiles = async ({

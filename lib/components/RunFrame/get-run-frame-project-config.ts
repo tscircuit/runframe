@@ -9,5 +9,5 @@ export const getRunFrameProjectConfig = ({
 }): Partial<PlatformConfig> => ({
   ...platformConfig,
   projectBaseUrl,
-  usePartOrientationAnalysis: true,
+  enablePartOrientationAnalysis: true,
 })

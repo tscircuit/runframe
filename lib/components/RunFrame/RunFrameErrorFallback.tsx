@@ -2,10 +2,15 @@ import { AlertTriangle } from "lucide-react"
 import { Button } from "../ui/button"
 import type { FallbackProps } from "react-error-boundary"
 
+interface RunFrameErrorFallbackProps extends FallbackProps {
+  componentStack?: string | null
+}
+
 export const RunFrameErrorFallback = ({
   error,
   resetErrorBoundary,
-}: FallbackProps) => {
+  componentStack,
+}: RunFrameErrorFallbackProps) => {
   const resolvedError =
     error instanceof Error ? error : new Error(String(error))
 
@@ -33,6 +38,16 @@ export const RunFrameErrorFallback = ({
                 </summary>
                 <pre className="rf-text-xs rf-font-mono no-scrollbar rf-whitespace-pre-wrap rf-text-gray-500 rf-bg-gray-100 rf-p-3 rf-rounded-lg rf-mt-2 rf-overflow-auto rf-text-left rf-max-h-[150px]">
                   {resolvedError.stack}
+                </pre>
+              </details>
+            )}
+            {componentStack && (
+              <details className="rf-text-center rf-mb-6">
+                <summary className="rf-text-xs rf-text-gray-500 rf-cursor-pointer hover:rf-text-gray-700">
+                  View component stack
+                </summary>
+                <pre className="rf-text-xs rf-font-mono no-scrollbar rf-whitespace-pre-wrap rf-text-gray-500 rf-bg-gray-100 rf-p-3 rf-rounded-lg rf-mt-2 rf-overflow-auto rf-text-left rf-max-h-[150px]">
+                  {componentStack}
                 </pre>
               </details>
             )}

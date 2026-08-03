@@ -4,6 +4,14 @@ import JSZip from "jszip"
 import { toast } from "lib/utils/toast"
 import { openForDownload } from "../open-for-download"
 
+type PnpCsvConverter = (
+  circuitJson: AnyCircuitElement[],
+  options?: {
+    flip_y_axis?: boolean
+    supplier?: string
+  },
+) => string
+
 export const exportFabricationFiles = async ({
   circuitJson,
   projectName,
@@ -62,7 +70,11 @@ export const exportFabricationFiles = async ({
       zip.file("bom.csv", bomCsv)
 
       // Generate Pick and Place CSV
-      const pnpCsv = await convertCircuitJsonToPickAndPlaceCsv(circuitJson)
+      const pnpCsv = await (
+        convertCircuitJsonToPickAndPlaceCsv as PnpCsvConverter
+      )(circuitJson, {
+        supplier: "jlcpcb",
+      })
       zip.file("pick_and_place.csv", pnpCsv)
 
       // Generate and download the zip file

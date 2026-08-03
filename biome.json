@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.3/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.6/schema.json",
   "formatter": {
     "enabled": true,
     "indentStyle": "space"
@@ -12,7 +12,13 @@
     }
   },
   "files": {
-    "ignore": ["cosmos-export", "dist", "package.json", "*.generated.ts"]
+    "includes": [
+      "**",
+      "!**/cosmos-export",
+      "!**/dist",
+      "!**/package.json",
+      "!**/*.generated.ts"
+    ]
   },
   "javascript": {
     "formatter": {
@@ -28,11 +34,11 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "suspicious": {
         "noExplicitAny": "off",
         "noArrayIndexKey": "off",
-        "noConsoleLog": "error"
+        "noConsole": { "level": "error", "options": { "allow": ["log"] } }
       },
       "complexity": {
         "noForEach": "error"

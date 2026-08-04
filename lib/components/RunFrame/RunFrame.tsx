@@ -603,12 +603,22 @@ export const RunFrame = (props: RunFrameProps) => {
         const isUnauthorized =
           error instanceof HTTPError && error.response?.status === 401
 
+        const isPayloadTooLarge =
+          error instanceof HTTPError && error.response?.status === 413
+
         if (isUnauthorized) {
           if (props.onLoginRequired) {
             props.onLoginRequired()
           } else {
             alert("You must be logged in to report autorouting bugs")
           }
+          return
+        }
+
+        if (isPayloadTooLarge) {
+          alert(
+            "This autorouting log is too large to report online. Download the log and attach it to a GitHub issue.",
+          )
           return
         }
 

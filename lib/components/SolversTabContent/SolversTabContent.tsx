@@ -1,3 +1,5 @@
+import { SOLVERS } from "@tscircuit/core"
+import { LayoutPipelineSolver } from "@tscircuit/matchpack"
 import { GenericSolverDebugger } from "@tscircuit/solver-utils/react"
 import { Box, BugIcon, DownloadIcon, LayoutGrid, Route } from "lucide-react"
 import { useMemo, useState } from "react"
@@ -7,8 +9,6 @@ import { openForDownload } from "../../optional-features/exporting/open-for-down
 import { sanitizeFileName } from "../../utils/sanitizeFileName"
 import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentProps"
 import { Button } from "../ui/button"
-import { getSolverIdsWithMatchpackLast } from "./get-solver-ids-with-matchpack-last"
-import { getRunframeSolverClass, RUNFRAME_SOLVERS } from "./solver-registry"
 
 interface SolversTabContentProps {
   solverEvents?: SolverStartedEvent[]
@@ -45,6 +45,11 @@ const SOLVER_REPORT_LINKS: Record<string, string> = {
   AutoroutingPipelineSolver8: AUTOROUTER_REPORT_LINK,
   CopperPourPipelineSolver: COPPER_POUR_REPORT_LINK,
   SchematicTracePipelineSolver: SCHEMATIC_TRACE_REPORT_LINK,
+}
+
+export const RUNFRAME_SOLVERS = {
+  ...SOLVERS,
+  LayoutPipelineSolver,
 }
 
 const getSolverIcon = (solverName: string) => {
@@ -180,10 +185,7 @@ export const SolversTabContent = ({
     return map
   }, [solverEvents])
 
-  const solverIds = useMemo(
-    () => getSolverIdsWithMatchpackLast(solversById),
-    [solversById],
-  )
+  const solverIds = useMemo(() => Array.from(solversById.keys()), [solversById])
 
   const selectedSolverEvent = selectedSolverId
     ? solversById.get(selectedSolverId)
@@ -195,25 +197,22 @@ export const SolversTabContent = ({
       return { instance: null, error: null, classFound: false }
     }
 
-    const SolverClass = getRunframeSolverClass(selectedSolverEvent.solverName)
+    const SolverClass = (RUNFRAME_SOLVERS as Record<string, any>)[
+      selectedSolverEvent.solverName
+    ]
     if (!SolverClass) {
       return {
         instance: null,
-        error: `Solver class "${selectedSolverEvent.solverName}" not found in solver registry. Available: ${Object.keys(RUNFRAME_SOLVERS).join(", ")}`,
+        error: `Solver class "${selectedSolverEvent.solverName}" not found in SOLVERS registry. Available: ${Object.keys(RUNFRAME_SOLVERS).join(", ")}`,
         classFound: false,
       }
     }
 
     try {
-      const solverParams = selectedSolverEvent.solverParams as Record<
-        string,
-        unknown
-      >
-      let solverInput: unknown = solverParams
-      if (solverParams.input !== undefined) {
-        solverInput = solverParams.input
-      }
-      const instance = new SolverClass(solverInput as never)
+      // HACK: if "input" is in the result, use that as the constructor parameter
+      const params = selectedSolverEvent.solverParams as Record<string, unknown>
+      const constructorArg = params?.input !== undefined ? params.input : params
+      const instance = new SolverClass(constructorArg)
       return { instance, error: null, classFound: true }
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : String(e)

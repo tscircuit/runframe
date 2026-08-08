@@ -117,8 +117,5 @@
     "@tscircuit/eval": "^0.0.1160",
     "@tscircuit/solver-utils": "^0.0.7",
     "debug": "^4.4.0"
-  },
-  "overrides": {
-    "circuit-json": "0.0.465"
   }
 }

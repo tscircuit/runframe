@@ -1,8 +1,8 @@
-import { SOLVERS } from "@tscircuit/core"
 import { GenericSolverDebugger } from "@tscircuit/solver-utils/react"
 import { Box, BugIcon, DownloadIcon, LayoutGrid, Route } from "lucide-react"
 import { useMemo, useState } from "react"
 import { ErrorBoundary } from "react-error-boundary"
+import { SOLVERS } from "tscircuit"
 import { useInjectTailwind } from "../../hooks/useInjectTailwind"
 import { openForDownload } from "../../optional-features/exporting/open-for-download"
 import { sanitizeFileName } from "../../utils/sanitizeFileName"
@@ -25,11 +25,14 @@ const COPPER_POUR_REPORT_LINK =
   "https://github.com/tscircuit/copper-pour-solver/issues/new"
 const PACK_SOLVER_REPORT_LINK =
   "https://github.com/tscircuit/calculate-packing/issues/new"
+const MATCHPACK_REPORT_LINK =
+  "https://github.com/tscircuit/matchpack/issues/new"
 const SCHEMATIC_TRACE_REPORT_LINK =
   "https://github.com/tscircuit/schematic-trace-solver/issues/new?template=json-bug-report.yml"
 
 const SOLVER_REPORT_LINKS: Record<string, string> = {
   PackSolver2: PACK_SOLVER_REPORT_LINK,
+  LayoutPipelineSolver: MATCHPACK_REPORT_LINK,
   AutoroutingPipelineSolver: AUTOROUTER_REPORT_LINK,
   AssignableAutoroutingPipeline2: AUTOROUTER_REPORT_LINK,
   AssignableAutoroutingPipeline3: AUTOROUTER_REPORT_LINK,

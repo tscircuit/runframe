@@ -63,7 +63,7 @@
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.20",
     "chokidar-cli": "^3.0.0",
-    "circuit-json": "^0.0.454",
+    "circuit-json": "^0.0.465",
     "circuit-json-to-bom-csv": "^0.0.9",
     "circuit-json-to-gerber": "^0.0.90",
     "circuit-json-to-kicad": "^0.0.171",
@@ -108,7 +108,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
-    "tscircuit": "^0.0.2142",
+    "tscircuit": "^0.0.2269",
     "tsup": "^8.3.5",
     "vite": "^7.1.2",
     "yargs": "^17.7.2"
@@ -117,5 +117,8 @@
     "@tscircuit/eval": "^0.0.1160",
     "@tscircuit/solver-utils": "^0.0.7",
     "debug": "^4.4.0"
+  },
+  "overrides": {
+    "circuit-json": "0.0.465"
   }
 }

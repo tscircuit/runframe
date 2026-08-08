@@ -54,7 +54,7 @@
     "@tscircuit/internal-dynamic-import": "^0.0.13",
     "@tscircuit/pcb-viewer": "1.11.381",
     "@tscircuit/props": "^0.0.612",
-    "@tscircuit/schematic-viewer": "^2.0.76",
+    "@tscircuit/schematic-viewer": "^2.0.77",
     "@types/bun": "latest",
     "@types/debug": "^4.1.12",
     "@types/react": "^19.1.10",

@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { LayoutPipelineSolver } from "@tscircuit/matchpack"
 import { applySolverEndedEvent } from "../lib/components/SolversTabContent/apply-solver-ended-event"
+import { getSolverIdsWithMatchpackLast } from "../lib/components/SolversTabContent/get-solver-ids-with-matchpack-last"
 import {
   instantiateSolverFromEvent,
   RUNFRAME_SOLVERS,
@@ -81,5 +82,41 @@ describe("solver event reconstruction", () => {
       iterations: 12,
       error: null,
     })
+  })
+
+  test("places Matchpack after the other detected solvers", () => {
+    const solverIds = getSolverIdsWithMatchpackLast(
+      new Map([
+        [
+          "autorouter",
+          {
+            type: "solver:started" as const,
+            solverName: "AutoroutingPipelineSolver",
+            solverParams: {},
+            componentName: "board",
+          },
+        ],
+        [
+          "matchpack",
+          {
+            type: "solver:started" as const,
+            solverName: "LayoutPipelineSolver",
+            solverParams: {},
+            componentName: "board",
+          },
+        ],
+        [
+          "packing",
+          {
+            type: "solver:started" as const,
+            solverName: "PackSolver2",
+            solverParams: {},
+            componentName: "board",
+          },
+        ],
+      ]),
+    )
+
+    expect(solverIds).toEqual(["autorouter", "packing", "matchpack"])
   })
 })

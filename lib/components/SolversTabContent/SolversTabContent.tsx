@@ -6,11 +6,11 @@ import { useInjectTailwind } from "../../hooks/useInjectTailwind"
 import { openForDownload } from "../../optional-features/exporting/open-for-download"
 import { sanitizeFileName } from "../../utils/sanitizeFileName"
 import type {
-  SolverEndedEvent,
   SolverEvent,
   SolverStartedEvent,
 } from "../CircuitJsonPreview/PreviewContentProps"
 import { Button } from "../ui/button"
+import { getSolverIdsWithMatchpackLast } from "./get-solver-ids-with-matchpack-last"
 import { instantiateSolverFromEvent, RUNFRAME_SOLVERS } from "./solver-registry"
 
 interface SolversTabContentProps {
@@ -86,14 +86,6 @@ const downloadSolverInput = (solverEvent: SolverStartedEvent) => {
     fileName: getSolverInputFileName(solverEvent),
     mimeType: "application/json",
   })
-}
-
-const getSolverStatus = (endedEvent?: SolverEndedEvent) => {
-  if (!endedEvent) return null
-  if (endedEvent.failed) {
-    return { label: "Failed", className: "rf-text-red-600" }
-  }
-  return { label: "Completed", className: "rf-text-green-600" }
 }
 
 const SolverDebuggerActions = ({
@@ -191,7 +183,10 @@ export const SolversTabContent = ({
     return map
   }, [solverEvents])
 
-  const solverIds = useMemo(() => Array.from(solversById.keys()), [solversById])
+  const solverIds = useMemo(
+    () => getSolverIdsWithMatchpackLast(solversById),
+    [solversById],
+  )
 
   const selectedSolverEvent = selectedSolverId
     ? solversById.get(selectedSolverId)
@@ -255,7 +250,6 @@ export const SolversTabContent = ({
         {solverIds.map((id) => {
           const solver = solversById.get(id)!
           const isSelected = selectedSolverId === id
-          const solverStatus = getSolverStatus(solver.endedEvent)
           return (
             <div
               key={id}
@@ -278,15 +272,6 @@ export const SolversTabContent = ({
                       <div className="rf-text-xs rf-text-gray-500 rf-truncate">
                         {solver.solverName}
                       </div>
-                      {solverStatus && (
-                        <div
-                          className={`rf-text-xs rf-font-medium ${solverStatus.className}`}
-                        >
-                          {solverStatus.label}
-                          {solver.endedEvent &&
-                            ` · ${solver.endedEvent.iterations} iterations`}
-                        </div>
-                      )}
                     </div>
                   </div>
                 )

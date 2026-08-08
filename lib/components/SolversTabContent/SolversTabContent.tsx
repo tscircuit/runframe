@@ -1,5 +1,4 @@
 import { SOLVERS } from "@tscircuit/core"
-import { LayoutPipelineSolver } from "@tscircuit/matchpack"
 import { GenericSolverDebugger } from "@tscircuit/solver-utils/react"
 import { Box, BugIcon, DownloadIcon, LayoutGrid, Route } from "lucide-react"
 import { useMemo, useState } from "react"
@@ -45,11 +44,6 @@ const SOLVER_REPORT_LINKS: Record<string, string> = {
   AutoroutingPipelineSolver8: AUTOROUTER_REPORT_LINK,
   CopperPourPipelineSolver: COPPER_POUR_REPORT_LINK,
   SchematicTracePipelineSolver: SCHEMATIC_TRACE_REPORT_LINK,
-}
-
-export const RUNFRAME_SOLVERS = {
-  ...SOLVERS,
-  LayoutPipelineSolver,
 }
 
 const getSolverIcon = (solverName: string) => {
@@ -197,13 +191,13 @@ export const SolversTabContent = ({
       return { instance: null, error: null, classFound: false }
     }
 
-    const SolverClass = (RUNFRAME_SOLVERS as Record<string, any>)[
+    const SolverClass = (SOLVERS as Record<string, any>)[
       selectedSolverEvent.solverName
     ]
     if (!SolverClass) {
       return {
         instance: null,
-        error: `Solver class "${selectedSolverEvent.solverName}" not found in SOLVERS registry. Available: ${Object.keys(RUNFRAME_SOLVERS).join(", ")}`,
+        error: `Solver class "${selectedSolverEvent.solverName}" not found in SOLVERS registry. Available: ${Object.keys(SOLVERS).join(", ")}`,
         classFound: false,
       }
     }

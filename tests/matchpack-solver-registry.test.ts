@@ -1,7 +1,6 @@
 import { expect, test } from "bun:test"
-import { LayoutPipelineSolver } from "@tscircuit/matchpack"
-import { RUNFRAME_SOLVERS } from "../lib/components/SolversTabContent/SolversTabContent"
+import { SOLVERS } from "@tscircuit/core"
 
-test("includes Matchpack in the Runframe solver registry", () => {
-  expect(RUNFRAME_SOLVERS.LayoutPipelineSolver).toBe(LayoutPipelineSolver)
+test("includes Matchpack in the solver registry", () => {
+  expect(SOLVERS.LayoutPipelineSolver).toBeDefined()
 })

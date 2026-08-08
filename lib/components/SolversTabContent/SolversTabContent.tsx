@@ -1,4 +1,3 @@
-import { SOLVERS } from "@tscircuit/core"
 import { GenericSolverDebugger } from "@tscircuit/solver-utils/react"
 import { Box, BugIcon, DownloadIcon, LayoutGrid, Route } from "lucide-react"
 import { useMemo, useState } from "react"
@@ -6,11 +5,16 @@ import { ErrorBoundary } from "react-error-boundary"
 import { useInjectTailwind } from "../../hooks/useInjectTailwind"
 import { openForDownload } from "../../optional-features/exporting/open-for-download"
 import { sanitizeFileName } from "../../utils/sanitizeFileName"
-import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentProps"
+import type {
+  SolverEndedEvent,
+  SolverEvent,
+  SolverStartedEvent,
+} from "../CircuitJsonPreview/PreviewContentProps"
 import { Button } from "../ui/button"
+import { instantiateSolverFromEvent, RUNFRAME_SOLVERS } from "./solver-registry"
 
 interface SolversTabContentProps {
-  solverEvents?: SolverStartedEvent[]
+  solverEvents?: SolverEvent[]
 }
 
 interface SolverResult {
@@ -25,11 +29,14 @@ const COPPER_POUR_REPORT_LINK =
   "https://github.com/tscircuit/copper-pour-solver/issues/new"
 const PACK_SOLVER_REPORT_LINK =
   "https://github.com/tscircuit/calculate-packing/issues/new"
+const MATCHPACK_REPORT_LINK =
+  "https://github.com/tscircuit/matchpack/issues/new"
 const SCHEMATIC_TRACE_REPORT_LINK =
   "https://github.com/tscircuit/schematic-trace-solver/issues/new?template=json-bug-report.yml"
 
 const SOLVER_REPORT_LINKS: Record<string, string> = {
   PackSolver2: PACK_SOLVER_REPORT_LINK,
+  LayoutPipelineSolver: MATCHPACK_REPORT_LINK,
   AutoroutingPipelineSolver: AUTOROUTER_REPORT_LINK,
   AssignableAutoroutingPipeline2: AUTOROUTER_REPORT_LINK,
   AssignableAutoroutingPipeline3: AUTOROUTER_REPORT_LINK,
@@ -79,6 +86,14 @@ const downloadSolverInput = (solverEvent: SolverStartedEvent) => {
     fileName: getSolverInputFileName(solverEvent),
     mimeType: "application/json",
   })
+}
+
+const getSolverStatus = (endedEvent?: SolverEndedEvent) => {
+  if (!endedEvent) return null
+  if (endedEvent.failed) {
+    return { label: "Failed", className: "rf-text-red-600" }
+  }
+  return { label: "Completed", className: "rf-text-green-600" }
 }
 
 const SolverDebuggerActions = ({
@@ -168,7 +183,7 @@ export const SolversTabContent = ({
   useInjectTailwind()
 
   const solversById = useMemo(() => {
-    const map = new Map<string, SolverStartedEvent>()
+    const map = new Map<string, SolverEvent>()
     for (const event of solverEvents) {
       const id = `${event.componentName}-${event.solverName}`
       map.set(id, event)
@@ -188,22 +203,18 @@ export const SolversTabContent = ({
       return { instance: null, error: null, classFound: false }
     }
 
-    const SolverClass = (SOLVERS as Record<string, any>)[
-      selectedSolverEvent.solverName
-    ]
-    if (!SolverClass) {
+    if (!(selectedSolverEvent.solverName in RUNFRAME_SOLVERS)) {
       return {
         instance: null,
-        error: `Solver class "${selectedSolverEvent.solverName}" not found in SOLVERS registry. Available: ${Object.keys(SOLVERS).join(", ")}`,
+        error: `Solver class "${selectedSolverEvent.solverName}" not found in solver registry. Available: ${Object.keys(RUNFRAME_SOLVERS).join(", ")}`,
         classFound: false,
       }
     }
 
     try {
-      // HACK: if "input" is in the result, use that as the constructor parameter
-      const params = selectedSolverEvent.solverParams as Record<string, unknown>
-      const constructorArg = params?.input !== undefined ? params.input : params
-      const instance = new SolverClass(constructorArg)
+      const instance = instantiateSolverFromEvent({
+        solverEvent: selectedSolverEvent,
+      })
       return { instance, error: null, classFound: true }
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : String(e)
@@ -244,6 +255,7 @@ export const SolversTabContent = ({
         {solverIds.map((id) => {
           const solver = solversById.get(id)!
           const isSelected = selectedSolverId === id
+          const solverStatus = getSolverStatus(solver.endedEvent)
           return (
             <div
               key={id}
@@ -266,6 +278,15 @@ export const SolversTabContent = ({
                       <div className="rf-text-xs rf-text-gray-500 rf-truncate">
                         {solver.solverName}
                       </div>
+                      {solverStatus && (
+                        <div
+                          className={`rf-text-xs rf-font-medium ${solverStatus.className}`}
+                        >
+                          {solverStatus.label}
+                          {solver.endedEvent &&
+                            ` · ${solver.endedEvent.iterations} iterations`}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )

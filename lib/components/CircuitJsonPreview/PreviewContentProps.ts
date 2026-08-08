@@ -6,7 +6,22 @@ export interface SolverStartedEvent {
   type: "solver:started"
   solverName: string
   solverParams: unknown
+  solverConstructorArgs?: readonly unknown[]
   componentName: string
+}
+
+export interface SolverEndedEvent {
+  type: "solver:ended"
+  solverName: string
+  componentName: string
+  solved: boolean
+  failed: boolean
+  iterations: number
+  error: string | null
+}
+
+export interface SolverEvent extends SolverStartedEvent {
+  endedEvent?: SolverEndedEvent
 }
 
 export type TabId =
@@ -145,7 +160,7 @@ export interface PreviewContentProps {
   onRerunWithDebug?: (debugOption: string) => void
 
   /**
-   * List of solver started events tracked during circuit rendering
+   * Solver lifecycle events tracked during circuit rendering
    */
-  solverEvents?: SolverStartedEvent[]
+  solverEvents?: SolverEvent[]
 }

@@ -115,6 +115,7 @@
   },
   "dependencies": {
     "@tscircuit/eval": "^0.0.1158",
+    "@tscircuit/matchpack": "^0.0.77",
     "@tscircuit/solver-utils": "^0.0.7",
     "debug": "^4.4.0"
   }

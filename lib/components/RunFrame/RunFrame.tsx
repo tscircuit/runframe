@@ -8,7 +8,11 @@ import {
   CircuitJsonPreview,
   type TabId,
 } from "../CircuitJsonPreview/CircuitJsonPreview"
-import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentProps"
+import type {
+  SolverEndedEvent,
+  SolverEvent,
+  SolverStartedEvent,
+} from "../CircuitJsonPreview/PreviewContentProps"
 import { Button } from "../ui/button"
 import { RunFrameErrorFallback } from "./RunFrameErrorFallback"
 
@@ -18,6 +22,10 @@ import { RunFrameErrorFallback } from "./RunFrameErrorFallback"
 const numRenderPhases = 26
 
 const debug = Debug("run-frame:RunFrame")
+
+interface SolverEndedEventWorker {
+  on(event: "solver:ended", callback: (event: SolverEndedEvent) => void): void
+}
 
 declare global {
   var runFrameWorker: any
@@ -42,6 +50,7 @@ import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
 import { API_BASE } from "../RunFrameWithApi/api-base"
 import { useRunFrameStore } from "../RunFrameWithApi/store"
 import { LoadingSkeleton } from "../ui/LoadingSkeleton"
+import { applySolverEndedEvent } from "../SolversTabContent/apply-solver-ended-event"
 import {
   Tooltip,
   TooltipContent,
@@ -210,7 +219,7 @@ export const RunFrame = (props: RunFrameProps) => {
 
   const [renderLog, setRenderLog] = useState<RenderLog | null>(null)
   const [autoroutingLog, setAutoroutingLog] = useState<Record<string, any>>({})
-  const [solverEvents, setSolverEvents] = useState<SolverStartedEvent[]>([])
+  const [solverEvents, setSolverEvents] = useState<SolverEvent[]>([])
   const [activeTab, setActiveTab] = useState<TabId>(
     props.defaultActiveTab ?? props.defaultTab ?? "pcb",
   )
@@ -395,6 +404,14 @@ export const RunFrame = (props: RunFrameProps) => {
           if (exists) return prev
           return [...prev, event]
         })
+      })
+      const solverEndedEventWorker = worker as typeof worker &
+        SolverEndedEventWorker
+      solverEndedEventWorker.on("solver:ended", (event) => {
+        debug("solver:ended", event)
+        setSolverEvents((solverEvents) =>
+          applySolverEndedEvent({ solverEvents, endedEvent: event }),
+        )
       })
       worker.on("board:renderPhaseStarted", (event: any) => {
         renderLog.lastRenderEvent = event

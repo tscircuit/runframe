@@ -5,16 +5,13 @@ import { ErrorBoundary } from "react-error-boundary"
 import { useInjectTailwind } from "../../hooks/useInjectTailwind"
 import { openForDownload } from "../../optional-features/exporting/open-for-download"
 import { sanitizeFileName } from "../../utils/sanitizeFileName"
-import type {
-  SolverEvent,
-  SolverStartedEvent,
-} from "../CircuitJsonPreview/PreviewContentProps"
+import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentProps"
 import { Button } from "../ui/button"
 import { getSolverIdsWithMatchpackLast } from "./get-solver-ids-with-matchpack-last"
-import { instantiateSolverFromEvent, RUNFRAME_SOLVERS } from "./solver-registry"
+import { getRunframeSolverClass, RUNFRAME_SOLVERS } from "./solver-registry"
 
 interface SolversTabContentProps {
-  solverEvents?: SolverEvent[]
+  solverEvents?: SolverStartedEvent[]
 }
 
 interface SolverResult {
@@ -175,7 +172,7 @@ export const SolversTabContent = ({
   useInjectTailwind()
 
   const solversById = useMemo(() => {
-    const map = new Map<string, SolverEvent>()
+    const map = new Map<string, SolverStartedEvent>()
     for (const event of solverEvents) {
       const id = `${event.componentName}-${event.solverName}`
       map.set(id, event)
@@ -198,7 +195,8 @@ export const SolversTabContent = ({
       return { instance: null, error: null, classFound: false }
     }
 
-    if (!(selectedSolverEvent.solverName in RUNFRAME_SOLVERS)) {
+    const SolverClass = getRunframeSolverClass(selectedSolverEvent.solverName)
+    if (!SolverClass) {
       return {
         instance: null,
         error: `Solver class "${selectedSolverEvent.solverName}" not found in solver registry. Available: ${Object.keys(RUNFRAME_SOLVERS).join(", ")}`,
@@ -207,9 +205,15 @@ export const SolversTabContent = ({
     }
 
     try {
-      const instance = instantiateSolverFromEvent({
-        solverEvent: selectedSolverEvent,
-      })
+      const solverParams = selectedSolverEvent.solverParams as Record<
+        string,
+        unknown
+      >
+      let solverInput: unknown = solverParams
+      if (solverParams.input !== undefined) {
+        solverInput = solverParams.input
+      }
+      const instance = new SolverClass(solverInput as never)
       return { instance, error: null, classFound: true }
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : String(e)

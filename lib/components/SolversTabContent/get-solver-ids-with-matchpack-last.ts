@@ -1,9 +1,9 @@
-import type { SolverEvent } from "../CircuitJsonPreview/PreviewContentProps"
+import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentProps"
 
 type SolverEventId = string
 
 export const getSolverIdsWithMatchpackLast = (
-  solversById: ReadonlyMap<SolverEventId, SolverEvent>,
+  solversById: ReadonlyMap<SolverEventId, SolverStartedEvent>,
 ) => {
   const otherSolverIds: SolverEventId[] = []
   const matchpackSolverIds: SolverEventId[] = []

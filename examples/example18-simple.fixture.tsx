@@ -20,7 +20,6 @@ circuit.add(
 `,
     }}
     entrypoint="main.tsx"
-    defaultActiveTab="solvers"
     showRunButton
   />
 )

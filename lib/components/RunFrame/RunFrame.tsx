@@ -233,6 +233,7 @@ export const RunFrame = (props: RunFrameProps) => {
         )
   const lastFsMapRef = useRef<Map<string, string> | null>(null)
   const lastEntrypointRef = useRef<string | null>(null)
+  const lastMainComponentPathRef = useRef<string | null>(null)
   const {
     isStaticCircuitJson,
     circuitJson: circuitJsonFileParsedContent,
@@ -283,6 +284,12 @@ export const RunFrame = (props: RunFrameProps) => {
         debug("code changes detected")
       } else if (lastEntrypointRef.current !== props.entrypoint) {
         debug("render triggered by entrypoint change")
+      } else if (lastMainComponentPathRef.current !== props.mainComponentPath) {
+        debug("render triggered by main component path change")
+        // The selected file changed. Clear the previous file's error and
+        // circuit so its failure is never shown for the new file.
+        setError(null)
+        setCircuitJson(null)
       } else if (!wasTriggeredByRunButton) {
         debug("render triggered without changes to fsMap, skipping")
         return
@@ -298,6 +305,7 @@ export const RunFrame = (props: RunFrameProps) => {
 
     lastFsMapRef.current = fsMap
     lastEntrypointRef.current = props.entrypoint ?? null
+    lastMainComponentPathRef.current = props.mainComponentPath ?? null
     lastRunCountTriggerRef.current = runCountTrigger
     setIsRunning(true)
 

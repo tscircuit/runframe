@@ -137,7 +137,7 @@ export interface RunFrameState {
   getFile: (path: FilePath) => Promise<void>
   startPolling: () => void
   stopPolling: () => void
-  setCircuitJson: (circuitJson: CircuitJson) => void
+  setCircuitJson: (circuitJson: CircuitJson | null) => void
   applyEditEventsAndUpdateManualEditsJson: (
     editEvents: ManualEditEvent[],
   ) => Promise<void>

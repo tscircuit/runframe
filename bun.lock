@@ -31,7 +31,7 @@
         "@tscircuit/fake-snippets": "^0.0.163",
         "@tscircuit/file-server": "^0.0.32",
         "@tscircuit/internal-dynamic-import": "^0.0.13",
-        "@tscircuit/pcb-viewer": "1.11.382",
+        "@tscircuit/pcb-viewer": "^1.11.383",
         "@tscircuit/props": "^0.0.612",
         "@tscircuit/schematic-viewer": "^2.0.77",
         "@types/bun": "latest",
@@ -591,7 +591,7 @@
 
     "@tscircuit/ngspice-spice-engine": ["@tscircuit/ngspice-spice-engine@0.0.20", "", { "peerDependencies": { "@tscircuit/props": "*", "circuit-json": "*", "spicets": "*", "typescript": "^5" } }, "sha512-dXjH51Wl95B6yEVkWCz65DpAHWTJRLHDyD/09eJUpGwLcYfd1F9m4E0XWbuiYZ8wKygYlACTozrSX9n3/LtfwA=="],
 
-    "@tscircuit/pcb-viewer": ["@tscircuit/pcb-viewer@1.11.382", "", { "dependencies": { "@emotion/css": "^11.11.2", "@tscircuit/alphabet": "^0.0.23", "@tscircuit/math-utils": "^0.0.36", "@vitejs/plugin-react": "^5.0.2", "circuit-json": "^0.0.450", "circuit-to-canvas": "^0.0.118", "color": "^4.2.3", "react-supergrid": "^1.0.10", "react-toastify": "^10.0.5", "transformation-matrix": "^2.13.0", "zustand": "^4.5.2" }, "peerDependencies": { "react": "*", "tscircuit": "*" } }, "sha512-IeE1osVmDYuFcqh0hJnGShg/jmOh+dS6or+npVbKrBqLm98xxAfyCgcEEgTAlOPCHuHOg32fOoQ481cyWKA/vQ=="],
+    "@tscircuit/pcb-viewer": ["@tscircuit/pcb-viewer@1.11.383", "", { "dependencies": { "@emotion/css": "^11.11.2", "@tscircuit/alphabet": "^0.0.23", "@tscircuit/math-utils": "^0.0.36", "@vitejs/plugin-react": "^5.0.2", "circuit-json": "^0.0.450", "circuit-to-canvas": "^0.0.118", "color": "^4.2.3", "react-supergrid": "^1.0.10", "react-toastify": "^10.0.5", "transformation-matrix": "^2.13.0", "zustand": "^4.5.2" }, "peerDependencies": { "react": "*", "tscircuit": "*" } }, "sha512-jFj36uo72bg9JaohI9cEmJK3AKfavLRCzPxoYurIc65RcxIWvcTjKJ1ficEpN7pM3a/SjoGsdkxUNjUKFWn0Cg=="],
 
     "@tscircuit/props": ["@tscircuit/props@0.0.612", "", { "peerDependencies": { "circuit-json": "*", "react": "*", "zod": "*" } }, "sha512-IGQbizDpQPXWXifdrmUEiU9W1tkyz98t6TeJhp+4gyfK405whQgvX4pjTFujV+ch2qy6zYt/TzHE+8A8RsdaFQ=="],
 

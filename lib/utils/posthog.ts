@@ -1,4 +1,5 @@
 import posthog from "posthog-js"
+import type { BeforeSendFn, CaptureResult } from "posthog-js"
 
 import { getWindowVar } from "./get-registry-ky"
 
@@ -9,8 +10,49 @@ const RUNFRAME_ANONYMOUS_ID_STORAGE_KEY = "runframe:anonymous-id"
 
 const isBrowser = () => typeof window !== "undefined"
 
-const isLocalHost = (hostname: string) =>
-  hostname.includes("localhost") || hostname.includes("127.0.0.1")
+// Matches loopback, private LAN, and CGNAT/Tailscale hostnames. A development
+// server can run on any of these, so telemetry must stay off for all of them.
+export const isLocalHost = (hostname: string) => {
+  const host = hostname.toLowerCase().replace(/^\[|\]$/g, "")
+  if (host === "localhost" || host.endsWith(".localhost")) return true
+  if (host.endsWith(".local")) return true
+  if (host === "::1") return true
+
+  const ipv4 = host.match(/^(\d{1,3})\.(\d{1,3})\.\d{1,3}\.\d{1,3}$/)
+  if (!ipv4) return false
+  const first = Number(ipv4[1])
+  const second = Number(ipv4[2])
+  if (first === 127) return true // loopback
+  if (first === 10) return true // private
+  if (first === 192 && second === 168) return true // private
+  if (first === 172 && second >= 16 && second <= 31) return true // private
+  if (first === 100 && second >= 64 && second <= 127) return true // CGNAT / Tailscale
+  return false
+}
+
+// Vite injects its dev client at /@vite/client, which only exists on a
+// development server. An exception thrown from that frame can never happen in a
+// built bundle, so drop it instead of sending it to error tracking.
+const isViteDevException = (result: CaptureResult) => {
+  if (result.event !== "$exception") return false
+  const exceptionList = result.properties?.$exception_list
+  if (!Array.isArray(exceptionList)) return false
+
+  return exceptionList.some((exception) => {
+    const frames = exception?.stacktrace?.frames
+    if (!Array.isArray(frames) || frames.length === 0) return false
+    const topFrame = frames[frames.length - 1]
+    return (
+      typeof topFrame?.filename === "string" &&
+      topFrame.filename.includes("/@vite/")
+    )
+  })
+}
+
+export const dropViteDevExceptions: BeforeSendFn = (result) => {
+  if (result && isViteDevException(result)) return null
+  return result
+}
 
 const getHostnameFromUrl = (url: string) => {
   try {
@@ -69,6 +111,7 @@ export const initPostHog = () => {
   posthog.init(POSTHOG_PROJECT_API_KEY, {
     api_host: POSTHOG_API_HOST,
     person_profiles: "always",
+    before_send: dropViteDevExceptions,
   })
 
   return true

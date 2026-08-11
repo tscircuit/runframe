@@ -22,6 +22,7 @@ export default () => {
     if (event.snippet_name === "push-failure") {
       pushEvent({
         event_type: "FAILED_TO_SAVE_SNIPPET",
+        error_code: "SERVER_ERROR",
         message: "The registry rejected this snippet.",
       })
       return

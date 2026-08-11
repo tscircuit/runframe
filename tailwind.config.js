@@ -1,3 +1,5 @@
+import tailwindcssAnimate from "tailwindcss-animate"
+
 /** @type {import('tailwindcss').Config} */
 export default {
   prefix: "rf-",
@@ -7,7 +9,7 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
     "./lib/**/*.{js,ts,jsx,tsx}",
   ],
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcssAnimate],
   theme: {
     extend: {
       borderRadius: {

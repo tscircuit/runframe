@@ -751,6 +751,10 @@ export const RunFrame = (props: RunFrameProps) => {
                 onReportAutoroutingLog={
                   props.onReportAutoroutingLog || handleReportAutoroutingLog
                 }
+                shouldLoadLatestEval={props.shouldLoadLatestEval}
+                onChangeShouldLoadLatestEval={
+                  props.onChangeShouldLoadLatestEval
+                }
               />
             )}
             {props.leftHeaderContent}

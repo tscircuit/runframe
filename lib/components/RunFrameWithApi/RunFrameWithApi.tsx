@@ -79,6 +79,8 @@ export interface RunFrameWithApiProps {
   forceLatestEvalVersion?: boolean
   debug?: boolean
   leftHeaderContent?: React.ReactNode
+  shouldLoadLatestEval?: boolean
+  onChangeShouldLoadLatestEval?: (shouldLoadLatestEval: boolean) => void
   defaultToFullScreen?: boolean
   showToggleFullScreen?: boolean
   showFilesSwitch?: boolean
@@ -298,6 +300,8 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     <RunFrame
       fsMap={fsMap}
       showFileMenu={props.showFileMenu}
+      shouldLoadLatestEval={props.shouldLoadLatestEval}
+      onChangeShouldLoadLatestEval={props.onChangeShouldLoadLatestEval}
       isCli={props.isCli}
       schematicSvgOptions={props.schematicSvgOptions}
       isLoadingFiles={isLoadingFiles}

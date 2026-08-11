@@ -474,7 +474,7 @@ export const FileMenuLeftHeader = (props: {
               View
             </div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="rf-z-[104]">
+          <DropdownMenuContent className="rf-z-[101]">
             <DropdownMenuSub>
               <DropdownMenuSubTrigger className="rf-text-xs">
                 Schematic

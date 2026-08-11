@@ -7,22 +7,12 @@ import type {
 import { SelectSnippetDialog } from "./RunFrameForCli/SelectSnippetDialog"
 import { useEventHandler } from "./RunFrameForCli/useEventHandler"
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSub,
-  DropdownMenuPortal,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
-} from "./ui/dropdown-menu"
-import {
   AlertDialog,
   AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   AlertDialogCancel,
 } from "./ui/alert-dialog"
 import { Checkbox } from "./ui/checkbox"
@@ -45,6 +35,16 @@ import {
 } from "./LbrnExportOptionsDialog"
 import { exportLbrn } from "lib/optional-features/exporting/formats/export-lbrn"
 import { getLatestAutoroutingLogEntry } from "lib/utils/get-latest-autorouting-log-entry"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu"
 
 export const FileMenuLeftHeader = (props: {
   isWebEmbedded?: boolean
@@ -108,6 +108,7 @@ export const FileMenuLeftHeader = (props: {
       setHasNeverBeenSaved(false)
       setNotificationMessage("Snippet saved successfully.")
       setIsError(false)
+      toast.success("Snippet pushed successfully.", { id: "snippet-push" })
       return
     }
     if (event.event_type === "REQUEST_EXPORT") {
@@ -138,12 +139,13 @@ export const FileMenuLeftHeader = (props: {
     if (saveFailedEvent) {
       setIsSaving(false)
       setRequestToSaveSentAt(null)
-      setErrorMessage(
+      const message =
         saveFailedEvent.message ??
-          "Failed to save snippet. See console for error.",
-      )
+        "Failed to push snippet. See console for error."
+      setErrorMessage(message)
       console.error(saveFailedEvent.message)
       setIsError(true)
+      toast.error(`Failed to push snippet: ${message}`, { id: "snippet-push" })
       if (
         saveFailedEvent.error_code === "SNIPPET_UNSET" &&
         saveFailedEvent.available_snippet_names
@@ -157,6 +159,7 @@ export const FileMenuLeftHeader = (props: {
       setRequestToSaveSentAt(null)
       setNotificationMessage("Snippet saved successfully.")
       setIsError(false)
+      toast.success("Snippet pushed successfully.", { id: "snippet-push" })
     }
   }, [recentEvents, isSaving])
 
@@ -165,10 +168,23 @@ export const FileMenuLeftHeader = (props: {
     setRequestToSaveSentAt(Date.now())
     setNotificationMessage(null)
     setIsError(false)
-    await pushEvent({
-      event_type: "REQUEST_TO_SAVE_SNIPPET",
-      snippet_name: snippetName,
-    } as RequestToSaveSnippetEvent)
+    toast.loading("Pushing snippet...", { id: "snippet-push" })
+    try {
+      await pushEvent({
+        event_type: "REQUEST_TO_SAVE_SNIPPET",
+        snippet_name: snippetName,
+      } as RequestToSaveSnippetEvent)
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Unable to request snippet push."
+      setIsSaving(false)
+      setRequestToSaveSentAt(null)
+      setErrorMessage(message)
+      setIsError(true)
+      toast.error(`Failed to push snippet: ${message}`, { id: "snippet-push" })
+    }
   }
 
   const storeCircuitJson = useRunFrameStore((state) => state.circuitJson)
@@ -458,10 +474,25 @@ export const FileMenuLeftHeader = (props: {
               setIsSaving(true)
               setRequestToSaveSentAt(Date.now())
               setSnippetName(name)
-              await pushEvent({
-                event_type: "REQUEST_TO_SAVE_SNIPPET",
-                snippet_name: name,
-              } as RequestToSaveSnippetEvent)
+              toast.loading("Pushing snippet...", { id: "snippet-push" })
+              try {
+                await pushEvent({
+                  event_type: "REQUEST_TO_SAVE_SNIPPET",
+                  snippet_name: name,
+                } as RequestToSaveSnippetEvent)
+              } catch (error) {
+                const message =
+                  error instanceof Error
+                    ? error.message
+                    : "Unable to request snippet push."
+                setIsSaving(false)
+                setRequestToSaveSentAt(null)
+                setErrorMessage(message)
+                setIsError(true)
+                toast.error(`Failed to push snippet: ${message}`, {
+                  id: "snippet-push",
+                })
+              }
               setIsSelectSnippetDialogOpen(false)
             }}
             onCancel={() => setIsSelectSnippetDialogOpen(false)}

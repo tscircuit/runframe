@@ -141,6 +141,9 @@ export interface RunFrameProps {
   evalVersion?: string
   forceLatestEvalVersion?: boolean
 
+  shouldLoadLatestEval?: boolean
+  onChangeShouldLoadLatestEval?: (shouldLoadLatestEval: boolean) => void
+
   /**
    * Optional project URL whose pathname will be used when
    * reporting autorouting bugs

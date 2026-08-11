@@ -68,24 +68,17 @@ export const RunFrameForCli = (props: RunFrameForCliProps) => {
         platformConfig={platformConfig}
         isCli={true}
         showFilesSwitch
-        showFileMenu={false}
         enableFetchProxy={props.enableFetchProxy}
         initialMainComponentPath={initialMainComponentPath}
         onLoginRequired={openLoginDialog}
         onMainComponentPathChange={updateMainComponentHash}
+        shouldLoadLatestEval={!evalWebWorkerBlobUrl && shouldLoadLatestEval}
+        onChangeShouldLoadLatestEval={(newShouldLoadLatestEval) => {
+          setLoadLatestEval(newShouldLoadLatestEval)
+          globalThis.runFrameWorker = null
+        }}
         leftHeaderContent={
           <div className="rf-flex rf-items-center rf-justify-between">
-            <FileMenuLeftHeader
-              isWebEmbedded={false}
-              shouldLoadLatestEval={
-                !evalWebWorkerBlobUrl && shouldLoadLatestEval
-              }
-              onChangeShouldLoadLatestEval={(newShouldLoadLatestEval) => {
-                setLoadLatestEval(newShouldLoadLatestEval)
-                globalThis.runFrameWorker = null
-              }}
-              onLoginRequired={openLoginDialog}
-            />
             {props.scenarioSelectorContent}
           </div>
         }

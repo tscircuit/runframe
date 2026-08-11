@@ -213,6 +213,13 @@ export const FileMenuLeftHeader = (props: {
     () => getLatestAutoroutingLogEntry(props.autoroutingLog),
     [props.autoroutingLog],
   )
+  const pushStatus = isSaving
+    ? { label: "Pushing…", className: "rf-text-blue-600" }
+    : isError
+      ? { label: "Push failed", className: "rf-text-red-600" }
+      : notificationMessage === "Snippet saved successfully."
+        ? { label: "Pushed", className: "rf-text-green-600" }
+        : null
 
   return (
     <>
@@ -499,6 +506,16 @@ export const FileMenuLeftHeader = (props: {
             isOpen={isSelectSnippetDialogOpen}
           />
         </DropdownMenu>
+        {pushStatus && (
+          <output
+            className={`rf-flex rf-items-center rf-gap-1 rf-text-xs rf-font-medium ${pushStatus.className}`}
+          >
+            {isSaving && (
+              <span className="rf-h-3 rf-w-3 rf-rounded-full rf-border-2 rf-border-current rf-border-t-transparent rf-animate-spin" />
+            )}
+            {pushStatus.label}
+          </output>
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div className="rf-whitespace-nowrap rf-text-xs font-medium rf-p-2 rf-mx-1 rf-cursor-pointer rf-relative">

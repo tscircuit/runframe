@@ -45,7 +45,7 @@ const DropdownMenuSubContent = React.forwardRef<
   <DropdownMenuPrimitive.SubContent
     ref={ref}
     className={cn(
-      "rf-z-50 rf-min-w-[8rem] rf-overflow-hidden rf-rounded-md rf-border rf-border-zinc-200 rf-bg-white rf-p-1 rf-text-zinc-950 rf-shadow-lg data-[state=open]:rf-animate-in data-[state=closed]:rf-animate-out data-[state=closed]:rf-fade-out-0 data-[state=open]:rf-fade-in-0 data-[state=closed]:rf-zoom-out-95 data-[state=open]:rf-zoom-in-95 data-[side=bottom]:rf-slide-in-from-top-2 data-[side=left]:rf-slide-in-from-right-2 data-[side=right]:rf-slide-in-from-left-2 data-[side=top]:rf-slide-in-from-bottom-2 dark:rf-border-zinc-800 dark:rf-bg-zinc-950 dark:rf-text-zinc-50",
+      "rf-z-[102] rf-min-w-[8rem] rf-overflow-hidden rf-rounded-md rf-border rf-border-zinc-200 rf-bg-white rf-p-1 rf-text-zinc-950 rf-shadow-lg data-[state=open]:rf-animate-in data-[state=closed]:rf-animate-out data-[state=closed]:rf-fade-out-0 data-[state=open]:rf-fade-in-0 data-[state=closed]:rf-zoom-out-95 data-[state=open]:rf-zoom-in-95 data-[side=bottom]:rf-slide-in-from-top-2 data-[side=left]:rf-slide-in-from-right-2 data-[side=right]:rf-slide-in-from-left-2 data-[side=top]:rf-slide-in-from-bottom-2 dark:rf-border-zinc-800 dark:rf-bg-zinc-950 dark:rf-text-zinc-50",
       className,
     )}
     {...props}

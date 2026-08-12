@@ -84,7 +84,7 @@ export const FileMenuLeftHeader = (props: {
   )
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isError, setIsError] = useState(false)
-  const [isExporting, setIsExporting] = useState(false)
+  const [isExporting, setisExporting] = useState(false)
   const [isLbrnDialogOpen, setIsLbrnDialogOpen] = useState(false)
   const [pendingLbrnExport, setPendingLbrnExport] = useState<{
     circuitJson: any
@@ -111,14 +111,14 @@ export const FileMenuLeftHeader = (props: {
       return
     }
     if (event.event_type === "REQUEST_EXPORT") {
-      setIsExporting(true)
+      setisExporting(true)
       setNotificationMessage("Export processing...")
       setIsError(false)
     }
     if (event.event_type === "EXPORT_CREATED") {
       setNotificationMessage(`Export created: ${event.exportFilePath}`)
       setIsError(false)
-      setIsExporting(false)
+      setisExporting(false)
     }
   })
 

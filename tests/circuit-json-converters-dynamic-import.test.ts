@@ -38,4 +38,19 @@ describe("circuit-json converter imports", () => {
 
     expect(staticRuntimeImports).toEqual([])
   })
+
+  test("the FDM component box converter is an available lazy accessory", async () => {
+    const { availableAccessoryExports, availableExports } = await import(
+      "../lib/optional-features/exporting/export-and-download"
+    )
+
+    expect(availableExports).not.toContainEqual({
+      extension: "3mf",
+      name: "Component Box (3MF)",
+    })
+    expect(availableAccessoryExports).toContainEqual({
+      extension: "3mf",
+      name: "Component Box (3MF)",
+    })
+  })
 })

@@ -1,6 +1,7 @@
 import type { CircuitJson } from "circuit-json"
 import { sanitizeFileName } from "lib/utils/sanitizeFileName"
 import { exportFabricationFiles } from "./formats/export-fabrication-files"
+import { exportFdmComponentBox } from "./formats/export-fdm-component-box"
 import { exportGlb } from "./formats/export-glb"
 import { exportKicadLibrary } from "./formats/export-kicad-library"
 import { exportKicadProject } from "./formats/export-kicad-project"
@@ -25,7 +26,13 @@ export const availableExports = [
   // { extension: "gbr", name: "Gerbers" },
 ] as const satisfies Array<{ extension: string; name: string }>
 
-type ExportName = (typeof availableExports)[number]["name"]
+export const availableAccessoryExports = [
+  { extension: "3mf", name: "Component Box (3MF)" },
+] as const satisfies Array<{ extension: string; name: string }>
+
+export type ExportName =
+  | (typeof availableExports)[number]["name"]
+  | (typeof availableAccessoryExports)[number]["name"]
 
 export const exportAndDownload = async ({
   exportName,
@@ -79,6 +86,10 @@ export const exportAndDownload = async ({
   }
   if (exportName === "STEP") {
     await exportStep({ circuitJson, projectName })
+    return
+  }
+  if (exportName === "Component Box (3MF)") {
+    await exportFdmComponentBox({ circuitJson, projectName })
     return
   }
   if (exportName === "LightBurn") {

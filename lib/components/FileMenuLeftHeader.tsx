@@ -184,7 +184,7 @@ export const FileMenuLeftHeader = (props: {
   const handleLbrnExport = async (options: LbrnExportOptions) => {
     if (!pendingLbrnExport) return
 
-    setIsExporting(true)
+    setisExporting(true)
     const toastId = toast.loading("Preparing LightBurn export...")
     try {
       await exportLbrn({
@@ -194,7 +194,7 @@ export const FileMenuLeftHeader = (props: {
       })
     } finally {
       toast.dismiss(toastId)
-      setIsExporting(false)
+      setisExporting(false)
       setPendingLbrnExport(null)
     }
   }
@@ -362,7 +362,7 @@ export const FileMenuLeftHeader = (props: {
                           return
                         }
 
-                        setIsExporting(true)
+                        setisExporting(true)
                         const toastId = toast.loading(
                           `Preparing ${exp.name}...`,
                         )
@@ -378,7 +378,7 @@ export const FileMenuLeftHeader = (props: {
                           })
                         } finally {
                           toast.dismiss(toastId)
-                          setIsExporting(false)
+                          setisExporting(false)
                         }
                       }}
                       disabled={

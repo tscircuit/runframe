@@ -84,7 +84,7 @@ export const FileMenuLeftHeader = (props: {
   )
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isError, setIsError] = useState(false)
-  const [isExporting, setisExporting] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
   const [isLbrnDialogOpen, setIsLbrnDialogOpen] = useState(false)
   const [pendingLbrnExport, setPendingLbrnExport] = useState<{
     circuitJson: any
@@ -111,14 +111,14 @@ export const FileMenuLeftHeader = (props: {
       return
     }
     if (event.event_type === "REQUEST_EXPORT") {
-      setisExporting(true)
+      setIsExporting(true)
       setNotificationMessage("Export processing...")
       setIsError(false)
     }
     if (event.event_type === "EXPORT_CREATED") {
       setNotificationMessage(`Export created: ${event.exportFilePath}`)
       setIsError(false)
-      setisExporting(false)
+      setIsExporting(false)
     }
   })
 
@@ -184,13 +184,19 @@ export const FileMenuLeftHeader = (props: {
   const handleLbrnExport = async (options: LbrnExportOptions) => {
     if (!pendingLbrnExport) return
 
-    await exportLbrn({
-      circuitJson: pendingLbrnExport.circuitJson,
-      projectName: pendingLbrnExport.projectName,
-      options,
-    })
-
-    setPendingLbrnExport(null)
+    setIsExporting(true)
+    const toastId = toast.loading("Preparing LightBurn export...")
+    try {
+      await exportLbrn({
+        circuitJson: pendingLbrnExport.circuitJson,
+        projectName: pendingLbrnExport.projectName,
+        options,
+      })
+    } finally {
+      toast.dismiss(toastId)
+      setIsExporting(false)
+      setPendingLbrnExport(null)
+    }
   }
 
   const latestAutoroutingLogEntry = useMemo(
@@ -322,7 +328,7 @@ export const FileMenuLeftHeader = (props: {
                   {availableExports.map((exp, i) => (
                     <DropdownMenuItem
                       key={i}
-                      onSelect={() => {
+                      onSelect={async () => {
                         if (!circuitJson) {
                           toast.error("No Circuit JSON to export")
                           return
@@ -356,15 +362,24 @@ export const FileMenuLeftHeader = (props: {
                           return
                         }
 
-                        exportAndDownload({
-                          exportName: exp.name,
-                          circuitJson,
-                          simpleRouteJson,
-                          projectName: projectName?.replace(
-                            /\.(board|circuit)$/,
-                            "",
-                          ),
-                        })
+                        setIsExporting(true)
+                        const toastId = toast.loading(
+                          `Preparing ${exp.name}...`,
+                        )
+                        try {
+                          await exportAndDownload({
+                            exportName: exp.name,
+                            circuitJson,
+                            simpleRouteJson,
+                            projectName: projectName?.replace(
+                              /\.(board|circuit)$/,
+                              "",
+                            ),
+                          })
+                        } finally {
+                          toast.dismiss(toastId)
+                          setIsExporting(false)
+                        }
                       }}
                       disabled={
                         isExporting ||

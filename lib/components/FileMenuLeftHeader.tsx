@@ -31,6 +31,7 @@ import { ImportComponentDialogForCli } from "./ImportComponentDialog2"
 import {
   availableExports,
   exportAndDownload,
+  type ExportName,
 } from "lib/optional-features/exporting/export-and-download"
 import { AiReviewDialog } from "./AiReviewDialog"
 import { hasRegistryToken } from "lib/utils/get-registry-ky"
@@ -45,6 +46,7 @@ import {
 } from "./LbrnExportOptionsDialog"
 import { exportLbrn } from "lib/optional-features/exporting/formats/export-lbrn"
 import { getLatestAutoroutingLogEntry } from "lib/utils/get-latest-autorouting-log-entry"
+import { ExportAccessoryDialog } from "./ExportAccessoryDialog"
 
 export const FileMenuLeftHeader = (props: {
   isWebEmbedded?: boolean
@@ -86,6 +88,8 @@ export const FileMenuLeftHeader = (props: {
   const [isError, setIsError] = useState(false)
   const [isExporting, setisExporting] = useState(false)
   const [isLbrnDialogOpen, setIsLbrnDialogOpen] = useState(false)
+  const [isExportAccessoryDialogOpen, setIsExportAccessoryDialogOpen] =
+    useState(false)
   const [pendingLbrnExport, setPendingLbrnExport] = useState<{
     circuitJson: any
     projectName: string
@@ -173,6 +177,18 @@ export const FileMenuLeftHeader = (props: {
 
   const storeCircuitJson = useRunFrameStore((state) => state.circuitJson)
   const circuitJson = storeCircuitJson ?? props.circuitJson
+  const exportProjectName = useMemo(() => {
+    let projectNameFromPath = "Untitled"
+    if (currentMainComponentPath) {
+      const filename = currentMainComponentPath.split("/").pop()
+      if (filename) projectNameFromPath = filename.replace(/\.[^.]+$/, "")
+    }
+
+    return (props.projectName ?? snippetName ?? projectNameFromPath).replace(
+      /\.(board|circuit)$/,
+      "",
+    )
+  }, [currentMainComponentPath, props.projectName, snippetName])
 
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
   const [isAiReviewDialogOpen, setIsAiReviewDialogOpen] = useState(false)
@@ -197,6 +213,30 @@ export const FileMenuLeftHeader = (props: {
     () => getLatestAutoroutingLogEntry(props.autoroutingLog),
     [props.autoroutingLog],
   )
+
+  const handleExport = (exportName: ExportName) => {
+    if (!circuitJson) {
+      toast.error("No Circuit JSON to export")
+      return
+    }
+    const simpleRouteJson = latestAutoroutingLogEntry?.value.simpleRouteJson
+
+    if (exportName === "LightBurn") {
+      setPendingLbrnExport({
+        circuitJson,
+        projectName: exportProjectName,
+      })
+      setIsLbrnDialogOpen(true)
+      return
+    }
+
+    exportAndDownload({
+      exportName,
+      circuitJson,
+      simpleRouteJson,
+      projectName: exportProjectName,
+    })
+  }
 
   return (
     <>
@@ -322,50 +362,7 @@ export const FileMenuLeftHeader = (props: {
                   {availableExports.map((exp, i) => (
                     <DropdownMenuItem
                       key={i}
-                      onSelect={() => {
-                        if (!circuitJson) {
-                          toast.error("No Circuit JSON to export")
-                          return
-                        }
-                        let projectNameFromPath = "Untitled"
-                        if (currentMainComponentPath) {
-                          const filename = currentMainComponentPath
-                            .split("/")
-                            .pop()
-                          if (filename) {
-                            projectNameFromPath = filename.replace(
-                              /\.[^.]+$/,
-                              "",
-                            )
-                          }
-                        }
-                        const projectName =
-                          props.projectName ??
-                          snippetName ??
-                          projectNameFromPath
-                        const simpleRouteJson =
-                          latestAutoroutingLogEntry?.value.simpleRouteJson
-
-                        // Special handling for LightBurn export - show options dialog
-                        if (exp.name === "LightBurn") {
-                          setPendingLbrnExport({
-                            circuitJson,
-                            projectName,
-                          })
-                          setIsLbrnDialogOpen(true)
-                          return
-                        }
-
-                        exportAndDownload({
-                          exportName: exp.name,
-                          circuitJson,
-                          simpleRouteJson,
-                          projectName: projectName?.replace(
-                            /\.(board|circuit)$/,
-                            "",
-                          ),
-                        })
-                      }}
+                      onSelect={() => handleExport(exp.name)}
                       disabled={
                         isExporting ||
                         (exp.name === "Simple Route JSON" &&
@@ -378,6 +375,20 @@ export const FileMenuLeftHeader = (props: {
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>
             </DropdownMenuSub>
+
+            <DropdownMenuItem
+              className="rf-text-xs"
+              disabled={isExporting}
+              onSelect={() => {
+                if (!circuitJson) {
+                  toast.error("No Circuit JSON to export")
+                  return
+                }
+                setIsExportAccessoryDialogOpen(true)
+              }}
+            >
+              Export Accessory…
+            </DropdownMenuItem>
 
             {/* Advanced - CLI only */}
             {!props.isWebEmbedded && (
@@ -535,6 +546,14 @@ export const FileMenuLeftHeader = (props: {
         onOpenChange={setIsLbrnDialogOpen}
         onExport={handleLbrnExport}
       />
+      {circuitJson && (
+        <ExportAccessoryDialog
+          open={isExportAccessoryDialogOpen}
+          onOpenChange={setIsExportAccessoryDialogOpen}
+          circuitJson={circuitJson}
+          projectName={exportProjectName}
+        />
+      )}
       <ImportComponentDialogForCli
         isOpen={isImportDialogOpen}
         onClose={() => setIsImportDialogOpen(false)}

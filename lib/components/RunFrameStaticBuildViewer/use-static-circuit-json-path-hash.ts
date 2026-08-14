@@ -66,7 +66,10 @@ export const getUpdatedCircuitJsonPathHash = ({
   return nextHash ? `#${nextHash}` : ""
 }
 
-export const useStaticCircuitJsonPathHash = (initialCircuitPath?: string) => {
+export const useStaticCircuitJsonPathHash = (
+  initialCircuitPath?: string,
+  defaultToGallery = false,
+) => {
   const [currentCircuitJsonPath, setCurrentCircuitJsonPath] = useState<string>(
     () => {
       if (typeof window === "undefined") return initialCircuitPath ?? ""
@@ -77,11 +80,14 @@ export const useStaticCircuitJsonPathHash = (initialCircuitPath?: string) => {
     },
   )
   const [isGalleryVisible, setIsGalleryVisible] = useState(() => {
-    if (typeof window === "undefined") return false
-    return hasGalleryFlag({
-      hash: window.location.hash,
-      search: window.location.search,
-    })
+    if (typeof window === "undefined") return defaultToGallery
+    return (
+      defaultToGallery ||
+      hasGalleryFlag({
+        hash: window.location.hash,
+        search: window.location.search,
+      })
+    )
   })
 
   const updateGalleryUrl = useCallback((visible: boolean) => {

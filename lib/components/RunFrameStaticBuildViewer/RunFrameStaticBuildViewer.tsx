@@ -28,6 +28,8 @@ export interface RunFrameStaticBuildViewerProps {
   projectName?: string
   showFileMenu?: boolean
   tabSelected?: TabId
+  /** Open the visual circuit gallery on the initial render. */
+  defaultToGallery?: boolean
 }
 
 const getErrorMessage = (error: unknown) =>
@@ -45,7 +47,10 @@ export const RunFrameStaticBuildViewer = (
     isGalleryVisible,
     showGallery,
     hideGallery,
-  } = useStaticCircuitJsonPathHash(props.initialCircuitPath)
+  } = useStaticCircuitJsonPathHash(
+    props.initialCircuitPath,
+    props.defaultToGallery,
+  )
 
   const [circuitJson, setCircuitJson] = useState<CircuitJson | null>(null)
   const [isLoadingCurrentFile, setIsLoadingCurrentFile] = useState(false)

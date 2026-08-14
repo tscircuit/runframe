@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
 import { CircuitJsonPreview } from "../CircuitJsonPreview/CircuitJsonPreview"
+import { CircuitJsonFileSelectorCombobox } from "./CircuitJsonFileSelectorCombobox"
 import { useStyles } from "../../hooks/use-styles"
 import type { CircuitJson } from "circuit-json"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
@@ -198,22 +199,30 @@ export const RunFrameStaticBuildViewer = (
         files={fileReferences}
         projectName={props.projectName}
         onSelectFile={handleFileChange}
+        onClose={hideGallery}
       />
     )
   }
 
-  const galleryButton =
+  const fileNavigation =
     availableFiles.length > 1 ? (
-      <Button
-        type="button"
-        variant="outline"
-        onClick={showGallery}
-        aria-label={`Browse all ${availableFiles.length} circuits`}
-        className="!rf-font-normal"
-      >
-        <LayoutGrid className="rf-h-4 rf-w-4" />
-        Browse {availableFiles.length} circuits
-      </Button>
+      <>
+        <CircuitJsonFileSelectorCombobox
+          currentFile={currentCircuitJsonPath}
+          files={availableFiles}
+          onFileChange={handleFileChange}
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={showGallery}
+          aria-label={`Browse all ${availableFiles.length} circuits as a gallery`}
+          title="Open circuit gallery"
+        >
+          <LayoutGrid className="rf-h-4 rf-w-4" />
+        </Button>
+      </>
     ) : null
 
   const currentFileFailed = failedFiles.has(currentCircuitJsonPath)
@@ -245,7 +254,7 @@ export const RunFrameStaticBuildViewer = (
             )}
             {availableFiles.length > 1 && (
               <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2 rf-flex rf-items-center rf-gap-2">
-                {galleryButton}
+                {fileNavigation}
               </div>
             )}
           </div>
@@ -295,7 +304,7 @@ export const RunFrameStaticBuildViewer = (
                 <div
                   className={`rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2 rf-flex rf-items-center rf-gap-2 ${isLoadingCurrentFile ? "rf-opacity-50" : ""}`}
                 >
-                  {galleryButton}
+                  {fileNavigation}
                 </div>
               )}
             </div>

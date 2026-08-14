@@ -1,6 +1,7 @@
-import { ImageIcon } from "lucide-react"
-import { useState } from "react"
+import { ArrowLeft, ImageIcon } from "lucide-react"
+import { useEffect, useState } from "react"
 import type { CircuitJsonFileReference } from "./RunFrameStaticBuildViewer"
+import { Button } from "../ui/button"
 
 export const getCircuitPreviewImageUrls = (
   fileRef: CircuitJsonFileReference,
@@ -55,25 +56,41 @@ export const CircuitGallery = ({
   files,
   projectName,
   onSelectFile,
+  onClose,
 }: {
   files: CircuitJsonFileReference[]
   projectName?: string
   onSelectFile: (filePath: string) => void
+  onClose: () => void
 }) => {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose()
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [onClose])
+
   return (
     <main className="rf-h-full rf-w-full rf-overflow-y-auto rf-bg-zinc-50">
       <div className="rf-mx-auto rf-w-full rf-max-w-7xl rf-px-5 rf-py-8 sm:rf-px-8 sm:rf-py-10">
-        <div className="rf-mb-7">
-          <p className="rf-mb-1 rf-text-xs rf-font-medium rf-uppercase rf-tracking-wider rf-text-zinc-500">
-            {projectName ?? "tscircuit project"}
-          </p>
-          <h1 className="rf-text-2xl rf-font-semibold rf-tracking-tight rf-text-zinc-950 sm:rf-text-3xl">
-            Circuit gallery
-          </h1>
-          <p className="rf-mt-2 rf-text-sm rf-text-zinc-600">
-            Explore {files.length} {files.length === 1 ? "board" : "boards"}.
-            Select one to open its interactive preview.
-          </p>
+        <div className="rf-mb-7 rf-flex rf-items-start rf-justify-between rf-gap-4">
+          <div>
+            <p className="rf-mb-1 rf-text-xs rf-font-medium rf-uppercase rf-tracking-wider rf-text-zinc-500">
+              {projectName ?? "tscircuit project"}
+            </p>
+            <h1 className="rf-text-2xl rf-font-semibold rf-tracking-tight rf-text-zinc-950 sm:rf-text-3xl">
+              Circuit gallery
+            </h1>
+            <p className="rf-mt-2 rf-text-sm rf-text-zinc-600">
+              Explore {files.length} {files.length === 1 ? "board" : "boards"}.
+              Select one to open its interactive preview.
+            </p>
+          </div>
+          <Button type="button" variant="outline" onClick={onClose}>
+            <ArrowLeft className="rf-h-4 rf-w-4" />
+            Back to circuit
+          </Button>
         </div>
 
         <div className="rf-grid rf-grid-cols-1 rf-gap-5 sm:rf-grid-cols-2 lg:rf-grid-cols-3">

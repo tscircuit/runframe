@@ -90,6 +90,12 @@ const App = () => (
 )
 ```
 
+When multiple files are provided, the viewer includes a circuit gallery. Gallery
+cards look for preview assets next to each `circuit.json`, preferring `3d.png`
+and falling back to PCB or schematic PNG/SVG assets. Add `gallery` to either the
+query string or hash (for example, `?gallery` or `#gallery=true`) to open the
+gallery directly.
+
 ### Providing the Blob URL (to avoid loading webworker from CDN)
 
 ```tsx

@@ -8,6 +8,9 @@ import { guessEntrypoint } from "lib/runner"
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary"
 import type { TabId } from "../CircuitJsonPreview/PreviewContentProps"
 import { useStaticCircuitJsonPathHash } from "./use-static-circuit-json-path-hash"
+import { CircuitGallery } from "./CircuitGallery"
+import { Button } from "../ui/button"
+import { LayoutGrid } from "lucide-react"
 
 export interface CircuitJsonFileReference {
   filePath: string
@@ -25,6 +28,8 @@ export interface RunFrameStaticBuildViewerProps {
   projectName?: string
   showFileMenu?: boolean
   tabSelected?: TabId
+  /** Open the visual circuit gallery on the initial render. */
+  defaultToGallery?: boolean
 }
 
 const getErrorMessage = (error: unknown) =>
@@ -35,8 +40,17 @@ export const RunFrameStaticBuildViewer = (
 ) => {
   useStyles()
 
-  const { currentCircuitJsonPath, setCurrentCircuitJsonPath, updateFileHash } =
-    useStaticCircuitJsonPathHash(props.initialCircuitPath)
+  const {
+    currentCircuitJsonPath,
+    setCurrentCircuitJsonPath,
+    updateFileHash,
+    isGalleryVisible,
+    showGallery,
+    hideGallery,
+  } = useStaticCircuitJsonPathHash(
+    props.initialCircuitPath,
+    props.defaultToGallery,
+  )
 
   const [circuitJson, setCircuitJson] = useState<CircuitJson | null>(null)
   const [isLoadingCurrentFile, setIsLoadingCurrentFile] = useState(false)
@@ -135,7 +149,7 @@ export const RunFrameStaticBuildViewer = (
   )
 
   useEffect(() => {
-    if (availableFiles.length === 0) return
+    if (availableFiles.length === 0 || isGalleryVisible) return
 
     let selectedPath = currentCircuitJsonPath
 
@@ -147,11 +161,15 @@ export const RunFrameStaticBuildViewer = (
     if (selectedPath && availableFiles.includes(selectedPath)) {
       loadCircuitJsonFile(selectedPath)
     }
-  }, [currentCircuitJsonPath])
+  }, [currentCircuitJsonPath, isGalleryVisible])
 
-  const handleFileChange = useCallback((newPath: string) => {
-    setCurrentCircuitJsonPath(newPath)
-  }, [])
+  const handleFileChange = useCallback(
+    (newPath: string) => {
+      hideGallery()
+      setCurrentCircuitJsonPath(newPath)
+    },
+    [hideGallery],
+  )
 
   const retryFailedFile = useCallback(
     (filePath: string) => {
@@ -179,6 +197,38 @@ export const RunFrameStaticBuildViewer = (
       </div>
     )
   }
+
+  if (isGalleryVisible) {
+    return (
+      <CircuitGallery
+        files={fileReferences}
+        projectName={props.projectName}
+        onSelectFile={handleFileChange}
+        onClose={hideGallery}
+      />
+    )
+  }
+
+  const fileNavigation =
+    availableFiles.length > 1 ? (
+      <>
+        <CircuitJsonFileSelectorCombobox
+          currentFile={currentCircuitJsonPath}
+          files={availableFiles}
+          onFileChange={handleFileChange}
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={showGallery}
+          aria-label={`Browse all ${availableFiles.length} circuits as a gallery`}
+          title="Open circuit gallery"
+        >
+          <LayoutGrid className="rf-h-4 rf-w-4" />
+        </Button>
+      </>
+    ) : null
 
   const currentFileFailed = failedFiles.has(currentCircuitJsonPath)
 
@@ -209,11 +259,7 @@ export const RunFrameStaticBuildViewer = (
             )}
             {availableFiles.length > 1 && (
               <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2 rf-flex rf-items-center rf-gap-2">
-                <CircuitJsonFileSelectorCombobox
-                  currentFile={currentCircuitJsonPath}
-                  files={availableFiles}
-                  onFileChange={handleFileChange}
-                />
+                {fileNavigation}
               </div>
             )}
           </div>
@@ -263,11 +309,7 @@ export const RunFrameStaticBuildViewer = (
                 <div
                   className={`rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2 rf-flex rf-items-center rf-gap-2 ${isLoadingCurrentFile ? "rf-opacity-50" : ""}`}
                 >
-                  <CircuitJsonFileSelectorCombobox
-                    currentFile={currentCircuitJsonPath}
-                    files={availableFiles}
-                    onFileChange={handleFileChange}
-                  />
+                  {fileNavigation}
                 </div>
               )}
             </div>

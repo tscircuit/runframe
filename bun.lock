@@ -56,7 +56,7 @@
         "comlink": "^4.4.2",
         "concurrently": "^9.1.2",
         "cssnano": "^7.0.6",
-        "easyeda": "^0.0.305",
+        "easyeda": "^0.0.307",
         "fflate": "^0.8.2",
         "fuse.js": "^7.1.0",
         "jose": "^6.1.0",
@@ -975,7 +975,7 @@
 
     "eastasianwidth": ["eastasianwidth@0.2.0", "", {}, "sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA=="],
 
-    "easyeda": ["easyeda@0.0.305", "", { "peerDependencies": { "typescript": "^5.5.2", "zod": "3" }, "bin": { "easyeda-converter": "dist/main.cjs", "easyeda": "dist/main.cjs" } }, "sha512-ZwF3z+A2BkdZPKKznYasufwUeRFF3Tt6UP53LI9m4ER633XGBJyrbS220W3zSnOLjmqcpWCyNTlknU+5LY84Jw=="],
+    "easyeda": ["easyeda@0.0.307", "", { "peerDependencies": { "typescript": "^5.5.2", "zod": "3" }, "bin": { "easyeda-converter": "dist/main.cjs", "easyeda": "dist/main.cjs" } }, "sha512-4jmSN2hTghI1357Qq3EbTC7V/w4lx9S02kbfYb5ocLGbP67synkeT3rw7y/eFmp27FvuRtUMEh2uLEDgFKHtpw=="],
 
     "edge-runtime": ["edge-runtime@2.5.10", "", { "dependencies": { "@edge-runtime/format": "2.2.1", "@edge-runtime/ponyfill": "2.4.2", "@edge-runtime/vm": "3.2.0", "async-listen": "3.0.1", "mri": "1.2.0", "picocolors": "1.0.0", "pretty-ms": "7.0.1", "signal-exit": "4.0.2", "time-span": "4.0.0" }, "bin": { "edge-runtime": "dist/cli/index.js" } }, "sha512-oe6JjFbU1MbISzeSBMHqmzBhNEwmy2AYDY0LxStl8FAIWSGdGO+CqzWub9nbgmANuJYPXZA0v3XAlbxeKV/Omw=="],
 

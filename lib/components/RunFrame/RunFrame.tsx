@@ -386,15 +386,7 @@ export const RunFrame = (props: RunFrameProps) => {
       })
       worker.on("solver:started", (event: SolverStartedEvent) => {
         debug("solver:started", event)
-        setSolverEvents((prev) => {
-          // Deduplicate by componentName-solverName to avoid counting the same solver multiple times
-          const id = `${event.componentName}-${event.solverName}`
-          const exists = prev.some(
-            (e) => `${e.componentName}-${e.solverName}` === id,
-          )
-          if (exists) return prev
-          return [...prev, event]
-        })
+        setSolverEvents((prev) => [...prev, event])
       })
       worker.on("board:renderPhaseStarted", (event: any) => {
         renderLog.lastRenderEvent = event

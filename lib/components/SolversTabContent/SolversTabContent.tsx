@@ -166,24 +166,21 @@ const SolverReportIconButton = ({
 export const SolversTabContent = ({
   solverEvents = [],
 }: SolversTabContentProps) => {
-  const [selectedSolverId, setSelectedSolverId] = useState<string | null>(null)
+  const [selectedSolverIndex, setSelectedSolverIndex] = useState<number | null>(
+    null,
+  )
 
   useInjectTailwind()
 
-  const solversById = useMemo(() => {
-    const map = new Map<string, SolverStartedEvent>()
-    for (const event of solverEvents) {
-      const id = `${event.componentName}-${event.solverName}`
-      map.set(id, event)
-    }
-    return map
-  }, [solverEvents])
+  let selectedSolverEvent: SolverStartedEvent | null = null
+  if (selectedSolverIndex !== null) {
+    selectedSolverEvent = solverEvents[selectedSolverIndex] ?? null
+  }
 
-  const solverIds = useMemo(() => Array.from(solversById.keys()), [solversById])
-
-  const selectedSolverEvent = selectedSolverId
-    ? solversById.get(selectedSolverId)
-    : null
+  let solverCountNoun = "Solvers"
+  if (solverEvents.length === 1) {
+    solverCountNoun = "Solver"
+  }
 
   // Reconstruct the solver instance from the event
   const solverResult = useMemo<SolverResult>(() => {
@@ -242,20 +239,19 @@ export const SolversTabContent = ({
       {/* Solver List Sidebar */}
       <div className="rf-w-64 rf-border-r rf-border-gray-200 rf-overflow-y-auto rf-flex-shrink-0">
         <div className="rf-text-xs rf-font-semibold rf-text-gray-500 rf-px-3 rf-py-2 rf-bg-gray-50 rf-border-b rf-border-gray-200">
-          {solverIds.length} {solverIds.length === 1 ? "Solver" : "Solvers"}
+          {solverEvents.length} {solverCountNoun}
         </div>
-        {solverIds.map((id) => {
-          const solver = solversById.get(id)!
-          const isSelected = selectedSolverId === id
+        {solverEvents.map((solver, solverIndex) => {
+          const isSelected = selectedSolverIndex === solverIndex
           return (
             <div
-              key={id}
+              key={solverIndex}
               className={`rf-px-3 rf-py-2 rf-cursor-pointer rf-border-b rf-border-gray-100 ${
                 isSelected
                   ? "rf-bg-blue-50 rf-border-l-2 rf-border-l-blue-500"
                   : "hover:rf-bg-gray-50"
               }`}
-              onClick={() => setSelectedSolverId(id)}
+              onClick={() => setSelectedSolverIndex(solverIndex)}
             >
               {(() => {
                 const SolverIcon = getSolverIcon(solver.solverName)

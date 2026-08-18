@@ -8,6 +8,7 @@ import { openForDownload } from "../../optional-features/exporting/open-for-down
 import { sanitizeFileName } from "../../utils/sanitizeFileName"
 import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentProps"
 import { Button } from "../ui/button"
+import { getSolverConstructorArgs } from "./get-solver-constructor-args"
 
 interface SolversTabContentProps {
   solverEvents?: SolverStartedEvent[]
@@ -203,10 +204,9 @@ export const SolversTabContent = ({
     }
 
     try {
-      // HACK: if "input" is in the result, use that as the constructor parameter
-      const params = selectedSolverEvent.solverParams as Record<string, unknown>
-      const constructorArg = params?.input !== undefined ? params.input : params
-      const instance = new SolverClass(constructorArg)
+      const instance = new SolverClass(
+        ...getSolverConstructorArgs(selectedSolverEvent),
+      )
       return { instance, error: null, classFound: true }
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : String(e)

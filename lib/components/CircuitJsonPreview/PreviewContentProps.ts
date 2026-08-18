@@ -6,6 +6,8 @@ export interface SolverStartedEvent {
   type: "solver:started"
   solverName: string
   solverParams: unknown
+  /** Exact constructor tuple emitted by newer versions of @tscircuit/core. */
+  solverConstructorArgs?: readonly unknown[]
   componentName: string
 }
 

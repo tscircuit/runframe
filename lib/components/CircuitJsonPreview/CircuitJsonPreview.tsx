@@ -692,10 +692,6 @@ export const CircuitJsonPreview = ({
                       containerStyle={{
                         height: "100%",
                       }}
-                      editingEnabled
-                      onEditEvent={(ee) => {
-                        onEditEvent?.(ee)
-                      }}
                       debugGrid={showSchematicDebugGrid}
                       showSchematicPorts={showSchematicPorts}
                       css={schematicSvgOptions?.css}

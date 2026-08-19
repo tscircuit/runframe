@@ -7,6 +7,17 @@ export const getSolverConstructorArgs = (
   >,
 ): readonly unknown[] => {
   if (Array.isArray(solverEvent.solverConstructorArgs)) {
+    const [onlyConstructorArg] = solverEvent.solverConstructorArgs
+    if (
+      solverEvent.solverConstructorArgs.length === 1 &&
+      onlyConstructorArg !== null &&
+      typeof onlyConstructorArg === "object" &&
+      "input" in onlyConstructorArg &&
+      "options" in onlyConstructorArg
+    ) {
+      return [onlyConstructorArg.input, onlyConstructorArg.options]
+    }
+
     return solverEvent.solverConstructorArgs
   }
 

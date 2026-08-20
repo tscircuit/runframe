@@ -1,6 +1,12 @@
 import type { PcbComponentFocusRequest } from "@tscircuit/pcb-viewer"
 import type { NavigateToPcbComponentOptions } from "@tscircuit/schematic-viewer"
 import type { Dispatch, SetStateAction } from "react"
+import type { TabId } from "./PreviewContentProps"
+
+export const isPcbNavigationAvailable = (availableTabs?: TabId[]) => {
+  if (!availableTabs) return true
+  return availableTabs.includes("pcb")
+}
 
 export const createNextPcbComponentFocusRequest = (
   previousRequest: PcbComponentFocusRequest | undefined,

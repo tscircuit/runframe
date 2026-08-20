@@ -7,14 +7,7 @@ import {
 import { cn } from "lib/utils"
 import { hasSimulationAnalysisResult } from "lib/utils/has-simulation-analysis-result"
 import { CadViewer } from "@tscircuit/3d-viewer"
-import {
-  useCallback,
-  useEffect,
-  useState,
-  useMemo,
-  type ComponentProps,
-  type ComponentType,
-} from "react"
+import { useCallback, useEffect, useState, useMemo } from "react"
 import { ErrorFallback } from "../ErrorFallback"
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary"
 import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
@@ -70,7 +63,10 @@ import {
   shouldShowCrispFeedbackButton,
 } from "./CrispFeedbackButton"
 import type { PcbComponentFocusRequest } from "@tscircuit/pcb-viewer"
-import { navigateToPcbComponent } from "./pcb-component-navigation"
+import {
+  isPcbNavigationAvailable,
+  navigateToPcbComponent,
+} from "./pcb-component-navigation"
 
 declare global {
   interface Window {
@@ -88,15 +84,6 @@ const dropdownMenuItems = [
   "render_log",
   "solvers",
 ]
-
-// Keep forwarding the legacy editing props while runframe can still be used
-// with schematic-viewer versions that support schematic movement.
-const RunframeSchematicViewer = SchematicViewer as ComponentType<
-  ComponentProps<typeof SchematicViewer> & {
-    editingEnabled?: boolean
-    onEditEvent?: PreviewContentProps["onEditEvent"]
-  }
->
 
 export type { PreviewContentProps, TabId, SolverStartedEvent }
 
@@ -260,6 +247,12 @@ export const CircuitJsonPreview = ({
     },
     [setActiveTab],
   )
+  let schematicPcbNavigationHandler:
+    | typeof handleNavigateToPcbComponent
+    | undefined
+  if (isPcbNavigationAvailable(availableTabs)) {
+    schematicPcbNavigationHandler = handleNavigateToPcbComponent
+  }
 
   const toggleFullScreen = () => {
     setIsFullScreen(!isFullScreen)
@@ -713,24 +706,16 @@ export const CircuitJsonPreview = ({
                   )}
                 >
                   {circuitJson ? (
-                    <RunframeSchematicViewer
+                    <SchematicViewer
                       circuitJson={circuitJson}
                       containerStyle={{
                         height: "100%",
-                      }}
-                      editingEnabled
-                      onEditEvent={(editEvent) => {
-                        onEditEvent?.(editEvent)
                       }}
                       debugGrid={showSchematicDebugGrid}
                       showSchematicPorts={showSchematicPorts}
                       css={schematicSvgOptions?.css}
                       className={schematicSvgOptions?.className}
-                      onNavigateToPcbComponent={
-                        !availableTabs || availableTabs.includes("pcb")
-                          ? handleNavigateToPcbComponent
-                          : undefined
-                      }
+                      onNavigateToPcbComponent={schematicPcbNavigationHandler}
                     />
                   ) : (
                     <PreviewEmptyState onRunClicked={onRunClicked} />

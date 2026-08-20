@@ -13,6 +13,7 @@ import {
   useState,
   useMemo,
   type ComponentProps,
+  type ComponentType,
 } from "react"
 import { ErrorFallback } from "../ErrorFallback"
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary"
@@ -68,6 +69,8 @@ import {
   CrispFeedbackButton,
   shouldShowCrispFeedbackButton,
 } from "./CrispFeedbackButton"
+import type { PcbComponentFocusRequest } from "@tscircuit/pcb-viewer"
+import { navigateToPcbComponent } from "./pcb-component-navigation"
 
 declare global {
   interface Window {
@@ -85,6 +88,15 @@ const dropdownMenuItems = [
   "render_log",
   "solvers",
 ]
+
+// Keep forwarding the legacy editing props while runframe can still be used
+// with schematic-viewer versions that support schematic movement.
+const RunframeSchematicViewer = SchematicViewer as ComponentType<
+  ComponentProps<typeof SchematicViewer> & {
+    editingEnabled?: boolean
+    onEditEvent?: PreviewContentProps["onEditEvent"]
+  }
+>
 
 export type { PreviewContentProps, TabId, SolverStartedEvent }
 
@@ -207,6 +219,9 @@ export const CircuitJsonPreview = ({
     activeTab,
   })
   const [lastActiveTab, setLastActiveTab] = useState<TabId | null>(null)
+  const [pcbComponentFocusRequest, setPcbComponentFocusRequest] = useState<
+    PcbComponentFocusRequest | undefined
+  >()
   const [isFullScreen, setIsFullScreen] = useState(defaultToFullScreen)
 
   // Internal state for when CircuitJsonPreview is used standalone (without external state management)
@@ -234,6 +249,16 @@ export const CircuitJsonPreview = ({
       onActiveTabChange?.(tab)
     },
     [onActiveTabChange, setActiveTabState],
+  )
+  const handleNavigateToPcbComponent = useCallback(
+    (options: Parameters<typeof navigateToPcbComponent>[0]["options"]) => {
+      navigateToPcbComponent({
+        options,
+        setPcbComponentFocusRequest,
+        setActiveTab,
+      })
+    },
+    [setActiveTab],
   )
 
   const toggleFullScreen = () => {
@@ -571,6 +596,7 @@ export const CircuitJsonPreview = ({
                     <PcbViewerWithContainerHeight
                       focusOnHover={false}
                       circuitJson={circuitJson}
+                      pcbComponentFocusRequest={pcbComponentFocusRequest}
                       debugGraphics={autoroutingGraphics}
                       onBoundsSelected={onPcbBoundsSelected}
                       containerClassName={cn(
@@ -687,19 +713,24 @@ export const CircuitJsonPreview = ({
                   )}
                 >
                   {circuitJson ? (
-                    <SchematicViewer
+                    <RunframeSchematicViewer
                       circuitJson={circuitJson}
                       containerStyle={{
                         height: "100%",
                       }}
                       editingEnabled
-                      onEditEvent={(ee) => {
-                        onEditEvent?.(ee)
+                      onEditEvent={(editEvent) => {
+                        onEditEvent?.(editEvent)
                       }}
                       debugGrid={showSchematicDebugGrid}
                       showSchematicPorts={showSchematicPorts}
                       css={schematicSvgOptions?.css}
                       className={schematicSvgOptions?.className}
+                      onNavigateToPcbComponent={
+                        !availableTabs || availableTabs.includes("pcb")
+                          ? handleNavigateToPcbComponent
+                          : undefined
+                      }
                     />
                   ) : (
                     <PreviewEmptyState onRunClicked={onRunClicked} />

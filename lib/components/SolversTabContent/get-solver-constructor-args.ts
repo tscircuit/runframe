@@ -3,21 +3,22 @@ import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentPro
 export const getSolverConstructorArgs = (
   solverEvent: Pick<
     SolverStartedEvent,
-    "solverParams" | "solverConstructorArgs"
+    "solverName" | "solverParams" | "solverConstructorArgs"
   >,
 ): readonly unknown[] => {
-  if (Array.isArray(solverEvent.solverConstructorArgs)) {
-    return solverEvent.solverConstructorArgs
-  }
+  const constructorArgs = solverEvent.solverConstructorArgs ?? [
+    solverEvent.solverParams,
+  ]
 
-  const solverParams = solverEvent.solverParams
   if (
-    solverParams !== null &&
-    typeof solverParams === "object" &&
-    "input" in solverParams
+    solverEvent.solverName !== "AutoroutingPipelineSolver7_MultiGraph" ||
+    constructorArgs.length !== 1
   ) {
-    return [(solverParams as { input: unknown }).input]
+    return constructorArgs
   }
 
-  return [solverParams]
+  const [{ input, options }] = constructorArgs as readonly [
+    { input: unknown; options: unknown },
+  ]
+  return [input, options]
 }

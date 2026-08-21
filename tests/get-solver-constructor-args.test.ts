@@ -5,6 +5,7 @@ test("uses exact solver constructor args with legacy fallbacks", () => {
   const exactConstructorArgs = [{ connections: [] }, { buses: [] }] as const
   expect(
     getSolverConstructorArgs({
+      solverName: "FanoutSolver",
       solverParams: exactConstructorArgs[0],
       solverConstructorArgs: exactConstructorArgs,
     }),
@@ -18,6 +19,7 @@ test("uses exact solver constructor args with legacy fallbacks", () => {
   }
   expect(
     getSolverConstructorArgs({
+      solverName: "AutoroutingPipelineSolver7_MultiGraph",
       solverParams: wrappedSolverParams,
       solverConstructorArgs: [wrappedSolverParams],
     }),
@@ -25,12 +27,16 @@ test("uses exact solver constructor args with legacy fallbacks", () => {
 
   expect(
     getSolverConstructorArgs({
+      solverName: "AutoroutingPipelineSolver7_MultiGraph",
       solverParams: { input: legacyInput, options: { effort: 1 } },
     }),
-  ).toEqual([legacyInput])
+  ).toEqual([legacyInput, { effort: 1 }])
 
   const legacyParams = { chips: [] }
-  expect(getSolverConstructorArgs({ solverParams: legacyParams })).toEqual([
-    legacyParams,
-  ])
+  expect(
+    getSolverConstructorArgs({
+      solverName: "LayoutPipelineSolver",
+      solverParams: legacyParams,
+    }),
+  ).toEqual([legacyParams])
 })

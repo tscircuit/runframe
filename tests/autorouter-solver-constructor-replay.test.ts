@@ -12,6 +12,7 @@ test("reconstructs an autorouter from Core's wrapped constructor args", () => {
   }
   const solverParams = { input, options: { effort: 1 } }
   const constructorArgs = getSolverConstructorArgs({
+    solverName: "AutoroutingPipelineSolver7_MultiGraph",
     solverParams,
     solverConstructorArgs: [solverParams],
   })

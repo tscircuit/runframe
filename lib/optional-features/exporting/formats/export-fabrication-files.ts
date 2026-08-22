@@ -1,9 +1,10 @@
 import importer from "@tscircuit/internal-dynamic-import"
 import type { AnyCircuitElement } from "circuit-json"
-import type * as CircuitJsonToGerber from "circuit-json-to-gerber"
 import JSZip from "jszip"
 import { toast } from "lib/utils/toast"
 import { openForDownload } from "../open-for-download"
+
+type CircuitJsonToGerber = typeof import("circuit-json-to-gerber")
 
 type PnpCsvConverter = (
   circuitJson: AnyCircuitElement[],
@@ -29,9 +30,7 @@ export const exportFabricationFiles = async ({
         { convertCircuitJsonToBomRows, convertBomRowsToCsv },
         { convertCircuitJsonToPickAndPlaceCsv },
       ] = await Promise.all([
-        importer("circuit-json-to-gerber") as Promise<
-          typeof CircuitJsonToGerber
-        >,
+        importer("circuit-json-to-gerber") as Promise<CircuitJsonToGerber>,
         importer("circuit-json-to-bom-csv"),
         importer("circuit-json-to-pnp-csv"),
       ])

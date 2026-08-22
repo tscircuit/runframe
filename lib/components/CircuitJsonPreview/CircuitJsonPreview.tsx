@@ -7,13 +7,7 @@ import {
 import { cn } from "lib/utils"
 import { hasSimulationAnalysisResult } from "lib/utils/has-simulation-analysis-result"
 import { CadViewer } from "@tscircuit/3d-viewer"
-import {
-  useCallback,
-  useEffect,
-  useState,
-  useMemo,
-  type ComponentProps,
-} from "react"
+import { useCallback, useEffect, useState, useMemo } from "react"
 import { ErrorFallback } from "../ErrorFallback"
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary"
 import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
@@ -68,6 +62,11 @@ import {
   CrispFeedbackButton,
   shouldShowCrispFeedbackButton,
 } from "./CrispFeedbackButton"
+import type { PcbComponentFocusRequest } from "@tscircuit/pcb-viewer"
+import {
+  isPcbNavigationAvailable,
+  navigateToPcbComponent,
+} from "./pcb-component-navigation"
 
 declare global {
   interface Window {
@@ -207,6 +206,9 @@ export const CircuitJsonPreview = ({
     activeTab,
   })
   const [lastActiveTab, setLastActiveTab] = useState<TabId | null>(null)
+  const [pcbComponentFocusRequest, setPcbComponentFocusRequest] = useState<
+    PcbComponentFocusRequest | undefined
+  >()
   const [isFullScreen, setIsFullScreen] = useState(defaultToFullScreen)
 
   // Internal state for when CircuitJsonPreview is used standalone (without external state management)
@@ -235,6 +237,22 @@ export const CircuitJsonPreview = ({
     },
     [onActiveTabChange, setActiveTabState],
   )
+  const handleNavigateToPcbComponent = useCallback(
+    (options: Parameters<typeof navigateToPcbComponent>[0]["options"]) => {
+      navigateToPcbComponent({
+        options,
+        setPcbComponentFocusRequest,
+        setActiveTab,
+      })
+    },
+    [setActiveTab],
+  )
+  let schematicPcbNavigationHandler:
+    | typeof handleNavigateToPcbComponent
+    | undefined
+  if (isPcbNavigationAvailable(availableTabs)) {
+    schematicPcbNavigationHandler = handleNavigateToPcbComponent
+  }
 
   const toggleFullScreen = () => {
     setIsFullScreen(!isFullScreen)
@@ -571,6 +589,7 @@ export const CircuitJsonPreview = ({
                     <PcbViewerWithContainerHeight
                       focusOnHover={false}
                       circuitJson={circuitJson}
+                      pcbComponentFocusRequest={pcbComponentFocusRequest}
                       debugGraphics={autoroutingGraphics}
                       onBoundsSelected={onPcbBoundsSelected}
                       containerClassName={cn(
@@ -696,6 +715,7 @@ export const CircuitJsonPreview = ({
                       showSchematicPorts={showSchematicPorts}
                       css={schematicSvgOptions?.css}
                       className={schematicSvgOptions?.className}
+                      onNavigateToPcbComponent={schematicPcbNavigationHandler}
                     />
                   ) : (
                     <PreviewEmptyState onRunClicked={onRunClicked} />

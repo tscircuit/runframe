@@ -4,6 +4,8 @@ import JSZip from "jszip"
 import { toast } from "lib/utils/toast"
 import { openForDownload } from "../open-for-download"
 
+type CircuitJsonToGerber = typeof import("circuit-json-to-gerber")
+
 type PnpCsvConverter = (
   circuitJson: AnyCircuitElement[],
   options?: {
@@ -24,16 +26,11 @@ export const exportFabricationFiles = async ({
       const zip = new JSZip()
 
       const [
-        {
-          stringifyGerberCommandLayers,
-          convertSoupToGerberCommands,
-          convertSoupToExcellonDrillCommands,
-          stringifyExcellonDrill,
-        },
+        gerberConverter,
         { convertCircuitJsonToBomRows, convertBomRowsToCsv },
         { convertCircuitJsonToPickAndPlaceCsv },
       ] = await Promise.all([
-        importer("circuit-json-to-gerber"),
+        importer("circuit-json-to-gerber") as Promise<CircuitJsonToGerber>,
         importer("circuit-json-to-bom-csv"),
         importer("circuit-json-to-pnp-csv"),
       ])
@@ -43,26 +40,15 @@ export const exportFabricationFiles = async ({
         (element) => !("error_type" in element) && !("warning_type" in element),
       ) as any
 
-      // Generate Gerber files
-      const gerberLayerCmds = convertSoupToGerberCommands(filteredCircuitJson, {
-        flip_y_axis: false,
-      })
-      const gerberFileContents = stringifyGerberCommandLayers(gerberLayerCmds)
-
-      for (const [fileName, fileContents] of Object.entries(
-        gerberFileContents,
-      )) {
-        zip.file(`gerber/${fileName}.gbr`, fileContents)
+      const gerberFiles = gerberConverter.convertCircuitJsonToGerberFiles(
+        filteredCircuitJson,
+        {
+          flip_y_axis: false,
+        },
+      )
+      for (const [fileName, fileContents] of Object.entries(gerberFiles)) {
+        zip.file(`gerber/${fileName}`, fileContents)
       }
-
-      // Generate Drill files
-      const drillCmds = convertSoupToExcellonDrillCommands({
-        circuitJson: filteredCircuitJson,
-        is_plated: true,
-        flip_y_axis: false,
-      })
-      const drillFileContents = stringifyExcellonDrill(drillCmds)
-      zip.file("gerber/drill.drl", drillFileContents)
 
       // Generate BOM CSV
       const bomRows = await convertCircuitJsonToBomRows({ circuitJson })

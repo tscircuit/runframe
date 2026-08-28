@@ -81,7 +81,7 @@
     "comlink": "^4.4.2",
     "concurrently": "^9.1.2",
     "cssnano": "^7.0.6",
-    "easyeda": "^0.0.316",
+    "easyeda": "^0.0.342",
     "fflate": "^0.8.2",
     "fuse.js": "^7.1.0",
     "jose": "^6.1.0",

@@ -56,6 +56,11 @@ import {
 } from "./run-completion"
 import { useRunnerStore } from "./runner-store/use-runner-store"
 import { useMutex } from "./useMutex"
+import {
+  captureAutoroutingPhase,
+  type AutoroutingPhase,
+  type AutoroutingPhaseEvent,
+} from "lib/autorouting"
 
 const fetchLatestEvalVersion = async () => {
   try {
@@ -211,6 +216,10 @@ export const RunFrame = (props: RunFrameProps) => {
   const [renderLog, setRenderLog] = useState<RenderLog | null>(null)
   const [autoroutingLog, setAutoroutingLog] = useState<Record<string, any>>({})
   const [solverEvents, setSolverEvents] = useState<SolverStartedEvent[]>([])
+  const [autoroutingPhases, setAutoroutingPhases] = useState<
+    AutoroutingPhase[]
+  >([])
+  const autoroutingCaptureGeneration = useRef(0)
   const [activeTab, setActiveTab] = useState<TabId>(
     props.defaultActiveTab ?? props.defaultTab ?? "pcb",
   )
@@ -307,6 +316,8 @@ export const RunFrame = (props: RunFrameProps) => {
       setRenderLog(null)
       setActiveAsyncEffects({})
       setSolverEvents([])
+      setAutoroutingPhases([])
+      const captureGeneration = ++autoroutingCaptureGeneration.current
       const renderLog: RenderLog = { progress: 0, debugOutputs: [] }
       let cancelled = false
 
@@ -349,6 +360,10 @@ export const RunFrame = (props: RunFrameProps) => {
       globalThis.runFrameWorker = worker
       setLastRunEvalVersion(resolvedEvalVersion)
 
+      // The worker is reused between runs. Replace the prior subscriptions so
+      // old listeners do not keep transferring full SRJ captures over Comlink.
+      await worker.clearEventListeners()
+
       // Enable debug mode if a debug option is set
       if (currentDebugOption?.trim()) {
         worker.enableDebug(currentDebugOption.replace("DEBUG=", ""))
@@ -375,7 +390,26 @@ export const RunFrame = (props: RunFrameProps) => {
           return rest
         })
       })
+      let phaseCaptures: AutoroutingPhase[] = []
+      const capturePhase = (event: AutoroutingPhaseEvent) => {
+        if (
+          cancelled ||
+          captureGeneration !== autoroutingCaptureGeneration.current
+        )
+          return
+        // Capture synchronously so the SRJ is cloned before React schedules its
+        // update, without cloning large snapshots a second time in an updater.
+        phaseCaptures = captureAutoroutingPhase(phaseCaptures, event)
+        setAutoroutingPhases(phaseCaptures)
+      }
+      worker.on("autorouting:end", (event) =>
+        capturePhase({ ...event, type: "autorouting:end" }),
+      )
+      worker.on("autorouting:error", (event) =>
+        capturePhase({ ...event, type: "autorouting:error" }),
+      )
       worker.on("autorouting:start", (event: AutoroutingStartEvent) => {
+        capturePhase({ ...event, type: "autorouting:start" })
         setAutoroutingLog({
           ...autoroutingLog,
           [event.componentDisplayName]: {
@@ -776,6 +810,7 @@ export const RunFrame = (props: RunFrameProps) => {
           incRunCountTrigger(1)
         }}
         solverEvents={solverEvents}
+        autoroutingPhases={isStaticCircuitJson ? [] : autoroutingPhases}
         isCli={props.isCli}
         showSchematicDebugGrid={showSchematicDebugGrid}
         showSchematicPorts={showSchematicPorts}

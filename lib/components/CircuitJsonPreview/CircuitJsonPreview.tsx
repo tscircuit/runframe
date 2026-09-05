@@ -51,6 +51,7 @@ import { useFullscreenBodyScroll } from "lib/hooks/use-fullscreen-body-scroll"
 import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { SolversTabContent } from "../SolversTabContent/SolversTabContent"
+import { AutoroutingTabContent } from "../AutoroutingTabContent/AutoroutingTabContent"
 import { capitalizeFirstLetters } from "lib/utils"
 import { useErrorTelemetry } from "lib/hooks/use-error-telemetry"
 import { usePostHogActivity } from "lib/hooks/use-posthog-activity"
@@ -83,10 +84,12 @@ const dropdownMenuItems = [
   "circuit_json",
   "errors",
   "render_log",
+  "autorouting",
   "solvers",
 ]
 
 export type { PreviewContentProps, TabId, SolverStartedEvent }
+export type { AutoroutingPhase, AutoroutingPhaseEvent } from "lib/autorouting"
 
 const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "An unknown error occurred"
@@ -138,6 +141,7 @@ export const CircuitJsonPreview = ({
   hideSchematicInAnalogSimulation = false,
   onRerunWithDebug,
   solverEvents,
+  autoroutingPhases,
   onPcbBoundsSelected,
 }: PreviewContentProps) => {
   useStyles()
@@ -412,13 +416,17 @@ export const CircuitJsonPreview = ({
                 )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <div className="rf-whitespace-nowrap rf-p-2 rf-mr-1 rf-cursor-pointer rf-relative">
+                    <button
+                      type="button"
+                      aria-label="More views"
+                      className="rf-whitespace-nowrap rf-p-2 rf-mr-1 rf-cursor-pointer rf-relative"
+                    >
                       <EllipsisIcon className="rf-w-4 rf-h-4" />
                       {((circuitJsonErrors && circuitJsonErrors.length > 0) ||
                         errorMessage) && (
                         <span className="rf-inline-flex rf-absolute rf-top-[6px] rf-right-[4px] rf-items-center rf-justify-center rf-w-1 rf-h-1 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full" />
                       )}
-                    </div>
+                    </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="rf-*:text-xs rf-z-[101]">
                     {dropdownMenuItems
@@ -880,6 +888,32 @@ export const CircuitJsonPreview = ({
                 />
               </TabsContent>
             )}
+          {(!availableTabs || availableTabs.includes("autorouting")) && (
+            <TabsContent value="autorouting">
+              <div
+                className={cn(
+                  "rf-overflow-auto",
+                  isFullScreen
+                    ? "rf-h-[calc(100vh-60px)]"
+                    : "rf-h-full rf-min-h-[620px]",
+                )}
+              >
+                <ErrorBoundary
+                  fallback={
+                    <div className="rf-p-4">
+                      Error loading autorouting captures
+                    </div>
+                  }
+                >
+                  <AutoroutingTabContent
+                    circuitJson={circuitJson}
+                    phases={autoroutingPhases}
+                    isRunning={isRunningCode}
+                  />
+                </ErrorBoundary>
+              </div>
+            </TabsContent>
+          )}
           {(!availableTabs || availableTabs.includes("solvers")) && (
             <TabsContent value="solvers">
               <div

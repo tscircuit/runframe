@@ -52,12 +52,13 @@
     "@resvg/resvg-wasm": "^2.6.2",
     "@tscircuit/3d-viewer": "^0.0.596",
     "@tscircuit/assembly-viewer": "^0.0.6",
+    "@tscircuit/capacity-autorouter": "^0.0.874",
     "@tscircuit/create-snippet-url": "^0.0.9",
     "@tscircuit/fake-snippets": "^0.0.163",
     "@tscircuit/file-server": "^0.0.32",
     "@tscircuit/internal-dynamic-import": "^0.0.15",
     "@tscircuit/pcb-viewer": "1.11.393",
-    "@tscircuit/props": "^0.0.612",
+    "@tscircuit/props": "^0.0.646",
     "@tscircuit/schematic-viewer": "^2.0.89",
     "@types/bun": "latest",
     "@types/debug": "^4.1.12",
@@ -67,7 +68,7 @@
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.20",
     "chokidar-cli": "^3.0.0",
-    "circuit-json": "^0.0.465",
+    "circuit-json": "^0.0.484",
     "circuit-json-to-bom-csv": "^0.0.15",
     "circuit-json-to-gerber": "^0.0.103",
     "circuit-json-to-kicad": "^0.0.205",
@@ -118,10 +119,13 @@
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "@tscircuit/core": "^0.0.1705",
+    "@tscircuit/core": "^0.0.1847",
     "@tscircuit/eval": "^0.0.1351",
-    "@tscircuit/solver-utils": "^0.0.7",
+    "@tscircuit/solver-utils": "^0.0.16",
     "debug": "^4.4.0",
     "format-si-unit": "^0.0.12"
+  },
+  "overrides": {
+    "circuit-json": "0.0.484"
   }
 }

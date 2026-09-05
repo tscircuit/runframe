@@ -84,6 +84,7 @@ const dropdownMenuItems = [
   "circuit_json",
   "errors",
   "render_log",
+  "autorouting",
   "solvers",
 ]
 
@@ -408,25 +409,24 @@ export const CircuitJsonPreview = ({
                     3D
                   </TabsTrigger>
                 ) : null}
-                {(!availableTabs || availableTabs.includes("autorouting")) && (
-                  <TabsTrigger value="autorouting">Autorouting</TabsTrigger>
-                )}
-                {!["pcb", "cad", "schematic", "autorouting"].includes(
-                  activeTab,
-                ) && (
+                {!["pcb", "cad", "schematic"].includes(activeTab) && (
                   <TabsTrigger value={activeTab}>
                     {capitalizeFirstLetters(activeTab)}
                   </TabsTrigger>
                 )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <div className="rf-whitespace-nowrap rf-p-2 rf-mr-1 rf-cursor-pointer rf-relative">
+                    <button
+                      type="button"
+                      aria-label="More views"
+                      className="rf-whitespace-nowrap rf-p-2 rf-mr-1 rf-cursor-pointer rf-relative"
+                    >
                       <EllipsisIcon className="rf-w-4 rf-h-4" />
                       {((circuitJsonErrors && circuitJsonErrors.length > 0) ||
                         errorMessage) && (
                         <span className="rf-inline-flex rf-absolute rf-top-[6px] rf-right-[4px] rf-items-center rf-justify-center rf-w-1 rf-h-1 rf-ml-2 rf-text-[8px] rf-font-bold rf-text-white rf-bg-red-500 rf-rounded-full" />
                       )}
-                    </div>
+                    </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="rf-*:text-xs rf-z-[101]">
                     {dropdownMenuItems

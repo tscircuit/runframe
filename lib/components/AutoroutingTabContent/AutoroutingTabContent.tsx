@@ -2,6 +2,8 @@ import { PCBViewer } from "@tscircuit/pcb-viewer"
 import type { CircuitJson } from "circuit-json"
 import {
   buildAutoroutingPhaseCircuitJson,
+  getAutoroutingPhaseAutorouterName,
+  getAutoroutingPhaseChangedTraceIds,
   getAutoroutingPhaseHighlightGraphics,
   AUTOROUTING_PHASE_HIGHLIGHT_COLOR,
   type AutoroutingPhase,
@@ -140,72 +142,80 @@ export const AutoroutingTabContent = ({
       data-testid="autorouting-explorer"
     >
       <aside
-        className="rf-flex rf-shrink-0 rf-flex-col rf-border-b rf-border-gray-200 md:rf-w-56 md:rf-border-b-0 md:rf-border-r"
+        className="rf-flex rf-shrink-0 rf-flex-col rf-border-b rf-border-gray-200 md:rf-w-52 md:rf-border-b-0 md:rf-border-r"
         aria-label="Routing phases"
       >
-        <div className="rf-flex rf-items-center rf-justify-between rf-px-4 rf-py-3 rf-text-xs rf-text-gray-500">
+        <div className="rf-flex rf-items-center rf-justify-between rf-px-3 rf-py-2 rf-text-xs rf-text-gray-500">
           <span>Routing phases</span>
-          <span>{phases.length} captures</span>
+          <span>{phases.length}</span>
         </div>
-        <div className="rf-flex rf-gap-1 rf-overflow-x-auto rf-p-2 md:rf-flex-col md:rf-overflow-x-hidden md:rf-overflow-y-auto">
-          {phases.map((phase, index) => (
-            <button
-              key={phase.id}
-              type="button"
-              aria-pressed={index === selectedIndex}
-              onClick={() => setPinnedPhase(phase)}
-              className={cn(
-                "rf-flex rf-min-w-[180px] rf-items-start rf-gap-2 rf-rounded-md rf-border rf-px-3 rf-py-3 rf-text-left md:rf-min-w-0",
-                index === selectedIndex
-                  ? "rf-border-blue-200 rf-bg-blue-50"
-                  : "rf-border-transparent hover:rf-bg-gray-50",
-              )}
-            >
-              <span
+        <div className="rf-flex rf-gap-1 rf-overflow-x-auto rf-px-1.5 rf-pb-1.5 md:rf-flex-col md:rf-overflow-x-hidden md:rf-overflow-y-auto">
+          {phases.map((phase, index) => {
+            const routedTraceCount =
+              getAutoroutingPhaseChangedTraceIds(phase).length
+            const status = phase.endSimpleRouteJson
+              ? `${routedTraceCount} ${routedTraceCount === 1 ? "trace" : "traces"} routed`
+              : phase.status === "error"
+                ? "Failed"
+                : phase.status === "running" && isRunning
+                  ? "Routing…"
+                  : "No output"
+            return (
+              <button
+                key={phase.id}
+                type="button"
+                aria-pressed={index === selectedIndex}
+                title={`${getPhaseScope(phase)} · ${status}`}
+                onClick={() => setPinnedPhase(phase)}
                 className={cn(
-                  "rf-flex rf-h-5 rf-w-5 rf-shrink-0 rf-items-center rf-justify-center rf-rounded-full rf-text-[11px]",
+                  "rf-flex rf-min-w-[192px] rf-items-start rf-gap-2 rf-rounded-md rf-border rf-px-2 rf-py-2 rf-text-left md:rf-min-w-0",
                   index === selectedIndex
-                    ? "rf-bg-blue-600 rf-text-white"
-                    : "rf-bg-gray-100 rf-text-gray-500",
+                    ? "rf-border-blue-200 rf-bg-blue-50"
+                    : "rf-border-transparent hover:rf-bg-gray-50",
                 )}
               >
-                {index + 1}
-              </span>
-              <span className="rf-min-w-0 rf-flex-1">
-                <span className="rf-block rf-break-words rf-text-sm rf-font-medium rf-text-gray-800">
-                  {getPhaseTitle(phase, index)}
-                </span>
                 <span
-                  className="rf-mt-1 rf-block rf-break-all rf-text-[11px] rf-text-gray-500"
-                  title={phase.componentDisplayName}
+                  className={cn(
+                    "rf-flex rf-h-5 rf-w-5 rf-shrink-0 rf-items-center rf-justify-center rf-rounded-full rf-text-[11px]",
+                    index === selectedIndex
+                      ? "rf-bg-blue-600 rf-text-white"
+                      : "rf-bg-gray-100 rf-text-gray-500",
+                  )}
                 >
-                  {getPhaseScope(phase)}
+                  {index + 1}
                 </span>
-                <span className="rf-mt-1 rf-block rf-text-[11px] rf-text-gray-500">
-                  {phase.status === "complete"
-                    ? "Captured"
-                    : phase.status === "error"
-                      ? "Failed"
-                      : isRunning
-                        ? "Routing…"
-                        : "Input only"}
+                <span className="rf-min-w-0 rf-flex-1">
+                  <span className="rf-flex rf-items-center rf-gap-1">
+                    <span
+                      className="rf-min-w-0 rf-flex-1 rf-truncate rf-text-xs rf-font-medium rf-leading-5 rf-text-gray-800"
+                      title={getPhaseTitle(phase, index)}
+                    >
+                      {getPhaseTitle(phase, index)}
+                    </span>
+                    {phase.status === "complete" ? (
+                      <Check
+                        aria-label="Captured"
+                        className="rf-h-3 rf-w-3 rf-shrink-0 rf-text-green-600"
+                      />
+                    ) : phase.status === "error" ? (
+                      <CircleAlert
+                        aria-label="Failed"
+                        className="rf-h-3 rf-w-3 rf-shrink-0 rf-text-red-500"
+                      />
+                    ) : isRunning ? (
+                      <Loader2
+                        aria-label="Routing"
+                        className="rf-h-3 rf-w-3 rf-shrink-0 rf-animate-spin rf-text-blue-500"
+                      />
+                    ) : null}
+                  </span>
+                  <span className="rf-block rf-text-[11px] rf-leading-4 rf-text-gray-500">
+                    {getAutoroutingPhaseAutorouterName(phase)} · {status}
+                  </span>
                 </span>
-              </span>
-              {phase.status === "complete" ? (
-                <Check className="rf-mt-0.5 rf-h-3.5 rf-w-3.5 rf-shrink-0 rf-text-green-600" />
-              ) : phase.status === "error" ? (
-                <CircleAlert className="rf-h-4 rf-w-4 rf-shrink-0 rf-text-red-500" />
-              ) : isRunning ? (
-                <Loader2 className="rf-h-4 rf-w-4 rf-shrink-0 rf-animate-spin rf-text-blue-500" />
-              ) : null}
-            </button>
-          ))}
-        </div>
-        <div className="rf-mt-auto rf-hidden rf-border-t rf-border-gray-200 rf-p-4 rf-text-xs rf-text-gray-500 md:rf-block">
-          {isRunning ? "Capturing current run" : "Captured routing history"}
-          <span className="rf-mt-1 rf-block rf-text-[11px]">
-            PCB geometry stays fixed between snapshots.
-          </span>
+              </button>
+            )
+          })}
         </div>
       </aside>
       <div className="rf-flex rf-min-w-0 rf-flex-1 rf-flex-col">
@@ -312,9 +322,7 @@ export const AutoroutingTabContent = ({
             {inputConnections === undefined
               ? "Input unavailable"
               : `${inputConnections} input connections`}
-            {selectedPhase.autorouterName
-              ? ` · ${selectedPhase.autorouterName}`
-              : ""}
+            {` · ${getPhaseScope(selectedPhase)}`}
           </span>
           <div className="rf-flex rf-items-center rf-gap-4">
             <button

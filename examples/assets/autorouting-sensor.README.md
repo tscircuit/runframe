@@ -16,14 +16,23 @@ Regenerate it from the repository root with the locked dependencies installed:
 bun run scripts/generate-autorouting-fixture.ts
 ```
 
-The generator requires at least two successful input/output pairs and records
-the core version. The current recording has five components, 13 final traces,
-two vias, and no PCB trace errors. The fanout output has six traces; the global
-input contains those six preloaded traces and its output supplies seven more.
+The generator requires at least two successful input/output pairs with emitted
+`autorouterName` and `solverName` metadata, and records the core version. The
+current recording uses **@tscircuit/core 0.0.1847** and has five components, 13 final
+traces, four vias, and no PCB trace errors. The fanout output has six traces; the
+global input contains those six preloaded traces and its output supplies seven more.
 This exercises both historical routing context and phase output reconstruction.
 
-The **Recorded sensor breakout** Cosmos fixture reads this capture without
-running a worker or fetching circuit data. The **Live sensor breakout** fixture
+Both phases actually emit `autorouterName: "tscircuit"` and
+`solverName: "AutoroutingPipelineSolver7_MultiGraph"`, displayed as **Pipeline7**.
+The first phase routes the fanout region using the automatic router; its scope
+does not imply that it uses the separate Fanout autorouter. The locked peer
+dependencies provide the exports this core version requires. The `circuit-json`
+override keeps core and the viewers on the same schema and TypeScript types.
+
+In `example58-autorouting.fixture.tsx`, the **Recorded sensor breakout** Cosmos
+fixture reads this capture without running a worker or fetching circuit data.
+The **Live sensor breakout** fixture
 passes the same TSX source to RunFrame and captures a fresh run through its normal
 worker path. It uses RunFrame's normal eval version selection and requires the
 worker to load successfully.

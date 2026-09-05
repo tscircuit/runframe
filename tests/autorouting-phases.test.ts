@@ -167,6 +167,74 @@ describe("captureAutoroutingPhase", () => {
   })
 })
 
+describe("getAutoroutingPhaseChangedTraceIds", () => {
+  test("reports the same changes for partial and cumulative phase outputs", () => {
+    const input = [
+      makeTrace("unchanged"),
+      makeTrace("rerouted", 1),
+      makeTrace("replaced", 2),
+    ]
+    const changes = [
+      makeTrace("new", 3),
+      makeTrace("rerouted", 4),
+      {
+        ...makeTrace("replacement", 5),
+        __replaces_pcb_trace_id: "replaced",
+      },
+    ]
+    const expectedIds = ["new", "rerouted", "replacement"]
+
+    expect(
+      getAutoroutingPhaseChangedTraceIds(makePhase(input, changes)),
+    ).toEqual(expectedIds)
+    expect(
+      getAutoroutingPhaseChangedTraceIds(
+        makePhase(input, [structuredClone(input[0]), ...changes]),
+      ),
+    ).toEqual(expectedIds)
+  })
+
+  test("does not count a previous phase's unchanged reroute again", () => {
+    const previouslyRerouted = {
+      ...makeTrace("rerouted_trace"),
+      __replaces_pcb_trace_id: "original_trace",
+    }
+    const input = [previouslyRerouted]
+    const cumulativeOutput = [
+      structuredClone(previouslyRerouted),
+      makeTrace("new_in_this_phase", 2),
+    ]
+
+    expect(
+      getAutoroutingPhaseChangedTraceIds(makePhase(input, cumulativeOutput)),
+    ).toEqual(["new_in_this_phase"])
+  })
+
+  test("only counts captured outputs for pending, failed, and output-only phases", () => {
+    const input = makeSrj([makeTrace("preloaded")])
+    const phase: AutoroutingPhase = {
+      id: "pending",
+      status: "running",
+      startSimpleRouteJson: input,
+    }
+    expect(getAutoroutingPhaseChangedTraceIds(phase)).toEqual([])
+    expect(
+      getAutoroutingPhaseChangedTraceIds({
+        ...phase,
+        status: "error",
+        errorSimpleRouteJson: input,
+      }),
+    ).toEqual([])
+    expect(
+      getAutoroutingPhaseChangedTraceIds({
+        id: "output_only",
+        status: "complete",
+        endSimpleRouteJson: makeSrj([makeTrace("captured")]),
+      }),
+    ).toEqual(["captured"])
+  })
+})
+
 describe("buildAutoroutingPhaseCircuitJson", () => {
   const board = pcb_board.parse({
     type: "pcb_board",

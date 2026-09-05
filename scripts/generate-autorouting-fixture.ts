@@ -10,11 +10,12 @@ import { Circuit } from "@tscircuit/core"
 import { fileURLToPath } from "node:url"
 import { createElement } from "react"
 import AutoroutingSensor from "../examples/assets/autorouting-sensor"
+import type { AutoroutingPhaseEvent } from "../lib/autorouting"
 
 const circuit = new Circuit({
   platform: { placementDrcChecksDisabled: true },
 })
-const events: unknown[] = []
+const events: AutoroutingPhaseEvent[] = []
 
 for (const type of [
   "autorouting:start",
@@ -33,21 +34,26 @@ circuit.add(createElement(AutoroutingSensor))
 await circuit.renderUntilSettled()
 
 const circuitJson = circuit.getCircuitJson()
-const typedEvents = events as Array<{ type: string }>
-const startCount = typedEvents.filter(
+const startCount = events.filter(
   (event) => event.type === "autorouting:start",
 ).length
-const endCount = typedEvents.filter(
+const endCount = events.filter(
   (event) => event.type === "autorouting:end",
 ).length
 
 if (
   startCount < 2 ||
   startCount !== endCount ||
-  typedEvents.some((event) => event.type === "autorouting:error")
+  events.some((event) => event.type === "autorouting:error")
 ) {
   throw new Error(
     `Expected at least two successful routing phases; got ${startCount} starts and ${endCount} outputs`,
+  )
+}
+
+if (events.some((event) => !event.autorouterName || !event.solverName)) {
+  throw new Error(
+    "Expected real autorouterName and solverName on every phase event; regenerate with the locked core and routing dependencies",
   )
 }
 

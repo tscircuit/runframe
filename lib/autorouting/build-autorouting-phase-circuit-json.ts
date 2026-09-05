@@ -42,7 +42,9 @@ export function getAutoroutingPhaseChangedTraceIds(
       const inputTrace = inputTracesById.get(trace.pcb_trace_id)
       return (
         !inputTrace ||
-        Boolean(trace.__replaces_pcb_trace_id) ||
+        (Boolean(trace.__replaces_pcb_trace_id) &&
+          trace.__replaces_pcb_trace_id !==
+            inputTrace.__replaces_pcb_trace_id) ||
         JSON.stringify(inputTrace.route) !== JSON.stringify(trace.route)
       )
     })

@@ -51,6 +51,7 @@ import { useFullscreenBodyScroll } from "lib/hooks/use-fullscreen-body-scroll"
 import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { RenderLogViewer } from "../RenderLogViewer/RenderLogViewer"
 import { SolversTabContent } from "../SolversTabContent/SolversTabContent"
+import { AutoroutingTabContent } from "../AutoroutingTabContent/AutoroutingTabContent"
 import { capitalizeFirstLetters } from "lib/utils"
 import { useErrorTelemetry } from "lib/hooks/use-error-telemetry"
 import { usePostHogActivity } from "lib/hooks/use-posthog-activity"
@@ -87,6 +88,7 @@ const dropdownMenuItems = [
 ]
 
 export type { PreviewContentProps, TabId, SolverStartedEvent }
+export type { AutoroutingPhase, AutoroutingPhaseEvent } from "lib/autorouting"
 
 const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "An unknown error occurred"
@@ -138,6 +140,7 @@ export const CircuitJsonPreview = ({
   hideSchematicInAnalogSimulation = false,
   onRerunWithDebug,
   solverEvents,
+  autoroutingPhases,
   onPcbBoundsSelected,
 }: PreviewContentProps) => {
   useStyles()
@@ -405,7 +408,12 @@ export const CircuitJsonPreview = ({
                     3D
                   </TabsTrigger>
                 ) : null}
-                {!["pcb", "cad", "schematic"].includes(activeTab) && (
+                {(!availableTabs || availableTabs.includes("autorouting")) && (
+                  <TabsTrigger value="autorouting">Autorouting</TabsTrigger>
+                )}
+                {!["pcb", "cad", "schematic", "autorouting"].includes(
+                  activeTab,
+                ) && (
                   <TabsTrigger value={activeTab}>
                     {capitalizeFirstLetters(activeTab)}
                   </TabsTrigger>
@@ -880,6 +888,32 @@ export const CircuitJsonPreview = ({
                 />
               </TabsContent>
             )}
+          {(!availableTabs || availableTabs.includes("autorouting")) && (
+            <TabsContent value="autorouting">
+              <div
+                className={cn(
+                  "rf-overflow-auto",
+                  isFullScreen
+                    ? "rf-h-[calc(100vh-60px)]"
+                    : "rf-h-full rf-min-h-[620px]",
+                )}
+              >
+                <ErrorBoundary
+                  fallback={
+                    <div className="rf-p-4">
+                      Error loading autorouting captures
+                    </div>
+                  }
+                >
+                  <AutoroutingTabContent
+                    circuitJson={circuitJson}
+                    phases={autoroutingPhases}
+                    isRunning={isRunningCode}
+                  />
+                </ErrorBoundary>
+              </div>
+            </TabsContent>
+          )}
           {(!availableTabs || availableTabs.includes("solvers")) && (
             <TabsContent value="solvers">
               <div

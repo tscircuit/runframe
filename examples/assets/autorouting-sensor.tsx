@@ -1,0 +1,69 @@
+/**
+ * Real sensor breakout shared by the recorded Autorouting preview and RunFrame.
+ * Adapted from core/tests/breakout/fanout-soic8-sensor-to-i2c-header.test.tsx.
+ */
+export default function AutoroutingSensor() {
+  return (
+    <board name="I2C_SENSOR" width="20mm" height="16mm">
+      <fanout name="SENSOR_FANOUT" autorouter="auto" padding="0.8mm">
+        <chip
+          name="U1"
+          footprint="soic8"
+          pinLabels={{
+            pin1: "SDA",
+            pin2: "SCL",
+            pin3: "ADDR",
+            pin4: "GND",
+            pin5: "INT",
+            pin6: "NC1",
+            pin7: "NC2",
+            pin8: "VCC",
+          }}
+          pinAttributes={{
+            VCC: { shouldHaveDecouplingCapacitor: false },
+          }}
+          pcbX={0}
+          pcbY={0}
+        />
+        <capacitor
+          name="C1"
+          capacitance="100nF"
+          footprint="0402"
+          pcbX={3.6}
+          pcbY={1.8}
+          connections={{ pin1: "U1.VCC", pin2: "U1.GND" }}
+        />
+      </fanout>
+      <pinheader
+        name="J1"
+        pinCount={4}
+        footprint="pinrow4"
+        pinLabels={["VCC", "GND", "SDA", "SCL"]}
+        pcbX={-6}
+        pcbY={0}
+        pcbRotation={90}
+      />
+      <resistor
+        name="R1"
+        resistance="4.7k"
+        footprint="0402"
+        pcbX={5.5}
+        pcbY={3}
+        connections={{ pin1: "U1.SDA", pin2: "net.VCC" }}
+      />
+      <resistor
+        name="R2"
+        resistance="4.7k"
+        footprint="0402"
+        pcbX={5.5}
+        pcbY={-3}
+        connections={{ pin1: "U1.SCL", pin2: "net.VCC" }}
+      />
+      <autoroutingphase name="Global routing" />
+      <trace from="J1.VCC" to="U1.VCC" />
+      <trace from="J1.GND" to="U1.GND" />
+      <trace from="J1.SDA" to="U1.SDA" />
+      <trace from="J1.SCL" to="U1.SCL" />
+    </board>
+  )
+}

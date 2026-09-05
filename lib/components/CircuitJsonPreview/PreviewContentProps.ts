@@ -1,6 +1,7 @@
 import type { ManualEditEvent } from "@tscircuit/props"
 import type { CircuitJson } from "circuit-json"
 import type { RenderLog } from "lib/render-logging/RenderLog"
+import type { AutoroutingPhase } from "lib/autorouting"
 
 export interface SolverStartedEvent {
   type: "solver:started"
@@ -24,6 +25,7 @@ export type TabId =
   | "errors"
   | "render_log"
   | "solvers"
+  | "autorouting"
 
 export interface PreviewContentProps {
   defaultToFullScreen?: boolean
@@ -150,4 +152,7 @@ export interface PreviewContentProps {
    * List of solver started events tracked during circuit rendering
    */
   solverEvents?: SolverStartedEvent[]
+
+  /** Captured routing inputs and outputs for the current circuit render. */
+  autoroutingPhases?: AutoroutingPhase[]
 }

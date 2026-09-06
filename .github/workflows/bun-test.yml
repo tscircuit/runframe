@@ -25,3 +25,11 @@ jobs:
 
       - name: Run tests
         run: bun test
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Validate npm package
+        run: npm pack --dry-run --ignore-scripts

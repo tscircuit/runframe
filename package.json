@@ -126,6 +126,6 @@
     "format-si-unit": "^0.0.12"
   },
   "overrides": {
-    "circuit-json": "0.0.484"
+    "circuit-json": "$circuit-json"
   }
 }

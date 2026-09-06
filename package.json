@@ -71,7 +71,7 @@
     "circuit-json": "^0.0.484",
     "circuit-json-to-bom-csv": "^0.0.15",
     "circuit-json-to-gerber": "^0.0.103",
-    "circuit-json-to-kicad": "^0.0.205",
+    "circuit-json-to-kicad": "^0.0.206",
     "circuit-json-to-lbrn": "^0.0.74",
     "circuit-json-to-pnp-csv": "^0.0.10",
     "circuit-json-to-step": "^0.0.36",

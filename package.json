@@ -121,7 +121,7 @@
   },
   "dependencies": {
     "@tscircuit/core": "^0.0.1847",
-    "@tscircuit/eval": "^0.0.1384",
+    "@tscircuit/eval": "^0.0.1385",
     "@tscircuit/solver-utils": "^0.0.16",
     "debug": "^4.4.0",
     "format-si-unit": "^0.0.12"

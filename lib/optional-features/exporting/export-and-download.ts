@@ -1,5 +1,6 @@
 import type { CircuitJson } from "circuit-json"
 import { sanitizeFileName } from "lib/utils/sanitizeFileName"
+import { exportAltiumProject } from "./formats/export-altium-project"
 import { exportFabricationFiles } from "./formats/export-fabrication-files"
 import { exportFdmComponentBox } from "./formats/export-fdm-component-box"
 import { exportGlb } from "./formats/export-glb"
@@ -15,6 +16,7 @@ export const availableExports = [
   { extension: "json", name: "Simple Route JSON" },
   { extension: "zip", name: "Fabrication Files" },
   { extension: "zip", name: "KiCad Project" },
+  { extension: "zip", name: "Altium Project" },
   { extension: "zip", name: "KiCad Library" },
   { extension: "glb", name: "GLB (Binary GLTF)" },
   { extension: "svg", name: "Pinout SVG" },
@@ -53,6 +55,10 @@ export const exportAndDownload = async ({
   }
   if (exportName === "KiCad Project") {
     await exportKicadProject({ circuitJson, projectName })
+    return
+  }
+  if (exportName === "Altium Project") {
+    await exportAltiumProject({ circuitJson, projectName })
     return
   }
   if (exportName === "KiCad Library") {

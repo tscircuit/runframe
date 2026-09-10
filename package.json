@@ -69,7 +69,7 @@
     "autoprefixer": "^10.4.20",
     "chokidar-cli": "^3.0.0",
     "circuit-json": "^0.0.484",
-    "circuit-json-to-altium": "github:tscircuit/circuit-json-to-altium#5bdb7d235ef896ddf9ac5c4f315c4d0ce07fdfb5",
+    "circuit-json-to-altium": "github:tscircuit/circuit-json-to-altium#1a50d0dd2c0737cf940d92c0315852dc0111dd87",
     "circuit-json-to-bom-csv": "^0.0.15",
     "circuit-json-to-gerber": "^0.0.105",
     "circuit-json-to-kicad": "^0.0.209",

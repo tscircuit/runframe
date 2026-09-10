@@ -156,26 +156,27 @@ export const CircuitJsonPreview = ({
   } = useEvalVersions(allowSelectingVersion)
 
   const circuitJsonErrors = useMemo<CircuitJsonError[] | null>(() => {
-    if (!circuitJson) return null
+    if (!Array.isArray(circuitJson)) return null
     return circuitJson.filter(
       (e) => (e && "error_type" in e) || e.type.includes("error"),
     ) as any
   }, [circuitJson])
 
   const circuitJsonWarnings = useMemo<CircuitJsonError[] | null>(() => {
-    if (!circuitJson) return null
+    if (!Array.isArray(circuitJson)) return null
     return circuitJson.filter(
       (e) => (e && "warning_type" in e) || e.type.includes("warning"),
     ) as any
   }, [circuitJson])
 
   const hasSchematicGroup = useMemo(() => {
-    if (!circuitJson) return true
+    if (!Array.isArray(circuitJson)) return true
     return circuitJson.some((e) => e.type === "schematic_group")
   }, [circuitJson])
 
   const hasPanels = useMemo(() => {
-    return circuitJson?.some((e) => e.type === "pcb_panel")
+    if (!Array.isArray(circuitJson)) return false
+    return circuitJson.some((e) => e.type === "pcb_panel")
   }, [circuitJson])
 
   const isAnalogSimulationGraphPending = useMemo(() => {

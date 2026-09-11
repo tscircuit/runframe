@@ -11,7 +11,9 @@ export const exportGlb = async ({
 }) => {
   let blob: Blob
   try {
-    const { convertCircuitJsonToGltf } = await importer("circuit-json-to-gltf")
+    const { convertCircuitJsonToGltf } = await importer(
+      "circuit-json-to-gltf@0.0.124",
+    )
 
     console.log("convertCircuitJsonToGltf", convertCircuitJsonToGltf)
 

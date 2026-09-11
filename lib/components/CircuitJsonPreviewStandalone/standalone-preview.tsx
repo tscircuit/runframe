@@ -25,7 +25,7 @@ root.render(
       defaultActiveTab={"cad"}
       autoRotate3dViewerDisabled={true}
       showRightHeaderContent={false}
-      circuitJson={window.CIRCUIT_JSON || {}}
+      circuitJson={window.CIRCUIT_JSON || []}
       {...(window.CIRCUIT_JSON_PREVIEW_PROPS || {})}
     />
   </div>,

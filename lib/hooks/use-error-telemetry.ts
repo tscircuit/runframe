@@ -28,12 +28,11 @@ export const useErrorTelemetry = ({
   useEffect(() => {
     if (circuitJsonErrors && circuitJsonErrors.length > 0) {
       for (const error of circuitJsonErrors) {
-        const err = new Error(error.message || "Circuit JSON Error")
-        if ((error as any).stack) {
-          ;(err as any).stack = (error as any).stack
-        }
         try {
-          posthog.captureException(err, { error_type: error.type })
+          posthog.capture("circuit_json_error", {
+            error_type: error.type,
+            error_message: error.message,
+          })
         } catch {
           // ignore analytics errors
         }

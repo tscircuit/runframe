@@ -74,7 +74,7 @@
     "circuit-json-to-gerber": "^0.0.105",
     "circuit-json-to-kicad": "^0.0.212",
     "circuit-json-to-lbrn": "^0.0.74",
-    "circuit-json-to-pnp-csv": "^0.0.10",
+    "circuit-json-to-pnp-csv": "^0.0.13",
     "circuit-json-to-step": "^0.0.36",
     "circuit-to-svg": "^0.0.393",
     "class-variance-authority": "^0.7.1",

@@ -51,7 +51,7 @@
         "circuit-json-to-gerber": "^0.0.105",
         "circuit-json-to-kicad": "^0.0.212",
         "circuit-json-to-lbrn": "^0.0.74",
-        "circuit-json-to-pnp-csv": "^0.0.10",
+        "circuit-json-to-pnp-csv": "^0.0.13",
         "circuit-json-to-step": "^0.0.36",
         "circuit-to-svg": "^0.0.393",
         "class-variance-authority": "^0.7.1",
@@ -831,7 +831,7 @@
 
     "circuit-json-to-lbrn": ["circuit-json-to-lbrn@0.0.74", "", { "dependencies": { "lbrnts": "^0.0.18", "manifold-3d": "^3.3.2" }, "peerDependencies": { "typescript": "^5" } }, "sha512-MVdlgj+TYHrTdcE2IN7yk6rkULJ02owAr9zeZg9UeypfrdjNNAjBvhz3Ue24FDGjSmvQdmjiafbUKAOapslxZQ=="],
 
-    "circuit-json-to-pnp-csv": ["circuit-json-to-pnp-csv@0.0.10", "", { "dependencies": { "papaparse": "^5.4.1" }, "peerDependencies": { "@tscircuit/soup-util": "*", "typescript": "^5.0.0" } }, "sha512-mZ6lrx77HPZObt0DpC60NE0lur8NZ5bFDk8FoZrvdul0PsnZvNHde2eDLDgEgULb/N/mf1sNFyejAxszFy2KoQ=="],
+    "circuit-json-to-pnp-csv": ["circuit-json-to-pnp-csv@0.0.13", "", { "dependencies": { "papaparse": "^5.4.1" }, "peerDependencies": { "@tscircuit/soup-util": "*", "typescript": "^5.0.0" } }, "sha512-evgWh9gcQCa+OfUfEHHqKgFw0BglHg29EucyUkuMWCUfM9qokAFenUIeSAJz/tFIGLTRPYY5xfQ4HzWXlkH/lg=="],
 
     "circuit-json-to-simple-3d": ["circuit-json-to-simple-3d@0.0.9", "", { "peerDependencies": { "typescript": "^5" } }, "sha512-thpCtDb9LpAQfGO+Z0hae19sxVAmJAMYM/It9UTMCtyXC3zoUHwRcp/oqtMO/ZIW+JDBhiR8AHmmtKScL2kW7Q=="],
 

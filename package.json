@@ -72,7 +72,7 @@
     "circuit-json-to-altium": "github:tscircuit/circuit-json-to-altium#1a50d0dd2c0737cf940d92c0315852dc0111dd87",
     "circuit-json-to-bom-csv": "^0.0.15",
     "circuit-json-to-gerber": "^0.0.105",
-    "circuit-json-to-kicad": "^0.0.211",
+    "circuit-json-to-kicad": "^0.0.212",
     "circuit-json-to-lbrn": "^0.0.74",
     "circuit-json-to-pnp-csv": "^0.0.10",
     "circuit-json-to-step": "^0.0.36",

@@ -2,7 +2,7 @@
   "name": "@tscircuit/runframe",
   "main": "dist/preview.js",
   "type": "module",
-  "version": "0.0.2734",
+  "version": "0.0.2735",
   "repository": {
     "type": "git",
     "url": "https://github.com/tscircuit/runframe"

@@ -120,8 +120,9 @@
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "@tscircuit/core": "^0.0.1847",
-    "@tscircuit/eval": "0.0.1402",
+   "@tscircuit/core": "^0.0.1906",
+    "@tscircuit/checks": "^0.0.191",
+    "@tscircuit/eval": "^0.0.1403",
     "@tscircuit/solver-utils": "^0.0.16",
     "debug": "^4.4.0",
     "format-si-unit": "^0.0.12"

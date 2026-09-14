@@ -58,7 +58,7 @@
     "@tscircuit/file-server": "^0.0.32",
     "@tscircuit/internal-dynamic-import": "^0.0.15",
     "@tscircuit/pcb-viewer": "1.11.394",
-    "@tscircuit/props": "^0.0.646",
+    "@tscircuit/props": "^0.0.658",
     "@tscircuit/schematic-viewer": "^2.0.92",
     "@types/bun": "latest",
     "@types/debug": "^4.1.12",
@@ -68,7 +68,7 @@
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.20",
     "chokidar-cli": "^3.0.0",
-    "circuit-json": "^0.0.484",
+    "circuit-json": "^0.0.491",
     "circuit-json-to-altium": "github:tscircuit/circuit-json-to-altium#1a50d0dd2c0737cf940d92c0315852dc0111dd87",
     "circuit-json-to-bom-csv": "^0.0.15",
     "circuit-json-to-gerber": "^0.0.106",
@@ -120,7 +120,8 @@
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "@tscircuit/core": "^0.0.1847",
+    "@tscircuit/checks": "^0.0.191",
+    "@tscircuit/core": "^0.0.1906",
     "@tscircuit/eval": "^0.0.1403",
     "@tscircuit/solver-utils": "^0.0.16",
     "debug": "^4.4.0",

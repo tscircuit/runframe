@@ -112,6 +112,9 @@ export const RunFrame = (props: RunFrameProps) => {
     stack?: string
   } | null>(null)
   const [componentStack, setComponentStack] = useState<string | null>(null)
+  const [emptyStateMessage, setEmptyStateMessage] = useState<string | null>(
+    null,
+  )
   const cancelExecutionRef = useRef<(() => void) | null>(null)
   const [autoroutingGraphics, setAutoroutingGraphics] = useState<any>(null)
   const [runCountTrigger, incRunCountTrigger] = useReducer(
@@ -272,16 +275,17 @@ export const RunFrame = (props: RunFrameProps) => {
     const fsMapObj =
       fsMap instanceof Map ? Object.fromEntries(fsMap.entries()) : fsMap
 
-    // Check if no files are provided
+    // Check if no files are provided. This is an expected empty state, not an
+    // error, so it is shown as an empty state and kept out of error telemetry.
     if (!fsMapObj || Object.keys(fsMapObj).length === 0) {
-      setError({
-        error:
-          "No files provided. Please provide at least one file with code to execute.",
-        stack: "",
-      })
+      setError(null)
+      setEmptyStateMessage(
+        "No files provided. Please provide at least one file with code to execute.",
+      )
       setIsRunning(false)
       return
     }
+    setEmptyStateMessage(null)
 
     const wasTriggeredByRunButton =
       runCountTrigger !== lastRunCountTriggerRef.current
@@ -801,6 +805,7 @@ export const RunFrame = (props: RunFrameProps) => {
         isRunningCode={isRunning}
         errorMessage={error?.error}
         errorStack={error?.stack}
+        emptyStateMessage={emptyStateMessage}
         onEditEvent={handleEditEvent}
         editEvents={props.editEvents}
         onPcbBoundsSelected={props.onPcbBoundsSelected}

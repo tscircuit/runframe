@@ -100,6 +100,7 @@ export const CircuitJsonPreview = ({
   onRunClicked = undefined,
   errorMessage,
   errorStack,
+  emptyStateMessage,
   circuitJson,
   autoroutingGraphics,
   showRightHeaderContent = true,
@@ -272,6 +273,13 @@ export const CircuitJsonPreview = ({
   const setCadViewerRef = useCallback((value: Object3D | null) => {
     window.TSCIRCUIT_3D_OBJECT_REF = value === null ? undefined : value
   }, [])
+
+  const previewEmptyState = (
+    <PreviewEmptyState
+      onRunClicked={onRunClicked}
+      message={emptyStateMessage}
+    />
+  )
 
   return (
     <div
@@ -609,7 +617,7 @@ export const CircuitJsonPreview = ({
                       // }}
                     />
                   ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                    previewEmptyState
                   )}
                 </ErrorBoundary>
               </div>
@@ -637,7 +645,7 @@ export const CircuitJsonPreview = ({
                       debugGrid
                     />
                   ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                    previewEmptyState
                   )}
                 </ErrorBoundary>
               </div>
@@ -664,7 +672,7 @@ export const CircuitJsonPreview = ({
                       }}
                     />
                   ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                    previewEmptyState
                   )}
                 </ErrorBoundary>
               </div>
@@ -706,7 +714,7 @@ export const CircuitJsonPreview = ({
                       className={schematicSvgOptions?.className}
                     />
                   ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                    previewEmptyState
                   )}
                 </ErrorBoundary>
               </div>
@@ -739,7 +747,7 @@ export const CircuitJsonPreview = ({
                       autoRotateDisabled={autoRotate3dViewerDisabled}
                     />
                   ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                    previewEmptyState
                   )}
                 </ErrorBoundary>
               </div>
@@ -788,7 +796,7 @@ export const CircuitJsonPreview = ({
                       />
                     )
                   ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                    previewEmptyState
                   )}
                 </ErrorBoundary>
               </div>
@@ -822,7 +830,7 @@ export const CircuitJsonPreview = ({
                   {circuitJson ? (
                     <BomTable circuitJson={circuitJson} />
                   ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                    previewEmptyState
                   )}
                 </ErrorBoundary>
               </div>
@@ -842,7 +850,7 @@ export const CircuitJsonPreview = ({
                   {circuitJson ? (
                     <CircuitJsonTableViewer elements={circuitJson} />
                   ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                    previewEmptyState
                   )}
                 </ErrorBoundary>
               </div>
@@ -874,7 +882,7 @@ export const CircuitJsonPreview = ({
                     onReportAutoroutingLog={onReportAutoroutingLog}
                   />
                 ) : (
-                  <PreviewEmptyState onRunClicked={onRunClicked} />
+                  previewEmptyState
                 )}
               </div>
             </TabsContent>

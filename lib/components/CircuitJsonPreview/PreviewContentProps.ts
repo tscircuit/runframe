@@ -36,6 +36,12 @@ export interface PreviewContentProps {
   tsxRunTriggerCount?: number
   errorMessage?: string | null
   errorStack?: string | null
+  /**
+   * A non-error empty-state message shown when there is no circuit JSON and no
+   * error, for example when no files are provided. It is displayed as an empty
+   * state and is not reported to error telemetry.
+   */
+  emptyStateMessage?: string | null
   autoroutingGraphics?: any
   circuitJson: CircuitJson | null
   className?: string

@@ -221,14 +221,3 @@ The event bus for the RunFrame is accessible from the `@tscircuit/file-server`
 | REQUEST_TO_SAVE_SNIPPET | Browser request to save the current circuit to snippets |
 | FAILED_TO_SAVE_SNIPPET  | Failed to save the current snippet to Registry          |
 | SNIPPET_SAVED           | Snippet was saved to Registry                           |
-
-### PCB to schematic navigation
-
-In the PCB preview, click a component pad and choose **U1 on Schematic** to open
-the schematic centered on that component. This uses the shared `CircuitJsonPreview`
-for both standalone Circuit JSON previews and `RunFrame`. The action is omitted
-when `availableTabs` excludes `schematic`, schematic rendering is disabled, or the
-circuit contains PCB panels.
-
-The Cosmos fixture **example59-pcb-to-schematic** includes standalone preview and
-RunFrame variants, plus a checkbox to disable the schematic tab.

@@ -183,3 +183,7 @@ cosmos-export
 yalc.lock
 .yalc
 .agent
+
+# Bun lockfiles are disabled in bunfig.toml
+bun.lock
+bun.lockb

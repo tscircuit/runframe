@@ -178,6 +178,15 @@ export const CircuitJsonPreview = ({
     return circuitJson?.some((e) => e.type === "pcb_panel")
   }, [circuitJson])
 
+  const schematicNavigationEnabled =
+    (!availableTabs || availableTabs.includes("schematic")) &&
+    hasSchematicGroup &&
+    !hasPanels
+  const [schematicFocus, setSchematicFocus] = useState<{
+    sourceComponentId: string
+    circuitJson: typeof circuitJson
+  } | null>(null)
+
   const isAnalogSimulationGraphPending = useMemo(() => {
     if (!circuitJson || !isRunningCode) return false
     if (circuitJsonErrors?.length) return false
@@ -581,6 +590,17 @@ export const CircuitJsonPreview = ({
                       circuitJson={circuitJson}
                       debugGraphics={autoroutingGraphics}
                       onBoundsSelected={onPcbBoundsSelected}
+                      onViewSchematicComponent={
+                        schematicNavigationEnabled
+                          ? ({ source_component_id }) => {
+                              setSchematicFocus({
+                                sourceComponentId: source_component_id,
+                                circuitJson,
+                              })
+                              setActiveTab("schematic")
+                            }
+                          : undefined
+                      }
                       containerClassName={cn(
                         "rf-h-full rf-w-full",
                         isFullScreen
@@ -696,6 +716,11 @@ export const CircuitJsonPreview = ({
                 >
                   {circuitJson ? (
                     <SchematicViewer
+                      focusSourceComponentId={
+                        schematicFocus?.circuitJson === circuitJson
+                          ? schematicFocus?.sourceComponentId
+                          : undefined
+                      }
                       circuitJson={circuitJson}
                       containerStyle={{
                         height: "100%",

@@ -33,7 +33,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
           package-manager-cache: false
       - run: npm install -g pver
-      - run: bun install --frozen-lockfile
+      - run: bun install
       - run: bun run build
       - run: pver release --no-push-main
         env:

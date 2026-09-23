@@ -63,6 +63,6 @@ function PcbToSchematic({ runFrame = false }: { runFrame?: boolean }) {
 }
 
 export default {
-  CircuitJsonPreview: <PcbToSchematic />,
-  RunFrame: <PcbToSchematic runFrame />,
+  CircuitJsonPreview: () => <PcbToSchematic />,
+  RunFrame: () => <PcbToSchematic runFrame />,
 }

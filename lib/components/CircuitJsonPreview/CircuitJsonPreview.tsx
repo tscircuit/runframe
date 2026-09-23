@@ -17,7 +17,10 @@ import {
 import { ErrorFallback } from "../ErrorFallback"
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary"
 import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
-import { SchematicViewer } from "@tscircuit/schematic-viewer"
+import {
+  SchematicViewer,
+  useSchematicViewerController,
+} from "@tscircuit/schematic-viewer"
 import { AssemblyViewer, PinoutViewer } from "@tscircuit/assembly-viewer"
 import PreviewEmptyState from "../PreviewEmptyState"
 import { CircuitJsonTableViewer } from "../CircuitJsonTableViewer/CircuitJsonTableViewer"
@@ -182,10 +185,8 @@ export const CircuitJsonPreview = ({
     (!availableTabs || availableTabs.includes("schematic")) &&
     hasSchematicGroup &&
     !hasPanels
-  const [schematicFocus, setSchematicFocus] = useState<{
-    sourceComponentId: string
-    circuitJson: typeof circuitJson
-  } | null>(null)
+  const { controller: schematicController, focusSchematicComponent } =
+    useSchematicViewerController()
 
   const isAnalogSimulationGraphPending = useMemo(() => {
     if (!circuitJson || !isRunningCode) return false
@@ -593,10 +594,17 @@ export const CircuitJsonPreview = ({
                       onViewSchematicComponent={
                         schematicNavigationEnabled
                           ? ({ source_component_id }) => {
-                              setSchematicFocus({
-                                sourceComponentId: source_component_id,
-                                circuitJson,
-                              })
+                              const component = circuitJson.find(
+                                (element) =>
+                                  element.type === "schematic_component" &&
+                                  element.source_component_id ===
+                                    source_component_id,
+                              )
+                              if (component?.type !== "schematic_component")
+                                return
+                              focusSchematicComponent(
+                                component.schematic_component_id,
+                              )
                               setActiveTab("schematic")
                             }
                           : undefined
@@ -716,11 +724,7 @@ export const CircuitJsonPreview = ({
                 >
                   {circuitJson ? (
                     <SchematicViewer
-                      focusSourceComponentId={
-                        schematicFocus?.circuitJson === circuitJson
-                          ? schematicFocus?.sourceComponentId
-                          : undefined
-                      }
+                      controller={schematicController}
                       circuitJson={circuitJson}
                       containerStyle={{
                         height: "100%",

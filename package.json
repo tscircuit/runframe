@@ -50,7 +50,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@react-hook/resize-observer": "^2.0.2",
     "@resvg/resvg-wasm": "^2.6.2",
-    "@tscircuit/3d-viewer": "^0.0.605",
+    "@tscircuit/3d-viewer": "^0.0.606",
     "@tscircuit/assembly-viewer": "^0.0.6",
     "@tscircuit/capacity-autorouter": "^0.0.874",
     "@tscircuit/circuit-json-util": "^0.0.116",

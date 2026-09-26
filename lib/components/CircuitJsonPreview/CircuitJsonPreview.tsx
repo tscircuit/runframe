@@ -188,6 +188,19 @@ export const CircuitJsonPreview = ({
   const { controller: schematicController, focusSchematicComponent } =
     useSchematicViewerController()
 
+  const handleViewSchematicComponent = schematicNavigationEnabled
+    ? ({ source_component_id }: { source_component_id: string }) => {
+        const component = circuitJson?.find(
+          (element) =>
+            element.type === "schematic_component" &&
+            element.source_component_id === source_component_id,
+        )
+        if (component?.type !== "schematic_component") return
+        focusSchematicComponent(component.schematic_component_id)
+        setActiveTab("schematic")
+      }
+    : undefined
+
   const isAnalogSimulationGraphPending = useMemo(() => {
     if (!circuitJson || !isRunningCode) return false
     if (circuitJsonErrors?.length) return false
@@ -591,24 +604,7 @@ export const CircuitJsonPreview = ({
                       circuitJson={circuitJson}
                       debugGraphics={autoroutingGraphics}
                       onBoundsSelected={onPcbBoundsSelected}
-                      onViewSchematicComponent={
-                        schematicNavigationEnabled
-                          ? ({ source_component_id }) => {
-                              const component = circuitJson.find(
-                                (element) =>
-                                  element.type === "schematic_component" &&
-                                  element.source_component_id ===
-                                    source_component_id,
-                              )
-                              if (component?.type !== "schematic_component")
-                                return
-                              focusSchematicComponent(
-                                component.schematic_component_id,
-                              )
-                              setActiveTab("schematic")
-                            }
-                          : undefined
-                      }
+                      onViewSchematicComponent={handleViewSchematicComponent}
                       containerClassName={cn(
                         "rf-h-full rf-w-full",
                         isFullScreen
@@ -766,6 +762,7 @@ export const CircuitJsonPreview = ({
                       ref={setCadViewerRef}
                       circuitJson={circuitJson}
                       autoRotateDisabled={autoRotate3dViewerDisabled}
+                      onViewSchematicComponent={handleViewSchematicComponent}
                     />
                   ) : (
                     <PreviewEmptyState onRunClicked={onRunClicked} />

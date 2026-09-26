@@ -26,14 +26,14 @@ const fsMap = new Map([["main.circuit.json", JSON.stringify(circuitJson)]])
 function PcbToSchematic({ runFrame = false }: { runFrame?: boolean }) {
   const [schematicEnabled, setSchematicEnabled] = useState(true)
   const availableTabs = schematicEnabled
-    ? (["pcb", "schematic"] as const)
-    : (["pcb"] as const)
+    ? (["pcb", "cad", "schematic"] as const)
+    : (["pcb", "cad"] as const)
   return (
     <div style={{ height: "100vh" }}>
       <div style={{ padding: 12, fontFamily: "sans-serif" }}>
-        Click a pad on U1 (left) or U2 (right), then choose “on Schematic”. The
-        schematic opens centered on that chip. Return to PCB to try the other
-        chip.
+        Click a PCB pad or right-click a 3D model on U1 (left) or U2 (right),
+        then choose the schematic action. The schematic opens centered on that
+        chip. Return to PCB or 3D to try the other chip.
         <label style={{ display: "block", marginTop: 8 }}>
           <input
             type="checkbox"

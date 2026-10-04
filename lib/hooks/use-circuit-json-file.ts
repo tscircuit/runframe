@@ -30,7 +30,7 @@ export const useCircuitJsonFile = ({
     }
 
     const circuitJsonContent = fsMap.get(mainComponentPath!)
-    if (!circuitJsonContent) {
+    if (circuitJsonContent === undefined) {
       return {
         isStaticCircuitJson: true,
         circuitJson: null,
@@ -39,8 +39,25 @@ export const useCircuitJsonFile = ({
     }
 
     try {
-      const parsed = JSON.parse(circuitJsonContent) as CircuitJson
-      return { isStaticCircuitJson: true, circuitJson: parsed, error: null }
+      const parsed: unknown = JSON.parse(circuitJsonContent)
+      if (!Array.isArray(parsed)) {
+        throw new Error("Expected an array of circuit elements")
+      }
+      for (const [index, element] of parsed.entries()) {
+        if (
+          element === null ||
+          typeof element !== "object" ||
+          Array.isArray(element) ||
+          typeof element.type !== "string"
+        ) {
+          throw new Error(`Invalid circuit element at index ${index}`)
+        }
+      }
+      return {
+        isStaticCircuitJson: true,
+        circuitJson: parsed as CircuitJson,
+        error: null,
+      }
     } catch (e) {
       return {
         isStaticCircuitJson: true,

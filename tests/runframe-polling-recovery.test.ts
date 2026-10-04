@@ -148,3 +148,82 @@ test("an event response alone does not clear a failed file update", async () => 
     unsubscribe()
   }
 })
+
+test("a failed file batch retries from the previous cursor without publishing partial changes", async () => {
+  const previousCursor = "2025-12-31T23:59:59.000Z"
+  const events = [
+    updatedFileEvent,
+    {
+      event_id: "2",
+      event_type: "FILE_DELETED",
+      file_path: "removed.tsx",
+      created_at: "2026-01-01T00:00:01.000Z",
+    },
+    {
+      ...updatedFileEvent,
+      event_id: "3",
+      file_path: "other.tsx",
+      created_at: "2026-01-01T00:00:02.000Z",
+    },
+  ]
+  const originalFiles = new Map([
+    ["main.tsx", "old main"],
+    ["removed.tsx", "old removed"],
+  ])
+  const fileError = new Error("second file request failed")
+  const requestedCursors: Array<string | null> = []
+  let failFileRequest = true
+  useRunFrameStore.setState({
+    lastEventTime: previousCursor,
+    fsMap: originalFiles,
+  })
+  globalThis.fetch = mock(async (input: string) => {
+    const url = new URL(input, "http://localhost")
+    if (url.pathname.endsWith("/events/list")) {
+      const since = url.searchParams.get("since")
+      requestedCursors.push(since)
+      return Response.json({
+        event_list: events.filter(
+          (event) => !since || event.created_at > since,
+        ),
+      })
+    }
+    const filePath = url.searchParams.get("file_path")
+    if (filePath === "other.tsx" && failFileRequest) throw fileError
+    return Response.json({
+      file: { file_path: filePath, text_content: `new ${filePath}` },
+    })
+  }) as unknown as typeof fetch
+
+  await startPolling()
+  expect(useRunFrameStore.getState().error).toBe(fileError)
+  expect(useRunFrameStore.getState().lastEventTime).toBe(previousCursor)
+  expect(useRunFrameStore.getState().recentEvents).toEqual([])
+  expect(useRunFrameStore.getState().fsMap).toBe(originalFiles)
+  expect(useRunFrameStore.getState().recentlySavedFiles).toEqual([])
+
+  failFileRequest = false
+  await pollAgain()
+  expect(requestedCursors).toEqual([previousCursor, previousCursor])
+  expect(useRunFrameStore.getState().error).toBeNull()
+  expect(useRunFrameStore.getState().lastEventTime).toBe(events[2].created_at)
+  expect(useRunFrameStore.getState().recentEvents).toEqual(events)
+  expect(useRunFrameStore.getState().fsMap).toEqual(
+    new Map([
+      ["main.tsx", "new main.tsx"],
+      ["other.tsx", "new other.tsx"],
+    ]),
+  )
+  expect(useRunFrameStore.getState().recentlySavedFiles).toEqual([
+    "other.tsx",
+    "main.tsx",
+  ])
+
+  await pollAgain()
+  expect(requestedCursors).toEqual([
+    previousCursor,
+    previousCursor,
+    events[2].created_at,
+  ])
+  expect(useRunFrameStore.getState().recentEvents).toEqual(events)
+})

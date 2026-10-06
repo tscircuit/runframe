@@ -4,6 +4,11 @@ export * from "./components/PcbViewerWithContainerHeight"
 export { CadViewer } from "@tscircuit/3d-viewer"
 export { PCBViewer as PcbViewer } from "@tscircuit/pcb-viewer"
 export {
+  usePcbViewerController,
+  type PcbViewerController,
+} from "@tscircuit/pcb-viewer"
+export type { ViewPcbComponentEvent } from "@tscircuit/schematic-viewer"
+export {
   SchematicViewer,
   useSchematicViewerController,
 } from "@tscircuit/schematic-viewer"

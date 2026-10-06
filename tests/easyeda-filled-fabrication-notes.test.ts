@@ -62,7 +62,7 @@ test("RunFrame JLCPCB import preserves filled RGB fabrication symbols", async ()
       saved.text_content.match(/<fabricationnotepath\b[^>]*\/>/g) ?? []
     expect(paths).toHaveLength(4)
     for (const path of paths) {
-      expect(path).toContain("isFilled")
+      expect(path).toMatch(/\bisFilled(?:\s|=\{true\})/)
       expect(path).toContain("hasStroke={false}")
       expect(path).toContain('strokeWidth="0mm"')
     }

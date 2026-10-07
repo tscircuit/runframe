@@ -14,8 +14,8 @@ export const sanitizeFileName = (name: string): string => {
     // Collapse multiple underscores
     .replace(/_+/g, "_")
 
-  // Prefix Windows reserved names (CON, PRN, AUX, NUL, COM0-9, LPT0-9)
-  const reserved = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])$/i
+  // Device names remain reserved before an extension, including superscript digits.
+  const reserved = /^(con|prn|aux|nul|com[0-9¹²³]|lpt[0-9¹²³])(\.|$)/i
   if (reserved.test(sanitized)) {
     sanitized = `_${sanitized}`
   }

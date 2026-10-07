@@ -7,6 +7,7 @@ import {
 import { cn } from "lib/utils"
 import { hasSimulationAnalysisResult } from "lib/utils/has-simulation-analysis-result"
 import { CadViewer } from "@tscircuit/3d-viewer"
+import { usePcbViewerController } from "@tscircuit/pcb-viewer"
 import {
   useCallback,
   useEffect,
@@ -187,6 +188,21 @@ export const CircuitJsonPreview = ({
     !hasPanels
   const { controller: schematicController, focusSchematicComponent } =
     useSchematicViewerController()
+  const { controller: pcbController, focusPcbComponent } =
+    usePcbViewerController()
+  const pcbNavigationEnabled = !availableTabs || availableTabs.includes("pcb")
+  const handleViewPcbComponent = pcbNavigationEnabled
+    ? ({ source_component_id }: { source_component_id: string }) => {
+        const component = circuitJson?.find(
+          (element) =>
+            element.type === "pcb_component" &&
+            element.source_component_id === source_component_id,
+        )
+        if (component?.type !== "pcb_component") return
+        focusPcbComponent(component.pcb_component_id)
+        setActiveTab("pcb")
+      }
+    : undefined
 
   const handleViewSchematicComponent = schematicNavigationEnabled
     ? ({ source_component_id }: { source_component_id: string }) => {
@@ -600,6 +616,7 @@ export const CircuitJsonPreview = ({
                 >
                   {circuitJson ? (
                     <PcbViewerWithContainerHeight
+                      controller={pcbController}
                       focusOnHover={false}
                       circuitJson={circuitJson}
                       debugGraphics={autoroutingGraphics}
@@ -720,6 +737,7 @@ export const CircuitJsonPreview = ({
                 >
                   {circuitJson ? (
                     <SchematicViewer
+                      onViewPcbComponent={handleViewPcbComponent}
                       controller={schematicController}
                       circuitJson={circuitJson}
                       containerStyle={{

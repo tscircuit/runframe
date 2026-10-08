@@ -77,14 +77,14 @@
     "circuit-json-to-lbrn": "^0.0.74",
     "circuit-json-to-pnp-csv": "^0.0.18",
     "circuit-json-to-step": "^0.0.36",
-    "circuit-to-svg": "^0.0.421",
+    "circuit-to-svg": "^0.0.444",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "comlink": "^4.4.2",
     "concurrently": "^9.1.2",
     "cssnano": "^7.0.6",
-    "easyeda": "^0.0.360",
+    "easyeda": "^0.0.372",
     "fflate": "^0.8.2",
     "fuse.js": "^7.1.0",
     "jose": "^6.1.0",
@@ -120,7 +120,8 @@
     "tsup": "^8.3.5",
     "vite": "^7.1.2",
     "yargs": "^17.7.2",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "bun-match-svg": "^0.0.17"
   },
   "dependencies": {
     "@tscircuit/core": "^0.0.1911",

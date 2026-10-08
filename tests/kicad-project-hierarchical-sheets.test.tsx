@@ -49,7 +49,7 @@ const getReferencedSchematicFilenames = (rootSchematic: string) =>
     (match) => match[1]!,
   ).sort()
 
-test("KiCad project ZIP omits hierarchical child schematic files", async () => {
+test("KiCad project ZIP includes hierarchical child schematic files", async () => {
   const projectName = "project"
   const rootSchematicFilename = `${projectName}.kicad_sch`
   const zip = await createKicadProjectZip({
@@ -70,6 +70,6 @@ test("KiCad project ZIP omits hierarchical child schematic files", async () => {
   ])
   expect(
     archivedFilenames.filter((filename) => filename.endsWith(".kicad_sch")),
-  ).toEqual([rootSchematicFilename])
-  expect(missingSchematicFilenames).toEqual(referencedSchematicFilenames)
+  ).toEqual(["logic.kicad_sch", "power.kicad_sch", rootSchematicFilename])
+  expect(missingSchematicFilenames).toEqual([])
 }, 30_000)

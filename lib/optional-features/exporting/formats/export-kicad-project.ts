@@ -19,7 +19,9 @@ export const createKicadProjectZip = async ({
   } = await importer("circuit-json-to-kicad")
   const schConverter = new CircuitJsonToKicadSchConverter(circuitJson as any)
   schConverter.runUntilFinished()
-  const schContent = schConverter.getOutputString()
+  const schematicFiles = schConverter.getOutputFiles({
+    schematicFilename: `${projectName}.kicad_sch`,
+  })
 
   const pcbConverter = new CircuitJsonToKicadPcbConverter(circuitJson as any, {
     includeBuiltin3dModels: true,
@@ -38,7 +40,9 @@ export const createKicadProjectZip = async ({
 
   const zip = new JSZip()
 
-  zip.file(`${projectName}.kicad_sch`, schContent)
+  for (const { filename, content } of schematicFiles) {
+    zip.file(filename, content)
+  }
   zip.file(`${projectName}.kicad_pcb`, pcbContent)
   zip.file(`${projectName}.kicad_pro`, proContent)
 

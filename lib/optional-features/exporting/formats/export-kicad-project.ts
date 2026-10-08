@@ -4,7 +4,12 @@ import JSZip from "jszip"
 import { toast } from "lib/utils/toast"
 import { openForDownload } from "../open-for-download"
 
-type CircuitJsonToKicadModule = typeof import("circuit-json-to-kicad")
+type SchematicFileOutputConverter = Pick<
+  InstanceType<
+    typeof import("circuit-json-to-kicad").CircuitJsonToKicadSchConverter
+  >,
+  "getOutputFiles"
+>
 
 export const createKicadProjectZip = async ({
   circuitJson,
@@ -18,12 +23,12 @@ export const createKicadProjectZip = async ({
     CircuitJsonToKicadSchConverter,
     CircuitJsonToKicadProConverter,
     resolveAndLoadKicad3dModelFiles,
-  } = (await importer("circuit-json-to-kicad")) as CircuitJsonToKicadModule
+  } = await importer("circuit-json-to-kicad")
   const schConverter = new CircuitJsonToKicadSchConverter(circuitJson as any)
   schConverter.runUntilFinished()
-  const schematicFiles = schConverter.getOutputFiles({
-    schematicFilename: `${projectName}.kicad_sch`,
-  })
+  const schematicFiles = (
+    schConverter as typeof schConverter & SchematicFileOutputConverter
+  ).getOutputFiles({ schematicFilename: `${projectName}.kicad_sch` })
 
   const pcbConverter = new CircuitJsonToKicadPcbConverter(circuitJson as any, {
     includeBuiltin3dModels: true,

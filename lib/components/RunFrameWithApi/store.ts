@@ -150,10 +150,12 @@ export const useRunFrameStore = create<RunFrameState>()(
               )
 
               set((state) => ({
-                recentEvents: [...state.recentEvents, ...events].slice(0, 100),
+                // The API returns oldest first; consumers read the latest at [0].
+                recentEvents: [
+                  ...[...events].reverse(),
+                  ...state.recentEvents,
+                ].slice(0, 100),
                 lastEventTime: newLastEventTime,
-                // TODO sort
-                // .sort((a, b) => b.created_at.localeCompare(a.created_at)),
               }))
 
               let fsUpdateCount = 0

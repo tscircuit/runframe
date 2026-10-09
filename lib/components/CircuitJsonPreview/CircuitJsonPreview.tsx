@@ -21,12 +21,12 @@ import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
 import {
   SchematicViewer,
   useSchematicViewerController,
-} from "@tscircuit/schematic-viewer"
+} from "@tscircuit/schematic-viewer/source"
 import { AssemblyViewer, PinoutViewer } from "@tscircuit/assembly-viewer"
 import PreviewEmptyState from "../PreviewEmptyState"
 import { CircuitJsonTableViewer } from "../CircuitJsonTableViewer/CircuitJsonTableViewer"
 import { BomTable } from "../BomTable"
-import { AnalogSimulationViewer } from "@tscircuit/schematic-viewer"
+import { AnalogSimulationViewer } from "@tscircuit/schematic-viewer/source"
 import {
   CheckIcon,
   EllipsisIcon,
@@ -99,6 +99,7 @@ const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "An unknown error occurred"
 
 export const CircuitJsonPreview = ({
+  platformConfig,
   code,
   fsMap,
   onRunClicked = undefined,
@@ -136,7 +137,7 @@ export const CircuitJsonPreview = ({
   showToggleFullScreen = true,
   defaultToFullScreen = false,
   activeEffectName,
-  allowSelectingVersion = true,
+  allowSelectingVersion = !platformConfig?.evalVersionSelectionDisabled,
   showFileMenu = false,
   isWebEmbedded = false,
   isCli = false,
@@ -235,6 +236,7 @@ export const CircuitJsonPreview = ({
     errorMessage,
     errorStack,
     circuitJsonErrors,
+    disabled: platformConfig?.telemetryDisabled,
   })
 
   const fallbackTab = defaultTab ?? availableTabs?.[0] ?? "pcb"
@@ -246,6 +248,7 @@ export const CircuitJsonPreview = ({
   usePostHogActivity({
     source: "runframe",
     component: "CircuitJsonPreview",
+    disabled: platformConfig?.telemetryDisabled,
     isWebEmbedded,
     activeTab,
   })
@@ -616,6 +619,7 @@ export const CircuitJsonPreview = ({
                 >
                   {circuitJson ? (
                     <PcbViewerWithContainerHeight
+                      renderer={platformConfig?.pcbRenderer}
                       controller={pcbController}
                       focusOnHover={false}
                       circuitJson={circuitJson}
@@ -737,6 +741,7 @@ export const CircuitJsonPreview = ({
                 >
                   {circuitJson ? (
                     <SchematicViewer
+                      platformConfig={platformConfig}
                       onViewPcbComponent={handleViewPcbComponent}
                       controller={schematicController}
                       circuitJson={circuitJson}

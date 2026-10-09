@@ -2,6 +2,7 @@ import type { ManualEditEvent } from "@tscircuit/props"
 import type { CircuitJson } from "circuit-json"
 import type { RenderLog } from "lib/render-logging/RenderLog"
 import type { AutoroutingPhase } from "lib/autorouting"
+import type { RunFramePlatformConfig } from "../RunFrame/RunFramePlatformConfig"
 
 export interface SolverStartedEvent {
   type: "solver:started"
@@ -28,6 +29,8 @@ export type TabId =
   | "autorouting"
 
 export interface PreviewContentProps {
+  /** Circuit platform hooks and preview settings. */
+  platformConfig?: RunFramePlatformConfig
   defaultToFullScreen?: boolean
   code?: string
   fsMap?: Map<string, string> | Record<string, string>

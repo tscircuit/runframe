@@ -36,6 +36,49 @@ circuit.add(
 )
 ```
 
+### Platform configuration
+
+`platformConfig` supplies circuit hooks to the evaluator and passes the same
+configuration to the preview viewers. Parts, footprint libraries, routing,
+simulation and supplier availability use the existing `@tscircuit/props`
+platform interfaces, including `partsEngine.fetchPartAvailability`.
+
+RunFrame's optional UI settings extend that interface without adding individual
+component props:
+
+```tsx
+import type { RunFramePlatformConfig } from "@tscircuit/runframe/runner"
+
+const platformConfig: RunFramePlatformConfig = {
+  ...circuitPlatformConfig,
+  telemetryDisabled: true,
+  evalCdnLoadingDisabled: true,
+  evalVersionSelectionDisabled: true,
+  pcbRenderer: "canvas",
+}
+
+<RunFrame
+  fsMap={projectFiles}
+  mainComponentPath="main.tsx"
+  platformConfig={platformConfig}
+  evalVersion="0.0.1580"
+  evalWebWorkerBlobUrl="/assets/eval-worker.js"
+/>
+```
+
+Omitting these settings preserves the normal web defaults. UI settings stay in
+the browser; only circuit platform hooks are sent to core in the worker.
+`CircuitJsonPreview` also accepts `platformConfig`, so the same configuration can
+be used when displaying already-rendered Circuit JSON.
+
+With CDN loading disabled, the host must provide evaluator dependencies through
+its worker bundle or `fsMap`. Optional converter/analyzer modules can be supplied
+through `@tscircuit/internal-dynamic-import`'s registry or resolver. Package the
+fonts, models and WASM needed by the enabled viewers as well.
+
+Hosts bundling TypeScript source can use `@tscircuit/runframe/source`; resolve
+its `lib/*` imports against the package's `lib` directory.
+
 ### Using CircuitJsonPreview Directly
 
 If you already have circuit JSON and just want to display it:

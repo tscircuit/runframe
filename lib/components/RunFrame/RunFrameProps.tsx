@@ -1,4 +1,5 @@
-import type { ManualEditEvent, PlatformConfig } from "@tscircuit/props"
+import type { ManualEditEvent } from "@tscircuit/props"
+import type { RunFramePlatformConfig } from "./RunFramePlatformConfig"
 import type { TabId } from "lib/components/CircuitJsonPreview/PreviewContentProps"
 import type { RunCompletedPayload } from "./run-completion"
 
@@ -156,9 +157,9 @@ export interface RunFrameProps {
   projectBaseUrl?: string
 
   /**
-   * Platform config for the eval webworker
+   * Circuit platform hooks and preview settings, passed through to the viewers.
    */
-  platformConfig?: PlatformConfig
+  platformConfig?: RunFramePlatformConfig
 
   onReportAutoroutingLog?: (
     name: string,

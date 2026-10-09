@@ -12,10 +12,12 @@
     "./preview": "./dist/preview.js",
     "./runner": "./dist/runner.js",
     "./standalone": "./dist/standalone.min.js",
-    "./standalone-preview": "./dist/standalone-preview.min.js"
+    "./standalone-preview": "./dist/standalone-preview.min.js",
+    "./source": "./lib/runner.ts"
   },
   "files": [
-    "dist"
+    "dist",
+    "lib"
   ],
   "scripts": {
     "start": "bun run build:css && concurrently 'bun run cosmos' 'bun run build:css:watch'",
@@ -59,8 +61,8 @@
     "@tscircuit/file-server": "^0.0.32",
     "@tscircuit/internal-dynamic-import": "^0.0.15",
     "@tscircuit/pcb-viewer": "^1.11.425",
-    "@tscircuit/props": "^0.0.657",
-    "@tscircuit/schematic-viewer": "^2.0.102",
+    "@tscircuit/props": "^0.0.697",
+    "@tscircuit/schematic-viewer": "github:tscircuit/schematic-viewer#5bc26f1a4761469777ed9109ee84f708f136fda5",
     "@types/bun": "latest",
     "@types/debug": "^4.1.12",
     "@types/react": "^19.1.10",

@@ -1,3 +1,4 @@
+import { getCircuitPlatformConfig } from "./RunFramePlatformConfig"
 import { createCircuitWebWorker } from "@tscircuit/eval/worker"
 import Debug from "debug"
 import { HTTPError } from "ky"
@@ -173,19 +174,23 @@ export const RunFrame = (props: RunFrameProps) => {
             evalVersion,
             webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
             projectConfig: getRunFrameProjectConfig({
+              enablePartOrientationAnalysis:
+                props.platformConfig?.enablePartOrientationAnalysis,
               projectBaseUrl:
-                props.projectBaseUrl || `${API_BASE}/files/static`,
+                props.projectBaseUrl ??
+                props.platformConfig?.projectBaseUrl ??
+                `${API_BASE}/files/static`,
             }),
             ...(props.platformConfig && {
-              platform: props.platformConfig,
+              platform: getCircuitPlatformConfig(props.platformConfig),
             }),
             verbose: true,
             ...(props.enableFetchProxy && {
               enableFetchProxy: props.enableFetchProxy,
             }),
-            ...(window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI && {
-              disableCdnLoading: true,
-            }),
+            disableCdnLoading:
+              props.platformConfig?.evalCdnLoadingDisabled ??
+              window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI,
             ...(props.tscircuitSessionToken && {
               tscircuitSessionToken: props.tscircuitSessionToken,
             }),
@@ -211,6 +216,7 @@ export const RunFrame = (props: RunFrameProps) => {
     props.evalWebWorkerBlobUrl,
     props.forceLatestEvalVersion,
     props.tscircuitSessionToken,
+    props.platformConfig?.evalCdnLoadingDisabled,
   ])
 
   const [renderLog, setRenderLog] = useState<RenderLog | null>(null)
@@ -226,6 +232,7 @@ export const RunFrame = (props: RunFrameProps) => {
   usePostHogActivity({
     source: "runframe",
     component: "RunFrame",
+    disabled: props.platformConfig?.telemetryDisabled,
     isWebEmbedded: props.isWebEmbedded,
     activeTab,
   })
@@ -339,17 +346,22 @@ export const RunFrame = (props: RunFrameProps) => {
           webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
           verbose: true,
           projectConfig: getRunFrameProjectConfig({
-            projectBaseUrl: props.projectBaseUrl || `${API_BASE}/files/static`,
+            enablePartOrientationAnalysis:
+              props.platformConfig?.enablePartOrientationAnalysis,
+            projectBaseUrl:
+              props.projectBaseUrl ??
+              props.platformConfig?.projectBaseUrl ??
+              `${API_BASE}/files/static`,
           }),
           ...(props.platformConfig && {
-            platform: props.platformConfig,
+            platform: getCircuitPlatformConfig(props.platformConfig),
           }),
           ...(props.enableFetchProxy && {
             enableFetchProxy: props.enableFetchProxy,
           }),
-          ...(window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI && {
-            disableCdnLoading: true,
-          }),
+          disableCdnLoading:
+            props.platformConfig?.evalCdnLoadingDisabled ??
+            window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI,
           ...(props.tscircuitSessionToken && {
             tscircuitSessionToken: props.tscircuitSessionToken,
           }),
@@ -683,6 +695,7 @@ export const RunFrame = (props: RunFrameProps) => {
       )}
     >
       <CircuitJsonPreview
+        platformConfig={props.platformConfig}
         code={fsMap.get(props.entrypoint ?? props.mainComponentPath)}
         fsMap={fsMap}
         defaultActiveTab={props.defaultActiveTab ?? props.defaultTab}

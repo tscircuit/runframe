@@ -1,3 +1,4 @@
+import type { RunFrameRuntime } from "lib/runtime/types"
 import type { AnyCircuitElement } from "circuit-json"
 import {
   loadJlcpcbComponentCircuitJson,
@@ -8,6 +9,7 @@ import type { ImportComponentDialogSearchResult } from "../types"
 
 export type FootprintPreviewLoadOptions = {
   jlcpcb?: JlcpcbPreviewLoadOptions
+  runtime?: RunFrameRuntime
 }
 
 export const canPreviewFootprint = (
@@ -19,14 +21,14 @@ export const loadFootprintPreviewCircuitJson = async (
   opts?: FootprintPreviewLoadOptions,
 ): Promise<AnyCircuitElement[]> => {
   if (result.source === "jlcpcb") {
-    return loadJlcpcbComponentCircuitJson(
-      result.component.partNumber,
-      opts?.jlcpcb,
-    )
+    return loadJlcpcbComponentCircuitJson(result.component.partNumber, {
+      ...opts?.jlcpcb,
+      runtime: opts?.runtime,
+    })
   }
 
   if (result.source === "kicad") {
-    return loadKicadFootprintCircuitJson(result.footprint.path)
+    return loadKicadFootprintCircuitJson(result.footprint.path, opts?.runtime)
   }
 
   throw new Error("Footprint preview is not available for this source")

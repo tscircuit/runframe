@@ -1,42 +1,51 @@
+import { useRunFrameRuntime } from "lib/runtime/context"
 import { useCallback, useState } from "react"
 import { mapKicadFootprintToSummary, searchKicadFootprints } from "../api/kicad"
 import type { KicadFootprintSearchResult } from "../types"
 
 export const useKicadFootprintSearch = () => {
+  const runtime = useRunFrameRuntime()
   const [results, setResults] = useState<KicadFootprintSearchResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [hasSearched, setHasSearched] = useState(false)
 
-  const search = useCallback(async (query: string) => {
-    const trimmedQuery = query.trim()
-    if (!trimmedQuery) return []
+  const search = useCallback(
+    async (query: string) => {
+      const trimmedQuery = query.trim()
+      if (!trimmedQuery) return []
 
-    setIsSearching(true)
-    setError(null)
+      setIsSearching(true)
+      setError(null)
 
-    try {
-      const footprints = await searchKicadFootprints(trimmedQuery, 20)
-      const mappedResults = footprints.map((footprintPath) => ({
-        source: "kicad" as const,
-        footprint: mapKicadFootprintToSummary(footprintPath),
-      }))
-      setResults(mappedResults)
-      return mappedResults
-    } catch (error) {
-      console.error("Error searching KiCad footprints", error)
-      setResults([])
-      setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to search KiCad footprints",
-      )
-      return []
-    } finally {
-      setIsSearching(false)
-      setHasSearched(true)
-    }
-  }, [])
+      try {
+        const footprints = await searchKicadFootprints(
+          trimmedQuery,
+          20,
+          runtime,
+        )
+        const mappedResults = footprints.map((footprintPath) => ({
+          source: "kicad" as const,
+          footprint: mapKicadFootprintToSummary(footprintPath),
+        }))
+        setResults(mappedResults)
+        return mappedResults
+      } catch (error) {
+        console.error("Error searching KiCad footprints", error)
+        setResults([])
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Failed to search KiCad footprints",
+        )
+        return []
+      } finally {
+        setIsSearching(false)
+        setHasSearched(true)
+      }
+    },
+    [runtime],
+  )
 
   const reset = useCallback(() => {
     setResults([])

@@ -1,4 +1,5 @@
-import importer from "@tscircuit/internal-dynamic-import"
+import { getDefaultRuntime } from "lib/runtime/default-runtime"
+import type { RunFrameRuntime } from "lib/runtime/types"
 import type { CircuitJson } from "circuit-json"
 import JSZip from "jszip"
 import { toast } from "lib/utils/toast"
@@ -7,16 +8,18 @@ import { openForDownload } from "../open-for-download"
 export const createKicadProjectZip = async ({
   circuitJson,
   projectName,
+  runtime = getDefaultRuntime(),
 }: {
   circuitJson: CircuitJson
   projectName: string
+  runtime?: RunFrameRuntime
 }) => {
   const {
     CircuitJsonToKicadPcbConverter,
     CircuitJsonToKicadSchConverter,
     CircuitJsonToKicadProConverter,
     resolveAndLoadKicad3dModelFiles,
-  } = await importer("circuit-json-to-kicad")
+  } = await runtime.modules.load("circuit-json-to-kicad")
   const schConverter = new CircuitJsonToKicadSchConverter(circuitJson as any)
   schConverter.runUntilFinished()
   const schContent = schConverter.getOutputString()
@@ -45,7 +48,7 @@ export const createKicadProjectZip = async ({
   await resolveAndLoadKicad3dModelFiles({
     projectName,
     model3dSourcePaths: pcbConverter.getModel3dSourcePaths(),
-    fetch,
+    fetch: runtime.fetch,
     onModelFile: ({ outputPath, content }) => {
       zip.file(outputPath, content)
     },
@@ -60,13 +63,19 @@ export const createKicadProjectZip = async ({
 export const exportKicadProject = async ({
   circuitJson,
   projectName,
+  runtime = getDefaultRuntime(),
 }: {
   circuitJson: CircuitJson
   projectName: string
+  runtime?: RunFrameRuntime
 }) => {
   await toast.promise(
     (async () => {
-      const zip = await createKicadProjectZip({ circuitJson, projectName })
+      const zip = await createKicadProjectZip({
+        circuitJson,
+        projectName,
+        runtime,
+      })
       const zipBlob = await zip.generateAsync({ type: "blob" })
 
       openForDownload(zipBlob, {

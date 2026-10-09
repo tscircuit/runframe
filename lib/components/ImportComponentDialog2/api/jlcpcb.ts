@@ -1,3 +1,5 @@
+import { getDefaultRuntime } from "lib/runtime/default-runtime"
+import type { RunFrameRuntime } from "lib/runtime/types"
 import { loadEasyedaBrowser } from "lib/optional-features/importing/load-easyeda-browser"
 import { createEasyEdaProxyFetch } from "lib/optional-features/importing/create-easyeda-proxy-fetch"
 import type { AnyCircuitElement } from "circuit-json"
@@ -20,9 +22,10 @@ interface SearchResponse {
 export const searchJlcpcbComponents = async (
   query: string,
   limit = 10,
+  runtime = getDefaultRuntime(),
 ): Promise<JlcpcbComponentApiResult[]> => {
   const encodedQuery = encodeURIComponent(query)
-  const response = await fetch(
+  const response = await runtime.fetch(
     `https://jlcsearch.tscircuit.com/api/search?limit=${limit}&q=${encodedQuery}`,
   )
 
@@ -50,6 +53,7 @@ export const mapJlcpcbComponentToSummary = (
 export type JlcpcbPreviewLoadOptions = {
   headers?: Record<string, string>
   apiBase?: string
+  runtime?: RunFrameRuntime
 }
 
 type EasyEdaFetchOptions = JlcpcbPreviewLoadOptions & {
@@ -60,19 +64,26 @@ const fetchEasyEdaComponentForJlcpcbPart = async (
   partNumber: string,
   opts?: EasyEdaFetchOptions,
 ) => {
-  const { fetchEasyEDAComponent } = await loadEasyedaBrowser()
+  if (opts?.runtime?.mode === "offline") {
+    throw new Error(
+      "EasyEDA part acquisition requires a local catalog; convert a supplied EasyEDA file offline instead.",
+    )
+  }
+  const { fetchEasyEDAComponent } = await loadEasyedaBrowser(opts?.runtime)
 
   return fetchEasyEDAComponent(partNumber, {
-    fetch: createEasyEdaProxyFetch(opts),
+    // easyeda calls the browser Fetch API; Bun's additional preconnect member
+    // is not part of this converter callback contract.
+    fetch: createEasyEdaProxyFetch(opts) as typeof fetch,
     includeModelMetadata: opts?.includeModelMetadata,
   })
 }
 
 export const loadJlcpcbComponentTsx = async (
   partNumber: string,
-  opts?: { headers?: Record<string, string>; apiBase?: string },
+  opts?: JlcpcbPreviewLoadOptions,
 ): Promise<string> => {
-  const { convertRawEasyToTsx } = await loadEasyedaBrowser()
+  const { convertRawEasyToTsx } = await loadEasyedaBrowser(opts?.runtime)
 
   const component = await fetchEasyEdaComponentForJlcpcbPart(partNumber, opts)
 
@@ -81,10 +92,10 @@ export const loadJlcpcbComponentTsx = async (
 
 export const loadJlcpcbComponentCircuitJson = async (
   partNumber: string,
-  opts?: { headers?: Record<string, string>; apiBase?: string },
+  opts?: JlcpcbPreviewLoadOptions,
 ): Promise<AnyCircuitElement[]> => {
   const { EasyEdaJsonSchema, convertEasyEdaJsonToCircuitJson } =
-    await loadEasyedaBrowser()
+    await loadEasyedaBrowser(opts?.runtime)
 
   const component = await fetchEasyEdaComponentForJlcpcbPart(partNumber, {
     ...opts,

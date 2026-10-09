@@ -112,11 +112,37 @@ if (process.env.STANDALONE === "preview") {
   }
 }
 
+const isOfflineBuild = process.env.STANDALONE?.startsWith("offline")
+
+if (isOfflineBuild) {
+  const isLibrary = process.env.STANDALONE === "offline-library"
+  build = {
+    lib: {
+      entry: resolve(__dirname, "lib/offline.tsx"),
+      name: "RunframeOffline",
+      fileName: () => (isLibrary ? "offline.js" : "standalone-offline.min.js"),
+      formats: [isLibrary ? "es" : "umd"],
+    },
+    minify: true,
+    emptyOutDir: false,
+  }
+}
+
 export default defineConfig({
   plugins,
   assetsInclude: ["**/*.glb", "**/*.step", "**/*.obj"],
   resolve: {
     alias: {
+      ...(isOfflineBuild && {
+        "lib/runtime/default-runtime": resolve(
+          __dirname,
+          "lib/runtime/require-runtime.ts",
+        ),
+        "@resvg/resvg-js": resolve(
+          __dirname,
+          "lib/runtime/browser-native-resvg.ts",
+        ),
+      }),
       lib: resolve(__dirname, "./lib"),
     },
   },
@@ -131,11 +157,15 @@ export default defineConfig({
   build: {
     ...build,
     rollupOptions: {
-      external: [
-        "@resvg/resvg-js",
-        "@resvg/resvg-js-darwin-arm64",
-        "@resvg/resvg-wasm",
-      ],
+      external: isOfflineBuild
+        ? process.env.STANDALONE === "offline-library"
+          ? [/^react(?:-dom)?(?:\/.*)?$/]
+          : []
+        : [
+            "@resvg/resvg-js",
+            "@resvg/resvg-js-darwin-arm64",
+            "@resvg/resvg-wasm",
+          ],
     },
   },
   optimizeDeps: {

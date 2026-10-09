@@ -1,8 +1,9 @@
+import type { RunFrameRuntimeProps } from "lib/runtime/types"
 import type { ManualEditEvent, PlatformConfig } from "@tscircuit/props"
 import type { TabId } from "lib/components/CircuitJsonPreview/PreviewContentProps"
 import type { RunCompletedPayload } from "./run-completion"
 
-export interface RunFrameProps {
+export interface RunFrameProps extends RunFrameRuntimeProps {
   /**
    * Map of filenames to file contents that will be available in the worker
    */

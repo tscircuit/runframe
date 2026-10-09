@@ -1,8 +1,9 @@
+import type { RunFrameRuntimeProps } from "lib/runtime/types"
 import type { AnyCircuitElement } from "circuit-json"
 import type { convertCircuitJsonToBomRows } from "circuit-json-to-bom-csv"
 import type React from "react"
 
-export interface BomTableProps {
+export interface BomTableProps extends RunFrameRuntimeProps {
   circuitJson: AnyCircuitElement[]
 }
 

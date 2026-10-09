@@ -1,3 +1,4 @@
+import type { RunFrameRuntimeProps } from "lib/runtime/types"
 import type { ManualEditEvent } from "@tscircuit/props"
 import type { CircuitJson } from "circuit-json"
 import type { RenderLog } from "lib/render-logging/RenderLog"
@@ -27,7 +28,7 @@ export type TabId =
   | "solvers"
   | "autorouting"
 
-export interface PreviewContentProps {
+export interface PreviewContentProps extends RunFrameRuntimeProps {
   defaultToFullScreen?: boolean
   code?: string
   fsMap?: Map<string, string> | Record<string, string>

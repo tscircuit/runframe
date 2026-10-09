@@ -1,15 +1,19 @@
+import { getDefaultRuntime } from "lib/runtime/default-runtime"
+import type { RunFrameRuntime } from "lib/runtime/types"
 import type { CircuitJson } from "circuit-json"
-import importer from "@tscircuit/internal-dynamic-import"
 import { openForDownload } from "../open-for-download"
 
 export const exportPinoutSvg = async ({
   circuitJson,
   projectName,
+  runtime = getDefaultRuntime(),
 }: {
   circuitJson: CircuitJson
   projectName: string
+  runtime?: RunFrameRuntime
 }) => {
-  const { convertCircuitJsonToPinoutSvg } = await importer("circuit-to-svg")
+  const { convertCircuitJsonToPinoutSvg } =
+    await runtime.modules.load("circuit-to-svg")
   const svgString = convertCircuitJsonToPinoutSvg(circuitJson)
 
   openForDownload(svgString, {

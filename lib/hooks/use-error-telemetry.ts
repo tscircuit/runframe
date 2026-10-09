@@ -1,5 +1,6 @@
+import { useRunFrameRuntime } from "lib/runtime/context"
 import { useEffect } from "react"
-import { posthog } from "lib/utils"
+import { posthog, initPostHog } from "lib/utils/posthog"
 import type { CircuitJsonError } from "circuit-json"
 
 interface UseErrorTelemetryParams {
@@ -13,7 +14,9 @@ export const useErrorTelemetry = ({
   errorStack,
   circuitJsonErrors,
 }: UseErrorTelemetryParams) => {
+  const runtime = useRunFrameRuntime()
   useEffect(() => {
+    if (runtime.mode === "offline" || !initPostHog()) return
     if (errorMessage) {
       const err = new Error(errorMessage)
       if (errorStack) err.stack = errorStack
@@ -23,9 +26,10 @@ export const useErrorTelemetry = ({
         // ignore analytics errors
       }
     }
-  }, [errorMessage, errorStack])
+  }, [errorMessage, errorStack, runtime])
 
   useEffect(() => {
+    if (runtime.mode === "offline" || !initPostHog()) return
     if (circuitJsonErrors && circuitJsonErrors.length > 0) {
       for (const error of circuitJsonErrors) {
         const err = new Error(error.message || "Circuit JSON Error")
@@ -39,5 +43,5 @@ export const useErrorTelemetry = ({
         }
       }
     }
-  }, [circuitJsonErrors])
+  }, [circuitJsonErrors, runtime])
 }

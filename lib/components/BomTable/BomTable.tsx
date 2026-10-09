@@ -1,10 +1,11 @@
-import importer from "@tscircuit/internal-dynamic-import"
+import { useRunFrameRuntime, withRunFrameRuntime } from "lib/runtime/context"
 import { useEffect, useState } from "react"
 import type React from "react"
 import { getBomCellDescriptors, getBomMetadata } from "./bom-table.columns"
 import type { BomRow, BomTableProps } from "./bom-table.types"
 
-export const BomTable: React.FC<BomTableProps> = ({ circuitJson }) => {
+const BomTableInner: React.FC<BomTableProps> = ({ circuitJson }) => {
+  const runtime = useRunFrameRuntime()
   const [rows, setRows] = useState<BomRow[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -16,7 +17,7 @@ export const BomTable: React.FC<BomTableProps> = ({ circuitJson }) => {
         setError(null)
         setRows(null)
 
-        const { convertCircuitJsonToBomRows } = await importer(
+        const { convertCircuitJsonToBomRows } = await runtime.modules.load(
           "circuit-json-to-bom-csv",
         )
         const bomRows = await convertCircuitJsonToBomRows({
@@ -38,7 +39,7 @@ export const BomTable: React.FC<BomTableProps> = ({ circuitJson }) => {
     return () => {
       cancelled = true
     }
-  }, [circuitJson])
+  }, [circuitJson, runtime])
 
   if (error) {
     throw new Error(error)
@@ -82,3 +83,5 @@ export const BomTable: React.FC<BomTableProps> = ({ circuitJson }) => {
     </div>
   )
 }
+
+export const BomTable = withRunFrameRuntime(BomTableInner)

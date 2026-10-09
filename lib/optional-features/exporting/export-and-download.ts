@@ -1,3 +1,5 @@
+import { getDefaultRuntime } from "lib/runtime/default-runtime"
+import type { RunFrameRuntime } from "lib/runtime/types"
 import type { CircuitJson } from "circuit-json"
 import { sanitizeFileName } from "lib/utils/sanitizeFileName"
 import { exportAltiumProject } from "./formats/export-altium-project"
@@ -41,28 +43,30 @@ export const exportAndDownload = async ({
   circuitJson,
   simpleRouteJson,
   projectName: rawProjectName,
+  runtime = getDefaultRuntime(),
 }: {
   exportName: ExportName
   circuitJson: CircuitJson
   simpleRouteJson?: any
   projectName: string
+  runtime?: RunFrameRuntime
 }) => {
   const projectName = sanitizeFileName(rawProjectName)
 
   if (exportName === "Fabrication Files") {
-    await exportFabricationFiles({ circuitJson, projectName })
+    await exportFabricationFiles({ circuitJson, projectName, runtime })
     return
   }
   if (exportName === "KiCad Project") {
-    await exportKicadProject({ circuitJson, projectName })
+    await exportKicadProject({ circuitJson, projectName, runtime })
     return
   }
   if (exportName === "Altium Project") {
-    await exportAltiumProject({ circuitJson, projectName })
+    await exportAltiumProject({ circuitJson, projectName, runtime })
     return
   }
   if (exportName === "KiCad Library") {
-    await exportKicadLibrary({ circuitJson, projectName })
+    await exportKicadLibrary({ circuitJson, projectName, runtime })
     return
   }
   if (exportName === "Circuit JSON") {
@@ -83,23 +87,23 @@ export const exportAndDownload = async ({
     return
   }
   if (exportName === "GLB (Binary GLTF)") {
-    await exportGlb({ circuitJson, projectName })
+    await exportGlb({ circuitJson, projectName, runtime })
     return
   }
   if (exportName === "Pinout SVG") {
-    exportPinoutSvg({ circuitJson, projectName })
+    await exportPinoutSvg({ circuitJson, projectName, runtime })
     return
   }
   if (exportName === "STEP") {
-    await exportStep({ circuitJson, projectName })
+    await exportStep({ circuitJson, projectName, runtime })
     return
   }
   if (exportName === "Component Box (3MF)") {
-    await exportFdmComponentBox({ circuitJson, projectName })
+    await exportFdmComponentBox({ circuitJson, projectName, runtime })
     return
   }
   if (exportName === "LightBurn") {
-    await exportLbrn({ circuitJson, projectName })
+    await exportLbrn({ circuitJson, projectName, runtime })
     return
   }
   throw new Error(`Unsupported export type: "${exportName}"`)

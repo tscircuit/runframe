@@ -1,3 +1,5 @@
+import { getDefaultRuntime } from "lib/runtime/default-runtime"
+import type { RunFrameRuntime } from "lib/runtime/types"
 import type { CircuitJson } from "circuit-json"
 import { toast } from "lib/utils/toast"
 import { openForDownload } from "../open-for-download"
@@ -5,13 +7,15 @@ import { openForDownload } from "../open-for-download"
 export const createAltiumProjectZip = async ({
   circuitJson,
   projectName,
+  runtime = getDefaultRuntime(),
 }: {
   circuitJson: CircuitJson
   projectName: string
+  runtime?: RunFrameRuntime
 }) => {
   // Bundle the pinned Git dependency lazily; it is not yet on the importer CDN.
-  const { convertCircuitJsonToAltiumZip } = await import(
-    "circuit-json-to-altium"
+  const { convertCircuitJsonToAltiumZip } = await runtime.modules.load(
+    "circuit-json-to-altium",
   )
   const bytes = await convertCircuitJsonToAltiumZip(circuitJson, projectName)
   return new Blob([new Uint8Array(bytes)], { type: "application/zip" })
@@ -20,13 +24,19 @@ export const createAltiumProjectZip = async ({
 export const exportAltiumProject = async ({
   circuitJson,
   projectName,
+  runtime = getDefaultRuntime(),
 }: {
   circuitJson: CircuitJson
   projectName: string
+  runtime?: RunFrameRuntime
 }) => {
   await toast.promise(
     (async () => {
-      const zipBlob = await createAltiumProjectZip({ circuitJson, projectName })
+      const zipBlob = await createAltiumProjectZip({
+        circuitJson,
+        projectName,
+        runtime,
+      })
       openForDownload(zipBlob, {
         fileName: `${projectName}_altium_project.zip`,
       })

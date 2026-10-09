@@ -1,40 +1,58 @@
 import Fuse from "fuse.js"
 import type { AnyCircuitElement } from "circuit-json"
-import importer from "@tscircuit/internal-dynamic-import"
+import { getDefaultRuntime } from "lib/runtime/default-runtime"
+import type { RunFrameRuntime } from "lib/runtime/types"
 import type { KicadFootprintSummary } from "../types"
 
 const KICAD_MOD_CACHE_BASE_URL = "https://kicad-mod-cache.tscircuit.com"
 
-let footprintsCache: string[] | null = null
-let footprintsPromise: Promise<string[]> | null = null
-let fuse: Fuse<string> | null = null
+interface FootprintIndex {
+  footprints?: string[]
+  promise?: Promise<string[]>
+  fuse?: Fuse<string>
+}
+const indexes = new WeakMap<RunFrameRuntime, FootprintIndex>()
+const getIndex = (runtime: RunFrameRuntime) => {
+  let index = indexes.get(runtime)
+  if (!index) {
+    index = {}
+    indexes.set(runtime, index)
+  }
+  return index
+}
 
-const ensureFootprints = async (): Promise<string[]> => {
-  if (footprintsCache) return footprintsCache
-  if (footprintsPromise) return footprintsPromise
-
-  footprintsPromise = fetch(
-    "https://kicad-mod-cache.tscircuit.com/kicad_files.json",
-  )
-    .then((response) => response.json())
-    .then((footprints) => {
-      footprintsCache = footprints
-      footprintsPromise = null
+const ensureFootprints = async (
+  runtime: RunFrameRuntime,
+): Promise<string[]> => {
+  const index = getIndex(runtime)
+  if (index.footprints) return index.footprints
+  if (index.promise) return index.promise
+  index.promise = runtime
+    .fetch(`${KICAD_MOD_CACHE_BASE_URL}/kicad_files.json`)
+    .then(async (response) => {
+      if (!response.ok)
+        throw new Error(
+          `KiCad footprint index fetch failed: ${response.status}`,
+        )
+      const footprints: string[] = await response.json()
+      index.footprints = footprints
       return footprints
     })
-
-  return footprintsPromise
+    .finally(() => {
+      index.promise = undefined
+    })
+  return index.promise
 }
 
 export const searchKicadFootprints = async (
   query: string,
   limit = 20,
+  runtime = getDefaultRuntime(),
 ): Promise<string[]> => {
-  const footprints = await ensureFootprints()
-  if (!fuse) {
-    fuse = new Fuse(footprints)
-  }
-  return fuse
+  const footprints = await ensureFootprints(runtime)
+  const index = getIndex(runtime)
+  index.fuse ??= new Fuse(footprints)
+  return index.fuse
     .search(query)
     .slice(0, limit)
     .map((result) => result.item)
@@ -64,8 +82,9 @@ const encodeFootprintPath = (footprintPath: string) =>
 
 export const loadKicadFootprintCircuitJson = async (
   footprintPath: string,
+  runtime = getDefaultRuntime(),
 ): Promise<AnyCircuitElement[]> => {
-  const response = await fetch(
+  const response = await runtime.fetch(
     `${KICAD_MOD_CACHE_BASE_URL}/${encodeFootprintPath(footprintPath)}`,
   )
 
@@ -75,7 +94,7 @@ export const loadKicadFootprintCircuitJson = async (
 
   const footprintContent = await response.text()
   // Use the shared runtime importer so this converter loads correctly after deploy.
-  const { KicadFootprintToCircuitJsonConverter } = await importer(
+  const { KicadFootprintToCircuitJsonConverter } = await runtime.modules.load(
     "kicad-to-circuit-json",
   )
   const converter = new KicadFootprintToCircuitJsonConverter()

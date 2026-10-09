@@ -1,3 +1,4 @@
+import { useRunFrameRuntime } from "lib/runtime/context"
 import { useCallback, useState } from "react"
 import {
   mapJlcpcbComponentToSummary,
@@ -16,46 +17,54 @@ const normalizeQuery = (query: string) => {
 }
 
 export const useJlcpcbComponentSearch = () => {
+  const runtime = useRunFrameRuntime()
   const [results, setResults] = useState<JlcpcbComponentSearchResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [hasSearched, setHasSearched] = useState(false)
 
-  const search = useCallback(async (query: string) => {
-    const normalizedQuery = normalizeQuery(query)
-    if (!normalizedQuery) return []
+  const search = useCallback(
+    async (query: string) => {
+      const normalizedQuery = normalizeQuery(query)
+      if (!normalizedQuery) return []
 
-    setIsSearching(true)
-    setError(null)
+      setIsSearching(true)
+      setError(null)
 
-    try {
-      const components = await searchJlcpcbComponents(normalizedQuery, 10)
-      const mappedResults = addDirectJlcpcbLookupResult(
-        query,
-        components.map((component) => ({
-          source: "jlcpcb" as const,
-          component: mapJlcpcbComponentToSummary(component),
-        })),
-      )
-      setResults(mappedResults)
-      return mappedResults
-    } catch (error) {
-      console.error("Error searching JLCPCB components", error)
-      const directResults = addDirectJlcpcbLookupResult(query, [])
-      setResults(directResults)
-      setError(
-        directResults.length > 0
-          ? null
-          : error instanceof Error
-            ? error.message
-            : "Failed to search JLCPCB components",
-      )
-      return directResults
-    } finally {
-      setIsSearching(false)
-      setHasSearched(true)
-    }
-  }, [])
+      try {
+        const components = await searchJlcpcbComponents(
+          normalizedQuery,
+          10,
+          runtime,
+        )
+        const mappedResults = addDirectJlcpcbLookupResult(
+          query,
+          components.map((component) => ({
+            source: "jlcpcb" as const,
+            component: mapJlcpcbComponentToSummary(component),
+          })),
+        )
+        setResults(mappedResults)
+        return mappedResults
+      } catch (error) {
+        console.error("Error searching JLCPCB components", error)
+        const directResults = addDirectJlcpcbLookupResult(query, [])
+        setResults(directResults)
+        setError(
+          directResults.length > 0
+            ? null
+            : error instanceof Error
+              ? error.message
+              : "Failed to search JLCPCB components",
+        )
+        return directResults
+      } finally {
+        setIsSearching(false)
+        setHasSearched(true)
+      }
+    },
+    [runtime],
+  )
 
   const reset = useCallback(() => {
     setResults([])

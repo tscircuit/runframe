@@ -4,7 +4,7 @@ import { CircuitJsonFileSelectorCombobox } from "./CircuitJsonFileSelectorCombob
 import { useStyles } from "../../hooks/use-styles"
 import type { CircuitJson } from "circuit-json"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
-import { guessEntrypoint } from "lib/runner"
+import { guessEntrypoint } from "lib/components/RunFrameWithApi/RunFrameWithApi"
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary"
 import type { TabId } from "../CircuitJsonPreview/PreviewContentProps"
 import { useStaticCircuitJsonPathHash } from "./use-static-circuit-json-path-hash"

@@ -12,14 +12,16 @@
     "./preview": "./dist/preview.js",
     "./runner": "./dist/runner.js",
     "./standalone": "./dist/standalone.min.js",
-    "./standalone-preview": "./dist/standalone-preview.min.js"
+    "./standalone-preview": "./dist/standalone-preview.min.js",
+    "./offline": "./dist/offline.js",
+    "./standalone-offline": "./dist/standalone-offline.min.js"
   },
   "files": [
     "dist"
   ],
   "scripts": {
     "start": "bun run build:css && concurrently 'bun run cosmos' 'bun run build:css:watch'",
-    "build": "bun run build:css && bun run build:standalone && bun run build:standalone-preview && bun run build:lib",
+    "build": "bun run build:css && bun run build:standalone && bun run build:standalone-preview && bun run build:lib && bun run build:offline",
     "build:lib": "tsup-node lib/preview.ts lib/runner.ts --external react-query schematic-symbols lucide-react circuit-to-svg @tscircuit/props --platform browser --format esm --dts",
     "build:css": "bun run scripts/build-css.ts",
     "build:css:watch": "chokidar 'lib/components/**/*.tsx' -c 'bun run build:css'",
@@ -32,7 +34,11 @@
     "format": "biome format --write .",
     "vercel-build": "bun run build:css && cosmos-export",
     "serve:cosmos": "serve cosmos-export",
-    "pkg-pr-new-release": "bunx pkg-pr-new publish --comment=off --peerDeps"
+    "pkg-pr-new-release": "bunx pkg-pr-new publish --comment=off --peerDeps",
+    "build:offline": "bun run build:css && bun run build:standalone-offline && bun run build:lib-offline",
+    "build:standalone-offline": "NODE_OPTIONS=--max-old-space-size=8192 STANDALONE=offline vite build",
+    "build:lib-offline": "NODE_OPTIONS=--max-old-space-size=8192 STANDALONE=offline-library vite build && tsup-node --config tsup-offline.config.ts",
+    "test:offline-browser": "bun run scripts/check-offline-module-loading.ts"
   },
   "devDependencies": {
     "@babel/standalone": "^7.26.10",
@@ -121,7 +127,10 @@
     "vite": "^7.1.2",
     "yargs": "^17.7.2",
     "zod": "^3.25.76",
-    "bun-match-svg": "^0.0.17"
+    "bun-match-svg": "^0.0.17",
+    "circuit-json-to-fdm-component-box": "0.0.4",
+    "circuit-json-to-gltf": "0.0.102",
+    "kicad-to-circuit-json": "0.0.117"
   },
   "dependencies": {
     "@tscircuit/core": "^0.0.1911",
@@ -133,5 +142,9 @@
   "overrides": {
     "circuit-json": "$circuit-json",
     "altiumts": "0.0.59"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0 || ^19.0.0",
+    "react-dom": "^18.2.0 || ^19.0.0"
   }
 }

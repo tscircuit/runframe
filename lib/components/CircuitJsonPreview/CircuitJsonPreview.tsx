@@ -1,3 +1,4 @@
+import { useRunFrameRuntime, withRunFrameRuntime } from "lib/runtime/context"
 import {
   Tabs,
   TabsContent,
@@ -98,7 +99,7 @@ export type { AutoroutingPhase, AutoroutingPhaseEvent } from "lib/autorouting"
 const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "An unknown error occurred"
 
-export const CircuitJsonPreview = ({
+const CircuitJsonPreviewInner = ({
   code,
   fsMap,
   onRunClicked = undefined,
@@ -148,6 +149,7 @@ export const CircuitJsonPreview = ({
   autoroutingPhases,
   onPcbBoundsSelected,
 }: PreviewContentProps) => {
+  const runtime = useRunFrameRuntime()
   useStyles()
 
   const {
@@ -388,6 +390,7 @@ export const CircuitJsonPreview = ({
               </div>
             )}
             {showRightHeaderContent &&
+              runtime.mode === "online" &&
               shouldShowCrispFeedbackButton({ isCli }) && (
                 <CrispFeedbackButton />
               )}
@@ -979,3 +982,5 @@ export const CircuitJsonPreview = ({
     </div>
   )
 }
+
+export const CircuitJsonPreview = withRunFrameRuntime(CircuitJsonPreviewInner)

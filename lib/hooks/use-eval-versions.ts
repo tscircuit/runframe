@@ -1,8 +1,10 @@
+import { useRunFrameRuntime } from "lib/runtime/context"
 import { useEffect, useMemo, useState } from "react"
 import { useLocalStorageState } from "./use-local-storage-state"
 import { useRunnerStore } from "lib/components/RunFrame/runner-store/use-runner-store"
 
 export const useEvalVersions = (allowSelecting: boolean) => {
+  const runtime = useRunFrameRuntime()
   const [allVersions, setAllVersions] = useState<string[]>([])
   const [latest, setLatest] = useState<string | null>(null)
   const [search, setSearch] = useState("")
@@ -15,7 +17,7 @@ export const useEvalVersions = (allowSelecting: boolean) => {
   const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
 
   useEffect(() => {
-    if (!allowSelecting) return
+    if (!allowSelecting || runtime.mode === "offline") return
     fetch("https://data.jsdelivr.com/v1/package/npm/@tscircuit/eval")
       .then((res) => res.json())
       .then((data) => {
@@ -29,10 +31,10 @@ export const useEvalVersions = (allowSelecting: boolean) => {
         }
       })
       .catch(() => {})
-  }, [allowSelecting])
+  }, [allowSelecting, runtime])
 
   useEffect(() => {
-    if (!allowSelecting) return
+    if (!allowSelecting || runtime.mode === "offline") return
     if (selected) {
       window.TSCIRCUIT_LATEST_EVAL_VERSION = selected
       setLastRunEvalVersion(selected)
@@ -40,7 +42,7 @@ export const useEvalVersions = (allowSelecting: boolean) => {
       window.TSCIRCUIT_LATEST_EVAL_VERSION = latest
       setLastRunEvalVersion(latest)
     }
-  }, [allowSelecting, selected, latest])
+  }, [allowSelecting, selected, latest, runtime])
 
   const filtered = useMemo(
     () => allVersions.filter((v) => v.includes(search)).slice(0, 50),
@@ -48,13 +50,20 @@ export const useEvalVersions = (allowSelecting: boolean) => {
   )
 
   const selectVersion = (v: string | null) => {
+    if (runtime.mode === "offline") return
     setSelected(v)
     setSearch("")
   }
 
   return {
-    versions: filtered,
-    latestVersion: latest,
+    versions:
+      runtime.mode === "offline"
+        ? runtime.evalVersion
+          ? [runtime.evalVersion]
+          : []
+        : filtered,
+    latestVersion:
+      runtime.mode === "offline" ? (runtime.evalVersion ?? null) : latest,
     lastRunEvalVersion,
     search,
     setSearch,

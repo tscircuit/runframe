@@ -30,6 +30,6 @@ test("UI settings do not cross the worker boundary; circuit hooks retain identit
 
 test("RunFrame and its preview consume one platform config", async () => {
   await runIsolatedUiTest(
-    new URL("./fixtures/platform-config.fixture.tsx", import.meta.url),
+    new URL("./fixtures/platform-config.tsx", import.meta.url),
   )
 }, 20000)

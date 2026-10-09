@@ -5,10 +5,7 @@ test(
   "RunFrame preserves its worker lifecycle across initialization, failures and static files",
   () =>
     runIsolatedUiTest(
-      new URL(
-        "./fixtures/runframe-worker-lifecycle.fixture.tsx",
-        import.meta.url,
-      ),
+      new URL("./fixtures/runframe-worker-lifecycle.tsx", import.meta.url),
     ),
   { timeout: 30000 },
 )

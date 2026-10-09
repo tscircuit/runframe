@@ -33,6 +33,7 @@ import {
 import type { ManualEditEvent } from "@tscircuit/props"
 import type { RenderLog } from "lib/render-logging/RenderLog"
 import { getPhaseTimingsFromRenderEvents } from "lib/render-logging/getPhaseTimingsFromRenderEvents"
+import { isCircuitJsonFile } from "lib/utils/file-filters"
 import { useCircuitJsonFile } from "../../hooks/use-circuit-json-file"
 import { usePostHogActivity } from "../../hooks/use-posthog-activity"
 import { useStyles } from "../../hooks/use-styles"
@@ -103,6 +104,10 @@ export type { RunFrameProps }
 export const RunFrame = (props: RunFrameProps) => {
   useStyles()
 
+  const isStaticCircuitJson =
+    props.mainComponentPath != null &&
+    isCircuitJsonFile(props.mainComponentPath)
+
   const circuitJson = useRunFrameStore((s) => s.circuitJson)
   const setCircuitJson = useRunFrameStore((s) => s.setCircuitJson)
   const [error, setError] = useState<{
@@ -147,6 +152,7 @@ export const RunFrame = (props: RunFrameProps) => {
   }
 
   useEffect(() => {
+    if (isStaticCircuitJson) return
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter" && !isRunning) {
         e.preventDefault()
@@ -157,9 +163,10 @@ export const RunFrame = (props: RunFrameProps) => {
     window.addEventListener("keydown", handleKeyDown, { capture: true })
     return () =>
       window.removeEventListener("keydown", handleKeyDown, { capture: true })
-  }, [isRunning])
+  }, [isRunning, isStaticCircuitJson])
 
   useEffect(() => {
+    if (isStaticCircuitJson) return
     let cancelled = false
     const load = async () => {
       try {
@@ -207,6 +214,7 @@ export const RunFrame = (props: RunFrameProps) => {
       cancelled = true
     }
   }, [
+    isStaticCircuitJson,
     props.evalVersion,
     props.evalWebWorkerBlobUrl,
     props.forceLatestEvalVersion,
@@ -242,8 +250,8 @@ export const RunFrame = (props: RunFrameProps) => {
         )
   const lastFsMapRef = useRef<Map<string, string> | null>(null)
   const lastEntrypointRef = useRef<string | null>(null)
+  const lastStaticResultRef = useRef<unknown>(null)
   const {
-    isStaticCircuitJson,
     circuitJson: circuitJsonFileParsedContent,
     error: circuitJsonFileError,
   } = useCircuitJsonFile({
@@ -253,15 +261,38 @@ export const RunFrame = (props: RunFrameProps) => {
 
   // Sync circuit.json file to store when detected
   useEffect(() => {
-    if (!isStaticCircuitJson) return
+    if (!isStaticCircuitJson) {
+      lastStaticResultRef.current = null
+      return
+    }
+    if (props.isLoadingFiles) return
+    const result = circuitJsonFileParsedContent ?? circuitJsonFileError
+    if (result === lastStaticResultRef.current) return
+    lastStaticResultRef.current = result
 
     if (circuitJsonFileParsedContent) {
+      props.onRenderStarted?.()
       setCircuitJson(circuitJsonFileParsedContent)
       setError(null)
+      props.onCircuitJsonChange?.(circuitJsonFileParsedContent)
+      props.onInitialRender?.({ circuitJson: circuitJsonFileParsedContent })
+      emitRunCompleted(
+        buildRunCompletedPayload({ circuitJson: circuitJsonFileParsedContent }),
+      )
+      props.onRenderFinished?.({ circuitJson: circuitJsonFileParsedContent })
     } else if (circuitJsonFileError) {
+      setCircuitJson(null)
       setError({ error: circuitJsonFileError, stack: "" })
+      const error = new Error(circuitJsonFileError)
+      props.onError?.(error)
+      emitRunCompleted(buildRunCompletedPayload({ executionError: error }))
     }
-  }, [isStaticCircuitJson, circuitJsonFileParsedContent, circuitJsonFileError])
+  }, [
+    isStaticCircuitJson,
+    circuitJsonFileParsedContent,
+    circuitJsonFileError,
+    props.isLoadingFiles,
+  ])
 
   useEffect(() => {
     if (props.isLoadingFiles) return

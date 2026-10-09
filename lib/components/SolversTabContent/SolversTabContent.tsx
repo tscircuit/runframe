@@ -3,7 +3,7 @@ import { GenericSolverDebugger } from "@tscircuit/solver-utils/react"
 import { Box, BugIcon, DownloadIcon, LayoutGrid, Route } from "lucide-react"
 import { useMemo, useState } from "react"
 import { ErrorBoundary } from "react-error-boundary"
-import { useInjectTailwind } from "../../hooks/useInjectTailwind"
+import { useSolverDebuggerStyles } from "../../hooks/use-solver-debugger-styles"
 import { openForDownload } from "../../optional-features/exporting/open-for-download"
 import { sanitizeFileName } from "../../utils/sanitizeFileName"
 import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentProps"
@@ -169,7 +169,7 @@ export const SolversTabContent = ({
 }: SolversTabContentProps) => {
   const [selectedSolverId, setSelectedSolverId] = useState<string | null>(null)
 
-  useInjectTailwind()
+  useSolverDebuggerStyles()
 
   const solversById = useMemo(() => {
     const map = new Map<string, SolverStartedEvent>()
@@ -238,7 +238,7 @@ export const SolversTabContent = ({
   }
 
   return (
-    <div className="rf-flex rf-h-full rf-overflow-hidden">
+    <div className="rf-solver-debugger rf-flex rf-h-full rf-overflow-hidden">
       {/* Solver List Sidebar */}
       <div className="rf-w-64 rf-border-r rf-border-gray-200 rf-overflow-y-auto rf-flex-shrink-0">
         <div className="rf-text-xs rf-font-semibold rf-text-gray-500 rf-px-3 rf-py-2 rf-bg-gray-50 rf-border-b rf-border-gray-200">

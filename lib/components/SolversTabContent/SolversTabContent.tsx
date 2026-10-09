@@ -3,7 +3,6 @@ import { GenericSolverDebugger } from "@tscircuit/solver-utils/react"
 import { Box, BugIcon, DownloadIcon, LayoutGrid, Route } from "lucide-react"
 import { useMemo, useState } from "react"
 import { ErrorBoundary } from "react-error-boundary"
-import { useInjectTailwind } from "../../hooks/useInjectTailwind"
 import { openForDownload } from "../../optional-features/exporting/open-for-download"
 import { sanitizeFileName } from "../../utils/sanitizeFileName"
 import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentProps"
@@ -168,8 +167,6 @@ export const SolversTabContent = ({
   solverEvents = [],
 }: SolversTabContentProps) => {
   const [selectedSolverId, setSelectedSolverId] = useState<string | null>(null)
-
-  useInjectTailwind()
 
   const solversById = useMemo(() => {
     const map = new Map<string, SolverStartedEvent>()

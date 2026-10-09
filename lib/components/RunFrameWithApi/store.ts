@@ -113,7 +113,7 @@ export const useRunFrameStore = create<RunFrameState>()(
         }
       },
 
-      setCircuitJson: (circuitJson: CircuitJson) => {
+      setCircuitJson: (circuitJson: CircuitJson | null) => {
         if (circuitJson === get().circuitJson) return
         set({ circuitJson })
       },

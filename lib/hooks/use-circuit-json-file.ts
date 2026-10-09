@@ -21,15 +21,16 @@ export const useCircuitJsonFile = ({
   mainComponentPath,
   fsMap,
 }: UseCircuitJsonFileOptions): UseCircuitJsonFileResult => {
+  const isStaticCircuitJson =
+    mainComponentPath != null && isCircuitJsonFile(mainComponentPath)
+  const circuitJsonContent = mainComponentPath
+    ? fsMap.get(mainComponentPath)
+    : undefined
   return useMemo(() => {
-    const isStaticCircuitJson =
-      mainComponentPath != null && isCircuitJsonFile(mainComponentPath)
-
     if (!isStaticCircuitJson) {
       return { isStaticCircuitJson: false, circuitJson: null, error: null }
     }
 
-    const circuitJsonContent = fsMap.get(mainComponentPath!)
     if (!circuitJsonContent) {
       return {
         isStaticCircuitJson: true,
@@ -48,5 +49,5 @@ export const useCircuitJsonFile = ({
         error: `Failed to parse circuit.json: ${e instanceof Error ? e.message : String(e)}`,
       }
     }
-  }, [mainComponentPath, fsMap])
+  }, [mainComponentPath, circuitJsonContent])
 }

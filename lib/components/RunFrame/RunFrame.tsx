@@ -3,7 +3,7 @@ import { createCircuitWebWorker } from "@tscircuit/eval/worker"
 import Debug from "debug"
 import { HTTPError } from "ky"
 import { Loader2, Play, Square } from "lucide-react"
-import { useEffect, useReducer, useRef, useState } from "react"
+import { useEffect, useMemo, useReducer, useRef, useState } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 import {
   CircuitJsonPreview,
@@ -104,6 +104,25 @@ export type { RunFrameProps }
 export const RunFrame = (props: RunFrameProps) => {
   useStyles()
 
+  const fsMap = useMemo(
+    () =>
+      props.fsMap instanceof Map
+        ? props.fsMap
+        : new Map(Object.entries(props.fsMap ?? {})),
+    [props.fsMap],
+  )
+  const lastFsMapRef = useRef<Map<string, string> | null>(null)
+  const lastEntrypointRef = useRef<string | null>(null)
+  const lastStaticResultRef = useRef<unknown>(null)
+  const {
+    isStaticCircuitJson,
+    circuitJson: circuitJsonFileParsedContent,
+    error: circuitJsonFileError,
+  } = useCircuitJsonFile({
+    mainComponentPath: props.mainComponentPath,
+    fsMap,
+  })
+
   const circuitJson = useRunFrameStore((s) => s.circuitJson)
   const setCircuitJson = useRunFrameStore((s) => s.setCircuitJson)
   const [error, setError] = useState<{
@@ -114,6 +133,11 @@ export const RunFrame = (props: RunFrameProps) => {
   } | null>(null)
   const [componentStack, setComponentStack] = useState<string | null>(null)
   const cancelExecutionRef = useRef<(() => void) | null>(null)
+  const componentActiveRef = useRef(true)
+  const workerCreationRef = useRef<Promise<{
+    worker: Awaited<ReturnType<typeof createCircuitWebWorker>>
+    evalVersion: string
+  }> | null>(null)
   const [autoroutingGraphics, setAutoroutingGraphics] = useState<any>(null)
   const [runCountTrigger, incRunCountTrigger] = useReducer(
     (acc: number, s: number) => acc + 1,
@@ -148,6 +172,7 @@ export const RunFrame = (props: RunFrameProps) => {
   }
 
   useEffect(() => {
+    if (isStaticCircuitJson) return
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter" && !isRunning) {
         e.preventDefault()
@@ -158,53 +183,93 @@ export const RunFrame = (props: RunFrameProps) => {
     window.addEventListener("keydown", handleKeyDown, { capture: true })
     return () =>
       window.removeEventListener("keydown", handleKeyDown, { capture: true })
-  }, [isRunning])
+  }, [isRunning, isStaticCircuitJson])
 
   useEffect(() => {
+    componentActiveRef.current = true
+    return () => {
+      componentActiveRef.current = false
+      cancelExecutionRef.current?.()
+      const pending = workerCreationRef.current
+      void pending
+        ?.then(({ worker }) => {
+          // An unpublished worker created after unmount has no future owner.
+          if (
+            !componentActiveRef.current &&
+            globalThis.runFrameWorker !== worker
+          ) {
+            return worker.kill()
+          }
+        })
+        .catch(() => {})
+    }
+  }, [])
+
+  const getWorker = (): NonNullable<typeof workerCreationRef.current> => {
+    if (workerCreationRef.current) return workerCreationRef.current
+    const pending = (async () => {
+      const evalVersion = await resolveEvalVersion(
+        props.evalVersion,
+        !globalThis.runFrameWorker && props.forceLatestEvalVersion,
+      )
+      // Resolve once for both preload and execution, then recheck the cache.
+      const worker =
+        globalThis.runFrameWorker ??
+        (await createCircuitWebWorker({
+          evalVersion,
+          webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
+          projectConfig: getRunFrameProjectConfig({
+            enablePartOrientationAnalysis:
+              props.platformConfig?.enablePartOrientationAnalysis,
+            projectBaseUrl:
+              props.projectBaseUrl ??
+              props.platformConfig?.projectBaseUrl ??
+              `${API_BASE}/files/static`,
+          }),
+          ...(props.platformConfig && {
+            platform: getCircuitPlatformConfig(props.platformConfig),
+          }),
+          verbose: true,
+          ...(props.enableFetchProxy && {
+            enableFetchProxy: props.enableFetchProxy,
+          }),
+          disableCdnLoading:
+            props.platformConfig?.evalCdnLoadingDisabled ??
+            window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI,
+          ...(props.tscircuitSessionToken && {
+            tscircuitSessionToken: props.tscircuitSessionToken,
+          }),
+          ...(props.easyEdaProxyConfig && {
+            easyEdaProxyConfig: props.easyEdaProxyConfig,
+          }),
+        }))
+      return { worker, evalVersion }
+    })()
+    workerCreationRef.current = pending
+    const clearPending = () => {
+      if (workerCreationRef.current === pending)
+        workerCreationRef.current = null
+    }
+    void pending.then(clearPending, clearPending)
+    return pending
+  }
+
+  useEffect(() => {
+    if (isStaticCircuitJson) return
     let cancelled = false
     const load = async () => {
       try {
         if (!globalThis.runFrameWorker) {
-          const evalVersion = await resolveEvalVersion(
-            props.evalVersion,
-            props.forceLatestEvalVersion,
-          )
-
-          const worker = await createCircuitWebWorker({
-            evalVersion,
-            webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
-            projectConfig: getRunFrameProjectConfig({
-              enablePartOrientationAnalysis:
-                props.platformConfig?.enablePartOrientationAnalysis,
-              projectBaseUrl:
-                props.projectBaseUrl ??
-                props.platformConfig?.projectBaseUrl ??
-                `${API_BASE}/files/static`,
-            }),
-            ...(props.platformConfig && {
-              platform: getCircuitPlatformConfig(props.platformConfig),
-            }),
-            verbose: true,
-            ...(props.enableFetchProxy && {
-              enableFetchProxy: props.enableFetchProxy,
-            }),
-            disableCdnLoading:
-              props.platformConfig?.evalCdnLoadingDisabled ??
-              window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI,
-            ...(props.tscircuitSessionToken && {
-              tscircuitSessionToken: props.tscircuitSessionToken,
-            }),
-            ...(props.easyEdaProxyConfig && {
-              easyEdaProxyConfig: props.easyEdaProxyConfig,
-            }),
-          })
-          if (cancelled) return
+          const { worker, evalVersion } = await getWorker()
+          if (cancelled || !componentActiveRef.current) return
           globalThis.runFrameWorker = worker
           setLastRunEvalVersion(evalVersion)
         }
         if (!cancelled) setDependenciesLoaded(true)
       } catch (err) {
-        console.error("Failed to preload eval worker", err)
+        if (!cancelled && componentActiveRef.current) {
+          console.error("Failed to preload eval worker", err)
+        }
       }
     }
     load()
@@ -212,6 +277,7 @@ export const RunFrame = (props: RunFrameProps) => {
       cancelled = true
     }
   }, [
+    isStaticCircuitJson,
     props.evalVersion,
     props.evalWebWorkerBlobUrl,
     props.forceLatestEvalVersion,
@@ -240,40 +306,50 @@ export const RunFrame = (props: RunFrameProps) => {
     if (props.debug) Debug.enable("run-frame*")
   }, [props.debug])
 
-  const fsMap =
-    props.fsMap instanceof Map
-      ? props.fsMap
-      : Object.entries(props.fsMap ?? {}).reduce(
-          (m, [k, v]) => m.set(k, v),
-          new Map(),
-        )
-  const lastFsMapRef = useRef<Map<string, string> | null>(null)
-  const lastEntrypointRef = useRef<string | null>(null)
-  const {
-    isStaticCircuitJson,
-    circuitJson: circuitJsonFileParsedContent,
-    error: circuitJsonFileError,
-  } = useCircuitJsonFile({
-    mainComponentPath: props.mainComponentPath,
-    fsMap,
-  })
-
   // Sync circuit.json file to store when detected
   useEffect(() => {
-    if (!isStaticCircuitJson) return
+    if (!isStaticCircuitJson) {
+      lastStaticResultRef.current = null
+      return
+    }
+    if (props.isLoadingFiles) return
+    const result = circuitJsonFileParsedContent ?? circuitJsonFileError
+    if (result === lastStaticResultRef.current) return
+    lastStaticResultRef.current = result
 
     if (circuitJsonFileParsedContent) {
+      props.onRenderStarted?.()
       setCircuitJson(circuitJsonFileParsedContent)
       setError(null)
+      props.onCircuitJsonChange?.(circuitJsonFileParsedContent)
+      props.onInitialRender?.({ circuitJson: circuitJsonFileParsedContent })
+      emitRunCompleted(
+        buildRunCompletedPayload({ circuitJson: circuitJsonFileParsedContent }),
+      )
+      props.onRenderFinished?.({ circuitJson: circuitJsonFileParsedContent })
     } else if (circuitJsonFileError) {
+      setCircuitJson(null)
       setError({ error: circuitJsonFileError, stack: "" })
+      const error = new Error(circuitJsonFileError)
+      props.onError?.(error)
+      emitRunCompleted(buildRunCompletedPayload({ executionError: error }))
     }
-  }, [isStaticCircuitJson, circuitJsonFileParsedContent, circuitJsonFileError])
+  }, [
+    isStaticCircuitJson,
+    circuitJsonFileParsedContent,
+    circuitJsonFileError,
+    props.isLoadingFiles,
+  ])
 
   useEffect(() => {
-    if (props.isLoadingFiles) return
-
-    if (isStaticCircuitJson) return
+    if (isStaticCircuitJson || props.isLoadingFiles) {
+      cancelExecutionRef.current?.()
+      cancelExecutionRef.current = null
+      setIsRunning(false)
+      setActiveAsyncEffects({})
+      if (props.isLoadingFiles) setCircuitJson(null)
+      return
+    }
 
     // Convert fsMap to object for consistent handling
     const fsMapObj =
@@ -281,6 +357,7 @@ export const RunFrame = (props: RunFrameProps) => {
 
     // Check if no files are provided
     if (!fsMapObj || Object.keys(fsMapObj).length === 0) {
+      setCircuitJson(null)
       setError({
         error:
           "No files provided. Please provide at least one file with code to execute.",
@@ -317,64 +394,42 @@ export const RunFrame = (props: RunFrameProps) => {
     lastRunCountTriggerRef.current = runCountTrigger
     setIsRunning(true)
 
+    let cancelled = false
+    const captureGeneration = ++autoroutingCaptureGeneration.current
+    const isCurrentRun = () =>
+      componentActiveRef.current &&
+      !cancelled &&
+      captureGeneration === autoroutingCaptureGeneration.current
+
+    let renderResult:
+      | Promise<{ success: true } | { success: false; error: unknown }>
+      | undefined
     const runWorker = async () => {
+      if (!isCurrentRun()) return
       debug("running render worker")
       setError(null)
       setRenderLog(null)
       setActiveAsyncEffects({})
       setSolverEvents([])
       setAutoroutingPhases([])
-      const captureGeneration = ++autoroutingCaptureGeneration.current
       const renderLog: RenderLog = { progress: 0, debugOutputs: [] }
-      let cancelled = false
 
       // Store cleanup function in ref to be called when execution is stopped
       cancelExecutionRef.current = () => {
         cancelled = true
       }
 
-      const resolvedEvalVersion = await resolveEvalVersion(
-        props.evalVersion,
-        !globalThis.runFrameWorker && props.forceLatestEvalVersion,
-      )
+      const { worker, evalVersion: resolvedEvalVersion } = await getWorker()
+      if (!isCurrentRun()) return
       debug("resolvedEvalVersion", resolvedEvalVersion)
 
-      const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
-        globalThis.runFrameWorker ??
-        (await createCircuitWebWorker({
-          evalVersion: resolvedEvalVersion,
-          webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
-          verbose: true,
-          projectConfig: getRunFrameProjectConfig({
-            enablePartOrientationAnalysis:
-              props.platformConfig?.enablePartOrientationAnalysis,
-            projectBaseUrl:
-              props.projectBaseUrl ??
-              props.platformConfig?.projectBaseUrl ??
-              `${API_BASE}/files/static`,
-          }),
-          ...(props.platformConfig && {
-            platform: getCircuitPlatformConfig(props.platformConfig),
-          }),
-          ...(props.enableFetchProxy && {
-            enableFetchProxy: props.enableFetchProxy,
-          }),
-          disableCdnLoading:
-            props.platformConfig?.evalCdnLoadingDisabled ??
-            window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI,
-          ...(props.tscircuitSessionToken && {
-            tscircuitSessionToken: props.tscircuitSessionToken,
-          }),
-          ...(props.easyEdaProxyConfig && {
-            easyEdaProxyConfig: props.easyEdaProxyConfig,
-          }),
-        }))
       globalThis.runFrameWorker = worker
       setLastRunEvalVersion(resolvedEvalVersion)
 
       // The worker is reused between runs. Replace the prior subscriptions so
       // old listeners do not keep transferring full SRJ captures over Comlink.
       await worker.clearEventListeners()
+      if (!isCurrentRun()) return
 
       // Enable debug mode if a debug option is set
       if (currentDebugOption?.trim()) {
@@ -495,58 +550,40 @@ export const RunFrame = (props: RunFrameProps) => {
       })
 
       debug("Executing fsMap...")
-      const evalResult = await worker
-        .executeWithFsMap({
-          entrypoint: props.entrypoint,
-          fsMap: fsMapObj,
-          ...(props.mainComponentPath
-            ? { mainComponentPath: props.mainComponentPath }
-            : {}),
-        })
-        .then(() => {
-          return { success: true }
-        })
-        .catch((e: any) => {
-          // removing the prefix "Eval compiled js error for "./main.tsx":"
-          const message: string = e.message.replace("Error: ", "")
-          debug(`eval error: ${message}`)
-          props.onError?.(e)
-          emitRunCompleted(buildRunCompletedPayload({ executionError: e }))
-          setError({ error: message, stack: e.stack })
-          setRenderLog(null)
-          console.error(e)
-          return { success: false }
-        })
+      await worker.executeWithFsMap({
+        entrypoint: props.entrypoint,
+        fsMap: fsMapObj,
+        ...(props.mainComponentPath
+          ? { mainComponentPath: props.mainComponentPath }
+          : {}),
+      })
+      if (!isCurrentRun()) return
       debug("worker call started")
-      if (!evalResult.success) {
-        setIsRunning(false)
-        setActiveAsyncEffects({})
-        return
-      }
 
-      const $renderResult = worker.renderUntilSettled()
+      // Observe settlement immediately: it can reject while the initial JSON
+      // request is still pending, or after that request fails.
+      const settlement = worker.renderUntilSettled().then(
+        () => ({ success: true as const }),
+        (error: unknown) => ({ success: false as const, error }),
+      )
+      renderResult = settlement
 
       debug("waiting for initial circuit json...")
-      let circuitJson = await worker.getCircuitJson().catch((e: any) => {
-        debug("error getting initial circuit json", e)
-        props.onError?.(e)
-        emitRunCompleted(buildRunCompletedPayload({ executionError: e }))
-        setError({ error: e.message, stack: e.stack })
-        setRenderLog(null)
-        setIsRunning(false)
-        setActiveAsyncEffects({})
-        return null
-      })
-      if (!circuitJson) return
+      let circuitJson = await worker.getCircuitJson()
+      if (!isCurrentRun()) return
+      if (!circuitJson) throw new Error("Eval worker returned no Circuit JSON")
       debug("got initial circuit json")
       setCircuitJson(circuitJson)
       props.onCircuitJsonChange?.(circuitJson)
       props.onInitialRender?.({ circuitJson })
 
-      await $renderResult
+      const settled = await settlement
+      if (!isCurrentRun()) return
+      if (!settled.success) throw settled.error
 
       debug("getting final circuit json")
       circuitJson = await worker.getCircuitJson()
+      if (!isCurrentRun()) return
       props.onCircuitJsonChange?.(circuitJson)
       setCircuitJson(circuitJson)
       emitRunCompleted(buildRunCompletedPayload({ circuitJson }))
@@ -568,7 +605,34 @@ export const RunFrame = (props: RunFrameProps) => {
       setCurrentDebugOption("") // Clear debug option after render completes
       cancelExecutionRef.current = null
     }
-    runMutex.runWithMutex(runWorker)
+    void runMutex
+      .runWithMutex(async () => {
+        try {
+          await runWorker()
+        } finally {
+          // Reuse the worker only after a started render has settled, including
+          // when its initial snapshot fails or its generation is superseded.
+          await renderResult
+        }
+      })
+      .catch((failure: unknown) => {
+        if (!isCurrentRun()) return
+        const error =
+          failure instanceof Error ? failure : new Error(String(failure))
+        debug("worker execution failed", error)
+        props.onError?.(error)
+        emitRunCompleted(buildRunCompletedPayload({ executionError: error }))
+        setCircuitJson(null)
+        setError({
+          error: error.message.replace("Error: ", ""),
+          stack: error.stack,
+        })
+        setRenderLog(null)
+        setIsRunning(false)
+        setActiveAsyncEffects({})
+        setCurrentDebugOption("")
+        cancelExecutionRef.current = null
+      })
   }, [
     props.fsMap,
     props.entrypoint,
@@ -696,7 +760,7 @@ export const RunFrame = (props: RunFrameProps) => {
     >
       <CircuitJsonPreview
         platformConfig={props.platformConfig}
-        code={fsMap.get(props.entrypoint ?? props.mainComponentPath)}
+        code={fsMap.get(props.entrypoint ?? props.mainComponentPath ?? "")}
         fsMap={fsMap}
         defaultActiveTab={props.defaultActiveTab ?? props.defaultTab}
         defaultTab={props.defaultTab}

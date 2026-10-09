@@ -1,3 +1,5 @@
+import type { RunFrameRuntimeProps } from "lib/runtime/types"
+import { useRunFrameRuntime, withRunFrameRuntime } from "lib/runtime/context"
 import { applyEditEventsToManualEditsFile } from "@tscircuit/core"
 import type { ManualEditsFile } from "@tscircuit/props"
 import Debug from "debug"
@@ -70,7 +72,7 @@ export const guessManualEditsFilePath = (files: string[]) =>
   files.find((file) => file.includes("manual-edit.")) ??
   files.find((file) => file.endsWith(".json"))
 
-export interface RunFrameWithApiProps {
+export interface RunFrameWithApiProps extends RunFrameRuntimeProps {
   /**
    * Base URL for the API endpoints
    */
@@ -114,7 +116,7 @@ export interface RunFrameWithApiProps {
   onLoginRequired?: () => void
 }
 
-export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
+const RunFrameWithApiInner = (props: RunFrameWithApiProps) => {
   const { apiBaseUrl, leftHeaderContent } = props
   useEffect(() => {
     if (props.debug) Debug.enable("run-frame*")
@@ -392,3 +394,5 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     />
   )
 }
+
+export const RunFrameWithApi = withRunFrameRuntime(RunFrameWithApiInner)

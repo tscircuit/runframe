@@ -1,5 +1,5 @@
 import { useRunFrameStore } from "lib/components/RunFrameWithApi/store"
-import { guessEntrypoint } from "lib/runner"
+import { guessEntrypoint } from "lib/components/RunFrameWithApi/RunFrameWithApi"
 import { useEffect } from "react"
 
 export const useSyncPageTitle = () => {

@@ -1,3 +1,5 @@
+import type { RunFrameRuntimeProps } from "lib/runtime/types"
+import { useRunFrameRuntime, withRunFrameRuntime } from "lib/runtime/context"
 import { useLocalStorageState } from "lib/hooks/use-local-storage-state"
 import { useCallback, useMemo, useState } from "react"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
@@ -9,7 +11,7 @@ import { API_BASE } from "../RunFrameWithApi/api-base"
 import { useLoginDialog } from "./LoginDialog"
 import { createCliLocalCacheEngine } from "./create-cli-local-cache-engine"
 
-export interface RunFrameForCliProps {
+export interface RunFrameForCliProps extends RunFrameRuntimeProps {
   debug?: boolean
   scenarioSelectorContent?: React.ReactNode
   workerBlobUrl?: string
@@ -19,7 +21,8 @@ export interface RunFrameForCliProps {
   platformConfig?: RunFrameWithApiProps["platformConfig"]
 }
 
-export const RunFrameForCli = (props: RunFrameForCliProps) => {
+const RunFrameForCliInner = (props: RunFrameForCliProps) => {
+  const runtime = useRunFrameRuntime()
   const [shouldLoadLatestEval, setLoadLatestEval] = useLocalStorageState(
     "load-latest-eval",
     true,
@@ -60,7 +63,11 @@ export const RunFrameForCli = (props: RunFrameForCliProps) => {
       {LoginDialog}
       <RunFrameWithApi
         debug={props.debug}
-        forceLatestEvalVersion={!evalWebWorkerBlobUrl && shouldLoadLatestEval}
+        forceLatestEvalVersion={
+          runtime.mode === "online" &&
+          !evalWebWorkerBlobUrl &&
+          shouldLoadLatestEval
+        }
         defaultToFullScreen={true}
         showToggleFullScreen={false}
         evalWebWorkerBlobUrl={evalWebWorkerBlobUrl}
@@ -72,10 +79,13 @@ export const RunFrameForCli = (props: RunFrameForCliProps) => {
         initialMainComponentPath={initialMainComponentPath}
         onLoginRequired={openLoginDialog}
         onMainComponentPathChange={updateMainComponentHash}
-        shouldLoadLatestEval={!evalWebWorkerBlobUrl && shouldLoadLatestEval}
+        shouldLoadLatestEval={
+          runtime.mode === "online" &&
+          !evalWebWorkerBlobUrl &&
+          shouldLoadLatestEval
+        }
         onChangeShouldLoadLatestEval={(newShouldLoadLatestEval) => {
           setLoadLatestEval(newShouldLoadLatestEval)
-          globalThis.runFrameWorker = null
         }}
         leftHeaderContent={
           <div className="rf-flex rf-items-center rf-justify-between">
@@ -86,3 +96,5 @@ export const RunFrameForCli = (props: RunFrameForCliProps) => {
     </>
   )
 }
+
+export const RunFrameForCli = withRunFrameRuntime(RunFrameForCliInner)

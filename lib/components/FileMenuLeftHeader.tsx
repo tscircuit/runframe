@@ -1,3 +1,4 @@
+import { useRunFrameRuntime } from "lib/runtime/context"
 import { useEffect, useMemo, useState } from "react"
 import { useRunFrameStore } from "./RunFrameWithApi/store"
 import type {
@@ -65,6 +66,7 @@ export const FileMenuLeftHeader = (props: {
   >
   onReportAutoroutingLog?: (key: string, data: { simpleRouteJson: any }) => void
 }) => {
+  const runtime = useRunFrameRuntime()
   const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
   const currentMainComponentPath = useRunFrameStore(
     (s) => s.currentMainComponentPath,
@@ -201,6 +203,7 @@ export const FileMenuLeftHeader = (props: {
     if (!pendingLbrnExport) return
 
     await exportLbrn({
+      runtime,
       circuitJson: pendingLbrnExport.circuitJson,
       projectName: pendingLbrnExport.projectName,
       options,
@@ -231,6 +234,7 @@ export const FileMenuLeftHeader = (props: {
     }
 
     exportAndDownload({
+      runtime,
       exportName,
       circuitJson,
       simpleRouteJson,
@@ -249,7 +253,7 @@ export const FileMenuLeftHeader = (props: {
           </DropdownMenuTrigger>
           <DropdownMenuContent className="rf-z-[101]">
             {/* CLI-only menu items */}
-            {!props.isWebEmbedded && (
+            {!props.isWebEmbedded && runtime.mode === "online" && (
               <>
                 <DropdownMenuItem
                   className="rf-text-xs"
@@ -294,18 +298,20 @@ export const FileMenuLeftHeader = (props: {
               </>
             )}
 
-            {!props.isWebEmbedded && props.onLoginRequired && (
-              <DropdownMenuItem
-                className="rf-text-xs"
-                onSelect={() => {
-                  props.onLoginRequired?.()
-                }}
-              >
-                Sign In
-              </DropdownMenuItem>
-            )}
+            {!props.isWebEmbedded &&
+              runtime.mode === "online" &&
+              props.onLoginRequired && (
+                <DropdownMenuItem
+                  className="rf-text-xs"
+                  onSelect={() => {
+                    props.onLoginRequired?.()
+                  }}
+                >
+                  Sign In
+                </DropdownMenuItem>
+              )}
 
-            {!props.isWebEmbedded && (
+            {!props.isWebEmbedded && runtime.mode === "online" && (
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className="rf-text-xs">
                   Report Bug
@@ -402,6 +408,7 @@ export const FileMenuLeftHeader = (props: {
                       <div className="rf-flex rf-items-center rf-gap-2">
                         <Checkbox
                           id="load-latest-eval"
+                          disabled={runtime.mode === "offline"}
                           checked={props.shouldLoadLatestEval}
                           onCheckedChange={(checked) => {
                             props.onChangeShouldLoadLatestEval?.(

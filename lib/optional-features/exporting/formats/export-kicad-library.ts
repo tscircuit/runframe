@@ -1,4 +1,5 @@
-import importer from "@tscircuit/internal-dynamic-import"
+import { getDefaultRuntime } from "lib/runtime/default-runtime"
+import type { RunFrameRuntime } from "lib/runtime/types"
 import type { CircuitJson } from "circuit-json"
 import JSZip from "jszip"
 import { toast } from "lib/utils/toast"
@@ -7,11 +8,13 @@ import { openForDownload } from "../open-for-download"
 export const createKicadLibraryZip = async ({
   circuitJson,
   libraryName,
+  runtime = getDefaultRuntime(),
 }: {
   circuitJson: CircuitJson
   libraryName: string
+  runtime?: RunFrameRuntime
 }) => {
-  const { CircuitJsonToKicadLibraryConverter } = await importer(
+  const { CircuitJsonToKicadLibraryConverter } = await runtime.modules.load(
     "circuit-json-to-kicad",
   )
   const libConverter = new CircuitJsonToKicadLibraryConverter(
@@ -47,7 +50,7 @@ export const createKicadLibraryZip = async ({
       for (const modelPath of libOutput.model3dSourcePaths) {
         try {
           const filename = modelPath.split("/").pop() || modelPath
-          const response = await fetch(modelPath)
+          const response = await runtime.fetch(modelPath)
           if (response.ok) {
             const arrayBuffer = await response.arrayBuffer()
             shapesFolder.file(filename, arrayBuffer)
@@ -69,15 +72,18 @@ export const createKicadLibraryZip = async ({
 export const exportKicadLibrary = async ({
   circuitJson,
   projectName,
+  runtime = getDefaultRuntime(),
 }: {
   circuitJson: CircuitJson
   projectName: string
+  runtime?: RunFrameRuntime
 }) => {
   await toast.promise(
     (async () => {
       const zip = await createKicadLibraryZip({
         circuitJson,
         libraryName: projectName,
+        runtime,
       })
       const zipBlob = await zip.generateAsync({ type: "blob" })
 

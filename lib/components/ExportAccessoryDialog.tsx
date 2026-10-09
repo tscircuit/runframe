@@ -1,3 +1,4 @@
+import { useRunFrameRuntime } from "lib/runtime/context"
 import type { CircuitJson } from "circuit-json"
 import { Download, LoaderCircle, PackageOpen } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -42,6 +43,7 @@ export function ExportAccessoryDialog({
   circuitJson,
   projectName,
 }: ExportAccessoryDialogProps) {
+  const runtime = useRunFrameRuntime()
   useStyles()
 
   const [selectedAccessory, setSelectedAccessory] = useState<
@@ -67,7 +69,7 @@ export function ExportAccessoryDialog({
     setGeneratedBox(null)
     setError(null)
 
-    generateFdmComponentBox(circuitJson)
+    generateFdmComponentBox(circuitJson, runtime)
       .then((result) => {
         if (cancelled) return
         const pngBytes = Uint8Array.from(result.previewPng)
@@ -93,7 +95,7 @@ export function ExportAccessoryDialog({
     return () => {
       cancelled = true
     }
-  }, [circuitJson, open, selectedAccessory])
+  }, [circuitJson, open, selectedAccessory, runtime])
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {

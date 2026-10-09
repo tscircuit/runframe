@@ -149,6 +149,4 @@ export const captureRunFrameActivity = (
   captureRunFrameTelemetry("runframe_activity", properties)
 }
 
-initPostHog()
-
 export { posthog }

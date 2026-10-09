@@ -1,16 +1,21 @@
+import { getDefaultRuntime } from "lib/runtime/default-runtime"
+import type { RunFrameRuntime } from "lib/runtime/types"
 import type { CircuitJson } from "circuit-json"
 import { openForDownload } from "../open-for-download"
 import { toast } from "lib/utils/toast"
-import importer from "@tscircuit/internal-dynamic-import"
 
 export const exportStep = async ({
   circuitJson,
   projectName,
+  runtime = getDefaultRuntime(),
 }: {
   circuitJson: CircuitJson
   projectName: string
+  runtime?: RunFrameRuntime
 }) => {
-  const { circuitJsonToStep } = await importer("circuit-json-to-step")
+  const { circuitJsonToStep } = await runtime.modules.load(
+    "circuit-json-to-step",
+  )
   // Extract board dimensions from circuit JSON
   const pcbBoard = circuitJson.find((el) => el.type === "pcb_board")
 

@@ -5,3 +5,5 @@ export * from "./components/RunFrameForCli/RunFrameForCli"
 export * from "./components/ImportComponentDialog"
 export * from "./components/ImportComponentDialog2"
 export * from "./components/RunFrameStaticBuildViewer"
+
+export * from "./runtime"

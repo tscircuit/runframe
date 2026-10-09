@@ -1,17 +1,22 @@
+import { getDefaultRuntime } from "lib/runtime/default-runtime"
+import type { RunFrameRuntime } from "lib/runtime/types"
 import type { CircuitJson } from "circuit-json"
 import { openForDownload } from "../open-for-download"
-import importer from "@tscircuit/internal-dynamic-import"
 
 export const exportGlb = async ({
   circuitJson,
   projectName,
+  runtime = getDefaultRuntime(),
 }: {
   circuitJson: CircuitJson
   projectName: string
+  runtime?: RunFrameRuntime
 }) => {
   let blob: Blob
   try {
-    const { convertCircuitJsonToGltf } = await importer("circuit-json-to-gltf")
+    const { convertCircuitJsonToGltf } = await runtime.modules.load(
+      "circuit-json-to-gltf",
+    )
 
     console.log("convertCircuitJsonToGltf", convertCircuitJsonToGltf)
 

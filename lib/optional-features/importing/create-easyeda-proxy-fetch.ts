@@ -1,8 +1,11 @@
+import { getDefaultRuntime } from "lib/runtime/default-runtime"
+import type { RunFrameRuntime } from "lib/runtime/types"
 import { API_BASE } from "lib/components/RunFrameWithApi/api-base"
 
 export type EasyEdaProxyFetchOptions = {
   apiBase?: string
   headers?: Record<string, string>
+  runtime?: RunFrameRuntime
 }
 
 export const createEasyEdaProxyFetch =
@@ -14,19 +17,22 @@ export const createEasyEdaProxyFetch =
       headers[key] = value
     })
 
-    return fetch(`${opts?.apiBase ?? API_BASE}/proxy`, {
-      ...options,
-      headers: {
-        ...headers,
-        "X-Target-Url": url.toString(),
-        "X-Sender-Origin": headers.origin ?? "",
-        "X-Sender-Host": headers.host ?? "https://easyeda.com",
-        "X-Sender-Referer": headers.referer ?? "",
-        "X-Sender-User-Agent": headers["user-agent"] ?? "",
-        "X-Sender-Cookie": headers.cookie ?? "",
-        authority: headers.authority ?? "",
-        "content-type": headers["content-type"] ?? "",
-        ...opts?.headers,
+    return (opts?.runtime ?? getDefaultRuntime()).fetch(
+      `${opts?.apiBase ?? API_BASE}/proxy`,
+      {
+        ...options,
+        headers: {
+          ...headers,
+          "X-Target-Url": url.toString(),
+          "X-Sender-Origin": headers.origin ?? "",
+          "X-Sender-Host": headers.host ?? "https://easyeda.com",
+          "X-Sender-Referer": headers.referer ?? "",
+          "X-Sender-User-Agent": headers["user-agent"] ?? "",
+          "X-Sender-Cookie": headers.cookie ?? "",
+          authority: headers.authority ?? "",
+          "content-type": headers["content-type"] ?? "",
+          ...opts?.headers,
+        },
       },
-    })
+    )
   }

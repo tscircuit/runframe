@@ -1,3 +1,4 @@
+import type { RunFrameRuntime } from "lib/runtime/types"
 import { API_BASE } from "lib/components/RunFrameWithApi/api-base"
 import { createEasyEdaProxyFetch } from "./create-easyeda-proxy-fetch"
 import { loadEasyedaBrowser } from "./load-easyeda-browser"
@@ -5,13 +6,15 @@ import ky from "ky"
 
 export const importComponentFromJlcpcb = async (
   jlcpcbPartNumber: string,
-  opts?: { headers?: Record<string, string> },
+  opts?: { headers?: Record<string, string>; runtime?: RunFrameRuntime },
 ) => {
+  if (opts?.runtime?.mode === "offline")
+    throw new Error("EasyEDA part acquisition requires a local catalog.")
   const { fetchEasyEDAComponent, convertRawEasyToTsx } =
-    await loadEasyedaBrowser()
+    await loadEasyedaBrowser(opts?.runtime)
 
   const component = await fetchEasyEDAComponent(jlcpcbPartNumber, {
-    fetch: createEasyEdaProxyFetch({ headers: opts?.headers }),
+    fetch: createEasyEdaProxyFetch(opts) as typeof fetch,
   })
 
   const tsx = await convertRawEasyToTsx({ rawEasy: component })

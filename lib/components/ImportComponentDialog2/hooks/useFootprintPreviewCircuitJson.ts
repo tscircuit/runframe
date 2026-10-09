@@ -1,3 +1,4 @@
+import { useRunFrameRuntime } from "lib/runtime/context"
 import * as React from "react"
 import type { AnyCircuitElement } from "circuit-json"
 import {
@@ -17,6 +18,7 @@ export const useFootprintPreviewCircuitJson = (
   result: ImportComponentDialogSearchResult | null,
   opts?: FootprintPreviewLoadOptions,
 ): FootprintPreviewState => {
+  const runtime = useRunFrameRuntime()
   const [state, setState] = React.useState<FootprintPreviewState>({
     circuitJson: null,
     error: null,
@@ -33,7 +35,7 @@ export const useFootprintPreviewCircuitJson = (
 
     setState({ circuitJson: null, error: null, isLoading: true })
 
-    loadFootprintPreviewCircuitJson(result, opts)
+    loadFootprintPreviewCircuitJson(result, { ...opts, runtime })
       .then((circuitJson) => {
         if (cancelled) return
         setState({ circuitJson, error: null, isLoading: false })
@@ -53,7 +55,7 @@ export const useFootprintPreviewCircuitJson = (
     return () => {
       cancelled = true
     }
-  }, [result, opts])
+  }, [result, opts, runtime])
 
   return state
 }

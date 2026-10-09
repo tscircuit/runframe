@@ -1,3 +1,4 @@
+import { useRunFrameRuntime } from "lib/runtime/context"
 import * as React from "react"
 import { Loader2 } from "lucide-react"
 import { Button } from "../ui/button"
@@ -58,6 +59,7 @@ export const ImportComponentDialog2 = ({
   jlcpcbProxyApiBase,
   tscircuitSessionToken,
 }: ImportComponentDialog2Props) => {
+  const runtime = useRunFrameRuntime()
   useStyles()
 
   const availableSources = React.useMemo(
@@ -225,6 +227,7 @@ export const ImportComponentDialog2 = ({
           throw new Error("JLCPCB handler not provided")
         }
         const tsx = await loadJlcpcbComponentTsx(result.component.partNumber, {
+          runtime,
           headers: jlcpcbProxyRequestHeaders,
           apiBase: jlcpcbProxyApiBase,
         })

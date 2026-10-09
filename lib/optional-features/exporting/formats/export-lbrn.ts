@@ -1,6 +1,7 @@
+import { getDefaultRuntime } from "lib/runtime/default-runtime"
+import type { RunFrameRuntime } from "lib/runtime/types"
 import type { CircuitJson } from "circuit-json"
 import { openForDownload } from "../open-for-download"
-import importer from "@tscircuit/internal-dynamic-import"
 import { toast } from "lib/utils/toast"
 
 export interface LbrnExportOptions {
@@ -11,15 +12,19 @@ export interface LbrnExportOptions {
 export const exportLbrn = async ({
   circuitJson,
   projectName,
+  runtime = getDefaultRuntime(),
   options = {},
 }: {
   circuitJson: CircuitJson
   projectName: string
+  runtime?: RunFrameRuntime
   options?: LbrnExportOptions
 }) => {
   try {
     // Convert Circuit JSON to LBRN format
-    const { convertCircuitJsonToLbrn } = await importer("circuit-json-to-lbrn")
+    const { convertCircuitJsonToLbrn } = await runtime.modules.load(
+      "circuit-json-to-lbrn",
+    )
     const lbrnProject = await convertCircuitJsonToLbrn(circuitJson, {
       includeSilkscreen: options.includeSilkscreen ?? false,
       includeOxidationCleaningLayer:

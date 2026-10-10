@@ -5,6 +5,7 @@ import {
   TabsTrigger,
 } from "lib/components/ui/tabs"
 import { cn } from "lib/utils"
+import { getWindowVar } from "lib/utils/get-registry-ky"
 import { hasSimulationAnalysisResult } from "lib/utils/has-simulation-analysis-result"
 import { CadViewer } from "@tscircuit/3d-viewer"
 import { usePcbViewerController } from "@tscircuit/pcb-viewer"
@@ -77,6 +78,10 @@ import {
 declare global {
   interface Window {
     TSCIRCUIT_3D_OBJECT_REF: Object3D | undefined
+    /** Disable RunFrame telemetry before loading the viewer. */
+    TSCIRCUIT_TELEMETRY_DISABLED?: boolean
+    /** Default for allowSelectingVersion; an explicit prop takes precedence. */
+    TSCIRCUIT_ALLOW_SELECTING_EVAL_VERSION?: boolean
   }
 }
 
@@ -137,7 +142,9 @@ export const CircuitJsonPreview = ({
   showToggleFullScreen = true,
   defaultToFullScreen = false,
   activeEffectName,
-  allowSelectingVersion = true,
+  allowSelectingVersion = getWindowVar(
+    "TSCIRCUIT_ALLOW_SELECTING_EVAL_VERSION",
+  ) !== false,
   showFileMenu = false,
   isWebEmbedded = false,
   isCli = false,

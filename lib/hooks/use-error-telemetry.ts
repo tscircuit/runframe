@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { posthog } from "lib/utils"
+import { getWindowVar } from "lib/utils/get-registry-ky"
 import type { CircuitJsonError } from "circuit-json"
 
 interface UseErrorTelemetryParams {
@@ -14,6 +15,7 @@ export const useErrorTelemetry = ({
   circuitJsonErrors,
 }: UseErrorTelemetryParams) => {
   useEffect(() => {
+    if (getWindowVar("TSCIRCUIT_TELEMETRY_DISABLED") === true) return
     if (errorMessage) {
       const err = new Error(errorMessage)
       if (errorStack) err.stack = errorStack
@@ -26,6 +28,7 @@ export const useErrorTelemetry = ({
   }, [errorMessage, errorStack])
 
   useEffect(() => {
+    if (getWindowVar("TSCIRCUIT_TELEMETRY_DISABLED") === true) return
     if (circuitJsonErrors && circuitJsonErrors.length > 0) {
       for (const error of circuitJsonErrors) {
         const err = new Error(error.message || "Circuit JSON Error")

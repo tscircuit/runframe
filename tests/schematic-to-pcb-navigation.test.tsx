@@ -3,7 +3,7 @@ import { JSDOM } from "jsdom"
 import { act, createContext, useContext, useEffect, useState } from "react"
 import { createRoot } from "react-dom/client"
 import { usePcbViewerController } from "@tscircuit/pcb-viewer"
-import { useSchematicViewerController } from "@tscircuit/schematic-viewer/source"
+import { useSchematicViewerController } from "@tscircuit/schematic-viewer"
 
 const Empty = () => null
 mock.module("posthog-js", () => ({
@@ -29,7 +29,7 @@ mock.module("lib/components/ui/tabs", () => ({
       <div data-active-tab={value}>{children}</div>
     ) : null,
 }))
-mock.module("@tscircuit/schematic-viewer/source", () => ({
+mock.module("@tscircuit/schematic-viewer", () => ({
   useSchematicViewerController,
   AnalogSimulationViewer: Empty,
   SchematicViewer: ({ onViewPcbComponent }: any) =>

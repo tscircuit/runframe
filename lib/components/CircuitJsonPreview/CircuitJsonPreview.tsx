@@ -21,12 +21,12 @@ import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
 import {
   SchematicViewer,
   useSchematicViewerController,
-} from "@tscircuit/schematic-viewer/source"
+} from "@tscircuit/schematic-viewer"
 import { AssemblyViewer, PinoutViewer } from "@tscircuit/assembly-viewer"
 import PreviewEmptyState from "../PreviewEmptyState"
 import { CircuitJsonTableViewer } from "../CircuitJsonTableViewer/CircuitJsonTableViewer"
 import { BomTable } from "../BomTable"
-import { AnalogSimulationViewer } from "@tscircuit/schematic-viewer/source"
+import { AnalogSimulationViewer } from "@tscircuit/schematic-viewer"
 import {
   CheckIcon,
   EllipsisIcon,

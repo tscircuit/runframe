@@ -7,11 +7,11 @@ export {
   usePcbViewerController,
   type PcbViewerController,
 } from "@tscircuit/pcb-viewer"
-export type { ViewPcbComponentEvent } from "@tscircuit/schematic-viewer/source"
+export type { ViewPcbComponentEvent } from "@tscircuit/schematic-viewer"
 export {
   SchematicViewer,
   useSchematicViewerController,
-} from "@tscircuit/schematic-viewer/source"
+} from "@tscircuit/schematic-viewer"
 export * from "./components/OrderDialog/useOrderDialog"
 export * from "./components/ExportAccessoryDialog"
 

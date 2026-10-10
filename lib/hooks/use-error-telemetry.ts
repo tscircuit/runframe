@@ -1,10 +1,8 @@
 import { useEffect } from "react"
 import { posthog } from "lib/utils"
-import { initPostHog } from "lib/utils/posthog"
 import type { CircuitJsonError } from "circuit-json"
 
 interface UseErrorTelemetryParams {
-  disabled?: boolean
   errorMessage?: string | null | undefined
   errorStack?: string | null | undefined
   circuitJsonErrors?: CircuitJsonError[] | null | undefined
@@ -14,10 +12,9 @@ export const useErrorTelemetry = ({
   errorMessage,
   errorStack,
   circuitJsonErrors,
-  disabled,
 }: UseErrorTelemetryParams) => {
   useEffect(() => {
-    if (!disabled && errorMessage && initPostHog()) {
+    if (errorMessage) {
       const err = new Error(errorMessage)
       if (errorStack) err.stack = errorStack
       try {
@@ -26,15 +23,10 @@ export const useErrorTelemetry = ({
         // ignore analytics errors
       }
     }
-  }, [disabled, errorMessage, errorStack])
+  }, [errorMessage, errorStack])
 
   useEffect(() => {
-    if (
-      !disabled &&
-      circuitJsonErrors &&
-      circuitJsonErrors.length > 0 &&
-      initPostHog()
-    ) {
+    if (circuitJsonErrors && circuitJsonErrors.length > 0) {
       for (const error of circuitJsonErrors) {
         const err = new Error(error.message || "Circuit JSON Error")
         if ((error as any).stack) {
@@ -47,5 +39,5 @@ export const useErrorTelemetry = ({
         }
       }
     }
-  }, [disabled, circuitJsonErrors])
+  }, [circuitJsonErrors])
 }

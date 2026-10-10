@@ -137,7 +137,7 @@ export const CircuitJsonPreview = ({
   showToggleFullScreen = true,
   defaultToFullScreen = false,
   activeEffectName,
-  allowSelectingVersion = !platformConfig?.evalVersionSelectionDisabled,
+  allowSelectingVersion = true,
   showFileMenu = false,
   isWebEmbedded = false,
   isCli = false,
@@ -236,7 +236,6 @@ export const CircuitJsonPreview = ({
     errorMessage,
     errorStack,
     circuitJsonErrors,
-    disabled: platformConfig?.telemetryDisabled,
   })
 
   const fallbackTab = defaultTab ?? availableTabs?.[0] ?? "pcb"
@@ -248,7 +247,6 @@ export const CircuitJsonPreview = ({
   usePostHogActivity({
     source: "runframe",
     component: "CircuitJsonPreview",
-    disabled: platformConfig?.telemetryDisabled,
     isWebEmbedded,
     activeTab,
   })
@@ -619,7 +617,6 @@ export const CircuitJsonPreview = ({
                 >
                   {circuitJson ? (
                     <PcbViewerWithContainerHeight
-                      renderer={platformConfig?.pcbRenderer}
                       controller={pcbController}
                       focusOnHover={false}
                       circuitJson={circuitJson}

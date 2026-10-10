@@ -83,16 +83,9 @@ test("RunFrame shares initialization, serializes rendering and recovers failed o
       }
       expect(onRunCompleted).toHaveBeenCalledTimes(expected)
     }
-    const circuitPlatformConfig = {
+    const platformConfig = {
       projectBaseUrl: "http://localhost/project",
       enablePartOrientationAnalysis: false,
-    }
-    const platformConfig = {
-      ...circuitPlatformConfig,
-      telemetryDisabled: true,
-      evalCdnLoadingDisabled: true,
-      evalVersionSelectionDisabled: true,
-      pcbRenderer: "canvas" as const,
     }
     await act(async () =>
       root.render(
@@ -130,13 +123,9 @@ test("RunFrame shares initialization, serializes rendering and recovers failed o
       expect(options).toMatchObject({
         evalVersion: "0.0.1580",
         webWorkerBlobUrl: "/assets/eval-worker.js",
-        platform: circuitPlatformConfig,
-        projectConfig: circuitPlatformConfig,
-        disableCdnLoading: true,
+        platform: platformConfig,
+        projectConfig: platformConfig,
       })
-      expect((options as { platform: unknown }).platform).toEqual(
-        circuitPlatformConfig,
-      )
     }
     expect(executeWithFsMap).toHaveBeenCalledWith({
       entrypoint: undefined,

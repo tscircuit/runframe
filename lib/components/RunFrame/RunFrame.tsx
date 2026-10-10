@@ -1,4 +1,3 @@
-import { getCircuitPlatformConfig } from "./RunFramePlatformConfig"
 import { createCircuitWebWorker } from "@tscircuit/eval/worker"
 import Debug from "debug"
 import { HTTPError } from "ky"
@@ -190,16 +189,14 @@ export const RunFrame = (props: RunFrameProps) => {
               props.platformConfig?.projectBaseUrl ??
               `${API_BASE}/files/static`,
           }),
-          ...(props.platformConfig && {
-            platform: getCircuitPlatformConfig(props.platformConfig),
-          }),
+          ...(props.platformConfig && { platform: props.platformConfig }),
           verbose: true,
           ...(props.enableFetchProxy && {
             enableFetchProxy: props.enableFetchProxy,
           }),
-          disableCdnLoading:
-            props.platformConfig?.evalCdnLoadingDisabled ??
-            window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI,
+          ...(window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI && {
+            disableCdnLoading: true,
+          }),
           ...(props.tscircuitSessionToken && {
             tscircuitSessionToken: props.tscircuitSessionToken,
           }),
@@ -268,7 +265,6 @@ export const RunFrame = (props: RunFrameProps) => {
     props.evalWebWorkerBlobUrl,
     props.forceLatestEvalVersion,
     props.tscircuitSessionToken,
-    props.platformConfig?.evalCdnLoadingDisabled,
   ])
 
   const [renderLog, setRenderLog] = useState<RenderLog | null>(null)
@@ -284,7 +280,6 @@ export const RunFrame = (props: RunFrameProps) => {
   usePostHogActivity({
     source: "runframe",
     component: "RunFrame",
-    disabled: props.platformConfig?.telemetryDisabled,
     isWebEmbedded: props.isWebEmbedded,
     activeTab,
   })

@@ -6,7 +6,6 @@ import {
 
 export const usePostHogActivity = (properties: RunFrameActivityProperties) => {
   useEffect(() => {
-    if (properties.disabled) return
     try {
       captureRunFrameActivity(properties)
     } catch {
@@ -17,6 +16,5 @@ export const usePostHogActivity = (properties: RunFrameActivityProperties) => {
     properties.component,
     properties.isWebEmbedded,
     properties.activeTab,
-    properties.disabled,
   ])
 }

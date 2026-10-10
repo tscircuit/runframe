@@ -75,7 +75,6 @@ export const initPostHog = () => {
 }
 
 export interface RunFrameActivityProperties {
-  disabled?: boolean
   source: "runframe" | "circuit_json_viewer"
   component?: string
   isWebEmbedded?: boolean
@@ -116,9 +115,8 @@ const getRunFrameIdentity = () => {
 
 export const captureRunFrameTelemetry = (
   eventName: string,
-  { disabled, source, ...properties }: RunFrameActivityProperties,
+  { source, ...properties }: RunFrameActivityProperties,
 ) => {
-  if (disabled) return
   const identity = getRunFrameIdentity()
   if (!identity) return
 
@@ -150,5 +148,7 @@ export const captureRunFrameActivity = (
 ) => {
   captureRunFrameTelemetry("runframe_activity", properties)
 }
+
+initPostHog()
 
 export { posthog }

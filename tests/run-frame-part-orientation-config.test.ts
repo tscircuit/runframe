@@ -11,3 +11,14 @@ test("RunFrame enables part orientation analysis in its project config", () => {
     enablePartOrientationAnalysis: true,
   })
 })
+
+test("RunFrame preserves an explicit platform choice to disable orientation analysis", () => {
+  expect(
+    getRunFrameProjectConfig({
+      projectBaseUrl: "https://example.com/files",
+      enablePartOrientationAnalysis: false,
+    }),
+  ).toMatchObject({
+    enablePartOrientationAnalysis: false,
+  })
+})

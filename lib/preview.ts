@@ -14,5 +14,3 @@ export {
 } from "@tscircuit/schematic-viewer"
 export * from "./components/OrderDialog/useOrderDialog"
 export * from "./components/ExportAccessoryDialog"
-
-export type { RunFramePlatformConfig } from "./components/RunFrame/RunFramePlatformConfig"

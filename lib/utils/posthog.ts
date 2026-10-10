@@ -61,6 +61,7 @@ const shouldTrackOnLocalhost = () =>
 
 export const initPostHog = () => {
   if (!isBrowser()) return false
+  if (getWindowVar("TSCIRCUIT_TELEMETRY_DISABLED") === true) return false
   if (isLocalHost(window.location.hostname) && !shouldTrackOnLocalhost()) {
     return false
   }

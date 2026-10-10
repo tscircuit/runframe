@@ -182,7 +182,12 @@ export const RunFrame = (props: RunFrameProps) => {
           evalVersion,
           webWorkerBlobUrl: props.evalWebWorkerBlobUrl,
           projectConfig: getRunFrameProjectConfig({
-            projectBaseUrl: props.projectBaseUrl || `${API_BASE}/files/static`,
+            enablePartOrientationAnalysis:
+              props.platformConfig?.enablePartOrientationAnalysis,
+            projectBaseUrl:
+              props.projectBaseUrl ??
+              props.platformConfig?.projectBaseUrl ??
+              `${API_BASE}/files/static`,
           }),
           ...(props.platformConfig && { platform: props.platformConfig }),
           verbose: true,
@@ -755,6 +760,7 @@ export const RunFrame = (props: RunFrameProps) => {
       )}
     >
       <CircuitJsonPreview
+        platformConfig={props.platformConfig}
         code={fsMap.get(props.entrypoint ?? props.mainComponentPath ?? "")}
         fsMap={fsMap}
         defaultActiveTab={props.defaultActiveTab ?? props.defaultTab}

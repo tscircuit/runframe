@@ -83,7 +83,10 @@ test("RunFrame shares initialization, serializes rendering and recovers failed o
       }
       expect(onRunCompleted).toHaveBeenCalledTimes(expected)
     }
-    const platformConfig = { projectBaseUrl: "http://localhost/project" }
+    const platformConfig = {
+      projectBaseUrl: "http://localhost/project",
+      enablePartOrientationAnalysis: false,
+    }
     await act(async () =>
       root.render(
         <RunFrame
@@ -121,6 +124,7 @@ test("RunFrame shares initialization, serializes rendering and recovers failed o
         evalVersion: "0.0.1580",
         webWorkerBlobUrl: "/assets/eval-worker.js",
         platform: platformConfig,
+        projectConfig: platformConfig,
       })
     }
     expect(executeWithFsMap).toHaveBeenCalledWith({

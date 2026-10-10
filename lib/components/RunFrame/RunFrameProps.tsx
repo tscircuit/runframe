@@ -156,7 +156,7 @@ export interface RunFrameProps {
   projectBaseUrl?: string
 
   /**
-   * Platform config for the eval webworker
+   * Shared circuit platform hooks, passed to the evaluator and preview viewers.
    */
   platformConfig?: PlatformConfig
 

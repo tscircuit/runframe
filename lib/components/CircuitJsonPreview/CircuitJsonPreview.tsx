@@ -99,6 +99,7 @@ const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "An unknown error occurred"
 
 export const CircuitJsonPreview = ({
+  platformConfig,
   code,
   fsMap,
   onRunClicked = undefined,
@@ -737,6 +738,7 @@ export const CircuitJsonPreview = ({
                 >
                   {circuitJson ? (
                     <SchematicViewer
+                      platformConfig={platformConfig}
                       onViewPcbComponent={handleViewPcbComponent}
                       controller={schematicController}
                       circuitJson={circuitJson}

@@ -1,4 +1,4 @@
-import type { ManualEditEvent } from "@tscircuit/props"
+import type { ManualEditEvent, PlatformConfig } from "@tscircuit/props"
 import type { CircuitJson } from "circuit-json"
 import type { RenderLog } from "lib/render-logging/RenderLog"
 import type { AutoroutingPhase } from "lib/autorouting"
@@ -28,6 +28,8 @@ export type TabId =
   | "autorouting"
 
 export interface PreviewContentProps {
+  /** Shared circuit platform hooks used by preview viewers. */
+  platformConfig?: PlatformConfig
   defaultToFullScreen?: boolean
   code?: string
   fsMap?: Map<string, string> | Record<string, string>

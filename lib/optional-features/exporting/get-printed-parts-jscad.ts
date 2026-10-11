@@ -3,7 +3,9 @@ import type { jscadToStep } from "jscad-to-step"
 
 type JscadOperation = Parameters<typeof jscadToStep>[0]
 
-export const getAssemblyJscad = (circuitJson: CircuitJson): JscadOperation => {
+export const getPrintedPartsJscad = (
+  circuitJson: CircuitJson,
+): JscadOperation => {
   const printedParts = circuitJson
     .filter((element) => element.type === "source_component")
     .filter((part) => part.ftype === "printedpart")
@@ -48,5 +50,6 @@ export const getAssemblyJscad = (circuitJson: CircuitJson): JscadOperation => {
     })
   })
 
+  // Combine the geometry into one model; this does not preserve a part hierarchy.
   return shapes.length === 1 ? shapes[0] : { type: "union", shapes }
 }

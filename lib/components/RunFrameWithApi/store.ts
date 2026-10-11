@@ -191,6 +191,7 @@ export const useRunFrameStore = create<RunFrameState>()(
                 })
               }
             }
+            set({ error: null })
           } catch (error) {
             set({ error: error as Error })
           }

@@ -22,7 +22,7 @@ export const availableExports = [
   { extension: "glb", name: "GLB (Binary GLTF)" },
   { extension: "svg", name: "Pinout SVG" },
   { extension: "step", name: "STEP" },
-  { extension: "step", name: "Assembly STEP" },
+  { extension: "zip", name: "Assembly STEP" },
   { extension: "lbrn2", name: "LightBurn" },
   // { extension: "svg", name: "SVG" },
   // { extension: "dsn", name: "Specctra DSN" },

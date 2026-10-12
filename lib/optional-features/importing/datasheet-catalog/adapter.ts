@@ -2,6 +2,7 @@ import { fp } from "@tscircuit/footprinter"
 import { pinAttributeMap } from "@tscircuit/props"
 import type { PinAttributeMap } from "@tscircuit/props"
 import type { AnyCircuitElement } from "circuit-json"
+import { generateTypescriptComponent } from "easyeda/browser"
 import { z } from "zod"
 import type { AdaptedCachedDatasheet, CachedDatasheet } from "./types"
 
@@ -286,7 +287,16 @@ export const adaptCachedDatasheet = (
     }
   })
   const componentName = componentNameFor(datasheet.chip_name)
-  const tsx = `import type { ChipProps } from "@tscircuit/props"\n\nconst pinLabels = ${JSON.stringify(pinLabels, null, 2)} as const\n\nexport const ${componentName} = (props: ChipProps<typeof pinLabels>) => (\n  <chip\n    pinLabels={pinLabels}\n    pinAttributes={${JSON.stringify(pinAttributes, null, 2)}}\n    manufacturerPartNumber={${JSON.stringify(datasheet.chip_name)}}\n    footprint={${JSON.stringify(datasheet.footprinter_string)}}\n    {...props}\n  />\n)\n\nexport default ${componentName}\n`
+  const componentSource = generateTypescriptComponent({
+    componentName,
+    manufacturerPartNumber: datasheet.chip_name,
+    pinLabels,
+    pinAttributes,
+    footprint: datasheet.footprinter_string,
+    supplierPartNumbers: {},
+    inferPinAttributes: false,
+  })
+  const tsx = `${componentSource}\n\nexport default ${componentName}\n`
   return {
     datasheetId: datasheet.datasheet_id,
     chipName: datasheet.chip_name,

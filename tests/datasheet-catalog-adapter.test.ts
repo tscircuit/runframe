@@ -82,7 +82,7 @@ test("adapts a cached API envelope to a compact local component without evaluati
   expect(part.chipName).toBe("TestChip")
   expect(part.datasheetId).toBe(record.datasheet_id)
   expect(part.tsx).toContain('footprint={"soic2"}')
-  expect(part.tsx).toContain('manufacturerPartNumber={"TestChip"}')
+  expect(part.tsx).toContain('manufacturerPartNumber="TestChip"')
   expect(part.tsx).not.toContain("example.com")
   expect(part.tsx).not.toContain("Do not evaluate")
   expect(part.tsx).not.toContain("pcb_smtpad")
@@ -132,6 +132,27 @@ test("renders generated source with local copper and electrical attributes", asy
   ).toMatchObject({
     requires_ground: true,
   })
+})
+
+test("shared generation escapes part names and keeps absent attributes uninferred", async () => {
+  const chipName = 'Test"Chip\n<&'
+  const { json } = await renderLocally(
+    fixture({ chip_name: chipName, pin_attributes: null }),
+  )
+  expect(
+    json.find((element) => element.type === "source_component"),
+  ).toMatchObject({ manufacturer_part_number: chipName })
+  const powerPin = json.find(
+    (element) => element.type === "source_port" && element.pin_number === 1,
+  )
+  const groundPin = json.find(
+    (element) => element.type === "source_port" && element.pin_number === 2,
+  )
+  if (powerPin?.type !== "source_port" || groundPin?.type !== "source_port") {
+    throw new Error("Generated source ports missing")
+  }
+  expect(powerPin.requires_power).toBeUndefined()
+  expect(groundPin.requires_ground).toBeUndefined()
 })
 
 test("keeps an explicitly labeled QFN thermal pin57 attached to its copper", async () => {

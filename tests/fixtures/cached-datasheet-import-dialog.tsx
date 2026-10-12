@@ -168,8 +168,8 @@ test("cached search, generated preview, and CLI save use only platformFetch", as
     expect(closeCount).toBe(1)
     const generatedTsx = fakeFileServer.files.get("imports/CachedChip.tsx")!
     expect(generatedTsx).toContain('footprint={"soic8"}')
-    expect(generatedTsx).toContain('"requiresGround": true')
-    expect(generatedTsx).toContain('"requiresVoltage": "3.3V"')
+    expect(generatedTsx).toContain("requiresGround: true")
+    expect(generatedTsx).toContain('requiresVoltage: "3.3V"')
     expect(generatedTsx).toContain('"SIGNAL8"')
     expect(cacheReads).toContain(".cache/datasheets/index.json")
     expect(cacheReads).toContain(".cache/datasheets/parts/cachedchip.json")

@@ -1,7 +1,7 @@
 import type { CircuitJson } from "circuit-json"
 import { openForDownload } from "../open-for-download"
 import { toast } from "lib/utils/toast"
-import importer from "@tscircuit/internal-dynamic-import"
+import { loadRunFrameModule as importer } from "lib/optional-features/importing/load-runframe-module"
 
 export const exportStep = async ({
   circuitJson,

@@ -1,4 +1,4 @@
-import importer from "@tscircuit/internal-dynamic-import"
+import { loadRunFrameModule as importer } from "lib/optional-features/importing/load-runframe-module"
 import type { CircuitJson } from "circuit-json"
 import { sanitizeFileName } from "lib/utils/sanitizeFileName"
 import { toast } from "lib/utils/toast"

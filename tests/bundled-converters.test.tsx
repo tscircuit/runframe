@@ -81,3 +81,56 @@ test("a missing bundled converter rejects without delegating to the CDN resolver
     setDynamicImportResolver(previousResolver)
   }
 })
+
+test("STEP, GLB, LBRN and FDM load locally and generate files without external fetching", async () => {
+  const previousFetch = globalThis.fetch
+  const requests: unknown[] = []
+  globalThis.fetch = Object.assign(
+    async (...request: Parameters<typeof fetch>) => {
+      requests.push(request)
+      throw new Error("External requests are disabled")
+    },
+    { preconnect: () => {} },
+  )
+  try {
+    const [step, gltf, lbrn, fdm] = await Promise.all([
+      loadRunFrameModule("circuit-json-to-step"),
+      loadRunFrameModule("circuit-json-to-gltf"),
+      loadRunFrameModule("circuit-json-to-lbrn"),
+      loadRunFrameModule("circuit-json-to-fdm-component-box"),
+    ])
+    const board = [
+      {
+        type: "pcb_board" as const,
+        pcb_board_id: "board1",
+        center: { x: 0, y: 0 },
+        width: 10,
+        height: 10,
+        thickness: 1.6,
+        num_layers: 2,
+      },
+    ]
+    const stepText = await step.circuitJsonToStep(board as any, {
+      exportMode: "pcb",
+    })
+    expect(stepText).toContain("ISO-10303-21")
+    const glb = await gltf.convertCircuitJsonToGltf([], { format: "glb" })
+    expect(new DataView(glb as ArrayBuffer).getUint32(0, true)).toBe(0x46546c67)
+    const laser = await lbrn.convertCircuitJsonToLbrn(board as any)
+    expect(laser.toXml()).toContain("LightBurnProject")
+    const box = await fdm.createFdmComponentBox([
+      {
+        type: "source_component",
+        source_component_id: "r1",
+        name: "R1",
+        ftype: "simple_resistor",
+      },
+    ] as any)
+    expect(box.componentRefdes).toEqual(["R1"])
+    expect(box.threeMf[0]).toBe(0x50)
+    expect(box.threeMf[1]).toBe(0x4b)
+    expect(requests).toEqual([])
+  } finally {
+    globalThis.fetch = previousFetch
+  }
+})

@@ -88,7 +88,7 @@
     "fflate": "^0.8.2",
     "fuse.js": "^7.1.0",
     "jose": "^6.1.0",
-    "jscad-to-step": "git+https://github.com/tscircuit/jscad-to-step.git#e47220e6b7a98746b2135f9be62f5687644e58fc",
+    "jscad-to-step": "github:tscircuit/jscad-to-step#e47220e6b7a98746b2135f9be62f5687644e58fc",
     "jszip": "^3.10.1",
     "jsdom": "^26.0.0",
     "kicad-component-converter": "^0.1.21",

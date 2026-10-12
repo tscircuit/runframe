@@ -1,5 +1,8 @@
 import type { CircuitJson } from "circuit-json"
-import { exportStep } from "./export-step"
+import JSZip from "jszip"
+import { toast } from "lib/utils/toast"
+import { getStepConverter } from "../get-step-converter"
+import { openForDownload } from "../open-for-download"
 
 export const exportAssemblyStep = async ({
   circuitJson,
@@ -7,4 +10,22 @@ export const exportAssemblyStep = async ({
 }: {
   circuitJson: CircuitJson
   projectName: string
-}) => exportStep({ circuitJson, projectName, exportMode: "assembly" })
+}) => {
+  try {
+    const { circuitJsonToStep } = await getStepConverter()
+    const files = await circuitJsonToStep(circuitJson, {
+      exportMode: "assembly",
+    })
+    const zip = new JSZip()
+    for (const [fileName, stepText] of Object.entries(files)) {
+      zip.file(fileName, stepText)
+    }
+    openForDownload(await zip.generateAsync({ type: "blob" }), {
+      fileName: `${projectName}-assembly.zip`,
+    })
+  } catch (error) {
+    toast.error(
+      `Failed to export assembly STEP: ${error instanceof Error ? error.message : String(error)}`,
+    )
+  }
+}

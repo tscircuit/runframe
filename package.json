@@ -76,7 +76,7 @@
     "circuit-json-to-kicad": "^0.0.229",
     "circuit-json-to-lbrn": "^0.0.74",
     "circuit-json-to-pnp-csv": "^0.0.18",
-    "circuit-json-to-step": "github:tscircuit/circuit-json-to-step#ddc8e1adedb39a6c5b139b02aa1991787bfb80f9",
+    "circuit-json-to-step": "^0.0.46",
     "circuit-to-svg": "^0.0.444",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -133,8 +133,5 @@
   "overrides": {
     "circuit-json": "$circuit-json",
     "altiumts": "0.0.59"
-  },
-  "trustedDependencies": [
-    "circuit-json-to-step"
-  ]
+  }
 }

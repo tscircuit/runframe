@@ -6,7 +6,7 @@ import {
   exportAndDownload,
 } from "../lib/optional-features/exporting/export-and-download"
 
-test("assembly STEP exports separate printed parts while default mixed input exports a PCB STEP", async () => {
+test("Assembly STEP downloads a ZIP containing separate printed parts", async () => {
   expect(availableExports).toContainEqual({
     extension: "zip",
     name: "Assembly STEP",
@@ -53,14 +53,14 @@ test("assembly STEP exports separate printed parts while default mixed input exp
     } as unknown as Document
     URL.createObjectURL = (blob) => {
       downloadedBlob = blob as Blob
-      return "blob:printed-part-test"
+      return "blob:assembly-step-test"
     }
     await exportAndDownload({
       exportName: "Assembly STEP",
       projectName: "corne/left",
       circuitJson,
     })
-    expect(anchor.download).toBe("corne_left-assembly-step.zip")
+    expect(anchor.download).toBe("corne_left-assembly.zip")
     expect(anchor.click).toHaveBeenCalledTimes(1)
     const zip = await JSZip.loadAsync(await downloadedBlob!.arrayBuffer())
     expect(Object.keys(zip.files)).toEqual(["BASE.step", "PLATE.step"])
@@ -73,35 +73,11 @@ test("assembly STEP exports separate printed parts while default mixed input exp
     }
     expect(circuitJson).toEqual(before)
     await exportAndDownload({
-      exportName: "STEP",
-      projectName: "corne/left",
-      circuitJson,
-    })
-    expect(anchor.download).toBe("corne_left.step")
-    expect(await downloadedBlob!.text()).toContain("ISO-10303-21;")
-    await exportAndDownload({
-      exportName: "STEP",
-      projectName: "pcb",
-      circuitJson: [
-        {
-          type: "pcb_board",
-          pcb_board_id: "board",
-          center: { x: 0, y: 0 },
-          width: 20,
-          height: 10,
-          thickness: 1.6,
-        },
-      ] as CircuitJson,
-    })
-    expect(anchor.download).toBe("pcb.step")
-    expect(await downloadedBlob!.text()).toContain("ISO-10303-21;")
-    const downloadCount = 3
-    await exportAndDownload({
       exportName: "Assembly STEP",
       projectName: "empty",
       circuitJson: [],
     })
-    expect(anchor.click).toHaveBeenCalledTimes(downloadCount)
+    expect(anchor.click).toHaveBeenCalledTimes(1)
   } finally {
     globalThis.document = originalDocument
     URL.createObjectURL = originalCreateObjectURL

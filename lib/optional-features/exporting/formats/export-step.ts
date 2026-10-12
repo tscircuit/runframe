@@ -1,42 +1,68 @@
 import type { CircuitJson } from "circuit-json"
-import JSZip from "jszip"
-import { toast } from "lib/utils/toast"
-import { getStepConverter } from "../get-step-converter"
 import { openForDownload } from "../open-for-download"
+import { toast } from "lib/utils/toast"
+import importer from "@tscircuit/internal-dynamic-import"
 
 export const exportStep = async ({
   circuitJson,
   projectName,
-  exportMode,
 }: {
   circuitJson: CircuitJson
   projectName: string
-  exportMode?: "pcb" | "assembly"
 }) => {
+  const { circuitJsonToStep } = await importer("circuit-json-to-step")
+  // Extract board dimensions from circuit JSON
+  const pcbBoard = circuitJson.find((el) => el.type === "pcb_board")
+
+  const boardWidth =
+    pcbBoard && "width" in pcbBoard ? pcbBoard.width : undefined
+  const boardHeight =
+    pcbBoard && "height" in pcbBoard ? pcbBoard.height : undefined
+  const boardThickness =
+    pcbBoard && "thickness" in pcbBoard ? pcbBoard.thickness : undefined
+
+  // Validate required dimensions
+  if (
+    boardWidth === undefined ||
+    boardHeight === undefined ||
+    boardThickness === undefined
+  ) {
+    toast.error(
+      "Board dimensions not found. Please add a pcb_board with width, height, and thickness to your circuit.",
+    )
+    return
+  }
+
+  // Convert Circuit JSON to STEP format
+  let stepText: string
   try {
-    const { circuitJsonToStep } = await getStepConverter()
-    const output = await circuitJsonToStep(circuitJson, {
-      exportMode,
+    stepText = await circuitJsonToStep(circuitJson, {
+      boardWidth,
+      boardHeight,
+      boardThickness,
       productName: projectName,
       includeComponents: true,
       includeExternalMeshes: true,
     })
-    if (typeof output === "string") {
-      openForDownload(new Blob([output], { type: "application/step" }), {
-        fileName: `${projectName}.step`,
-      })
-    } else {
-      const zip = new JSZip()
-      for (const [fileName, content] of Object.entries(output)) {
-        zip.file(fileName, content)
-      }
-      openForDownload(await zip.generateAsync({ type: "blob" }), {
-        fileName: `${projectName}${exportMode === "assembly" ? "-assembly" : ""}-step.zip`,
-      })
-    }
   } catch (error) {
-    toast.error(
-      `Failed to export STEP: ${error instanceof Error ? error.message : String(error)}`,
-    )
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error"
+    toast.error(`Failed to convert circuit to STEP format: ${errorMessage}`)
+    return
+  }
+
+  // Create blob and trigger download
+  const blob = new Blob([stepText], {
+    type: "application/step",
+  })
+
+  try {
+    openForDownload(blob, {
+      fileName: `${projectName}.step`,
+    })
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error"
+    toast.error(`Failed to download STEP file: ${errorMessage}`)
   }
 }

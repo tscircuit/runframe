@@ -853,6 +853,8 @@ export const RunFrame = (props: RunFrameProps) => {
             )}
             {props.showFileMenu !== false && (
               <FileMenuLeftHeader
+                platformConfig={props.platformConfig}
+                cachedDatasheetImports={props.cachedDatasheetImports}
                 isWebEmbedded={props.isWebEmbedded}
                 onLoginRequired={props.onLoginRequired}
                 showSchematicDebugGrid={showSchematicDebugGrid}

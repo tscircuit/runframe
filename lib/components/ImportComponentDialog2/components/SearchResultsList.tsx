@@ -35,6 +35,8 @@ const getResultKey = (result: ImportComponentDialogSearchResult) => {
       return `jlc-${result.component.lcscId}`
     case "kicad":
       return `kicad-${result.footprint.path}`
+    case "datasheets":
+      return `datasheet-${result.datasheet.datasheet_id}`
     default:
       return "unknown"
   }
@@ -50,6 +52,8 @@ const getPrimaryText = (result: ImportComponentDialogSearchResult) => {
         : result.component.manufacturer
     case "kicad":
       return result.footprint.qualifiedName
+    case "datasheets":
+      return result.datasheet.chip_name
   }
 }
 
@@ -66,6 +70,8 @@ const getSecondaryText = (result: ImportComponentDialogSearchResult) => {
       return result.component.description
     case "kicad":
       return result.footprint.description
+    case "datasheets":
+      return result.datasheet.description
   }
 }
 
@@ -78,6 +84,7 @@ const getPartNumberLabel = (result: ImportComponentDialogSearchResult) => {
         ? undefined
         : result.component.partNumber
     case "kicad":
+    case "datasheets":
       return undefined
   }
 }

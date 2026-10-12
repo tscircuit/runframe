@@ -1,6 +1,8 @@
 import type { Package } from "@tscircuit/fake-snippets/schema"
+import type { PlatformConfig } from "@tscircuit/props"
+import type { DatasheetCatalogEntry } from "lib/optional-features/importing/datasheet-catalog/catalog"
 
-export type ImportSource = "tscircuit.com" | "jlcpcb" | "kicad"
+export type ImportSource = "tscircuit.com" | "jlcpcb" | "kicad" | "datasheets"
 
 export interface TscircuitPackageDetails {
   ai_description?: string
@@ -41,10 +43,16 @@ export interface KicadFootprintSearchResult {
   footprint: KicadFootprintSummary
 }
 
+export interface DatasheetComponentSearchResult {
+  source: "datasheets"
+  datasheet: DatasheetCatalogEntry
+}
+
 export type ImportComponentDialogSearchResult =
   | TscircuitPackageSearchResult
   | JlcpcbComponentSearchResult
   | KicadFootprintSearchResult
+  | DatasheetComponentSearchResult
 
 export interface ImportComponentDialog2Props {
   isOpen: boolean
@@ -52,6 +60,9 @@ export interface ImportComponentDialog2Props {
   jlcpcbProxyRequestHeaders?: Record<string, string>
   jlcpcbProxyApiBase?: string
   tscircuitSessionToken?: string
+  /** Use only the datasheet catalog provided by platformFetch. */
+  cachedDatasheetImports?: boolean
+  platformConfig?: PlatformConfig
   onKicadStringSelected?: (
     payload: KicadStringSelectedPayload,
   ) => void | Promise<void>
@@ -60,6 +71,9 @@ export interface ImportComponentDialog2Props {
   ) => void | Promise<void>
   onJlcpcbComponentTsxLoaded?: (
     payload: JlcpcbComponentTsxLoadedPayload,
+  ) => void | Promise<void>
+  onDatasheetComponentTsxLoaded?: (
+    payload: DatasheetComponentTsxLoadedPayload,
   ) => void | Promise<void>
 }
 
@@ -77,5 +91,10 @@ export interface TscircuitPackageSelectedPayload {
 
 export interface JlcpcbComponentTsxLoadedPayload {
   result: JlcpcbComponentSearchResult
+  tsx: string
+}
+
+export interface DatasheetComponentTsxLoadedPayload {
+  result: DatasheetComponentSearchResult
   tsx: string
 }

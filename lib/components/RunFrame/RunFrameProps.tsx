@@ -159,6 +159,8 @@ export interface RunFrameProps {
    * Shared circuit platform hooks, passed to the evaluator and preview viewers.
    */
   platformConfig?: PlatformConfig
+  /** Import components only from the catalog supplied by platformFetch. */
+  cachedDatasheetImports?: boolean
 
   onReportAutoroutingLog?: (
     name: string,

@@ -132,6 +132,8 @@
   },
   "overrides": {
     "circuit-json": "$circuit-json",
-    "altiumts": "0.0.59"
-  }
+    "altiumts": "0.0.59",
+    "jscad-to-step": "github:tscircuit/jscad-to-step#e47220e6b7a98746b2135f9be62f5687644e58fc"
+  },
+  "trustedDependencies": ["jscad-to-step"]
 }

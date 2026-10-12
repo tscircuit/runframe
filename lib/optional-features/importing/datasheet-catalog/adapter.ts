@@ -1,27 +1,9 @@
 import { fp } from "@tscircuit/footprinter"
-import { pinAttributeMap } from "@tscircuit/props"
 import type { PinAttributeMap } from "@tscircuit/props"
 import type { AnyCircuitElement } from "circuit-json"
-import { z } from "zod"
-import type { AdaptedCachedDatasheet, CachedDatasheet } from "./types"
-
-const cachedDatasheetSchema = z.object({
-  datasheet_id: z.string().uuid(),
-  chip_name: z.string().trim().min(1),
-  ai_description: z.string().nullish(),
-  footprinter_string: z.string().trim().min(1).max(8192),
-  pin_information: z
-    .array(
-      z.object({
-        pin_number: z.string().trim().min(1),
-        name: z.array(z.string().trim().min(1)),
-        description: z.string().optional(),
-        capabilities: z.array(z.string()).optional(),
-      }),
-    )
-    .min(1),
-  pin_attributes: z.record(pinAttributeMap).nullish(),
-})
+import { generateTypescriptComponent } from "easyeda/browser"
+import { cachedDatasheetSchema } from "./types"
+import type { AdaptedCachedDatasheet } from "./types"
 
 const invalid = (message: string): never => {
   throw new Error(`Cached datasheet cannot be imported: ${message}`)
@@ -104,7 +86,7 @@ export const adaptCachedDatasheet = (
     const issue = parsed.error.issues[0]!
     return invalid(`${issue.path.join(".") || "record"}: ${issue.message}`)
   }
-  const datasheet: CachedDatasheet = parsed.data
+  const datasheet = parsed.data
   const footprintCircuitJson = parseFootprint(datasheet.footprinter_string)
   const pins = datasheet.pin_information
   const physicalOwners = new Map<string, number>()
@@ -286,7 +268,16 @@ export const adaptCachedDatasheet = (
     }
   })
   const componentName = componentNameFor(datasheet.chip_name)
-  const tsx = `import type { ChipProps } from "@tscircuit/props"\n\nconst pinLabels = ${JSON.stringify(pinLabels, null, 2)} as const\n\nexport const ${componentName} = (props: ChipProps<typeof pinLabels>) => (\n  <chip\n    pinLabels={pinLabels}\n    pinAttributes={${JSON.stringify(pinAttributes, null, 2)}}\n    manufacturerPartNumber={${JSON.stringify(datasheet.chip_name)}}\n    footprint={${JSON.stringify(datasheet.footprinter_string)}}\n    {...props}\n  />\n)\n\nexport default ${componentName}\n`
+  const componentSource = generateTypescriptComponent({
+    componentName,
+    manufacturerPartNumber: datasheet.chip_name,
+    pinLabels,
+    pinAttributes,
+    footprint: datasheet.footprinter_string,
+    supplierPartNumbers: {},
+    inferPinAttributes: false,
+  })
+  const tsx = `${componentSource}\n\nexport default ${componentName}\n`
   return {
     datasheetId: datasheet.datasheet_id,
     chipName: datasheet.chip_name,

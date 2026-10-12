@@ -66,10 +66,9 @@ circuit.add(
     <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
       <p style={{ margin: "12px 16px" }}>
         Open File → Export → Assembly STEP to download the printed parts as a
-        ZIP with one independently printable STEP file per part. The regular
-        STEP export also separates printed parts by default. The spacer is 42 ×
-        42 × 10 mm, with a 30 mm center opening and four 3.2 mm screw holes.{" "}
-        {ready ? "Ready to export." : "Rendering printed parts…"}
+        ZIP with one independently printable STEP file per part. The spacer is
+        42 × 42 × 10 mm, with a 30 mm center opening and four 3.2 mm screw
+        holes. {ready ? "Ready to export." : "Rendering printed parts…"}
       </p>
       <div style={{ flex: 1, minHeight: 0 }}>
         <RunFrame

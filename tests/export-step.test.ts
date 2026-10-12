@@ -6,7 +6,7 @@ import {
   exportAndDownload,
 } from "../lib/optional-features/exporting/export-and-download"
 
-test("existing STEP exports download printed parts separately by default and PCB-only input as STEP", async () => {
+test("assembly STEP exports separate printed parts while default mixed input exports a PCB STEP", async () => {
   expect(availableExports).toContainEqual({
     extension: "zip",
     name: "Assembly STEP",
@@ -56,11 +56,11 @@ test("existing STEP exports download printed parts separately by default and PCB
       return "blob:printed-part-test"
     }
     await exportAndDownload({
-      exportName: "STEP",
+      exportName: "Assembly STEP",
       projectName: "corne/left",
       circuitJson,
     })
-    expect(anchor.download).toBe("corne_left-step.zip")
+    expect(anchor.download).toBe("corne_left-assembly-step.zip")
     expect(anchor.click).toHaveBeenCalledTimes(1)
     const zip = await JSZip.loadAsync(await downloadedBlob!.arrayBuffer())
     expect(Object.keys(zip.files)).toEqual(["BASE.step", "PLATE.step"])
@@ -73,15 +73,12 @@ test("existing STEP exports download printed parts separately by default and PCB
     }
     expect(circuitJson).toEqual(before)
     await exportAndDownload({
-      exportName: "Assembly STEP",
+      exportName: "STEP",
       projectName: "corne/left",
       circuitJson,
     })
-    expect(anchor.download).toBe("corne_left-assembly-step.zip")
-    const assemblyZip = await JSZip.loadAsync(
-      await downloadedBlob!.arrayBuffer(),
-    )
-    expect(Object.keys(assemblyZip.files)).toEqual(["BASE.step", "PLATE.step"])
+    expect(anchor.download).toBe("corne_left.step")
+    expect(await downloadedBlob!.text()).toContain("ISO-10303-21;")
     await exportAndDownload({
       exportName: "STEP",
       projectName: "pcb",

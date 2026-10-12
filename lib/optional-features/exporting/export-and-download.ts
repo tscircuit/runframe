@@ -1,6 +1,7 @@
 import type { CircuitJson } from "circuit-json"
 import { sanitizeFileName } from "lib/utils/sanitizeFileName"
 import { exportAltiumProject } from "./formats/export-altium-project"
+import { exportAssemblyStep } from "./formats/export-assembly-step"
 import { exportFabricationFiles } from "./formats/export-fabrication-files"
 import { exportFdmComponentBox } from "./formats/export-fdm-component-box"
 import { exportGlb } from "./formats/export-glb"
@@ -21,6 +22,7 @@ export const availableExports = [
   { extension: "glb", name: "GLB (Binary GLTF)" },
   { extension: "svg", name: "Pinout SVG" },
   { extension: "step", name: "STEP" },
+  { extension: "step", name: "Assembly STEP" },
   { extension: "lbrn2", name: "LightBurn" },
   // { extension: "svg", name: "SVG" },
   // { extension: "dsn", name: "Specctra DSN" },
@@ -92,6 +94,10 @@ export const exportAndDownload = async ({
   }
   if (exportName === "STEP") {
     await exportStep({ circuitJson, projectName })
+    return
+  }
+  if (exportName === "Assembly STEP") {
+    await exportAssemblyStep({ circuitJson, projectName })
     return
   }
   if (exportName === "Component Box (3MF)") {

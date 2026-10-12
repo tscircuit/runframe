@@ -14,9 +14,11 @@ export interface RunFrameForCliProps {
   scenarioSelectorContent?: React.ReactNode
   workerBlobUrl?: string
   evalWebWorkerBlobUrl?: string
+  evalVersion?: RunFrameWithApiProps["evalVersion"]
   enableFetchProxy?: boolean
   apiBaseUrl?: string
   platformConfig?: RunFrameWithApiProps["platformConfig"]
+  cachedDatasheetImports?: boolean
 }
 
 export const RunFrameForCli = (props: RunFrameForCliProps) => {
@@ -64,8 +66,10 @@ export const RunFrameForCli = (props: RunFrameForCliProps) => {
         defaultToFullScreen={true}
         showToggleFullScreen={false}
         evalWebWorkerBlobUrl={evalWebWorkerBlobUrl}
+        evalVersion={props.evalVersion}
         apiBaseUrl={props.apiBaseUrl}
         platformConfig={platformConfig}
+        cachedDatasheetImports={props.cachedDatasheetImports}
         isCli={true}
         showFilesSwitch
         enableFetchProxy={props.enableFetchProxy}

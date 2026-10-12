@@ -1,10 +1,15 @@
 import { fileURLToPath } from "node:url"
 
-// Bun module mocks persist across test files. Run UI fixtures that replace
-// dependencies separately so real worker and converter tests retain theirs.
-export const runIsolatedUiTest = async (fixture: URL) => {
+// Run fixtures with test-specific services separately so worker and converter
+// tests in the parent process retain their real dependencies.
+export const runIsolatedUiTest = async (fixture: URL, preload?: URL) => {
   const subprocess = Bun.spawn({
-    cmd: [process.execPath, "test", fileURLToPath(fixture)],
+    cmd: [
+      process.execPath,
+      "test",
+      ...(preload ? ["--preload", fileURLToPath(preload)] : []),
+      fileURLToPath(fixture),
+    ],
     stdout: "pipe",
     stderr: "pipe",
   })

@@ -1,39 +1,21 @@
-import { expect, mock, test } from "bun:test"
+import { expect, test } from "bun:test"
 import type { PlatformConfig } from "@tscircuit/props"
-import { useSchematicViewerController } from "@tscircuit/schematic-viewer"
 import { JSDOM } from "jsdom"
 import { act } from "react"
 import { createRoot } from "react-dom/client"
-
-const createWorker = mock(async (_options: unknown) => ({}))
-const previewConfigs: (PlatformConfig | undefined)[] = []
-mock.module("@tscircuit/eval/worker", () => ({
-  createCircuitWebWorker: createWorker,
-}))
-mock.module("posthog-js", () => ({
-  default: {
-    init: () => {},
-    identify: () => {},
-    capture: () => {},
-    captureException: () => {},
-  },
-}))
-mock.module("@tscircuit/schematic-viewer", () => ({
-  useSchematicViewerController,
-  AnalogSimulationViewer: () => null,
-  SchematicViewer: ({
-    platformConfig,
-  }: { platformConfig?: PlatformConfig }) => {
-    previewConfigs.push(platformConfig)
-    return <div data-testid="schematic-viewer" />
-  },
-}))
+import {
+  fakeEvaluator,
+  previewConfigs,
+  cliConfigs,
+} from "./fake-platform-services"
 
 test("shared circuit hooks reach the evaluator and schematic viewer unchanged", async () => {
   const dom = new JSDOM('<div id="root"></div>', {
     url: "http://localhost",
     pretendToBeVisual: true,
   })
+  ;(dom.window as any).TSCIRCUIT_ALLOW_SELECTING_EVAL_VERSION = false
+  ;(dom.window as any).TSCIRCUIT_TELEMETRY_DISABLED = true
   const globals = [
     "window",
     "document",
@@ -54,7 +36,11 @@ test("shared circuit hooks reach the evaluator and schematic viewer unchanged", 
   )
   const previousFetch = globalThis.fetch
   const previousWorker = globalThis.runFrameWorker
-  const network = mock(async () => new Response('{"versions":[]}'))
+  const externalRequests: RequestInfo[] = []
+  const fakeNetwork = async (input: RequestInfo) => {
+    externalRequests.push(input)
+    throw new Error("Pinned local runtime must not use global fetch")
+  }
   Object.assign(
     globalThis,
     Object.fromEntries(globals.map((key) => [key, (dom.window as any)[key]])),
@@ -65,10 +51,10 @@ test("shared circuit hooks reach the evaluator and schematic viewer unchanged", 
         observe() {}
         disconnect() {}
       },
-      fetch: network,
+      fetch: fakeNetwork,
     },
   )
-  ;(dom.window as any).fetch = network
+  ;(dom.window as any).fetch = fakeNetwork
   let root = createRoot(document.getElementById("root")!)
   try {
     const { RunFrame } = await import("../../lib/components/RunFrame/RunFrame")
@@ -76,7 +62,7 @@ test("shared circuit hooks reach the evaluator and schematic viewer unchanged", 
       projectBaseUrl: "http://localhost/project",
       enablePartOrientationAnalysis: false,
       partsEngine: { findPart: () => ({}) },
-      platformFetch: network as typeof fetch,
+      platformFetch: fakeNetwork as typeof fetch,
     }
     await act(async () => {
       root.render(
@@ -90,8 +76,8 @@ test("shared circuit hooks reach the evaluator and schematic viewer unchanged", 
         />,
       )
     })
-    expect(createWorker).toHaveBeenCalledTimes(1)
-    const options = createWorker.mock.calls[0][0] as {
+    expect(fakeEvaluator.workers).toHaveLength(1)
+    const options = fakeEvaluator.workers[0]!.options as {
       platform: PlatformConfig
       projectConfig: Partial<PlatformConfig>
     }
@@ -100,7 +86,7 @@ test("shared circuit hooks reach the evaluator and schematic viewer unchanged", 
       projectBaseUrl: platformConfig.projectBaseUrl,
       enablePartOrientationAnalysis: false,
     })
-    expect(network).not.toHaveBeenCalled()
+    expect(externalRequests).toHaveLength(0)
 
     await act(async () => root.unmount())
     root = createRoot(document.getElementById("root")!)
@@ -120,7 +106,34 @@ test("shared circuit hooks reach the evaluator and schematic viewer unchanged", 
       document.querySelector('[data-testid="schematic-viewer"]'),
     ).not.toBeNull()
     expect(previewConfigs.at(-1)).toBe(platformConfig)
-    expect(createWorker).toHaveBeenCalledTimes(1)
+    expect(fakeEvaluator.workers).toHaveLength(1)
+
+    await act(async () => root.unmount())
+    root = createRoot(document.getElementById("root")!)
+    const { RunFrameForCli } = await import(
+      "../../lib/components/RunFrameForCli/RunFrameForCli"
+    )
+    await act(async () =>
+      root.render(
+        <RunFrameForCli
+          platformConfig={platformConfig}
+          cachedDatasheetImports
+          evalVersion="0.0.1595"
+          evalWebWorkerBlobUrl="/assets/eval-worker.js"
+        />,
+      ),
+    )
+    expect(cliConfigs.at(-1)).toMatchObject({
+      cachedDatasheetImports: true,
+      evalVersion: "0.0.1595",
+      evalWebWorkerBlobUrl: "/assets/eval-worker.js",
+      forceLatestEvalVersion: false,
+      shouldLoadLatestEval: false,
+    })
+    expect(cliConfigs.at(-1)?.platformConfig?.platformFetch).toBe(
+      platformConfig.platformFetch,
+    )
+    expect(externalRequests).toHaveLength(0)
   } finally {
     await act(async () => root.unmount())
     globalThis.fetch = previousFetch

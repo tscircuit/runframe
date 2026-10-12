@@ -22,6 +22,11 @@ export const SOURCE_CONFIG: Record<ImportSource, SourceConfig> = {
     placeholder: "Search KiCad footprints...",
     emptyMessage: "No footprints found",
   },
+  datasheets: {
+    label: "Cached Datasheets",
+    placeholder: "Search cached datasheet components...",
+    emptyMessage: "No cached components found",
+  },
 }
 
 export const DEFAULT_SOURCES: ImportSource[] = [

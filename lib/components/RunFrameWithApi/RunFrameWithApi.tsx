@@ -89,6 +89,7 @@ export interface RunFrameWithApiProps {
   showFileMenu?: boolean
   schematicSvgOptions?: RunFrameProps["schematicSvgOptions"]
   platformConfig?: RunFrameProps["platformConfig"]
+  cachedDatasheetImports?: boolean
   isCli?: boolean
 
   /**
@@ -309,6 +310,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       forceLatestEvalVersion={props.forceLatestEvalVersion}
       evalWebWorkerBlobUrl={props.evalWebWorkerBlobUrl ?? props.workerBlobUrl}
       platformConfig={props.platformConfig}
+      cachedDatasheetImports={props.cachedDatasheetImports}
       enableFetchProxy={props.enableFetchProxy}
       leftHeaderContent={
         <div className="rf-flex rf-items-center rf-justify-between rf-w-full">

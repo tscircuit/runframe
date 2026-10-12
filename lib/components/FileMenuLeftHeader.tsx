@@ -47,8 +47,11 @@ import {
 import { exportLbrn } from "lib/optional-features/exporting/formats/export-lbrn"
 import { getLatestAutoroutingLogEntry } from "lib/utils/get-latest-autorouting-log-entry"
 import { ExportAccessoryDialog } from "./ExportAccessoryDialog"
+import type { PlatformConfig } from "@tscircuit/props"
 
 export const FileMenuLeftHeader = (props: {
+  platformConfig?: PlatformConfig
+  cachedDatasheetImports?: boolean
   isWebEmbedded?: boolean
   shouldLoadLatestEval?: boolean
   onChangeShouldLoadLatestEval?: (shouldLoadLatestEval: boolean) => void
@@ -555,6 +558,8 @@ export const FileMenuLeftHeader = (props: {
         />
       )}
       <ImportComponentDialogForCli
+        platformConfig={props.platformConfig}
+        cachedDatasheetImports={props.cachedDatasheetImports}
         isOpen={isImportDialogOpen}
         onClose={() => setIsImportDialogOpen(false)}
       />

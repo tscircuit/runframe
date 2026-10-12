@@ -30,17 +30,26 @@ import { useJlcpcbComponentSearch } from "./hooks/useJlcpcbComponentSearch"
 import { useKicadFootprintSearch } from "./hooks/useKicadFootprintSearch"
 import { useStyles } from "../../hooks/use-styles"
 import { zIndexMap } from "lib/utils/z-index-map"
+import { createLocalDatasheetCatalog } from "lib/optional-features/importing/datasheet-catalog/catalog"
+import { useDatasheetComponentSearch } from "./hooks/useDatasheetComponentSearch"
 
 const computeAvailableSources = ({
   onTscircuitPackageSelected,
   onJlcpcbComponentTsxLoaded,
   onKicadStringSelected,
+  onDatasheetComponentTsxLoaded,
+  cachedDatasheetImports,
 }: Pick<
   ImportComponentDialog2Props,
   | "onTscircuitPackageSelected"
   | "onJlcpcbComponentTsxLoaded"
   | "onKicadStringSelected"
+  | "onDatasheetComponentTsxLoaded"
+  | "cachedDatasheetImports"
 >): ImportSource[] => {
+  if (cachedDatasheetImports) {
+    return onDatasheetComponentTsxLoaded ? ["datasheets"] : []
+  }
   const sources: ImportSource[] = []
   if (onTscircuitPackageSelected) sources.push("tscircuit.com")
   if (onJlcpcbComponentTsxLoaded) sources.push("jlcpcb")
@@ -57,8 +66,26 @@ export const ImportComponentDialog2 = ({
   onJlcpcbComponentTsxLoaded,
   jlcpcbProxyApiBase,
   tscircuitSessionToken,
+  cachedDatasheetImports = false,
+  platformConfig,
+  onDatasheetComponentTsxLoaded,
 }: ImportComponentDialog2Props) => {
   useStyles()
+  const importModeRef = React.useRef({
+    cached: cachedDatasheetImports,
+    platformFetch: platformConfig?.platformFetch,
+    revision: 0,
+  })
+  if (
+    importModeRef.current.cached !== cachedDatasheetImports ||
+    importModeRef.current.platformFetch !== platformConfig?.platformFetch
+  ) {
+    importModeRef.current = {
+      cached: cachedDatasheetImports,
+      platformFetch: platformConfig?.platformFetch,
+      revision: importModeRef.current.revision + 1,
+    }
+  }
 
   const availableSources = React.useMemo(
     () =>
@@ -66,23 +93,53 @@ export const ImportComponentDialog2 = ({
         onKicadStringSelected,
         onTscircuitPackageSelected,
         onJlcpcbComponentTsxLoaded,
+        onDatasheetComponentTsxLoaded,
+        cachedDatasheetImports,
       }),
     [
       onKicadStringSelected,
       onTscircuitPackageSelected,
       onJlcpcbComponentTsxLoaded,
+      onDatasheetComponentTsxLoaded,
+      cachedDatasheetImports,
     ],
   )
 
   const hasSources = availableSources.length > 0
   const singleSource = availableSources.length === 1
-  const [activeSource, setActiveSource] = React.useState<ImportSource>(
+  const [sourceSelection, setActiveSource] = React.useState<ImportSource>(
     availableSources[0] ?? "tscircuit.com",
   )
+  // Derive these immediately so a mode change cannot expose an old online result
+  // before effects reset the dialog state.
+  const activeSource = cachedDatasheetImports
+    ? "datasheets"
+    : availableSources.includes(sourceSelection)
+      ? sourceSelection
+      : (availableSources[0] ?? "tscircuit.com")
 
   const [searchQuery, setSearchQuery] = React.useState("")
-  const [selectedSearchResult, setSelectedSearchResult] =
+  const [selection, setSelectedSearchResult] =
     React.useState<ImportComponentDialogSearchResult | null>(null)
+  const selectedSearchResult =
+    selection && availableSources.includes(selection.source) ? selection : null
+  const datasheetCatalog = React.useMemo(
+    () =>
+      cachedDatasheetImports && platformConfig?.platformFetch
+        ? createLocalDatasheetCatalog({
+            platformFetch: platformConfig.platformFetch,
+          })
+        : null,
+    [cachedDatasheetImports, platformConfig?.platformFetch],
+  )
+  const {
+    results: datasheetResults,
+    isSearching: isDatasheetSearching,
+    error: datasheetError,
+    hasSearched: hasDatasheetSearched,
+    search: searchDatasheets,
+    reset: resetDatasheetSearch,
+  } = useDatasheetComponentSearch(datasheetCatalog)
   const {
     results: tscircuitResults,
     isSearching: isTscircuitSearching,
@@ -131,8 +188,9 @@ export const ImportComponentDialog2 = ({
         headers: jlcpcbProxyRequestHeaders,
         apiBase: jlcpcbProxyApiBase,
       },
+      datasheetCatalog,
     }),
-    [jlcpcbProxyApiBase, jlcpcbProxyRequestHeaders],
+    [jlcpcbProxyApiBase, jlcpcbProxyRequestHeaders, datasheetCatalog],
   )
   const {
     circuitJson: footprintPreviewCircuitJson,
@@ -152,8 +210,21 @@ export const ImportComponentDialog2 = ({
     resetTscircuitSearch()
     resetJlcpcbSearch()
     resetKicadSearch()
+    resetDatasheetSearch()
     setSelectedSearchResult(null)
-  }, [resetJlcpcbSearch, resetKicadSearch, resetTscircuitSearch])
+  }, [
+    resetJlcpcbSearch,
+    resetKicadSearch,
+    resetTscircuitSearch,
+    resetDatasheetSearch,
+  ])
+
+  React.useEffect(() => {
+    resetAllSearches()
+    setIsDetailsDialogOpen(false)
+    setComponentForDetails(null)
+    setImportErrorMessage(null)
+  }, [cachedDatasheetImports, datasheetCatalog, resetAllSearches])
 
   React.useEffect(() => {
     if (!isOpen) {
@@ -174,10 +245,19 @@ export const ImportComponentDialog2 = ({
       resetJlcpcbSearch()
     } else if (activeSource === "kicad") {
       resetKicadSearch()
+    } else if (activeSource === "datasheets") {
+      resetDatasheetSearch()
     }
-  }, [activeSource, resetJlcpcbSearch, resetKicadSearch, resetTscircuitSearch])
+  }, [
+    activeSource,
+    resetJlcpcbSearch,
+    resetKicadSearch,
+    resetTscircuitSearch,
+    resetDatasheetSearch,
+  ])
 
   const handleShowDetails = (component: TscircuitPackageSearchResult) => {
+    if (cachedDatasheetImports) return
     setSelectedSearchResult(component)
     setComponentForDetails(component)
     setDetailsPreviewTab("pcb")
@@ -197,7 +277,9 @@ export const ImportComponentDialog2 = ({
 
     setSelectedSearchResult(null)
 
-    if (activeSource === "tscircuit.com") {
+    if (cachedDatasheetImports) {
+      await searchDatasheets(searchQuery)
+    } else if (activeSource === "tscircuit.com") {
       await searchTscircuit(searchQuery)
     } else if (activeSource === "jlcpcb") {
       await searchJlcpcb(searchQuery)
@@ -212,7 +294,31 @@ export const ImportComponentDialog2 = ({
     try {
       setImportErrorMessage(null)
       setIsSubmittingImport(true)
-      if (result.source === "kicad") {
+      const startedInCachedMode = importModeRef.current.cached
+      const startedInRevision = importModeRef.current.revision
+      const requireSameImportMode = () => {
+        if (importModeRef.current.revision !== startedInRevision) {
+          throw new Error("Import source changed; select a component again")
+        }
+      }
+      if (startedInCachedMode && result.source !== "datasheets") {
+        throw new Error(
+          "Only cached datasheet components can be imported in this mode",
+        )
+      }
+      if (result.source === "datasheets") {
+        if (!cachedDatasheetImports || !datasheetCatalog) {
+          throw new Error(
+            "Cached datasheet imports require platformConfig.platformFetch",
+          )
+        }
+        if (!onDatasheetComponentTsxLoaded) {
+          throw new Error("Datasheet import handler not provided")
+        }
+        const component = await datasheetCatalog.loadComponent(result.datasheet)
+        requireSameImportMode()
+        await onDatasheetComponentTsxLoaded({ result, tsx: component.tsx })
+      } else if (result.source === "kicad") {
         if (!onKicadStringSelected) {
           throw new Error("KiCad handler not provided")
         }
@@ -228,6 +334,7 @@ export const ImportComponentDialog2 = ({
           headers: jlcpcbProxyRequestHeaders,
           apiBase: jlcpcbProxyApiBase,
         })
+        requireSameImportMode()
         await onJlcpcbComponentTsxLoaded({ result, tsx })
       } else if (result.source === "tscircuit.com") {
         if (!onTscircuitPackageSelected) {
@@ -262,7 +369,12 @@ export const ImportComponentDialog2 = ({
   let searchError: string | null = null
   let hasExecutedSearch = false
 
-  if (activeSource === "tscircuit.com") {
+  if (cachedDatasheetImports) {
+    searchResults = datasheetResults
+    isSearching = isDatasheetSearching
+    searchError = datasheetError
+    hasExecutedSearch = hasDatasheetSearched
+  } else if (activeSource === "tscircuit.com") {
     searchResults = tscircuitResults
     isSearching = isTscircuitSearching
     searchError = tscircuitError
@@ -320,9 +432,11 @@ export const ImportComponentDialog2 = ({
             Component
           </DialogTitle>
           <DialogDescription className="rf-text-sm">
-            {hasSources
-              ? "Search for components from available sources."
-              : "Import options are disabled because no handlers were provided."}
+            {cachedDatasheetImports && hasSources
+              ? "Search components available in the local datasheet cache."
+              : hasSources
+                ? "Search for components from available sources."
+                : "Import options are disabled because no handlers were provided."}
           </DialogDescription>
         </DialogHeader>
 
@@ -440,27 +554,29 @@ export const ImportComponentDialog2 = ({
         </DialogFooter>
       </DialogContent>
 
-      <TscircuitPackageDetailsDialog
-        packageResult={componentForDetails}
-        isOpen={isDetailsDialogOpen}
-        onOpenChange={handleDetailsClose}
-        isLoading={isPackageDetailsLoading}
-        details={packageDetails}
-        previewTab={detailsPreviewTab}
-        onPreviewTabChange={(value) => setDetailsPreviewTab(value)}
-        isSubmitting={isSubmittingImport}
-        onImport={() => {
-          if (!componentForDetails) return
-          performActionForComponent(componentForDetails).then((succeeded) => {
-            if (succeeded) {
-              setIsDetailsDialogOpen(false)
-              onClose()
-              resetAllSearches()
-              setSearchQuery("")
-            }
-          })
-        }}
-      />
+      {!cachedDatasheetImports && (
+        <TscircuitPackageDetailsDialog
+          packageResult={componentForDetails}
+          isOpen={isDetailsDialogOpen}
+          onOpenChange={handleDetailsClose}
+          isLoading={isPackageDetailsLoading}
+          details={packageDetails}
+          previewTab={detailsPreviewTab}
+          onPreviewTabChange={(value) => setDetailsPreviewTab(value)}
+          isSubmitting={isSubmittingImport}
+          onImport={() => {
+            if (!componentForDetails) return
+            performActionForComponent(componentForDetails).then((succeeded) => {
+              if (succeeded) {
+                setIsDetailsDialogOpen(false)
+                onClose()
+                resetAllSearches()
+                setSearchQuery("")
+              }
+            })
+          }}
+        />
+      )}
     </Dialog>
   )
 }

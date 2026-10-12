@@ -1,4 +1,4 @@
-import importer from "@tscircuit/internal-dynamic-import"
+import { loadRunFrameModule as importer } from "lib/optional-features/importing/load-runframe-module"
 import type { AnyCircuitElement } from "circuit-json"
 import JSZip from "jszip"
 import { toast } from "lib/utils/toast"

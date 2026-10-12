@@ -1,4 +1,4 @@
-import importer from "@tscircuit/internal-dynamic-import"
+import { loadRunFrameModule as importer } from "lib/optional-features/importing/load-runframe-module"
 import { useEffect, useState } from "react"
 import type React from "react"
 import { getBomCellDescriptors, getBomMetadata } from "./bom-table.columns"

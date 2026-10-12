@@ -2,12 +2,6 @@ import { pinAttributeMap, type PinAttributeMap } from "@tscircuit/props"
 import { z } from "zod"
 import type { AnyCircuitElement } from "circuit-json"
 
-export interface DatasheetCatalogEntry {
-  datasheet_id: string
-  chip_name: string
-  description?: string
-}
-
 /**
  * Supported cached API subset: a local Footprinter recipe and a complete physical
  * pin table. Descriptions and electrical attributes may be absent. Source-code,
@@ -33,6 +27,18 @@ export const cachedDatasheetSchema = z.object({
 })
 
 export type CachedDatasheet = z.infer<typeof cachedDatasheetSchema>
+
+export const datasheetCatalogEntrySchema = cachedDatasheetSchema
+  .pick({ datasheet_id: true, chip_name: true, ai_description: true })
+  .extend({ description: z.string().nullish() })
+  .transform(({ datasheet_id, chip_name, description, ai_description }) => ({
+    datasheet_id,
+    chip_name,
+    ...((description ?? ai_description)
+      ? { description: (description ?? ai_description)! }
+      : {}),
+  }))
+export type DatasheetCatalogEntry = z.infer<typeof datasheetCatalogEntrySchema>
 
 export interface AdaptedCachedDatasheet {
   datasheetId: string

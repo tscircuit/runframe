@@ -1,6 +1,11 @@
+import ky from "ky"
+import { z } from "zod"
 import { adaptCachedDatasheet } from "./adapter"
 import { normalizeDatasheetChipName } from "./create-cached-datasheet-fetch"
-import type { DatasheetCatalogEntry } from "./types"
+import {
+  datasheetCatalogEntrySchema,
+  type DatasheetCatalogEntry,
+} from "./types"
 
 export type { DatasheetCatalogEntry, AdaptedCachedDatasheet } from "./types"
 
@@ -11,45 +16,32 @@ export interface LocalDatasheetCatalogOptions {
 }
 
 const parseIndex = (input: unknown): DatasheetCatalogEntry[] => {
-  const rows = (input as { datasheets?: unknown })?.datasheets
-  if (!Array.isArray(rows)) {
-    throw new Error(
-      "Invalid cached datasheet index: expected a datasheets array",
-    )
+  const parsed = z
+    .object({ datasheets: z.array(datasheetCatalogEntrySchema) })
+    .safeParse(input)
+  if (!parsed.success) {
+    throw new Error(`Invalid cached datasheet index: ${parsed.error.message}`)
   }
   const ids = new Set<string>()
   const names = new Set<string>()
-  return rows.map((row) => {
+  for (const entry of parsed.data.datasheets) {
+    const normalizedName = normalizeDatasheetChipName(entry.chip_name)
     if (
-      !row ||
-      typeof row.datasheet_id !== "string" ||
-      !row.datasheet_id.trim() ||
-      typeof row.chip_name !== "string" ||
-      !normalizeDatasheetChipName(row.chip_name)
+      !normalizedName ||
+      ids.has(entry.datasheet_id) ||
+      names.has(normalizedName)
     ) {
       throw new Error(
-        "Invalid cached datasheet index entry: expected datasheet_id and chip_name",
+        `Invalid or duplicate cached datasheet identity: ${entry.chip_name}`,
       )
     }
-    const normalizedName = normalizeDatasheetChipName(row.chip_name)
-    if (ids.has(row.datasheet_id) || names.has(normalizedName)) {
-      throw new Error(`Duplicate cached datasheet identity: ${row.chip_name}`)
-    }
-    ids.add(row.datasheet_id)
+    ids.add(entry.datasheet_id)
     names.add(normalizedName)
-    const description = row.description ?? row.ai_description
-    if (description != null && typeof description !== "string") {
-      throw new Error(`Invalid cached datasheet description: ${row.chip_name}`)
-    }
-    return {
-      datasheet_id: row.datasheet_id,
-      chip_name: row.chip_name,
-      ...(description ? { description } : {}),
-    }
-  })
+  }
+  return parsed.data.datasheets
 }
 
-/** Search local metadata and adapt selected stored records, without JLC/EasyEDA. */
+/** Search local metadata and adapt selected stored records, without supplier requests. */
 export const createLocalDatasheetCatalog = ({
   platformFetch,
   apiBaseUrl = "https://api.tscircuit.com",
@@ -60,15 +52,10 @@ export const createLocalDatasheetCatalog = ({
     )
   }
   const base = new URL(`${apiBaseUrl.replace(/\/$/, "")}/`)
-  const readJson = async (url: URL) => {
-    const response = await platformFetch(url.toString())
-    if (!response.ok) {
-      throw new Error(
-        `Cached datasheet read failed (${response.status}): ${url.pathname}`,
-      )
-    }
-    return response.json() as Promise<unknown>
-  }
+  const readJson = (url: URL) =>
+    ky
+      .get(url, { fetch: platformFetch, retry: 0, timeout: false })
+      .json<unknown>()
   return {
     search: async (
       query: string,

@@ -34,7 +34,7 @@ const createCatalog = (files: Record<string, unknown>) =>
     }),
   })
 
-test("local search and selected imports use cached API envelopes without JLC or EasyEDA", async () => {
+test("local search and selected imports use cached API envelopes without supplier requests", async () => {
   const catalog = createCatalog({
     ".cache/datasheets/index.json": {
       datasheets: [
@@ -101,7 +101,10 @@ test("corrupt catalog entries and duplicate normalized identities are rejected",
     {
       datasheets: [
         { datasheet_id: id, chip_name: "CHIP.1" },
-        { datasheet_id: "another-id", chip_name: "chip1" },
+        {
+          datasheet_id: "22222222-2222-2222-2222-222222222222",
+          chip_name: "chip1",
+        },
       ],
     },
   ]) {
@@ -117,12 +120,14 @@ test("requires an explicit transport and reports cache HTTP errors", async () =>
       platformFetch: undefined as unknown as typeof fetch,
     }),
   ).toThrow("platformConfig.platformFetch")
+  const cacheRequests: string[] = []
   const catalog = createLocalDatasheetCatalog({
-    platformFetch: (async () =>
-      new Response(null, { status: 404 })) as typeof fetch,
+    platformFetch: (async (input: RequestInfo | URL) => {
+      cacheRequests.push(input instanceof Request ? input.url : String(input))
+      return new Response(null, { status: 404 })
+    }) as typeof fetch,
   })
-  await expect(catalog.search("chip")).rejects.toThrow(
-    "Cached datasheet read failed (404)",
-  )
+  await expect(catalog.search("chip")).rejects.toThrow("404")
+  expect(cacheRequests).toEqual(["https://api.tscircuit.com/datasheets/list"])
   await expect(catalog.search("chip", 0)).rejects.toThrow("search limit")
 })

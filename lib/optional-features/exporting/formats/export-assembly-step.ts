@@ -1,7 +1,5 @@
 import type { CircuitJson } from "circuit-json"
-import { toast } from "lib/utils/toast"
-import { getStepConverter } from "../get-step-converter"
-import { openForDownload } from "../open-for-download"
+import { exportStep } from "./export-step"
 
 export const exportAssemblyStep = async ({
   circuitJson,
@@ -9,18 +7,4 @@ export const exportAssemblyStep = async ({
 }: {
   circuitJson: CircuitJson
   projectName: string
-}) => {
-  try {
-    const { circuitJsonToStep } = await getStepConverter()
-    const stepText = await circuitJsonToStep(circuitJson, {
-      exportMode: "assembly",
-    })
-    openForDownload(new Blob([stepText], { type: "application/step" }), {
-      fileName: `${projectName}-assembly.step`,
-    })
-  } catch (error) {
-    toast.error(
-      `Failed to export assembly STEP: ${error instanceof Error ? error.message : String(error)}`,
-    )
-  }
-}
+}) => exportStep({ circuitJson, projectName, exportMode: "assembly" })

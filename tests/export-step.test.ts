@@ -6,12 +6,20 @@ import {
   exportAndDownload,
 } from "../lib/optional-features/exporting/export-and-download"
 
-test("printed-part menu exports a ZIP containing only separate base and plate STEP files", async () => {
+test("existing STEP exports download printed parts separately by default and PCB-only input as STEP", async () => {
   expect(availableExports).toContainEqual({
     extension: "zip",
-    name: "Printed Parts STEP (ZIP)",
+    name: "Assembly STEP",
   })
   const circuitJson = [
+    {
+      type: "pcb_board",
+      pcb_board_id: "board",
+      center: { x: 0, y: 0 },
+      width: 20,
+      height: 10,
+      thickness: 1.6,
+    },
     ...["BASE", "PLATE"].flatMap((name, i) => [
       {
         type: "source_component",
@@ -48,11 +56,11 @@ test("printed-part menu exports a ZIP containing only separate base and plate ST
       return "blob:printed-part-test"
     }
     await exportAndDownload({
-      exportName: "Printed Parts STEP (ZIP)",
+      exportName: "STEP",
       projectName: "corne/left",
       circuitJson,
     })
-    expect(anchor.download).toBe("corne_left-printed-parts-step.zip")
+    expect(anchor.download).toBe("corne_left-step.zip")
     expect(anchor.click).toHaveBeenCalledTimes(1)
     const zip = await JSZip.loadAsync(await downloadedBlob!.arrayBuffer())
     expect(Object.keys(zip.files)).toEqual(["BASE.step", "PLATE.step"])
@@ -64,14 +72,39 @@ test("printed-part menu exports a ZIP containing only separate base and plate ST
       expect(step).not.toContain(name === "BASE" ? "'PLATE'" : "'BASE'")
     }
     expect(circuitJson).toEqual(before)
-    await expect(
-      exportAndDownload({
-        exportName: "Printed Parts STEP (ZIP)",
-        projectName: "empty",
-        circuitJson: [],
-      }),
-    ).rejects.toThrow("No assembly.printedpart")
-    expect(anchor.click).toHaveBeenCalledTimes(1)
+    await exportAndDownload({
+      exportName: "Assembly STEP",
+      projectName: "corne/left",
+      circuitJson,
+    })
+    expect(anchor.download).toBe("corne_left-assembly-step.zip")
+    const assemblyZip = await JSZip.loadAsync(
+      await downloadedBlob!.arrayBuffer(),
+    )
+    expect(Object.keys(assemblyZip.files)).toEqual(["BASE.step", "PLATE.step"])
+    await exportAndDownload({
+      exportName: "STEP",
+      projectName: "pcb",
+      circuitJson: [
+        {
+          type: "pcb_board",
+          pcb_board_id: "board",
+          center: { x: 0, y: 0 },
+          width: 20,
+          height: 10,
+          thickness: 1.6,
+        },
+      ] as CircuitJson,
+    })
+    expect(anchor.download).toBe("pcb.step")
+    expect(await downloadedBlob!.text()).toContain("ISO-10303-21;")
+    const downloadCount = 3
+    await exportAndDownload({
+      exportName: "Assembly STEP",
+      projectName: "empty",
+      circuitJson: [],
+    })
+    expect(anchor.click).toHaveBeenCalledTimes(downloadCount)
   } finally {
     globalThis.document = originalDocument
     URL.createObjectURL = originalCreateObjectURL

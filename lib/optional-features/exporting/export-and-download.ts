@@ -10,7 +10,6 @@ import { exportKicadProject } from "./formats/export-kicad-project"
 import { exportLbrn } from "./formats/export-lbrn"
 import { exportPinoutSvg } from "./formats/export-pinout-svg"
 import { exportStep } from "./formats/export-step"
-import { exportPrintedPartSteps } from "./formats/export-printed-part-steps"
 import { openForDownload } from "./open-for-download"
 
 export const availableExports = [
@@ -23,8 +22,7 @@ export const availableExports = [
   { extension: "glb", name: "GLB (Binary GLTF)" },
   { extension: "svg", name: "Pinout SVG" },
   { extension: "step", name: "STEP" },
-  { extension: "step", name: "Assembly STEP" },
-  { extension: "zip", name: "Printed Parts STEP (ZIP)" },
+  { extension: "zip", name: "Assembly STEP" },
   { extension: "lbrn2", name: "LightBurn" },
   // { extension: "svg", name: "SVG" },
   // { extension: "dsn", name: "Specctra DSN" },
@@ -100,10 +98,6 @@ export const exportAndDownload = async ({
   }
   if (exportName === "Assembly STEP") {
     await exportAssemblyStep({ circuitJson, projectName })
-    return
-  }
-  if (exportName === "Printed Parts STEP (ZIP)") {
-    await exportPrintedPartSteps({ circuitJson, projectName })
     return
   }
   if (exportName === "Component Box (3MF)") {

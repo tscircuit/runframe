@@ -112,11 +112,19 @@ if (process.env.STANDALONE === "preview") {
   }
 }
 
-export default defineConfig({
+export default defineConfig(() => ({
   plugins,
   assetsInclude: ["**/*.glb", "**/*.step", "**/*.obj"],
   resolve: {
     alias: {
+      ...(process.env.STANDALONE === "1" || process.env.STANDALONE === "preview"
+        ? {
+            "lib/optional-features/importing/load-runframe-module": resolve(
+              __dirname,
+              "lib/optional-features/importing/load-bundled-runframe-module.ts",
+            ),
+          }
+        : {}),
       lib: resolve(__dirname, "./lib"),
     },
   },
@@ -145,4 +153,4 @@ export default defineConfig({
       "@resvg/resvg-wasm",
     ],
   },
-})
+}))

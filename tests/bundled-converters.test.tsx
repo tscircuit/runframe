@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test"
 import { Circuit } from "@tscircuit/core"
 import { setDynamicImportResolver } from "@tscircuit/internal-dynamic-import"
-import { loadRunFrameModule } from "lib/optional-features/importing/load-runframe-module"
+import { loadRunFrameModule } from "lib/optional-features/importing/load-bundled-runframe-module"
 
 test("bundled fabrication and KiCad converters process a locally rendered board without fetching", async () => {
   const previousFetch = globalThis.fetch

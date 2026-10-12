@@ -66,15 +66,15 @@ export const ImportComponentDialogForCli = (props: CliImportDialogProps) => {
     })
   }
 
-  const handleJlcpcbComponentTsxLoaded = async ({
+  const handleComponentTsxLoaded = async ({
     result,
     tsx,
-  }: JlcpcbComponentTsxLoadedPayload) => {
+  }: JlcpcbComponentTsxLoadedPayload | DatasheetComponentTsxLoadedPayload) => {
     const componentName = extractComponentName(tsx)
     const filePath = `imports/${componentName}.tsx`
 
     await toast.promise(upsertFile(filePath, tsx), {
-      loading: `Importing ${result.component.partNumber}`,
+      loading: `Importing ${result.source === "datasheets" ? result.datasheet.chip_name : result.component.partNumber}`,
       success: `Imported to "${filePath}"`,
       error: (error) =>
         `Failed to import component: ${
@@ -83,26 +83,13 @@ export const ImportComponentDialogForCli = (props: CliImportDialogProps) => {
     })
   }
 
-  const handleDatasheetComponentTsxLoaded = async ({
-    result,
-    tsx,
-  }: DatasheetComponentTsxLoadedPayload) => {
-    const filePath = `imports/${extractComponentName(tsx)}.tsx`
-    await toast.promise(upsertFile(filePath, tsx), {
-      loading: `Importing ${result.datasheet.chip_name}`,
-      success: `Imported to "${filePath}"`,
-      error: (error) =>
-        `Failed to import component: ${error instanceof Error ? error.message : String(error)}`,
-    })
-  }
-
   return (
     <ImportComponentDialog2
       {...props}
       onTscircuitPackageSelected={handleTscircuitPackageSelected}
       onKicadStringSelected={handleKicadStringSelected}
-      onJlcpcbComponentTsxLoaded={handleJlcpcbComponentTsxLoaded}
-      onDatasheetComponentTsxLoaded={handleDatasheetComponentTsxLoaded}
+      onJlcpcbComponentTsxLoaded={handleComponentTsxLoaded}
+      onDatasheetComponentTsxLoaded={handleComponentTsxLoaded}
     />
   )
 }

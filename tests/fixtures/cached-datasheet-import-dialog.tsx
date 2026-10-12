@@ -168,8 +168,8 @@ test("cached search, generated preview, and CLI save use only platformFetch", as
     expect(closeCount).toBe(1)
     const generatedTsx = fakeFileServer.files.get("imports/CachedChip.tsx")!
     expect(generatedTsx).toContain('footprint={"soic8"}')
-    expect(generatedTsx).toContain('"requiresGround": true')
-    expect(generatedTsx).toContain('"requiresVoltage": "3.3V"')
+    expect(generatedTsx).toContain("requiresGround: true")
+    expect(generatedTsx).toContain('requiresVoltage: "3.3V"')
     expect(generatedTsx).toContain('"SIGNAL8"')
     expect(cacheReads).toContain(".cache/datasheets/index.json")
     expect(cacheReads).toContain(".cache/datasheets/parts/cachedchip.json")
@@ -334,6 +334,29 @@ test("cached search, generated preview, and CLI save use only platformFetch", as
       expect(document.body.textContent).toContain("Import source changed")
       expect(externalRequests).toHaveLength(0)
     }
+    // The same save handler also preserves normal supplier imports.
+    fakeSupplier.pendingTsx = Promise.resolve(
+      "export const SupplierChip = () => null",
+    )
+    await act(async () =>
+      root.render(<ImportComponentDialogForCli isOpen onClose={closed} />),
+    )
+    const supplierTab = Array.from(
+      document.querySelectorAll('[role="tab"]'),
+    ).find((tab) => tab.textContent?.includes("JLCPCB"))!
+    await act(async () =>
+      supplierTab.dispatchEvent(
+        new dom.window.MouseEvent("mousedown", { bubbles: true, button: 0 }),
+      ),
+    )
+    await search("InFlightChip")
+    await select("InFlightChip")
+    await act(async () => importButton().click())
+    expect(fakeFileServer.writes).toHaveLength(2)
+    expect(fakeFileServer.files.get("imports/SupplierChip.tsx")).toBe(
+      "export const SupplierChip = () => null",
+    )
+    expect(externalRequests).toHaveLength(0)
   } finally {
     await act(async () => root.unmount())
     globalThis.fetch = previousFetch

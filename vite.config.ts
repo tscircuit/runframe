@@ -132,6 +132,8 @@ export default defineConfig({
     ...build,
     rollupOptions: {
       external: [
+        // Assembly STEP does not use this optional PCB mesh converter.
+        "circuit-json-to-gltf",
         "@resvg/resvg-js",
         "@resvg/resvg-js-darwin-arm64",
         "@resvg/resvg-wasm",
@@ -140,6 +142,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     exclude: [
+      "circuit-json-to-gltf",
       "@resvg/resvg-js",
       "@resvg/resvg-js-darwin-arm64",
       "@resvg/resvg-wasm",

@@ -1,4 +1,4 @@
-import importer from "@tscircuit/internal-dynamic-import"
+import importer from "@tscircuit/internal-dynamic-import/source"
 import type { CircuitJson } from "circuit-json"
 import { sanitizeFileName } from "lib/utils/sanitizeFileName"
 import { toast } from "lib/utils/toast"

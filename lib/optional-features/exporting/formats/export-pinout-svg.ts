@@ -1,5 +1,5 @@
 import type { CircuitJson } from "circuit-json"
-import importer from "@tscircuit/internal-dynamic-import"
+import importer from "@tscircuit/internal-dynamic-import/source"
 import { openForDownload } from "../open-for-download"
 
 export const exportPinoutSvg = async ({

@@ -1,6 +1,6 @@
 import type { CircuitJson } from "circuit-json"
 import { openForDownload } from "../open-for-download"
-import importer from "@tscircuit/internal-dynamic-import"
+import importer from "@tscircuit/internal-dynamic-import/source"
 
 export const exportGlb = async ({
   circuitJson,

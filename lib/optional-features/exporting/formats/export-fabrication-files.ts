@@ -1,4 +1,4 @@
-import importer from "@tscircuit/internal-dynamic-import"
+import importer from "@tscircuit/internal-dynamic-import/source"
 import type { AnyCircuitElement } from "circuit-json"
 import JSZip from "jszip"
 import { toast } from "lib/utils/toast"

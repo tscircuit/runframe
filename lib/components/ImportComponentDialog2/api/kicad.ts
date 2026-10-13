@@ -1,6 +1,6 @@
 import Fuse from "fuse.js"
 import type { AnyCircuitElement } from "circuit-json"
-import importer from "@tscircuit/internal-dynamic-import"
+import importer from "@tscircuit/internal-dynamic-import/source"
 import type { KicadFootprintSummary } from "../types"
 
 const KICAD_MOD_CACHE_BASE_URL = "https://kicad-mod-cache.tscircuit.com"

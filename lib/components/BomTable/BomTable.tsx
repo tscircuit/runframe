@@ -1,4 +1,4 @@
-import importer from "@tscircuit/internal-dynamic-import"
+import importer from "@tscircuit/internal-dynamic-import/source"
 import { useEffect, useState } from "react"
 import type React from "react"
 import { getBomCellDescriptors, getBomMetadata } from "./bom-table.columns"

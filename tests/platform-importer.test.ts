@@ -59,14 +59,14 @@ describe("platform dynamic imports", () => {
   })
 
   test("isolates modules between viewers even when URLs are identical", async () => {
-    const a = createPlatform("/jscdn", "enterprise-a")
-    const b = createPlatform("/jscdn", "enterprise-b")
+    const a = createPlatform("/jscdn", "standalone-a")
+    const b = createPlatform("/jscdn", "standalone-b")
     const [first, second] = await Promise.all([
       getPlatformImporter(a.config)("circuit-to-svg"),
       getPlatformImporter(b.config)("circuit-to-svg"),
     ])
-    expect(first.convertCircuitJsonToPinoutSvg([])).toBe("enterprise-a")
-    expect(second.convertCircuitJsonToPinoutSvg([])).toBe("enterprise-b")
+    expect(first.convertCircuitJsonToPinoutSvg([])).toBe("standalone-a")
+    expect(second.convertCircuitJsonToPinoutSvg([])).toBe("standalone-b")
     expect(a.platformFetch).toHaveBeenCalledTimes(1)
     expect(b.platformFetch).toHaveBeenCalledTimes(1)
   })
@@ -87,14 +87,14 @@ describe("platform dynamic imports", () => {
       async () => new Response("missing", { status: 404 }),
     )
     const config: PlatformConfig = {
-      jscdnBaseUrl: "https://enterprise.example/js",
+      jscdnBaseUrl: "https://standalone.example/js",
       platformFetch: platformFetch as unknown as typeof fetch,
     }
     const load = getPlatformImporter(config)
     await expect(load("circuit-to-svg")).rejects.toThrow("404")
     expect(platformFetch).toHaveBeenCalledTimes(1)
     expect(platformFetch).toHaveBeenCalledWith(
-      "https://enterprise.example/js/circuit-to-svg/latest/+esm",
+      "https://standalone.example/js/circuit-to-svg/latest/+esm",
     )
     platformFetch.mockImplementation(async () => bundle("retry"))
     const mod = await load("circuit-to-svg")

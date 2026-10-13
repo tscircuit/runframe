@@ -33,9 +33,9 @@ test("BOM previews keep separate platform transports and respond to config chang
     IS_REACT_ACT_ENVIRONMENT: true,
   })
   const root = createRoot(document.getElementById("root")!)
-  const a = createPlatform("ENTERPRISE_A")
-  const b = createPlatform("ENTERPRISE_B")
-  const c = createPlatform("ENTERPRISE_C")
+  const a = createPlatform("STANDALONE_A")
+  const b = createPlatform("STANDALONE_B")
+  const c = createPlatform("STANDALONE_C")
   const circuitJson = []
   try {
     await act(async () => {
@@ -46,8 +46,8 @@ test("BOM previews keep separate platform transports and respond to config chang
         </>,
       )
     })
-    expect(document.body.textContent).toContain("ENTERPRISE_A")
-    expect(document.body.textContent).toContain("ENTERPRISE_B")
+    expect(document.body.textContent).toContain("STANDALONE_A")
+    expect(document.body.textContent).toContain("STANDALONE_B")
     expect(a.platformFetch).toHaveBeenCalledWith(
       "/jscdn/circuit-json-to-bom-csv/latest/+esm",
     )
@@ -62,8 +62,8 @@ test("BOM previews keep separate platform transports and respond to config chang
         </>,
       )
     })
-    expect(document.body.textContent).toContain("ENTERPRISE_C")
-    expect(document.body.textContent).not.toContain("ENTERPRISE_A")
+    expect(document.body.textContent).toContain("STANDALONE_C")
+    expect(document.body.textContent).not.toContain("STANDALONE_A")
     expect(c.platformFetch).toHaveBeenCalledTimes(1)
     expect(b.platformFetch).toHaveBeenCalledTimes(1)
   } finally {

@@ -108,9 +108,7 @@ Pass `platformConfig.jscdnBaseUrl` to `RunFrame`, `CircuitJsonPreview`, or
 `RunFrameStaticBuildViewer` to load export converters and BOM dependencies from
 an enterprise endpoint instead of the public CDN. This shared property is
 introduced in [tscircuit/props#933](https://github.com/tscircuit/props/pull/933).
-The development dependency uses its verified PR package snapshot until this
-property is released; replace the snapshot and override with the published
-props version after that PR merges.
+This property is available in `@tscircuit/props` version `0.0.702` and later.
 
 ```tsx
 const platformConfig = {

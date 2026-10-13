@@ -102,44 +102,6 @@ gallery directly.
 import evalWebWorkerBlobUrl from "@tscircuit/eval/blob-url"
 ```
 
-### Serving dynamic dependencies locally
-
-Pass `platformConfig.jscdnBaseUrl` to `RunFrame`, `CircuitJsonPreview`, or
-`RunFrameStaticBuildViewer` to load export converters and BOM dependencies from
-an enterprise endpoint instead of the public CDN. This shared property is
-introduced in [tscircuit/props#933](https://github.com/tscircuit/props/pull/933).
-This property is available in `@tscircuit/props` version `0.0.702` and later.
-
-```tsx
-const platformConfig = {
-  jscdnBaseUrl: "/jscdn",
-  platformFetch: (input, init) => fetch(input, init),
-}
-
-<CircuitJsonPreview circuitJson={myCircuitJson} platformConfig={platformConfig} />
-```
-
-The endpoint must serve a self-contained browser ESM bundle at
-`<jscdnBaseUrl>/<package>/<version>/+esm`; unversioned imports use `latest`.
-Bundles must include their transitive JavaScript dependencies. Runframe fetches
-bundle source through `platformFetch` (or `fetch` when the hook is omitted), then
-imports a temporary blob URL. CSP policies must allow `blob:` module scripts.
-A configured endpoint never falls back to a public CDN, and imported modules
-are cached per platform configuration.
-
-For either standalone entrypoint, set `window.TSCIRCUIT_PLATFORM_CONFIG` before
-loading `standalone.min.js` or `standalone-preview.min.js`. This is a runtime
-object, so it can contain callable hooks such as `platformFetch` without JSON
-serialization. Static builds also pass the configuration to file loading,
-previews, and the export menu.
-
-This controls runframe's dynamic converter transport. Offline deployments must
-also provide an evaluator worker, circuit resources, and platform services used
-by their enabled viewers and features. Providing `evalWebWorkerBlobUrl` skips
-public evaluator version metadata requests because the bundle already selects
-the evaluator. Without an explicit or cached version, its diagnostic version
-label is `bundled`.
-
 ### Standalone Iframe
 
 RunFrame can be embedded in an iframe, allowing you to evaluate tscircuit code from a parent application. There are two main ways to integrate RunFrame: using the React component or creating a standalone iframe implementation.

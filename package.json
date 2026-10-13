@@ -57,7 +57,7 @@
     "@tscircuit/create-snippet-url": "^0.0.9",
     "@tscircuit/fake-snippets": "^0.0.163",
     "@tscircuit/file-server": "^0.0.32",
-    "@tscircuit/internal-dynamic-import": "github:tscircuit/internal-dynamic-import#dc7376dee530f8bf512d727fd959e25645af2d8f",
+    "@tscircuit/internal-dynamic-import": "^0.0.18",
     "@tscircuit/pcb-viewer": "^1.11.427",
     "@tscircuit/props": "^0.0.702",
     "@tscircuit/schematic-viewer": "^2.0.104",

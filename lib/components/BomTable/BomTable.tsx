@@ -1,10 +1,13 @@
-import importer from "@tscircuit/internal-dynamic-import"
+import { getPlatformImporter } from "lib/utils/get-platform-importer"
 import { useEffect, useState } from "react"
 import type React from "react"
 import { getBomCellDescriptors, getBomMetadata } from "./bom-table.columns"
 import type { BomRow, BomTableProps } from "./bom-table.types"
 
-export const BomTable: React.FC<BomTableProps> = ({ circuitJson }) => {
+export const BomTable: React.FC<BomTableProps> = ({
+  circuitJson,
+  platformConfig,
+}) => {
   const [rows, setRows] = useState<BomRow[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -16,9 +19,9 @@ export const BomTable: React.FC<BomTableProps> = ({ circuitJson }) => {
         setError(null)
         setRows(null)
 
-        const { convertCircuitJsonToBomRows } = await importer(
-          "circuit-json-to-bom-csv",
-        )
+        const { convertCircuitJsonToBomRows } = await getPlatformImporter(
+          platformConfig,
+        )("circuit-json-to-bom-csv")
         const bomRows = await convertCircuitJsonToBomRows({
           circuitJson,
         })
@@ -38,7 +41,7 @@ export const BomTable: React.FC<BomTableProps> = ({ circuitJson }) => {
     return () => {
       cancelled = true
     }
-  }, [circuitJson])
+  }, [circuitJson, platformConfig])
 
   if (error) {
     throw new Error(error)

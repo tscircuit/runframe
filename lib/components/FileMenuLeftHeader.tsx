@@ -1,3 +1,4 @@
+import type { PlatformConfig } from "@tscircuit/props"
 import { useEffect, useMemo, useState } from "react"
 import { useRunFrameStore } from "./RunFrameWithApi/store"
 import type {
@@ -49,6 +50,7 @@ import { getLatestAutoroutingLogEntry } from "lib/utils/get-latest-autorouting-l
 import { ExportAccessoryDialog } from "./ExportAccessoryDialog"
 
 export const FileMenuLeftHeader = (props: {
+  platformConfig?: PlatformConfig
   isWebEmbedded?: boolean
   shouldLoadLatestEval?: boolean
   onChangeShouldLoadLatestEval?: (shouldLoadLatestEval: boolean) => void
@@ -204,6 +206,7 @@ export const FileMenuLeftHeader = (props: {
       circuitJson: pendingLbrnExport.circuitJson,
       projectName: pendingLbrnExport.projectName,
       options,
+      platformConfig: props.platformConfig,
     })
 
     setPendingLbrnExport(null)
@@ -235,6 +238,7 @@ export const FileMenuLeftHeader = (props: {
       circuitJson,
       simpleRouteJson,
       projectName: exportProjectName,
+      platformConfig: props.platformConfig,
     })
   }
 
@@ -552,9 +556,11 @@ export const FileMenuLeftHeader = (props: {
           onOpenChange={setIsExportAccessoryDialogOpen}
           circuitJson={circuitJson}
           projectName={exportProjectName}
+          platformConfig={props.platformConfig}
         />
       )}
       <ImportComponentDialogForCli
+        platformConfig={props.platformConfig}
         isOpen={isImportDialogOpen}
         onClose={() => setIsImportDialogOpen(false)}
       />

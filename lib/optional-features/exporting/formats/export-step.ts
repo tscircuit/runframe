@@ -1,16 +1,21 @@
+import type { PlatformConfig } from "@tscircuit/props"
 import type { CircuitJson } from "circuit-json"
 import { openForDownload } from "../open-for-download"
 import { toast } from "lib/utils/toast"
-import importer from "@tscircuit/internal-dynamic-import"
+import { getPlatformImporter } from "lib/utils/get-platform-importer"
 
 export const exportStep = async ({
   circuitJson,
   projectName,
+  platformConfig,
 }: {
   circuitJson: CircuitJson
   projectName: string
+  platformConfig?: PlatformConfig
 }) => {
-  const { circuitJsonToStep } = await importer("circuit-json-to-step")
+  const { circuitJsonToStep } = await getPlatformImporter(platformConfig)(
+    "circuit-json-to-step",
+  )
   // Extract board dimensions from circuit JSON
   const pcbBoard = circuitJson.find((el) => el.type === "pcb_board")
 

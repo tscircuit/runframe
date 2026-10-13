@@ -1,4 +1,5 @@
-import importer from "@tscircuit/internal-dynamic-import"
+import type { PlatformConfig } from "@tscircuit/props"
+import { getPlatformImporter } from "lib/utils/get-platform-importer"
 import type { AnyCircuitElement } from "circuit-json"
 import JSZip from "jszip"
 import { toast } from "lib/utils/toast"
@@ -17,9 +18,11 @@ type PnpCsvConverter = (
 export const exportFabricationFiles = async ({
   circuitJson,
   projectName,
+  platformConfig,
 }: {
   circuitJson: AnyCircuitElement[]
   projectName: string
+  platformConfig?: PlatformConfig
 }) => {
   await toast.promise(
     (async () => {
@@ -30,9 +33,11 @@ export const exportFabricationFiles = async ({
         { convertCircuitJsonToBomRows, convertBomRowsToCsv },
         { convertCircuitJsonToPickAndPlaceCsv },
       ] = await Promise.all([
-        importer("circuit-json-to-gerber") as Promise<CircuitJsonToGerber>,
-        importer("circuit-json-to-bom-csv"),
-        importer("circuit-json-to-pnp-csv"),
+        getPlatformImporter(platformConfig)(
+          "circuit-json-to-gerber",
+        ) as Promise<CircuitJsonToGerber>,
+        getPlatformImporter(platformConfig)("circuit-json-to-bom-csv"),
+        getPlatformImporter(platformConfig)("circuit-json-to-pnp-csv"),
       ])
 
       // Filter out error and warning elements for gerber/drill generation

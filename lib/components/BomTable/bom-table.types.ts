@@ -1,8 +1,10 @@
+import type { PlatformConfig } from "@tscircuit/props"
 import type { AnyCircuitElement } from "circuit-json"
 import type { convertCircuitJsonToBomRows } from "circuit-json-to-bom-csv"
 import type React from "react"
 
 export interface BomTableProps {
+  platformConfig?: PlatformConfig
   circuitJson: AnyCircuitElement[]
 }
 

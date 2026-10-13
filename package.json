@@ -59,7 +59,7 @@
     "@tscircuit/file-server": "^0.0.32",
     "@tscircuit/internal-dynamic-import": "^0.0.15",
     "@tscircuit/pcb-viewer": "^1.11.427",
-    "@tscircuit/props": "^0.0.697",
+    "@tscircuit/props": "https://pkg.pr.new/@tscircuit/props@d7d346aef94acf56da47a91ebdaa88fe449d2d04",
     "@tscircuit/schematic-viewer": "^2.0.104",
     "@types/bun": "latest",
     "@types/debug": "^4.1.12",
@@ -132,6 +132,7 @@
   },
   "overrides": {
     "circuit-json": "$circuit-json",
-    "altiumts": "0.0.59"
+    "altiumts": "0.0.59",
+    "@tscircuit/props": "$@tscircuit/props"
   }
 }

@@ -1,3 +1,4 @@
+import type { PlatformConfig } from "@tscircuit/props"
 import { useCallback, useEffect, useState } from "react"
 import { CircuitJsonPreview } from "../CircuitJsonPreview/CircuitJsonPreview"
 import { CircuitJsonFileSelectorCombobox } from "./CircuitJsonFileSelectorCombobox"
@@ -18,6 +19,7 @@ export interface CircuitJsonFileReference {
 }
 
 export interface RunFrameStaticBuildViewerProps {
+  platformConfig?: PlatformConfig
   debug?: boolean
   files: CircuitJsonFileReference[]
   onFetchFile?: (fileRef: CircuitJsonFileReference) => Promise<CircuitJson>
@@ -69,7 +71,9 @@ export const RunFrameStaticBuildViewer = (
         )
       }
 
-      const response = await fetch(fileRef.fileStaticAssetUrl)
+      const response = await (props.platformConfig?.platformFetch ?? fetch)(
+        fileRef.fileStaticAssetUrl,
+      )
       if (!response.ok) {
         throw new Error(
           `Failed to fetch ${fileRef.filePath}: ${response.statusText}`,
@@ -78,7 +82,7 @@ export const RunFrameStaticBuildViewer = (
 
       return await response.json()
     },
-    [],
+    [props.platformConfig],
   )
 
   const loadCircuitJsonFile = useCallback(
@@ -252,6 +256,7 @@ export const RunFrameStaticBuildViewer = (
           <div className="rf-flex rf-items-center rf-justify-between rf-w-full rf-p-4 rf-border-b rf-border-gray-200">
             {(props.showFileMenu ?? true) && (
               <FileMenuLeftHeader
+                platformConfig={props.platformConfig}
                 isWebEmbedded={true}
                 circuitJson={null}
                 projectName={props.projectName}
@@ -289,6 +294,7 @@ export const RunFrameStaticBuildViewer = (
         </div>
       ) : (
         <CircuitJsonPreview
+          platformConfig={props.platformConfig}
           circuitJson={circuitJson}
           defaultToFullScreen={props.defaultToFullScreen}
           showToggleFullScreen={props.showToggleFullScreen}
@@ -300,6 +306,7 @@ export const RunFrameStaticBuildViewer = (
             <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
               {(props.showFileMenu ?? true) && (
                 <FileMenuLeftHeader
+                  platformConfig={props.platformConfig}
                   isWebEmbedded={true}
                   circuitJson={circuitJson}
                   projectName={props.projectName}

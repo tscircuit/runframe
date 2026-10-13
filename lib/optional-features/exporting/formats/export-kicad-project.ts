@@ -1,4 +1,5 @@
-import importer from "@tscircuit/internal-dynamic-import"
+import type { PlatformConfig } from "@tscircuit/props"
+import { getPlatformImporter } from "lib/utils/get-platform-importer"
 import type { CircuitJson } from "circuit-json"
 import JSZip from "jszip"
 import { toast } from "lib/utils/toast"
@@ -7,16 +8,18 @@ import { openForDownload } from "../open-for-download"
 export const createKicadProjectZip = async ({
   circuitJson,
   projectName,
+  platformConfig,
 }: {
   circuitJson: CircuitJson
   projectName: string
+  platformConfig?: PlatformConfig
 }) => {
   const {
     CircuitJsonToKicadPcbConverter,
     CircuitJsonToKicadSchConverter,
     CircuitJsonToKicadProConverter,
     resolveAndLoadKicad3dModelFiles,
-  } = await importer("circuit-json-to-kicad")
+  } = await getPlatformImporter(platformConfig)("circuit-json-to-kicad")
   const schConverter = new CircuitJsonToKicadSchConverter(circuitJson as any)
   schConverter.runUntilFinished()
   const schContent = schConverter.getOutputString()
@@ -45,7 +48,7 @@ export const createKicadProjectZip = async ({
   await resolveAndLoadKicad3dModelFiles({
     projectName,
     model3dSourcePaths: pcbConverter.getModel3dSourcePaths(),
-    fetch,
+    fetch: platformConfig?.platformFetch ?? fetch,
     onModelFile: ({ outputPath, content }) => {
       zip.file(outputPath, content)
     },
@@ -60,13 +63,19 @@ export const createKicadProjectZip = async ({
 export const exportKicadProject = async ({
   circuitJson,
   projectName,
+  platformConfig,
 }: {
   circuitJson: CircuitJson
   projectName: string
+  platformConfig?: PlatformConfig
 }) => {
   await toast.promise(
     (async () => {
-      const zip = await createKicadProjectZip({ circuitJson, projectName })
+      const zip = await createKicadProjectZip({
+        circuitJson,
+        projectName,
+        platformConfig,
+      })
       const zipBlob = await zip.generateAsync({ type: "blob" })
 
       openForDownload(zipBlob, {

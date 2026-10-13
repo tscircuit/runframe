@@ -348,6 +348,7 @@ export const CircuitJsonPreview = ({
             {leftHeaderContent}
             {showFileMenu && !leftHeaderContent && (
               <FileMenuLeftHeader
+                platformConfig={platformConfig}
                 isWebEmbedded={isWebEmbedded}
                 circuitJson={circuitJson}
                 projectName={projectName}
@@ -873,7 +874,10 @@ export const CircuitJsonPreview = ({
                   )}
                 >
                   {circuitJson ? (
-                    <BomTable circuitJson={circuitJson} />
+                    <BomTable
+                      circuitJson={circuitJson}
+                      platformConfig={platformConfig}
+                    />
                   ) : (
                     <PreviewEmptyState onRunClicked={onRunClicked} />
                   )}

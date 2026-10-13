@@ -1,3 +1,4 @@
+import type { PlatformConfig } from "@tscircuit/props"
 import { createRoot } from "react-dom/client"
 import { RunFrameWithApi } from "./RunFrameWithApi"
 import { RunFrameForCli } from "../RunFrameForCli/RunFrameForCli"
@@ -13,6 +14,8 @@ declare global {
     TSCIRCUIT_RUNFRAME_STATIC_FILE_LIST?: CircuitJsonFileReference[]
     TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH?: string
     TSCIRCUIT_PACKAGE_NAME?: string
+    /** Runtime hooks may contain functions; set this before loading standalone. */
+    TSCIRCUIT_PLATFORM_CONFIG?: PlatformConfig
   }
 }
 
@@ -45,7 +48,7 @@ const ensureRoot = () => {
   return el
 }
 
-const loadScriptsAsFsMap = async () => {
+const loadScriptsAsFsMap = async (platformConfig?: PlatformConfig) => {
   const scripts = Array.from(
     document.querySelectorAll<HTMLScriptElement>(
       "script[type='tscircuit-tsx']",
@@ -60,7 +63,9 @@ const loadScriptsAsFsMap = async () => {
         `script${idx ? idx + 1 : ""}.tsx`
 
       if (script.src) {
-        const response = await fetch(script.src)
+        const response = await (platformConfig?.platformFetch ?? fetch)(
+          script.src,
+        )
         const text = await response.text()
         fsMap.set(path, text)
       } else {
@@ -90,6 +95,7 @@ const runframeStandaloneProps: ComponentProps<typeof RunFrameWithApi> = {
   await ensureDocumentReady()
 
   const root = createRoot(ensureRoot())
+  const platformConfig = window.TSCIRCUIT_PLATFORM_CONFIG
 
   const staticFileList = window.TSCIRCUIT_RUNFRAME_STATIC_FILE_LIST
   const defaultMainComponentPath = window.TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH
@@ -102,16 +108,33 @@ const runframeStandaloneProps: ComponentProps<typeof RunFrameWithApi> = {
         initialCircuitPath={defaultMainComponentPath}
         tabSelected={tabSelected}
         projectName={projectName}
+        platformConfig={platformConfig}
       />,
     )
   } else if (window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI) {
-    root.render(<RunFrameForCli {...runframeStandaloneProps} />)
+    root.render(
+      <RunFrameForCli
+        {...runframeStandaloneProps}
+        platformConfig={platformConfig}
+      />,
+    )
   } else {
-    const { fsMap } = await loadScriptsAsFsMap()
+    const { fsMap } = await loadScriptsAsFsMap(platformConfig)
     if (fsMap.size > 0) {
-      root.render(<RunFrame {...runframeStandaloneProps} fsMap={fsMap} />)
+      root.render(
+        <RunFrame
+          {...runframeStandaloneProps}
+          platformConfig={platformConfig}
+          fsMap={fsMap}
+        />,
+      )
     } else {
-      root.render(<RunFrameWithApi {...runframeStandaloneProps} />)
+      root.render(
+        <RunFrameWithApi
+          {...runframeStandaloneProps}
+          platformConfig={platformConfig}
+        />,
+      )
     }
   }
 })()

@@ -1,4 +1,5 @@
-import importer from "@tscircuit/internal-dynamic-import"
+import type { PlatformConfig } from "@tscircuit/props"
+import { getPlatformImporter } from "lib/utils/get-platform-importer"
 import type { CircuitJson } from "circuit-json"
 import { sanitizeFileName } from "lib/utils/sanitizeFileName"
 import { toast } from "lib/utils/toast"
@@ -20,10 +21,12 @@ export interface GeneratedFdmComponentBox {
 
 export const generateFdmComponentBox = async (
   circuitJson: CircuitJson,
+  platformConfig?: PlatformConfig,
 ): Promise<GeneratedFdmComponentBox> => {
-  const { createFdmComponentBox, renderFdmComponentBoxPng } = await importer(
-    "circuit-json-to-fdm-component-box",
-  )
+  const { createFdmComponentBox, renderFdmComponentBoxPng } =
+    await getPlatformImporter(platformConfig)(
+      "circuit-json-to-fdm-component-box",
+    )
   const [result, previewPng] = await Promise.all([
     createFdmComponentBox(circuitJson),
     renderFdmComponentBoxPng(circuitJson, {}, { width: 960, height: 640 }),
@@ -32,8 +35,11 @@ export const generateFdmComponentBox = async (
   return { ...result, previewPng }
 }
 
-const generateFdmComponentBox3mf = async (circuitJson: CircuitJson) => {
-  const { createFdmComponentBox } = await importer(
+const generateFdmComponentBox3mf = async (
+  circuitJson: CircuitJson,
+  platformConfig?: PlatformConfig,
+) => {
+  const { createFdmComponentBox } = await getPlatformImporter(platformConfig)(
     "circuit-json-to-fdm-component-box",
   )
   return createFdmComponentBox(circuitJson)
@@ -55,13 +61,18 @@ export const downloadFdmComponentBox = ({
 export const exportFdmComponentBox = async ({
   circuitJson,
   projectName,
+  platformConfig,
 }: {
   circuitJson: CircuitJson
   projectName: string
+  platformConfig?: PlatformConfig
 }) => {
   await toast.promise(
     (async () => {
-      const generatedBox = await generateFdmComponentBox3mf(circuitJson)
+      const generatedBox = await generateFdmComponentBox3mf(
+        circuitJson,
+        platformConfig,
+      )
       downloadFdmComponentBox({
         generatedBox,
         projectName,

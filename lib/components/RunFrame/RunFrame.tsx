@@ -81,8 +81,15 @@ const fetchLatestEvalVersion = async () => {
 const resolveEvalVersion = async (
   evalVersionProp?: string,
   forceLatest?: boolean,
+  hasEmbeddedWorker?: boolean,
 ) => {
   if (evalVersionProp) return evalVersionProp
+
+  // The supplied bundle already selects the evaluator. Fetching CDN version
+  // metadata cannot change it and would introduce an unnecessary external call.
+  if (hasEmbeddedWorker) {
+    return window.TSCIRCUIT_LATEST_EVAL_VERSION || "bundled"
+  }
 
   if (forceLatest || !window.TSCIRCUIT_LATEST_EVAL_VERSION) {
     const latest = await fetchLatestEvalVersion()
@@ -174,6 +181,7 @@ export const RunFrame = (props: RunFrameProps) => {
       const evalVersion = await resolveEvalVersion(
         props.evalVersion,
         !globalThis.runFrameWorker && props.forceLatestEvalVersion,
+        Boolean(props.evalWebWorkerBlobUrl),
       )
       // Resolve once for both preload and execution, then recheck the cache.
       const worker =
@@ -853,6 +861,7 @@ export const RunFrame = (props: RunFrameProps) => {
             )}
             {props.showFileMenu !== false && (
               <FileMenuLeftHeader
+                platformConfig={props.platformConfig}
                 isWebEmbedded={props.isWebEmbedded}
                 onLoginRequired={props.onLoginRequired}
                 showSchematicDebugGrid={showSchematicDebugGrid}

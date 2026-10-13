@@ -84,7 +84,6 @@ test("shared circuit hooks reach the evaluator and schematic viewer unchanged", 
           fsMap={{}}
           isLoadingFiles
           platformConfig={platformConfig}
-          evalVersion="0.0.1580"
           evalWebWorkerBlobUrl="/assets/eval-worker.js"
           showFileMenu={false}
         />,
@@ -94,7 +93,9 @@ test("shared circuit hooks reach the evaluator and schematic viewer unchanged", 
     const options = createWorker.mock.calls[0][0] as {
       platform: PlatformConfig
       projectConfig: Partial<PlatformConfig>
+      evalVersion: string
     }
+    expect(options.evalVersion).toBe("bundled")
     expect(options.platform).toBe(platformConfig)
     expect(options.projectConfig).toMatchObject({
       projectBaseUrl: platformConfig.projectBaseUrl,

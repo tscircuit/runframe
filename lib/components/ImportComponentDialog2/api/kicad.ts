@@ -1,6 +1,7 @@
+import type { PlatformConfig } from "@tscircuit/props"
 import Fuse from "fuse.js"
 import type { AnyCircuitElement } from "circuit-json"
-import importer from "@tscircuit/internal-dynamic-import"
+import { getPlatformImporter } from "lib/utils/get-platform-importer"
 import type { KicadFootprintSummary } from "../types"
 
 const KICAD_MOD_CACHE_BASE_URL = "https://kicad-mod-cache.tscircuit.com"
@@ -64,8 +65,9 @@ const encodeFootprintPath = (footprintPath: string) =>
 
 export const loadKicadFootprintCircuitJson = async (
   footprintPath: string,
+  platformConfig?: PlatformConfig,
 ): Promise<AnyCircuitElement[]> => {
-  const response = await fetch(
+  const response = await (platformConfig?.platformFetch ?? fetch)(
     `${KICAD_MOD_CACHE_BASE_URL}/${encodeFootprintPath(footprintPath)}`,
   )
 
@@ -74,10 +76,9 @@ export const loadKicadFootprintCircuitJson = async (
   }
 
   const footprintContent = await response.text()
-  // Use the shared runtime importer so this converter loads correctly after deploy.
-  const { KicadFootprintToCircuitJsonConverter } = await importer(
-    "kicad-to-circuit-json",
-  )
+  const { KicadFootprintToCircuitJsonConverter } = await getPlatformImporter(
+    platformConfig,
+  )("kicad-to-circuit-json")
   const converter = new KicadFootprintToCircuitJsonConverter()
 
   converter.addFile(

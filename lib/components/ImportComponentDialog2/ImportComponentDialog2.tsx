@@ -50,6 +50,7 @@ const computeAvailableSources = ({
 
 export const ImportComponentDialog2 = ({
   isOpen,
+  platformConfig,
   onClose,
   jlcpcbProxyRequestHeaders,
   onKicadStringSelected,
@@ -127,12 +128,13 @@ export const ImportComponentDialog2 = ({
   const [isSubmittingImport, setIsSubmittingImport] = React.useState(false)
   const footprintPreviewOptions = React.useMemo(
     () => ({
+      platformConfig,
       jlcpcb: {
         headers: jlcpcbProxyRequestHeaders,
         apiBase: jlcpcbProxyApiBase,
       },
     }),
-    [jlcpcbProxyApiBase, jlcpcbProxyRequestHeaders],
+    [jlcpcbProxyApiBase, jlcpcbProxyRequestHeaders, platformConfig],
   )
   const {
     circuitJson: footprintPreviewCircuitJson,

@@ -1,17 +1,22 @@
+import type { PlatformConfig } from "@tscircuit/props"
 import type { CircuitJson } from "circuit-json"
 import { openForDownload } from "../open-for-download"
-import importer from "@tscircuit/internal-dynamic-import"
+import { getPlatformImporter } from "lib/utils/get-platform-importer"
 
 export const exportGlb = async ({
   circuitJson,
   projectName,
+  platformConfig,
 }: {
   circuitJson: CircuitJson
   projectName: string
+  platformConfig?: PlatformConfig
 }) => {
   let blob: Blob
   try {
-    const { convertCircuitJsonToGltf } = await importer("circuit-json-to-gltf")
+    const { convertCircuitJsonToGltf } = await getPlatformImporter(
+      platformConfig,
+    )("circuit-json-to-gltf")
 
     console.log("convertCircuitJsonToGltf", convertCircuitJsonToGltf)
 

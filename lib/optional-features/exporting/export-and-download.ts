@@ -1,3 +1,4 @@
+import type { PlatformConfig } from "@tscircuit/props"
 import type { CircuitJson } from "circuit-json"
 import { sanitizeFileName } from "lib/utils/sanitizeFileName"
 import { exportAltiumProject } from "./formats/export-altium-project"
@@ -40,6 +41,7 @@ export type ExportName =
 
 export const exportAndDownload = async ({
   exportName,
+  platformConfig,
   circuitJson,
   simpleRouteJson,
   projectName: rawProjectName,
@@ -48,15 +50,16 @@ export const exportAndDownload = async ({
   circuitJson: CircuitJson
   simpleRouteJson?: any
   projectName: string
+  platformConfig?: PlatformConfig
 }) => {
   const projectName = sanitizeFileName(rawProjectName)
 
   if (exportName === "Fabrication Files") {
-    await exportFabricationFiles({ circuitJson, projectName })
+    await exportFabricationFiles({ circuitJson, projectName, platformConfig })
     return
   }
   if (exportName === "KiCad Project") {
-    await exportKicadProject({ circuitJson, projectName })
+    await exportKicadProject({ circuitJson, projectName, platformConfig })
     return
   }
   if (exportName === "Altium Project") {
@@ -64,7 +67,7 @@ export const exportAndDownload = async ({
     return
   }
   if (exportName === "KiCad Library") {
-    await exportKicadLibrary({ circuitJson, projectName })
+    await exportKicadLibrary({ circuitJson, projectName, platformConfig })
     return
   }
   if (exportName === "Circuit JSON") {
@@ -85,27 +88,27 @@ export const exportAndDownload = async ({
     return
   }
   if (exportName === "GLB (Binary GLTF)") {
-    await exportGlb({ circuitJson, projectName })
+    await exportGlb({ circuitJson, projectName, platformConfig })
     return
   }
   if (exportName === "Pinout SVG") {
-    exportPinoutSvg({ circuitJson, projectName })
+    await exportPinoutSvg({ circuitJson, projectName, platformConfig })
     return
   }
   if (exportName === "STEP") {
-    await exportStep({ circuitJson, projectName })
+    await exportStep({ circuitJson, projectName, platformConfig })
     return
   }
   if (exportName === "Assembly STEP") {
-    await exportAssemblyStep({ circuitJson, projectName })
+    await exportAssemblyStep({ circuitJson, projectName, platformConfig })
     return
   }
   if (exportName === "Component Box (3MF)") {
-    await exportFdmComponentBox({ circuitJson, projectName })
+    await exportFdmComponentBox({ circuitJson, projectName, platformConfig })
     return
   }
   if (exportName === "LightBurn") {
-    await exportLbrn({ circuitJson, projectName })
+    await exportLbrn({ circuitJson, projectName, platformConfig })
     return
   }
   throw new Error(`Unsupported export type: "${exportName}"`)

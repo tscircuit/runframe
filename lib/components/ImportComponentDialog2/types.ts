@@ -1,3 +1,4 @@
+import type { PlatformConfig } from "@tscircuit/props"
 import type { Package } from "@tscircuit/fake-snippets/schema"
 
 export type ImportSource = "tscircuit.com" | "jlcpcb" | "kicad"
@@ -47,6 +48,7 @@ export type ImportComponentDialogSearchResult =
   | KicadFootprintSearchResult
 
 export interface ImportComponentDialog2Props {
+  platformConfig?: PlatformConfig
   isOpen: boolean
   onClose: () => void
   jlcpcbProxyRequestHeaders?: Record<string, string>

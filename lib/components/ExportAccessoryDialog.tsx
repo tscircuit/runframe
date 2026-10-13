@@ -1,3 +1,4 @@
+import type { PlatformConfig } from "@tscircuit/props"
 import type { CircuitJson } from "circuit-json"
 import { Download, LoaderCircle, PackageOpen } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -32,6 +33,7 @@ export interface ExportAccessoryDialogProps {
   onOpenChange: (open: boolean) => void
   circuitJson: CircuitJson
   projectName: string
+  platformConfig?: PlatformConfig
 }
 
 const formatMillimetres = (value: number) => `${value.toFixed(1)} mm`
@@ -41,6 +43,7 @@ export function ExportAccessoryDialog({
   onOpenChange,
   circuitJson,
   projectName,
+  platformConfig,
 }: ExportAccessoryDialogProps) {
   useStyles()
 
@@ -67,7 +70,7 @@ export function ExportAccessoryDialog({
     setGeneratedBox(null)
     setError(null)
 
-    generateFdmComponentBox(circuitJson)
+    generateFdmComponentBox(circuitJson, platformConfig)
       .then((result) => {
         if (cancelled) return
         const pngBytes = Uint8Array.from(result.previewPng)
@@ -93,7 +96,7 @@ export function ExportAccessoryDialog({
     return () => {
       cancelled = true
     }
-  }, [circuitJson, open, selectedAccessory])
+  }, [circuitJson, open, selectedAccessory, platformConfig])
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {

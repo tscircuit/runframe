@@ -1,6 +1,7 @@
+import type { PlatformConfig } from "@tscircuit/props"
 import type { CircuitJson } from "circuit-json"
 import { openForDownload } from "../open-for-download"
-import importer from "@tscircuit/internal-dynamic-import"
+import { getPlatformImporter } from "lib/utils/get-platform-importer"
 import { toast } from "lib/utils/toast"
 
 export interface LbrnExportOptions {
@@ -11,15 +12,19 @@ export interface LbrnExportOptions {
 export const exportLbrn = async ({
   circuitJson,
   projectName,
+  platformConfig,
   options = {},
 }: {
   circuitJson: CircuitJson
   projectName: string
+  platformConfig?: PlatformConfig
   options?: LbrnExportOptions
 }) => {
   try {
     // Convert Circuit JSON to LBRN format
-    const { convertCircuitJsonToLbrn } = await importer("circuit-json-to-lbrn")
+    const { convertCircuitJsonToLbrn } = await getPlatformImporter(
+      platformConfig,
+    )("circuit-json-to-lbrn")
     const lbrnProject = await convertCircuitJsonToLbrn(circuitJson, {
       includeSilkscreen: options.includeSilkscreen ?? false,
       includeOxidationCleaningLayer:

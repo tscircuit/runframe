@@ -1,3 +1,4 @@
+import type { PlatformConfig } from "@tscircuit/props"
 import type { AnyCircuitElement } from "circuit-json"
 import {
   loadJlcpcbComponentCircuitJson,
@@ -7,6 +8,7 @@ import { loadKicadFootprintCircuitJson } from "./kicad"
 import type { ImportComponentDialogSearchResult } from "../types"
 
 export type FootprintPreviewLoadOptions = {
+  platformConfig?: PlatformConfig
   jlcpcb?: JlcpcbPreviewLoadOptions
 }
 
@@ -26,7 +28,10 @@ export const loadFootprintPreviewCircuitJson = async (
   }
 
   if (result.source === "kicad") {
-    return loadKicadFootprintCircuitJson(result.footprint.path)
+    return loadKicadFootprintCircuitJson(
+      result.footprint.path,
+      opts?.platformConfig,
+    )
   }
 
   throw new Error("Footprint preview is not available for this source")

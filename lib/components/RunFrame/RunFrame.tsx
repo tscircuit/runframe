@@ -23,6 +23,8 @@ declare global {
   var runFrameWorker: any
   interface Window {
     TSCIRCUIT_USE_RUNFRAME_FOR_CLI?: boolean
+    TSCIRCUIT_JLCSEARCH_BASE_URL?: string
+    TSCIRCUIT_DATASHEET_API_BASE_URL?: string
   }
 }
 
@@ -175,6 +177,13 @@ export const RunFrame = (props: RunFrameProps) => {
         props.evalVersion,
         !globalThis.runFrameWorker && props.forceLatestEvalVersion,
       )
+      const partsEngineOptions = {
+        jlcSearchBaseUrl: window.TSCIRCUIT_JLCSEARCH_BASE_URL,
+        datasheetApiBaseUrl: window.TSCIRCUIT_DATASHEET_API_BASE_URL,
+      }
+      const hasPartsEngineBaseUrls =
+        partsEngineOptions.jlcSearchBaseUrl !== undefined ||
+        partsEngineOptions.datasheetApiBaseUrl !== undefined
       // Resolve once for both preload and execution, then recheck the cache.
       const worker =
         globalThis.runFrameWorker ??
@@ -203,6 +212,7 @@ export const RunFrame = (props: RunFrameProps) => {
           ...(props.easyEdaProxyConfig && {
             easyEdaProxyConfig: props.easyEdaProxyConfig,
           }),
+          ...(hasPartsEngineBaseUrls && { partsEngineOptions }),
         }))
       return { worker, evalVersion }
     })()

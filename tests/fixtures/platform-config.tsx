@@ -96,6 +96,7 @@ test("shared circuit hooks reach the evaluator and schematic viewer unchanged", 
       projectConfig: Partial<PlatformConfig>
     }
     expect(options.platform).toBe(platformConfig)
+    expect(options).not.toHaveProperty("partsEngineOptions")
     expect(options.projectConfig).toMatchObject({
       projectBaseUrl: platformConfig.projectBaseUrl,
       enablePartOrientationAnalysis: false,

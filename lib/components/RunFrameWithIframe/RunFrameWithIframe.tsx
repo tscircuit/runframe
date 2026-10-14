@@ -4,6 +4,7 @@
  */
 import { useEffect, useRef } from "react"
 import type { RunFrameProps } from "../RunFrame/RunFrameProps"
+import { isRunFrameReadyMessageFromChild } from "./iframe-message-source"
 
 export interface RunFrameWithIframeProps extends RunFrameProps {
   iframeUrl?: string
@@ -16,14 +17,21 @@ export const RunFrameWithIframe = ({
   const iframeRef = useRef<HTMLIFrameElement>(null)
 
   useEffect(() => {
+    const origin = new URL(iframeUrl, window.location.href).origin
     const handleMessage = (event: MessageEvent) => {
-      if (event.data?.runframe_type === "runframe_ready_to_receive") {
+      if (
+        isRunFrameReadyMessageFromChild(
+          event,
+          iframeRef.current?.contentWindow,
+          origin,
+        )
+      ) {
         iframeRef.current?.contentWindow?.postMessage(
           {
             runframe_type: "runframe_props_changed",
             runframe_props: runFrameProps,
           },
-          "*",
+          origin,
         )
       }
     }

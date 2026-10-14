@@ -1,6 +1,7 @@
 import type { ManualEditEvent, PlatformConfig } from "@tscircuit/props"
 import type { TabId } from "lib/components/CircuitJsonPreview/PreviewContentProps"
 import type { RunCompletedPayload } from "./run-completion"
+import type { ExtraRunFrameTab } from "../CircuitJsonPreview/extra-runframe-tabs"
 
 export interface RunFrameProps {
   /**
@@ -130,6 +131,9 @@ export interface RunFrameProps {
    * Tabs to display. Defaults to all
    */
   availableTabs?: TabId[]
+
+  /** Trusted HTTP(S) pages displayed as additional iframe views. */
+  extraTabs?: ExtraRunFrameTab[]
 
   schematicSvgOptions?: {
     css?: string

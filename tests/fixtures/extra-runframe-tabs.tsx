@@ -130,6 +130,60 @@ test("iframe navigation survives tab switches, updates replace source, and remov
       window.dispatchEvent(new Event(EXTRA_RUNFRAME_TABS_CHANGE_EVENT)),
     )
     expect(document.querySelector("output")!.textContent).toBe("[]")
+
+    const { RunFrameWithIframe } = await import(
+      "../../lib/components/RunFrameWithIframe/RunFrameWithIframe"
+    )
+    await act(async () =>
+      root.render(
+        <RunFrameWithIframe
+          fsMap={{}}
+          iframeUrl="https://runner.example/iframe.html"
+          extraTabs={[tab]}
+        />,
+      ),
+    )
+    const child = document.querySelector("iframe")!.contentWindow!
+    const sent: any[] = []
+    child.postMessage = ((message: unknown, origin: string) =>
+      sent.push({ message, origin })) as typeof child.postMessage
+    const ready = { runframe_type: "runframe_ready_to_receive" }
+    await act(async () =>
+      window.dispatchEvent(
+        new dom.window.MessageEvent("message", {
+          data: ready,
+          source: window,
+          origin: "https://runner.example",
+        }),
+      ),
+    )
+    expect(sent).toHaveLength(0)
+    await act(async () =>
+      window.dispatchEvent(
+        new dom.window.MessageEvent("message", {
+          data: ready,
+          source: child,
+          origin: "https://runner.example",
+        }),
+      ),
+    )
+    expect(sent.at(-1)).toEqual({
+      message: {
+        runframe_type: "runframe_props_changed",
+        runframe_props: { fsMap: {}, extraTabs: [tab] },
+      },
+      origin: "https://runner.example",
+    })
+    await act(async () =>
+      root.render(
+        <RunFrameWithIframe
+          fsMap={{}}
+          iframeUrl="https://runner.example/iframe.html"
+          extraTabs={[]}
+        />,
+      ),
+    )
+    expect(sent.at(-1).message.runframe_props.extraTabs).toEqual([])
   } finally {
     await act(async () => root.unmount())
     dom.window.close()

@@ -42,6 +42,10 @@ test("RunFrame shares initialization, serializes rendering and recovers failed o
     url: "http://localhost",
     pretendToBeVisual: true,
   })
+  Object.assign(dom.window, {
+    TSCIRCUIT_JLCSEARCH_BASE_URL: "http://localhost:4200/jlcsearch",
+    TSCIRCUIT_DATASHEET_API_BASE_URL: "http://localhost:4200/datasheet-api",
+  })
   const globals = [
     "window",
     "document",
@@ -125,6 +129,10 @@ test("RunFrame shares initialization, serializes rendering and recovers failed o
         webWorkerBlobUrl: "/assets/eval-worker.js",
         platform: platformConfig,
         projectConfig: platformConfig,
+        partsEngineOptions: {
+          jlcSearchBaseUrl: "http://localhost:4200/jlcsearch",
+          datasheetApiBaseUrl: "http://localhost:4200/datasheet-api",
+        },
       })
     }
     expect(executeWithFsMap).toHaveBeenCalledWith({
@@ -307,6 +315,12 @@ test("RunFrame shares initialization, serializes rendering and recovers failed o
     mounted = false
     await new Promise((resolve) => setTimeout(resolve, 30))
     expect(globalThis.runFrameWorker).toBeUndefined()
+    expect(createWorker.mock.calls.at(-1)?.[0]).toMatchObject({
+      partsEngineOptions: {
+        jlcSearchBaseUrl: "http://localhost:4200/jlcsearch",
+        datasheetApiBaseUrl: "http://localhost:4200/datasheet-api",
+      },
+    })
     expect(worker.kill).toHaveBeenCalledTimes(1)
     expect(onRunCompleted).toHaveBeenCalledTimes(completedBeforeUnmount)
     expect(onError).toHaveBeenCalledTimes(errorsBeforeUnmount)

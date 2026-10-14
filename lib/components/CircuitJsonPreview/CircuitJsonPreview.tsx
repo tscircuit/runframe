@@ -341,7 +341,7 @@ export const CircuitJsonPreview = ({
         >
           <div
             className={cn(
-              "rf-flex rf-items-center rf-gap-2 rf-p-2 rf-pb-0",
+              "rf-flex rf-flex-wrap rf-items-center rf-gap-2 rf-p-2 rf-pb-0",
               headerClassName,
             )}
           >
@@ -583,7 +583,14 @@ export const CircuitJsonPreview = ({
               </TabsList>
             )}
             {showToggleFullScreen && (
-              <Button onClick={toggleFullScreen} variant="ghost">
+              <Button
+                onClick={toggleFullScreen}
+                variant="ghost"
+                className="rf-ml-auto rf-flex-shrink-0"
+                aria-label={
+                  isFullScreen ? "Exit fullscreen" : "Enter fullscreen"
+                }
+              >
                 {isFullScreen ? (
                   <MinimizeIcon size={16} />
                 ) : (

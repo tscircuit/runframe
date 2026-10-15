@@ -13,6 +13,8 @@ declare global {
     TSCIRCUIT_RUNFRAME_STATIC_FILE_LIST?: CircuitJsonFileReference[]
     TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH?: string
     TSCIRCUIT_PACKAGE_NAME?: string
+    TSCIRCUIT_EVAL_WORKER_URL?: string
+    TSCIRCUIT_EVAL_VERSION?: string
   }
 }
 
@@ -77,11 +79,12 @@ const INJECT_TSCIRCUIT_EVAL_WEB_WORKER_BLOB_URL =
   "<--INJECT_TSCIRCUIT_EVAL_WEB_WORKER_BLOB_URL-->"
 const INJECT_ENABLE_FETCH_PROXY = "<--INJECT_ENABLE_FETCH_PROXY-->"
 const runframeStandaloneProps: ComponentProps<typeof RunFrameWithApi> = {
-  evalWebWorkerBlobUrl: INJECT_TSCIRCUIT_EVAL_WEB_WORKER_BLOB_URL.includes(
-    "<--",
-  )
-    ? undefined
-    : INJECT_TSCIRCUIT_EVAL_WEB_WORKER_BLOB_URL,
+  evalVersion: window.TSCIRCUIT_EVAL_VERSION,
+  evalWebWorkerBlobUrl:
+    window.TSCIRCUIT_EVAL_WORKER_URL ??
+    (INJECT_TSCIRCUIT_EVAL_WEB_WORKER_BLOB_URL.includes("<--")
+      ? undefined
+      : INJECT_TSCIRCUIT_EVAL_WEB_WORKER_BLOB_URL),
   enableFetchProxy: INJECT_ENABLE_FETCH_PROXY.includes("<--")
     ? undefined
     : true,

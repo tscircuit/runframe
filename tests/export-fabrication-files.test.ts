@@ -1,4 +1,5 @@
-import { expect, mock, test } from "bun:test"
+import { expect, mock, spyOn, test } from "bun:test"
+import * as dynamicImporter from "@tscircuit/internal-dynamic-import"
 import JSZip from "jszip"
 import {
   availableExports,
@@ -12,6 +13,33 @@ test("Fabrication Files exports Gerbers beside the CSVs, matching the CLI ZIP la
   })
   const originalDocument = globalThis.document
   const originalCreateObjectURL = URL.createObjectURL
+  const originalImporter = dynamicImporter.default
+  const fixtureGerberFiles = {
+    "top-copper.gbr": "G04 synthetic copper fixture*\nM02*\n",
+    "drill.drl": "M48\n%\nM30\n",
+  }
+  const bomCsv = "Designator,Quantity\nR1,1\n"
+  const pnpCsv = "Designator,X,Y\nR1,0,0\n"
+  // Exercise real ZIP packaging without loading browser-only CDN converters.
+  const importerSpy = spyOn(dynamicImporter, "default").mockImplementation(
+    async (moduleName) => {
+      if (moduleName === "circuit-json-to-gerber") {
+        return {
+          convertCircuitJsonToGerberFiles: () => fixtureGerberFiles,
+        }
+      }
+      if (moduleName === "circuit-json-to-bom-csv") {
+        return {
+          convertCircuitJsonToBomRows: async () => [],
+          convertBomRowsToCsv: async () => bomCsv,
+        }
+      }
+      if (moduleName === "circuit-json-to-pnp-csv") {
+        return { convertCircuitJsonToPickAndPlaceCsv: async () => pnpCsv }
+      }
+      return originalImporter(moduleName)
+    },
+  )
   let downloadedBlob: Blob | undefined
   const anchor = {
     download: "",
@@ -65,7 +93,15 @@ test("Fabrication Files exports Gerbers beside the CSVs, matching the CLI ZIP la
         (name) => !name.includes("/") && !name.toLowerCase().endsWith(".zip"),
       ),
     ).toBe(true)
+    for (const [name, contents] of Object.entries({
+      ...fixtureGerberFiles,
+      "bom.csv": bomCsv,
+      "pick_and_place.csv": pnpCsv,
+    })) {
+      expect(await zip.file(name)!.async("string")).toBe(contents)
+    }
   } finally {
+    importerSpy.mockRestore()
     globalThis.document = originalDocument
     URL.createObjectURL = originalCreateObjectURL
   }

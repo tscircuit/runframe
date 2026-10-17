@@ -6,6 +6,7 @@ import { RunFrameStaticBuildViewer } from "../RunFrameStaticBuildViewer/RunFrame
 import type { CircuitJsonFileReference } from "../RunFrameStaticBuildViewer/RunFrameStaticBuildViewer"
 import type { ComponentProps } from "react"
 import type { TabId } from "../CircuitJsonPreview/PreviewContentProps"
+import { useExtraRunFrameTabsFromWindow } from "../../hooks/use-extra-runframe-tabs-from-window"
 
 declare global {
   interface Window {
@@ -94,24 +95,40 @@ const runframeStandaloneProps: ComponentProps<typeof RunFrameWithApi> = {
   const staticFileList = window.TSCIRCUIT_RUNFRAME_STATIC_FILE_LIST
   const defaultMainComponentPath = window.TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH
   const projectName = window.TSCIRCUIT_PACKAGE_NAME
-  if (Array.isArray(staticFileList)) {
-    const tabSelected = parseTabFromHash()
-    root.render(
-      <RunFrameStaticBuildViewer
-        files={staticFileList}
-        initialCircuitPath={defaultMainComponentPath}
-        tabSelected={tabSelected}
-        projectName={projectName}
-      />,
-    )
-  } else if (window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI) {
-    root.render(<RunFrameForCli {...runframeStandaloneProps} />)
-  } else {
-    const { fsMap } = await loadScriptsAsFsMap()
-    if (fsMap.size > 0) {
-      root.render(<RunFrame {...runframeStandaloneProps} fsMap={fsMap} />)
-    } else {
-      root.render(<RunFrameWithApi {...runframeStandaloneProps} />)
+  const isCli = window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI
+  const { fsMap } =
+    !Array.isArray(staticFileList) && !isCli
+      ? await loadScriptsAsFsMap()
+      : { fsMap: new Map<string, string>() }
+
+  function StandaloneApp() {
+    const extraTabs = useExtraRunFrameTabsFromWindow()
+    if (Array.isArray(staticFileList)) {
+      return (
+        <RunFrameStaticBuildViewer
+          files={staticFileList}
+          initialCircuitPath={defaultMainComponentPath}
+          tabSelected={parseTabFromHash()}
+          projectName={projectName}
+          extraTabs={extraTabs}
+        />
+      )
     }
+    if (isCli)
+      return (
+        <RunFrameForCli {...runframeStandaloneProps} extraTabs={extraTabs} />
+      )
+    if (fsMap.size > 0)
+      return (
+        <RunFrame
+          {...runframeStandaloneProps}
+          fsMap={fsMap}
+          extraTabs={extraTabs}
+        />
+      )
+    return (
+      <RunFrameWithApi {...runframeStandaloneProps} extraTabs={extraTabs} />
+    )
   }
+  root.render(<StandaloneApp />)
 })()

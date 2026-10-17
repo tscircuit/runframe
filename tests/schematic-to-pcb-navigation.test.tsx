@@ -4,6 +4,7 @@ import { act, createContext, useContext, useEffect, useState } from "react"
 import { createRoot } from "react-dom/client"
 import { usePcbViewerController } from "@tscircuit/pcb-viewer"
 import { useSchematicViewerController } from "@tscircuit/schematic-viewer"
+import { shouldShowCrispFeedbackButton } from "../lib/components/CircuitJsonPreview/CrispFeedbackButton"
 
 const Empty = () => null
 mock.module("posthog-js", () => ({
@@ -87,7 +88,7 @@ for (const [module, name] of [
 mock.module("lib/components/PreviewEmptyState", () => ({ default: Empty }))
 mock.module("lib/components/CircuitJsonPreview/CrispFeedbackButton", () => ({
   CrispFeedbackButton: Empty,
-  shouldShowCrispFeedbackButton: () => false,
+  shouldShowCrispFeedbackButton,
 }))
 for (const [path, hook] of [
   ["use-styles", "useStyles"],

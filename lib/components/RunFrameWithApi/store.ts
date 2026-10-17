@@ -149,14 +149,8 @@ export const useRunFrameStore = create<RunFrameState>()(
                 events.map((e) => e.event_type),
               )
 
-              set((state) => ({
-                recentEvents: [...state.recentEvents, ...events].slice(0, 100),
-                lastEventTime: newLastEventTime,
-                // TODO sort
-                // .sort((a, b) => b.created_at.localeCompare(a.created_at)),
-              }))
-
               let fsUpdateCount = 0
+              const savedFilePaths: FilePath[] = []
 
               // Process all file updates
               const updates = new Map(state.fsMap)
@@ -176,8 +170,7 @@ export const useRunFrameStore = create<RunFrameState>()(
                   } else {
                     updates.set(file.file_path, "__STATIC_ASSET__")
                   }
-                  // Track recently saved files
-                  get().addRecentlySavedFile(event.file_path)
+                  savedFilePaths.push(event.file_path)
                 } else if (event.event_type === "FILE_DELETED") {
                   fsUpdateCount++
                   updates.delete(event.file_path)
@@ -186,10 +179,25 @@ export const useRunFrameStore = create<RunFrameState>()(
 
               if (fsUpdateCount > 0) {
                 debug("updating fsMap, fsUpdateCount:", fsUpdateCount)
-                set({
-                  fsMap: updates,
-                })
               }
+
+              // Commit the batch only after all file requests succeed so a
+              // failed request can retry from the same cursor on the next poll.
+              set((state) => ({
+                ...(fsUpdateCount > 0 ? { fsMap: updates } : {}),
+                recentEvents: [...state.recentEvents, ...events].slice(0, 100),
+                lastEventTime: newLastEventTime,
+                // TODO sort
+                // .sort((a, b) => b.created_at.localeCompare(a.created_at)),
+              }))
+
+              for (const filePath of savedFilePaths) {
+                get().addRecentlySavedFile(filePath)
+              }
+            }
+
+            if (get().error) {
+              set({ error: null })
             }
           } catch (error) {
             set({ error: error as Error })

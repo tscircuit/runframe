@@ -2,6 +2,10 @@ import type { ManualEditEvent, PlatformConfig } from "@tscircuit/props"
 import type { CircuitJson } from "circuit-json"
 import type { RenderLog } from "lib/render-logging/RenderLog"
 import type { AutoroutingPhase } from "lib/autorouting"
+import type {
+  ExtraRunFrameTab,
+  ExtraRunFrameTabId,
+} from "./extra-runframe-tabs"
 
 export interface SolverStartedEvent {
   type: "solver:started"
@@ -13,6 +17,7 @@ export interface SolverStartedEvent {
 }
 
 export type TabId =
+  | ExtraRunFrameTabId
   | "code"
   | "pcb"
   | "schematic"
@@ -88,6 +93,9 @@ export interface PreviewContentProps {
    * Tabs to display. Defaults to all
    */
   availableTabs?: TabId[]
+
+  /** Additional iframe views. Duplicate or invalid descriptors are ignored. */
+  extraTabs?: ExtraRunFrameTab[]
 
   renderLog?: RenderLog | null
 

@@ -265,7 +265,9 @@ export const CircuitJsonPreview = ({
   const fallbackTab =
     requestedDefault && visibleTabIds.includes(requestedDefault)
       ? requestedDefault
-      : (visibleTabIds[0] ?? "pcb")
+      : (availableTabs?.find((tab) => visibleTabIds.includes(tab)) ??
+        visibleTabIds[0] ??
+        "pcb")
   const [storedActiveTab, setActiveTabState] = useLocalStorageState<TabId>(
     "runframe-active-tab",
     fallbackTab,

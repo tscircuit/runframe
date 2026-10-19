@@ -10,7 +10,7 @@ export interface ExtraRunFrameTab {
 export type ExtraRunFrameTabId = `extra:${string}`
 
 export interface ResolvedExtraRunFrameTab extends ExtraRunFrameTab {
-  id: ExtraRunFrameTabId
+  tabId: ExtraRunFrameTabId
 }
 
 const normalizeComponentPath = (path: string) =>
@@ -37,22 +37,22 @@ export function filterExtraRunFrameTabs(
 
 /** Treat bootstrap data as untrusted input, including when supplied by JavaScript. */
 export function resolveExtraRunFrameTabs(
-  value: unknown,
+  extraTabsInput: unknown,
 ): ResolvedExtraRunFrameTab[] {
-  if (!Array.isArray(value)) return []
+  if (!Array.isArray(extraTabsInput)) return []
   const names = new Set<string>()
   const tabs: ResolvedExtraRunFrameTab[] = []
-  for (const tab of value) {
+  for (const tab of extraTabsInput) {
     if (!tab || typeof tab !== "object") continue
     if (typeof tab.tabName !== "string" || typeof tab.iframeUrl !== "string")
       continue
     const tabName = tab.tabName.trim()
     if (!tabName || names.has(tabName)) continue
     let url: URL
-    let id: ExtraRunFrameTabId
+    let tabId: ExtraRunFrameTabId
     try {
       url = new URL(tab.iframeUrl)
-      id = `extra:${encodeURIComponent(tabName)}`
+      tabId = `extra:${encodeURIComponent(tabName)}`
     } catch {
       continue
     }
@@ -62,7 +62,7 @@ export function resolveExtraRunFrameTabs(
     tabs.push({
       tabName,
       iframeUrl: url.href,
-      id,
+      tabId,
     })
   }
   return tabs

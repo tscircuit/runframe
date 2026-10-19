@@ -259,7 +259,7 @@ export const CircuitJsonPreview = ({
         (tab !== "render_log" || showRenderLogTab),
     ),
     ...(showCodeTab ? ["code" as const] : []),
-    ...resolvedExtraTabs.map((tab) => tab.id),
+    ...resolvedExtraTabs.map((tab) => tab.tabId),
   ]
   const requestedDefault = defaultActiveTab ?? defaultTab
   const fallbackTab =
@@ -282,7 +282,9 @@ export const CircuitJsonPreview = ({
       onActiveTabChange?.(activeTab)
     }
   }, [storedActiveTab, activeTab, setActiveTabState, onActiveTabChange])
-  const activeExtraTab = resolvedExtraTabs.find((tab) => tab.id === activeTab)
+  const activeExtraTab = resolvedExtraTabs.find(
+    (tab) => tab.tabId === activeTab,
+  )
   usePostHogActivity({
     source: "runframe",
     component: "CircuitJsonPreview",
@@ -509,10 +511,10 @@ export const CircuitJsonPreview = ({
                   <DropdownMenuContent className="rf-*:text-xs rf-z-[101]">
                     {resolvedExtraTabs.map((tab) => (
                       <DropdownMenuItem
-                        key={tab.id}
-                        onSelect={() => setActiveTab(tab.id)}
+                        key={tab.tabId}
+                        onSelect={() => setActiveTab(tab.tabId)}
                       >
-                        {activeTab === tab.id ? (
+                        {activeTab === tab.tabId ? (
                           <CheckIcon className="rf-w-3 rf-h-3" />
                         ) : (
                           <Circle className="rf-w-3 rf-h-3 rf-opacity-30" />
@@ -1029,9 +1031,9 @@ export const CircuitJsonPreview = ({
           )}
           {resolvedExtraTabs.map((tab) => (
             <ExtraIframeTabContent
-              key={tab.id}
+              key={tab.tabId}
               tab={tab}
-              active={activeTab === tab.id}
+              active={activeTab === tab.tabId}
               isFullScreen={isFullScreen}
             />
           ))}

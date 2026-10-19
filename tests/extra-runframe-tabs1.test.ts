@@ -38,8 +38,8 @@ test("only valid HTTP(S) views survive bootstrap validation", () => {
     {
       tabName: "Sysconfig",
       iframeUrl: "https://viewer.example/#data:application/gzip;base64,a+b/c=",
-      id: "extra:Sysconfig",
+      tabId: "extra:Sysconfig",
     },
-    { tabName: "pcb", iframeUrl: "http://localhost:5187/", id: "extra:pcb" },
+    { tabName: "pcb", iframeUrl: "http://localhost:5187/", tabId: "extra:pcb" },
   ])
 })

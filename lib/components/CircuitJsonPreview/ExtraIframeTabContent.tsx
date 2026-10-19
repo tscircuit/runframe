@@ -19,7 +19,7 @@ export function ExtraIframeTabContent({
 
   return (
     <TabsContent
-      value={tab.id}
+      value={tab.tabId}
       forceMount
       className="rf-flex-1 rf-min-h-0 rf-overflow-hidden"
       style={{

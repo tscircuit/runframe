@@ -64,12 +64,12 @@ test("iframe navigation survives tab switches, updates replace source, and remov
       "../../lib/components/CircuitJsonPreview/ExtraIframeTabContent"
     )
     const tab = {
-      id: "extra:Sysconfig" as const,
+      tabId: "extra:Sysconfig" as const,
       tabName: "Sysconfig",
       iframeUrl: "https://viewer.example/#first",
     }
     const renderPanel = (active: boolean, iframeUrl = tab.iframeUrl) => (
-      <Tabs value={active ? tab.id : "pcb"}>
+      <Tabs value={active ? tab.tabId : "pcb"}>
         <ExtraIframeTabContent active={active} tab={{ ...tab, iframeUrl }} />
       </Tabs>
     )
@@ -96,7 +96,7 @@ test("iframe navigation survives tab switches, updates replace source, and remov
     const { CircuitJsonPreview } = await import(
       "../../lib/components/CircuitJsonPreview/CircuitJsonPreview"
     )
-    localStorage.setItem("runframe-active-tab", JSON.stringify(tab.id))
+    localStorage.setItem("runframe-active-tab", JSON.stringify(tab.tabId))
     const preview = (extraTabs: ExtraRunFrameTab[]) => (
       <CircuitJsonPreview
         circuitJson={null}

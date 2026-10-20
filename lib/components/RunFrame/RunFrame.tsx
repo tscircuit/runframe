@@ -9,6 +9,7 @@ import {
   type TabId,
 } from "../CircuitJsonPreview/CircuitJsonPreview"
 import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentProps"
+import { filterExtraRunFrameTabs } from "../CircuitJsonPreview/extra-runframe-tabs"
 import { Button } from "../ui/button"
 import { RunFrameErrorFallback } from "./RunFrameErrorFallback"
 
@@ -776,6 +777,10 @@ export const RunFrame = (props: RunFrameProps) => {
         defaultActiveTab={props.defaultActiveTab ?? props.defaultTab}
         defaultTab={props.defaultTab}
         availableTabs={props.availableTabs}
+        extraTabs={filterExtraRunFrameTabs(
+          props.extraTabs,
+          props.mainComponentPath ?? props.entrypoint,
+        )}
         schematicSvgOptions={props.schematicSvgOptions}
         showToggleFullScreen={props.showToggleFullScreen}
         autoroutingGraphics={autoroutingGraphics}

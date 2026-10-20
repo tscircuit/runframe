@@ -2,8 +2,11 @@
  * NOTE: RunFrame as a module is quite large, so you might want to vendor this
  * file into your project.
  */
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import type { RunFrameProps } from "../RunFrame/RunFrameProps"
+import { isRunFrameReadyMessageFromChild } from "./iframe-message-source"
+import { useStableRunFrameProps } from "./use-stable-runframe-props"
+import { postRunFrameProps } from "./post-runframe-props"
 
 export interface RunFrameWithIframeProps extends RunFrameProps {
   iframeUrl?: string
@@ -13,27 +16,53 @@ export const RunFrameWithIframe = ({
   iframeUrl = "https://runframe.tscircuit.com/iframe.html",
   ...runFrameProps
 }: RunFrameWithIframeProps) => {
+  const stableProps = useStableRunFrameProps(runFrameProps)
+  const [error, setError] = useState<Error | null>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
+  const latestProps = useRef(stableProps)
+  latestProps.current = stableProps
+  const ready = useRef(false)
 
   useEffect(() => {
+    ready.current = false
+    const origin = new URL(iframeUrl, window.location.href).origin
     const handleMessage = (event: MessageEvent) => {
-      if (event.data?.runframe_type === "runframe_ready_to_receive") {
-        iframeRef.current?.contentWindow?.postMessage(
-          {
-            runframe_type: "runframe_props_changed",
-            runframe_props: runFrameProps,
-          },
-          "*",
+      if (
+        isRunFrameReadyMessageFromChild({
+          event,
+          child: iframeRef.current?.contentWindow,
+          origin,
+        })
+      ) {
+        ready.current = true
+        setError(
+          postRunFrameProps({
+            child: iframeRef.current?.contentWindow,
+            origin,
+            props: latestProps.current,
+          }),
         )
       }
     }
 
     window.addEventListener("message", handleMessage)
     return () => window.removeEventListener("message", handleMessage)
-  }, [])
+  }, [iframeUrl])
+
+  useEffect(() => {
+    if (!ready.current) return
+    setError(
+      postRunFrameProps({
+        child: iframeRef.current?.contentWindow,
+        origin: new URL(iframeUrl, window.location.href).origin,
+        props: stableProps,
+      }),
+    )
+  }, [iframeUrl, stableProps])
 
   return (
     <div>
+      {error && <p role="alert">{error.message}</p>}
       <iframe
         ref={iframeRef}
         src={iframeUrl}

@@ -17,6 +17,7 @@ export interface RunFrameForCliProps {
   enableFetchProxy?: boolean
   apiBaseUrl?: string
   platformConfig?: RunFrameWithApiProps["platformConfig"]
+  extraTabs?: RunFrameWithApiProps["extraTabs"]
 }
 
 export const RunFrameForCli = (props: RunFrameForCliProps) => {
@@ -59,6 +60,7 @@ export const RunFrameForCli = (props: RunFrameForCliProps) => {
     <>
       {LoginDialog}
       <RunFrameWithApi
+        extraTabs={props.extraTabs}
         debug={props.debug}
         forceLatestEvalVersion={!evalWebWorkerBlobUrl && shouldLoadLatestEval}
         defaultToFullScreen={true}

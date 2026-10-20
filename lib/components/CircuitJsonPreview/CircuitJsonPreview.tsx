@@ -8,6 +8,8 @@ import { cn } from "lib/utils"
 import { getWindowVar } from "lib/utils/get-registry-ky"
 import { hasSimulationAnalysisResult } from "lib/utils/has-simulation-analysis-result"
 import { CadViewer } from "@tscircuit/3d-viewer"
+import { resolveExtraRunFrameTabs } from "./extra-runframe-tabs"
+import { ExtraIframeTabContent } from "./ExtraIframeTabContent"
 import { usePcbViewerController } from "@tscircuit/pcb-viewer"
 import {
   useCallback,
@@ -134,6 +136,7 @@ export const CircuitJsonPreview = ({
   defaultActiveTab,
   defaultTab,
   availableTabs,
+  extraTabs,
   autoRotate3dViewerDisabled,
   showSchematicDebugGrid: showSchematicDebugGridProp = false,
   showSchematicPorts: showSchematicPortsProp = false,
@@ -245,11 +248,42 @@ export const CircuitJsonPreview = ({
     circuitJsonErrors,
   })
 
-  const fallbackTab = defaultTab ?? availableTabs?.[0] ?? "pcb"
-  const [activeTab, setActiveTabState] = useLocalStorageState<TabId>(
+  const resolvedExtraTabs = useMemo(
+    () => resolveExtraRunFrameTabs(extraTabs),
+    [extraTabs],
+  )
+  const visibleTabIds: TabId[] = [
+    ...(["pcb", "schematic", "cad", ...dropdownMenuItems] as TabId[]).filter(
+      (tab) =>
+        (!availableTabs || availableTabs.includes(tab)) &&
+        (tab !== "render_log" || showRenderLogTab),
+    ),
+    ...(showCodeTab ? ["code" as const] : []),
+    ...resolvedExtraTabs.map((tab) => tab.tabId),
+  ]
+  const requestedDefault = defaultActiveTab ?? defaultTab
+  const fallbackTab =
+    requestedDefault && visibleTabIds.includes(requestedDefault)
+      ? requestedDefault
+      : (availableTabs?.find((tab) => visibleTabIds.includes(tab)) ??
+        visibleTabIds[0] ??
+        "pcb")
+  const [storedActiveTab, setActiveTabState] = useLocalStorageState<TabId>(
     "runframe-active-tab",
-    defaultActiveTab ?? fallbackTab,
+    fallbackTab,
     defaultActiveTab,
+  )
+  const activeTab = visibleTabIds.includes(storedActiveTab)
+    ? storedActiveTab
+    : fallbackTab
+  useEffect(() => {
+    if (storedActiveTab !== activeTab) {
+      setActiveTabState(activeTab)
+      onActiveTabChange?.(activeTab)
+    }
+  }, [storedActiveTab, activeTab, setActiveTabState, onActiveTabChange])
+  const activeExtraTab = resolvedExtraTabs.find(
+    (tab) => tab.tabId === activeTab,
   )
   usePostHogActivity({
     source: "runframe",
@@ -307,11 +341,9 @@ export const CircuitJsonPreview = ({
       !errorMessage
     ) {
       setActiveTab(
-        lastActiveTab ??
-          defaultActiveTab ??
-          defaultTab ??
-          availableTabs?.[0] ??
-          "pcb",
+        lastActiveTab && visibleTabIds.includes(lastActiveTab)
+          ? lastActiveTab
+          : fallbackTab,
       )
     }
   }, [circuitJson])
@@ -458,7 +490,8 @@ export const CircuitJsonPreview = ({
                 ) : null}
                 {!["pcb", "cad", "schematic"].includes(activeTab) && (
                   <TabsTrigger value={activeTab}>
-                    {capitalizeFirstLetters(activeTab)}
+                    {activeExtraTab?.tabName ??
+                      capitalizeFirstLetters(activeTab)}
                   </TabsTrigger>
                 )}
                 <DropdownMenu>
@@ -476,6 +509,19 @@ export const CircuitJsonPreview = ({
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="rf-*:text-xs rf-z-[101]">
+                    {resolvedExtraTabs.map((tab) => (
+                      <DropdownMenuItem
+                        key={tab.tabId}
+                        onSelect={() => setActiveTab(tab.tabId)}
+                      >
+                        {activeTab === tab.tabId ? (
+                          <CheckIcon className="rf-w-3 rf-h-3" />
+                        ) : (
+                          <Circle className="rf-w-3 rf-h-3 rf-opacity-30" />
+                        )}
+                        <div className="rf-pr-2">{tab.tabName}</div>
+                      </DropdownMenuItem>
+                    ))}
                     {dropdownMenuItems
                       .filter(
                         (item) =>
@@ -983,6 +1029,14 @@ export const CircuitJsonPreview = ({
               </div>
             </TabsContent>
           )}
+          {resolvedExtraTabs.map((tab) => (
+            <ExtraIframeTabContent
+              key={tab.tabId}
+              tab={tab}
+              active={activeTab === tab.tabId}
+              isFullScreen={isFullScreen}
+            />
+          ))}
         </Tabs>
       </div>
     </div>

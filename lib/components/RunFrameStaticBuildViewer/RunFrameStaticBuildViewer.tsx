@@ -11,6 +11,10 @@ import { useStaticCircuitJsonPathHash } from "./use-static-circuit-json-path-has
 import { CircuitGallery } from "./CircuitGallery"
 import { Button } from "../ui/button"
 import { LayoutGrid } from "lucide-react"
+import {
+  filterExtraRunFrameTabs,
+  type ExtraRunFrameTab,
+} from "../CircuitJsonPreview/extra-runframe-tabs"
 
 export interface CircuitJsonFileReference {
   filePath: string
@@ -18,6 +22,7 @@ export interface CircuitJsonFileReference {
 }
 
 export interface RunFrameStaticBuildViewerProps {
+  extraTabs?: ExtraRunFrameTab[]
   debug?: boolean
   files: CircuitJsonFileReference[]
   onFetchFile?: (fileRef: CircuitJsonFileReference) => Promise<CircuitJson>
@@ -289,6 +294,10 @@ export const RunFrameStaticBuildViewer = (
         </div>
       ) : (
         <CircuitJsonPreview
+          extraTabs={filterExtraRunFrameTabs(
+            props.extraTabs,
+            currentCircuitJsonPath,
+          )}
           circuitJson={circuitJson}
           defaultToFullScreen={props.defaultToFullScreen}
           showToggleFullScreen={props.showToggleFullScreen}

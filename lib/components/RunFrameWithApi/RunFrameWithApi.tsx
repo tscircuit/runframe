@@ -22,6 +22,10 @@ import {
 import { DEFAULT_UI_FILE_FILTER } from "lib/utils/file-filters"
 import { getBoardFilesFromConfig } from "lib/utils/get-board-files-from-config"
 import { EnhancedFileSelectorCombobox } from "./EnhancedFileSelectorCombobox"
+import {
+  filterExtraRunFrameTabs,
+  type ExtraRunFrameTab,
+} from "../CircuitJsonPreview/extra-runframe-tabs"
 
 const debug = Debug("run-frame:RunFrameWithApi")
 
@@ -71,6 +75,7 @@ export const guessManualEditsFilePath = (files: string[]) =>
   files.find((file) => file.endsWith(".json"))
 
 export interface RunFrameWithApiProps {
+  extraTabs?: ExtraRunFrameTab[]
   /**
    * Base URL for the API endpoints
    */
@@ -298,6 +303,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
 
   return (
     <RunFrame
+      extraTabs={filterExtraRunFrameTabs(props.extraTabs, componentPath)}
       fsMap={fsMap}
       showFileMenu={props.showFileMenu}
       shouldLoadLatestEval={props.shouldLoadLatestEval}

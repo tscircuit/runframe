@@ -2,6 +2,7 @@ import type { RunFrameIframeEvent } from "lib/components/RunFrameWithIframe/RunF
 import { RunFrame, type RunFrameProps } from "lib/runner"
 import React, { useEffect, useReducer, useState } from "react"
 import { createRoot } from "react-dom/client"
+import { isRunFramePropsMessageFromParent } from "../components/RunFrameWithIframe/iframe-message-source"
 
 const root = createRoot(document.getElementById("root")!)
 
@@ -17,7 +18,7 @@ function IframeApp() {
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      if (event.data && "runframe_props" in event.data) {
+      if (isRunFramePropsMessageFromParent(event, window.parent)) {
         setPropsFromParent(event.data.runframe_props)
         setPropsReceived(true)
       }

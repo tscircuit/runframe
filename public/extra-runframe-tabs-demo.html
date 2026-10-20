@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Read-only configuration transport demo</title>
+<style>
+  * { box-sizing: border-box } body { margin: 0; font: 14px system-ui, sans-serif; color: #263238; background: #fff }
+  header { padding: 18px 24px; border-bottom: 1px solid #d9dee3; background: #f7f8fa }
+  header p { margin: 8px 0 0; color: #52606d } h1 { font-size: 20px; margin: 0 }
+  main { display: flex; min-height: 500px } nav { width: 180px; padding: 18px 12px; border-right: 1px solid #d9dee3 }
+  nav a { display: block; color: #155a9e; padding: 12px; border-radius: 4px; text-decoration: none }
+  nav a[aria-current="page"] { background: #e8f1fa; font-weight: 600 }
+  article { padding: 24px; flex: 1 } h2 { margin-top: 0; font-size: 18px }
+  dl { display: grid; grid-template-columns: 150px 1fr; gap: 16px } dd { margin: 0; font-family: ui-monospace, monospace }
+  details { border: 1px solid #d9dee3; border-radius: 6px; padding: 14px; margin-top: 24px } summary { cursor: pointer; font-weight: 600 }
+  .badge { float: right; border: 1px solid #bfc9d2; border-radius: 12px; padding: 3px 9px; font-size: 12px }
+</style>
+<header><span class="badge">View only</span><h1>Configuration viewer</h1><p>Iframe transport demo — this sample does not represent TI SysConfig visual parity.</p></header>
+<main>
+  <nav aria-label="Modules"><a href="#gpio" aria-current="page">GPIO</a><a href="#uart">UART</a></nav>
+  <article id="gpio"><h2>GPIO • CONFIG_LED</h2><dl><dt>Direction</dt><dd>Output</dd><dt>Assigned pin</dt><dd>DIO11</dd><dt>Initial output</dt><dd>Low</dd></dl><details><summary>Pin assignment details</summary><p>The LED output is assigned to DIO11. Navigation and disclosure controls remain interactive while configuration values cannot be edited.</p></details></article>
+  <article id="uart" hidden><h2>UART • CONFIG_UART0</h2><dl><dt>Baud rate</dt><dd>115200</dd><dt>Data bits</dt><dd>8</dd><dt>Parity</dt><dd>None</dd></dl><details><summary>Communication details</summary><p>This sample exposes fixed configuration values. Switch to PCB and return to confirm this module and disclosure remain selected.</p></details></article>
+</main>
+<script>
+  function showModule() {
+    const current = location.hash === '#uart' ? 'uart' : 'gpio';
+    for (const article of document.querySelectorAll('article')) article.hidden = article.id !== current;
+    for (const link of document.querySelectorAll('nav a')) {
+      if (link.hash === '#' + current) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    }
+  }
+  window.addEventListener('hashchange', showModule);
+  showModule();
+</script>
+</html>

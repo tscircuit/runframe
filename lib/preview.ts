@@ -1,4 +1,8 @@
 export * from "./components/CircuitJsonPreview/CircuitJsonPreview"
+export type {
+  ExtraRunFrameTab,
+  ExtraRunFrameTabId,
+} from "./components/CircuitJsonPreview/extra-runframe-tabs"
 export * from "./components/BomTable"
 export * from "./components/PcbViewerWithContainerHeight"
 export { CadViewer } from "@tscircuit/3d-viewer"

@@ -2,7 +2,7 @@
   "name": "@tscircuit/runframe",
   "main": "dist/preview.js",
   "type": "module",
-  "version": "0.0.3058",
+  "version": "0.0.3068",
   "repository": {
     "type": "git",
     "url": "https://github.com/tscircuit/runframe"
@@ -50,7 +50,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@react-hook/resize-observer": "^2.0.2",
     "@resvg/resvg-wasm": "^2.6.2",
-    "@tscircuit/3d-viewer": "^0.0.630",
+    "@tscircuit/3d-viewer": "^0.0.632",
     "@tscircuit/assembly-viewer": "^0.0.6",
     "@tscircuit/capacity-autorouter": "^0.0.874",
     "@tscircuit/circuit-json-util": "^0.0.116",
@@ -58,7 +58,7 @@
     "@tscircuit/fake-snippets": "^0.0.163",
     "@tscircuit/file-server": "^0.0.32",
     "@tscircuit/internal-dynamic-import": "^0.0.18",
-    "@tscircuit/pcb-viewer": "^1.11.432",
+    "@tscircuit/pcb-viewer": "^1.11.434",
     "@tscircuit/props": "^0.0.702",
     "@tscircuit/schematic-viewer": "^2.0.104",
     "@types/bun": "latest",
@@ -72,8 +72,8 @@
     "circuit-json": "^0.0.525",
     "circuit-json-to-altium": "github:tscircuit/circuit-json-to-altium#1a50d0dd2c0737cf940d92c0315852dc0111dd87",
     "circuit-json-to-bom-csv": "^0.0.21",
-    "circuit-json-to-gerber": "^0.0.113",
-    "circuit-json-to-kicad": "^0.0.249",
+    "circuit-json-to-gerber": "^0.0.116",
+    "circuit-json-to-kicad": "^0.0.251",
     "circuit-json-to-lbrn": "^0.0.74",
     "circuit-json-to-pnp-csv": "^0.0.18",
     "circuit-json-to-step": "^0.0.47",
@@ -125,7 +125,7 @@
   },
   "dependencies": {
     "@tscircuit/core": "^0.0.1911",
-    "@tscircuit/eval": "0.0.1656",
+    "@tscircuit/eval": "0.0.1659",
     "@tscircuit/solver-utils": "^0.0.16",
     "debug": "^4.4.0",
     "format-si-unit": "^0.0.12"

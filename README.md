@@ -221,3 +221,64 @@ The event bus for the RunFrame is accessible from the `@tscircuit/file-server`
 | REQUEST_TO_SAVE_SNIPPET | Browser request to save the current circuit to snippets |
 | FAILED_TO_SAVE_SNIPPET  | Failed to save the current snippet to Registry          |
 | SNIPPET_SAVED           | Snippet was saved to Registry                           |
+
+
+### Extra iframe tabs
+
+RunFrame, CircuitJsonPreview, RunFrameWithApi, RunFrameForCli, and
+RunFrameStaticBuildViewer accept `extraTabs`. Import `ExtraRunFrameTab` from
+`@tscircuit/runframe` or `@tscircuit/runframe/runner`:
+
+```tsx
+<RunFrame
+  fsMap={files}
+  mainComponentPath="boards/controller.tsx"
+  extraTabs={[
+    {
+      tabName: "Sysconfig",
+      iframeUrl: "https://sysconfig-viewer.tscircuit.com/#encodedcontent",
+      mainComponentPath: "boards/controller.tsx",
+    },
+  ]}
+/>
+```
+
+Omit `mainComponentPath` for a project-wide tab. The RunFrame, API/CLI, and
+static-build wrappers filter scoped tabs against the selected circuit path.
+CircuitJsonPreview accepts the already-selected views. Static-build paths must
+match `files[].filePath`. Different circuits may each define a tab named
+`Sysconfig`; duplicate names within the selected circuit are ignored after the
+first valid descriptor. Blank names, malformed URLs, credential-bearing URLs,
+and protocols other than HTTP(S) are ignored.
+
+Extra views appear in **More views**, with the selected view also shown in the
+header. They are additional to `availableTabs`, which filters built-in views.
+Use `defaultActiveTab="extra:Sysconfig"` to select this example initially; the
+suffix is the URL-encoded tab name. Iframes load when first selected and remain
+mounted between view changes. Removing the selected view falls back to an
+available tab. Changing its URL navigates the existing iframe to the new page.
+
+For the standalone CLI bundle, inject the global before loading the bundle:
+
+```html
+<script>
+  window.TSCIRCUIT_EXTRA_RUNFRAME_TABS = [
+    { tabName: "Sysconfig", iframeUrl: "https://sysconfig-viewer.tscircuit.com/#encodedcontent" }
+  ];
+</script>
+```
+
+For live updates, replace that array and dispatch
+`window.dispatchEvent(new Event("tscircuit:extra-runframe-tabs-change"))`.
+React consumers update the `extraTabs` prop instead.
+
+Pages must be trusted by the embedding application. Frames use
+`sandbox="allow-scripts allow-same-origin"` so application assets and SDK data
+can load, without granting popup, form, or top-level navigation capabilities.
+An iframe served from the parent's own origin shares that origin's trust;
+use a separate origin for external viewers. The framed page controls read-only
+behavior and must allow framing through its response headers.
+
+`example62-extra-iframe-tabs` demonstrates transport, retained navigation, and
+circuit scoping using a local read-only sample. It is not a TI SysConfig parity
+demo and does not implement SysConfig parsing or URL encoding.

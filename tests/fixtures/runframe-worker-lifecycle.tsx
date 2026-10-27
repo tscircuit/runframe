@@ -219,6 +219,39 @@ test("RunFrame shares initialization, serializes rendering and recovers failed o
       expect(document.body.textContent).toContain("No errors or warnings")
     }
 
+    // Keep a completed preview while a slow build runs. Many edits during it
+    // replace one pending request, and cannot prevent the active result landing.
+    let finishBurst!: () => void
+    worker.renderUntilSettled.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          finishBurst = resolve
+        }),
+    )
+    const beforeBurst = executeWithFsMap.mock.calls.length
+    const completedBeforeBurst = onRunCompleted.mock.calls.length
+    const previewBeforeBurst = document.querySelector(
+      "[data-circuit-json]",
+    )?.textContent
+    await act(async () =>
+      root.render(render("export default () => <board width={10} />")),
+    )
+    for (let width = 11; width <= 30; width++) {
+      await act(async () =>
+        root.render(render(`export default () => <board width={${width}} />`)),
+      )
+    }
+    expect(executeWithFsMap).toHaveBeenCalledTimes(beforeBurst + 1)
+    expect(document.querySelector("[data-circuit-json]")?.textContent).toBe(
+      previewBeforeBurst,
+    )
+    await act(async () => finishBurst())
+    expect(executeWithFsMap).toHaveBeenCalledTimes(beforeBurst + 2)
+    expect(executeWithFsMap.mock.calls.at(-1)?.[0]).toMatchObject({
+      fsMap: { "board.tsx": "export default () => <board width={30} />" },
+    })
+    expect(onRunCompleted).toHaveBeenCalledTimes(completedBeforeBurst + 2)
+
     let finishIdenticalRender!: () => void
     worker.renderUntilSettled.mockImplementationOnce(
       () =>
@@ -233,6 +266,14 @@ test("RunFrame shares initialization, serializes rendering and recovers failed o
     await act(async () => root.render(render(pendingSource)))
     await act(async () => finishIdenticalRender())
     expect(onRunCompleted).toHaveBeenCalledTimes(beforeIdenticalRender + 1)
+
+    const beforeVersionChange = executeWithFsMap.mock.calls.length
+    await act(async () =>
+      root.render(
+        cloneElement(render(pendingSource), { evalVersion: "0.0.1581" }),
+      ),
+    )
+    expect(executeWithFsMap).toHaveBeenCalledTimes(beforeVersionChange + 1)
 
     let finishRejectedSnapshotRender!: () => void
     worker.renderUntilSettled.mockImplementationOnce(
@@ -334,4 +375,4 @@ test("RunFrame shares initialization, serializes rendering and recovers failed o
     })
     dom.window.close()
   }
-})
+}, 15000)

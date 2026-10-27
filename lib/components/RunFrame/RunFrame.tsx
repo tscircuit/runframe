@@ -134,6 +134,7 @@ export const RunFrame = (props: RunFrameProps) => {
   const setLastRunEvalVersion = useRunnerStore((s) => s.setLastRunEvalVersion)
   const lastRunCountTriggerRef = useRef(0)
   const runMutex = useMutex()
+  const latestRunRequest = useRef(0)
   const [isRunning, setIsRunning] = useState(false)
   const [dependenciesLoaded, setDependenciesLoaded] = useState(false)
   const [activeAsyncEffects, setActiveAsyncEffects] = useState<
@@ -155,6 +156,7 @@ export const RunFrame = (props: RunFrameProps) => {
     componentActiveRef.current = true
     return () => {
       componentActiveRef.current = false
+      runMutex.cancel()
       cancelExecutionRef.current?.()
       const pending = workerCreationRef.current
       void pending
@@ -307,6 +309,8 @@ export const RunFrame = (props: RunFrameProps) => {
   )
   const lastFsMapRef = useRef<Map<string, string> | null>(null)
   const lastEntrypointRef = useRef<string | null>(null)
+  const lastMainComponentPathRef = useRef<string | undefined>(undefined)
+  const lastEvalVersionRef = useRef<string | undefined>(undefined)
   const lastStaticResultRef = useRef<unknown>(null)
   const {
     circuitJson: circuitJsonFileParsedContent,
@@ -355,6 +359,8 @@ export const RunFrame = (props: RunFrameProps) => {
     if (isStaticCircuitJson || props.isLoadingFiles) {
       // Invalidate queued runs as well as the currently active run.
       autoroutingCaptureGeneration.current += 1
+      latestRunRequest.current += 1
+      runMutex.cancel()
       cancelExecutionRef.current?.()
       cancelExecutionRef.current = null
       setIsRunning(false)
@@ -386,7 +392,11 @@ export const RunFrame = (props: RunFrameProps) => {
 
       if (Object.keys(changes).length > 0) {
         debug("code changes detected")
-      } else if (lastEntrypointRef.current !== props.entrypoint) {
+      } else if (
+        lastEntrypointRef.current !== (props.entrypoint ?? null) ||
+        lastMainComponentPathRef.current !== props.mainComponentPath ||
+        lastEvalVersionRef.current !== props.evalVersion
+      ) {
         debug("render triggered by entrypoint change")
       } else if (!wasTriggeredByRunButton) {
         debug("render triggered without changes to fsMap, skipping")
@@ -403,11 +413,15 @@ export const RunFrame = (props: RunFrameProps) => {
 
     lastFsMapRef.current = fsMap
     lastEntrypointRef.current = props.entrypoint ?? null
+    lastMainComponentPathRef.current = props.mainComponentPath
+    lastEvalVersionRef.current = props.evalVersion
     lastRunCountTriggerRef.current = runCountTrigger
     setIsRunning(true)
 
     let cancelled = false
-    const captureGeneration = ++autoroutingCaptureGeneration.current
+    const request = ++latestRunRequest.current
+    let captureGeneration = autoroutingCaptureGeneration.current
+    const hasPreviousPreview = circuitJson !== null
     const isCurrentRun = () =>
       componentActiveRef.current &&
       !cancelled &&
@@ -417,7 +431,12 @@ export const RunFrame = (props: RunFrameProps) => {
       | Promise<{ success: true } | { success: false; error: unknown }>
       | undefined
     const runWorker = async () => {
-      if (!isCurrentRun()) return
+      if (!componentActiveRef.current || request !== latestRunRequest.current)
+        return
+      // A new request replaces queued work, not the active render. This lets
+      // continuous editing show completed results instead of starving the view.
+      captureGeneration = ++autoroutingCaptureGeneration.current
+      setIsRunning(true)
       debug("running render worker")
       setError(null)
       setRenderLog(null)
@@ -585,8 +604,10 @@ export const RunFrame = (props: RunFrameProps) => {
       if (!isCurrentRun()) return
       if (!circuitJson) throw new Error("Eval worker returned no Circuit JSON")
       debug("got initial circuit json")
-      setCircuitJson(circuitJson)
-      props.onCircuitJsonChange?.(circuitJson)
+      if (!hasPreviousPreview) {
+        setCircuitJson(circuitJson)
+        props.onCircuitJsonChange?.(circuitJson)
+      }
       props.onInitialRender?.({ circuitJson })
 
       const settled = await settlement
@@ -628,7 +649,7 @@ export const RunFrame = (props: RunFrameProps) => {
         }
       })
       .catch((failure: unknown) => {
-        if (!isCurrentRun()) return
+        if (!isCurrentRun() || request !== latestRunRequest.current) return
         const error =
           failure instanceof Error ? failure : new Error(String(failure))
         debug("worker execution failed", error)

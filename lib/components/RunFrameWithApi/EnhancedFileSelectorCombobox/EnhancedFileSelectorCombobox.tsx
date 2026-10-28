@@ -321,16 +321,8 @@ export const EnhancedFileSelectorCombobox = ({
     return combinedRecent
   }, [recentlySavedFiles, recentlyViewedFiles, filteredFiles])
 
-  const displayPath = currentFolder ?? "/"
-  const shortDisplayPath =
-    displayPath.length > 25 ? "..." + displayPath.slice(-22) : displayPath // Fixed width to eliminate jitter - no dynamic sizing
-  const getDropdownWidth = () => {
-    const maxWidth = isSearching ? "rf-max-w-[600px]" : "rf-max-w-[1000px]"
-    return `rf-w-full rf-min-w-[600px] ${maxWidth}`
-  }
-
   return (
-    <div className="rf-flex rf-items-center rf-gap-1">
+    <div className="rf-flex rf-min-w-0 rf-max-w-96 rf-items-center rf-gap-1">
       <Popover
         open={open}
         onOpenChange={(newOpen) => {
@@ -346,7 +338,8 @@ export const EnhancedFileSelectorCombobox = ({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="rf-w-fit rf-min-w-32 rf-max-w-100 rf-justify-center rf-items-center rf-gap-1 !rf-font-normal"
+            className="rf-w-full rf-min-w-0 rf-justify-center rf-items-center rf-gap-1 !rf-font-normal"
+            title={file || placeholder}
           >
             <span className="rf-truncate rf-text-left">
               {file ? getDisplayName(file) : placeholder}
@@ -355,10 +348,13 @@ export const EnhancedFileSelectorCombobox = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className={cn(
-            "!rf-p-0 !rf-overflow-y-auto !rf-max-h-[80vh] !rf-z-[200]",
-            getDropdownWidth(),
-          )}
+          collisionPadding={8}
+          className="!rf-p-0 !rf-overflow-y-auto !rf-z-[200]"
+          style={{
+            width: "min(600px, calc(100vw - 16px))",
+            maxHeight:
+              "min(80vh, var(--radix-popover-content-available-height))",
+          }}
         >
           <Command shouldFilter={false}>
             <CommandInput
@@ -403,7 +399,10 @@ export const EnhancedFileSelectorCombobox = ({
                             <Clock className="rf-mr-2 rf-h-4 rf-w-4 rf-text-blue-500" />
                           </span>
                         )}
-                        <span className="rf-text-sm">
+                        <span
+                          className="rf-min-w-0 rf-truncate rf-text-sm"
+                          title={item.path}
+                        >
                           {getDisplayName(item.path.split("/").pop() || "")}
                         </span>
                         <span className="rf-text-xs rf-text-muted-foreground rf-ml-2 rf-truncate rf-max-w-[40%]">
@@ -411,7 +410,7 @@ export const EnhancedFileSelectorCombobox = ({
                         </span>
                         <Check
                           className={cn(
-                            "rf-ml-auto rf-h-4 rf-w-4",
+                            "rf-ml-auto rf-h-4 rf-w-4 rf-shrink-0",
                             item.path === currentFile
                               ? "rf-opacity-100"
                               : "rf-opacity-0",
@@ -427,7 +426,7 @@ export const EnhancedFileSelectorCombobox = ({
             {/* Directory Header */}
             <div className="rf-px-3 rf-py-2 rf-bg-slate-50 rf-flex rf-items-center rf-justify-between rf-gap-2">
               <div className="rf-flex rf-items-center rf-text-xs rf-text-slate-600 rf-min-w-0 rf-flex-1">
-                <div className="rf-flex rf-items-center rf-min-w-0">
+                <div className="rf-flex rf-min-w-0 rf-items-center rf-overflow-x-auto rf-whitespace-nowrap">
                   <button
                     onClick={() => handleNavigateToFolder(null)}
                     className="rf-text-blue-600 hover:rf-text-blue-800 rf-underline rf-cursor-pointer rf-bg-transparent rf-border-none rf-p-0 rf-flex-shrink-0"
@@ -442,7 +441,7 @@ export const EnhancedFileSelectorCombobox = ({
                       return (
                         <span
                           key={pathToSegment}
-                          className="rf-flex rf-items-center rf-min-w-0"
+                          className="rf-flex rf-items-center rf-shrink-0"
                         >
                           <span className="rf-mx-1 rf-flex-shrink-0">/</span>
                           {index === array.length - 1 ? (
@@ -525,7 +524,7 @@ export const EnhancedFileSelectorCombobox = ({
                             </span>
                             <Check
                               className={cn(
-                                "rf-ml-auto rf-h-4 rf-w-4",
+                                "rf-ml-auto rf-h-4 rf-w-4 rf-shrink-0",
                                 path === currentFile
                                   ? "rf-opacity-100"
                                   : "rf-opacity-0",
@@ -550,11 +549,16 @@ export const EnhancedFileSelectorCombobox = ({
                             "rf-group",
                           )}
                         >
-                          <span className="rf-mr-2">
+                          <span className="rf-mr-2 rf-shrink-0">
                             {defaultFileIcon(fileNode.name)}
                           </span>
-                          {getDisplayName(fileNode.name)}
-                          <div className="rf-ml-auto rf-flex rf-items-center rf-gap-1">
+                          <span
+                            className="rf-min-w-0 rf-truncate"
+                            title={fileNode.path}
+                          >
+                            {getDisplayName(fileNode.name)}
+                          </span>
+                          <div className="rf-ml-auto rf-flex rf-shrink-0 rf-items-center rf-gap-1">
                             {/* Favorite star button - commented out for now
                             {onToggleFavorite && (
                               <button
@@ -617,9 +621,14 @@ export const EnhancedFileSelectorCombobox = ({
                           }
                           className="rf-text-slate-600 hover:rf-text-slate-900"
                         >
-                          <Folder className="rf-mr-2 rf-h-4 rf-w-4 rf-text-blue-600" />
-                          {folderNode.name}
-                          <ChevronRight className="rf-ml-auto rf-h-4 rf-w-4" />
+                          <Folder className="rf-mr-2 rf-h-4 rf-w-4 rf-shrink-0 rf-text-blue-600" />
+                          <span
+                            className="rf-min-w-0 rf-truncate"
+                            title={folderNode.path}
+                          >
+                            {folderNode.name}
+                          </span>
+                          <ChevronRight className="rf-ml-auto rf-h-4 rf-w-4 rf-shrink-0" />
                         </CommandItem>
                       ))}
                     </CommandGroup>

@@ -317,13 +317,13 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
       platformConfig={props.platformConfig}
       enableFetchProxy={props.enableFetchProxy}
       leftHeaderContent={
-        <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
-          <div className="rf-flex rf-items-center rf-gap-2">
+        <div className="rf-flex rf-min-w-0 rf-w-full rf-items-center rf-gap-2">
+          <div className="rf-flex rf-shrink-0 rf-items-center rf-gap-2">
             {props.leftHeaderContent}
             <ApiStatusIndicator />
           </div>
           {props.showFilesSwitch && (
-            <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2">
+            <div className="rf-min-w-0 rf-flex-1">
               <EnhancedFileSelectorCombobox
                 currentFile={componentPath}
                 files={visibleBoardFiles}

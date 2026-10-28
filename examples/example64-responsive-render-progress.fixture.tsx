@@ -24,35 +24,45 @@ const stages = [
 
 export default () => {
   const [stage, setStage] = useState(0)
+  const [naturalHeight, setNaturalHeight] = useState(false)
   const [currentFile, setCurrentFile] = useState(files[0])
   const current = stages[stage]
   return (
     <>
-      <CircuitJsonPreview
-        circuitJson={circuitJson}
-        leftHeaderContent={
-          <div className="rf-flex rf-min-w-0 rf-w-full rf-items-center rf-gap-2">
-            <span className="rf-inline-flex rf-size-2 rf-shrink-0 rf-rounded-full rf-bg-green-600" />
-            <div className="rf-min-w-0 rf-flex-1">
-              <EnhancedFileSelectorCombobox
-                files={files}
-                currentFile={currentFile}
-                onFileChange={setCurrentFile}
-              />
+      <div style={{ height: naturalHeight ? "auto" : "100%" }}>
+        <CircuitJsonPreview
+          circuitJson={circuitJson}
+          leftHeaderContent={
+            <div className="rf-flex rf-min-w-0 rf-w-full rf-items-center rf-gap-2">
+              <span className="rf-inline-flex rf-size-2 rf-shrink-0 rf-rounded-full rf-bg-green-600" />
+              <div className="rf-min-w-0 rf-flex-1">
+                <EnhancedFileSelectorCombobox
+                  files={files}
+                  currentFile={currentFile}
+                  onFileChange={setCurrentFile}
+                />
+              </div>
             </div>
-          </div>
-        }
-        renderLog={{
-          progress: current.progress,
-          lastRenderEvent: {
-            type: "board:renderPhaseStarted",
-            phase: current.phase,
-            renderId: "responsive-fixture",
-            eventsProcessed: 1,
-            createdAt: 0,
-          },
-        }}
-      />
+          }
+          renderLog={{
+            progress: current.progress,
+            lastRenderEvent: {
+              type: "board:renderPhaseStarted",
+              phase: current.phase,
+              renderId: "responsive-fixture",
+              eventsProcessed: 1,
+              createdAt: 0,
+            },
+          }}
+        />
+      </div>
+      <button
+        type="button"
+        onClick={() => setNaturalHeight((value) => !value)}
+        style={{ position: "fixed", bottom: 8, left: 160, zIndex: 100 }}
+      >
+        {naturalHeight ? "Use bounded height" : "Use natural height"}
+      </button>
       <button
         type="button"
         onClick={() => setStage((stage + 1) % stages.length)}

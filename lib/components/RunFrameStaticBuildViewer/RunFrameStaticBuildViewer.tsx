@@ -226,6 +226,7 @@ export const RunFrameStaticBuildViewer = (
           type="button"
           variant="outline"
           size="icon"
+          className="rf-shrink-0"
           onClick={showGallery}
           aria-label={`Browse all ${availableFiles.length} circuits as a gallery`}
           title="Open circuit gallery"
@@ -254,7 +255,7 @@ export const RunFrameStaticBuildViewer = (
     >
       {currentFileFailed ? (
         <div className="rf-w-full rf-h-full rf-flex rf-flex-col">
-          <div className="rf-flex rf-items-center rf-justify-between rf-w-full rf-p-4 rf-border-b rf-border-gray-200">
+          <div className="rf-flex rf-items-center rf-gap-2 rf-min-w-0 rf-w-full rf-p-4 rf-border-b rf-border-gray-200">
             {(props.showFileMenu ?? true) && (
               <FileMenuLeftHeader
                 isWebEmbedded={true}
@@ -263,7 +264,7 @@ export const RunFrameStaticBuildViewer = (
               />
             )}
             {availableFiles.length > 1 && (
-              <div className="rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2 rf-flex rf-items-center rf-gap-2">
+              <div className="rf-flex rf-min-w-0 rf-flex-1 rf-items-center rf-gap-2">
                 {fileNavigation}
               </div>
             )}
@@ -306,7 +307,7 @@ export const RunFrameStaticBuildViewer = (
           projectName={props.projectName}
           defaultActiveTab={props.tabSelected}
           leftHeaderContent={
-            <div className="rf-flex rf-items-center rf-justify-between rf-w-full">
+            <div className="rf-flex rf-min-w-0 rf-w-full rf-items-center rf-gap-2">
               {(props.showFileMenu ?? true) && (
                 <FileMenuLeftHeader
                   isWebEmbedded={true}
@@ -316,7 +317,7 @@ export const RunFrameStaticBuildViewer = (
               )}
               {availableFiles.length > 1 && (
                 <div
-                  className={`rf-absolute rf-left-1/2 rf-transform rf--translate-x-1/2 rf-flex rf-items-center rf-gap-2 ${isLoadingCurrentFile ? "rf-opacity-50" : ""}`}
+                  className={`rf-flex rf-min-w-0 rf-flex-1 rf-items-center rf-gap-2 ${isLoadingCurrentFile ? "rf-opacity-50" : ""}`}
                 >
                   {fileNavigation}
                 </div>

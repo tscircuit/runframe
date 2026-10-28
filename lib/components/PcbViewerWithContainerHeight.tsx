@@ -19,10 +19,7 @@ export const PcbViewerWithContainerHeight = ({
     const updateHeight = () => {
       if (containerRef.current) {
         const containerHeight = containerRef.current.clientHeight
-        const screenHeight = window.innerHeight
-        setComputedHeight(
-          Math.min(Math.max(containerHeight, 620), screenHeight),
-        )
+        setComputedHeight(containerHeight || 620)
       }
     }
 

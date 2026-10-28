@@ -429,7 +429,7 @@ export const CircuitJsonPreview = ({
               )}
             <div className="rf-flex rf-min-w-0 rf-max-w-full rf-items-center rf-gap-2 rf-ml-auto">
               {showRightHeaderContent && (
-                <TabsList className="rf-min-w-0 rf-justify-start rf-overflow-x-auto">
+                <TabsList className="rf-min-w-0 rf-justify-start rf-overflow-x-auto rf-overflow-y-hidden">
                   {showCodeTab && <TabsTrigger value="code">Code</TabsTrigger>}
                   {!availableTabs || availableTabs.includes("pcb") ? (
                     <TabsTrigger value="pcb" className="rf-whitespace-nowrap">

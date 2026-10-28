@@ -28,13 +28,16 @@ export default () => {
         "boards/power/ShortBoard.tsx",
         "boards/VeryLongUnbrokenFolderNameForTestingSmallScreenSelectorNavigation/NestedBoard.tsx",
       ]
-      for (const file_path of paths) {
+      for (const filePath of paths) {
         const response = await fetch("/api/files/upsert", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ file_path, text_content: boardSource }),
+          body: JSON.stringify({
+            file_path: filePath,
+            text_content: boardSource,
+          }),
         })
-        if (!response.ok) throw new Error(`Could not create ${file_path}`)
+        if (!response.ok) throw new Error(`Could not create ${filePath}`)
       }
       const response = await fetch("/api/events/create", {
         method: "POST",

@@ -891,6 +891,7 @@ export const RunFrame = (props: RunFrameProps) => {
         circuitJson={circuitJson}
         renderLog={renderLog}
         activeEffectName={activeEffectName}
+        activeAsyncEffects={Object.values(activeAsyncEffects)}
         isRunningCode={isRunning}
         errorMessage={error?.error}
         errorStack={error?.stack}

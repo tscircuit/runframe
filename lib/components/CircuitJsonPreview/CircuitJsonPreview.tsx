@@ -1,3 +1,4 @@
+import { RenderStatus } from "./RenderStatus"
 import {
   Tabs,
   TabsContent,
@@ -35,7 +36,6 @@ import {
   EllipsisIcon,
   FullscreenIcon,
   Loader2,
-  LoaderCircleIcon,
   MinimizeIcon,
   Circle,
 } from "lucide-react"
@@ -149,6 +149,7 @@ export const CircuitJsonPreview = ({
   showToggleFullScreen = true,
   defaultToFullScreen = false,
   activeEffectName,
+  activeAsyncEffects,
   allowSelectingVersion = getWindowVar(
     "TSCIRCUIT_ALLOW_SELECTING_EVAL_VERSION",
   ) !== false,
@@ -406,22 +407,11 @@ export const CircuitJsonPreview = ({
               )}
             </div>
             {renderLog && renderLog.progress !== 1 && !errorMessage && (
-              <div className="rf-flex rf-w-48 rf-max-w-full rf-shrink-0 rf-items-center rf-gap-2 rf-min-w-0">
-                <div
-                  className="rf-text-xs rf-text-gray-500 rf-truncate rf-min-w-0 rf-flex-1"
-                  title={
-                    activeEffectName ?? renderLog.lastRenderEvent?.phase ?? ""
-                  }
-                >
-                  {activeEffectName ?? renderLog.lastRenderEvent?.phase}
-                </div>
-                <div className="rf-w-4 rf-h-4 rf-bg-blue-500 rf-opacity-50 rf-rounded-full rf-text-white rf-flex-shrink-0">
-                  <LoaderCircleIcon className="rf-w-4 rf-h-4 rf-animate-spin" />
-                </div>
-                <div className="rf-text-xs rf-font-bold rf-text-gray-700 rf-tabular-nums rf-flex-shrink-0 rf-w-[6ch] rf-text-right">
-                  {((renderLog.progress ?? 0) * 100).toFixed(1)}%
-                </div>
-              </div>
+              <RenderStatus
+                renderLog={renderLog}
+                activeEffectName={activeEffectName}
+                activeAsyncEffects={activeAsyncEffects}
+              />
             )}
             {showRightHeaderContent &&
               shouldShowCrispFeedbackButton({ isCli }) && (

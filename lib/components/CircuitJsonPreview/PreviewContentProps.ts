@@ -1,3 +1,4 @@
+import type { ActiveAsyncEffect } from "./RenderStatus"
 import type { ManualEditEvent, PlatformConfig } from "@tscircuit/props"
 import type { CircuitJson } from "circuit-json"
 import type { RenderLog } from "lib/render-logging/RenderLog"
@@ -103,6 +104,7 @@ export interface PreviewContentProps {
    * Name of the currently running async effect from @tscircuit/core, if any
    */
   activeEffectName?: string
+  activeAsyncEffects?: ActiveAsyncEffect[]
 
   onEditEvent?: (editEvent: ManualEditEvent) => void
   editEvents?: ManualEditEvent[]

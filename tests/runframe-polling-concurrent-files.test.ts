@@ -1,9 +1,21 @@
 import { afterEach, describe, expect, test } from "bun:test"
-;(globalThis as any).window ??= {}
+
+const previousWindow = globalThis.window
+if (!previousWindow) {
+  Object.defineProperty(globalThis, "window", {
+    value: {},
+    configurable: true,
+    writable: true,
+  })
+}
 
 const { useRunFrameStore } = await import(
   "../lib/components/RunFrameWithApi/store"
 )
+
+if (!previousWindow) {
+  Reflect.deleteProperty(globalThis, "window")
+}
 
 const originalFetch = globalThis.fetch
 const originalSetTimeout = globalThis.setTimeout

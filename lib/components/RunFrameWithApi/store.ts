@@ -140,6 +140,10 @@ export const useRunFrameStore = create<RunFrameState>()(
           try {
             const events = await getEvents(state.lastEventTime)
 
+            if (state.error) {
+              set({ error: null })
+            }
+
             if (events.length > 0) {
               // Update lastEventTime to most recent event
               const newLastEventTime = events[events.length - 1].created_at
@@ -150,7 +154,7 @@ export const useRunFrameStore = create<RunFrameState>()(
               )
 
               set((state) => ({
-                recentEvents: [...state.recentEvents, ...events].slice(0, 100),
+                recentEvents: [...state.recentEvents, ...events].slice(-100),
                 lastEventTime: newLastEventTime,
                 // TODO sort
                 // .sort((a, b) => b.created_at.localeCompare(a.created_at)),

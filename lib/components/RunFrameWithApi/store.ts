@@ -5,6 +5,7 @@ import Debug from "lib/utils/debug"
 import { create } from "zustand"
 import { devtools, persist } from "zustand/middleware"
 import { API_BASE } from "./api-base"
+import { isDynamicFilePath } from "./isDynamicFilePath"
 import type {
   File,
   FileContent,
@@ -13,7 +14,6 @@ import type {
   RunFrameEvent,
   RunFrameState,
 } from "./types"
-import { isDynamicFilePath } from "./isDynamicFilePath"
 
 const debug = Debug.extend("store")
 
@@ -159,7 +159,7 @@ export const useRunFrameStore = create<RunFrameState>()(
               let fsUpdateCount = 0
 
               // Process all file updates
-              const updates = new Map(state.fsMap)
+              const updates = new Map<FilePath, FileContent | null>()
               for (const event of events) {
                 if (event.event_type === "FILE_UPDATED") {
                   fsUpdateCount++
@@ -180,14 +180,22 @@ export const useRunFrameStore = create<RunFrameState>()(
                   get().addRecentlySavedFile(event.file_path)
                 } else if (event.event_type === "FILE_DELETED") {
                   fsUpdateCount++
-                  updates.delete(event.file_path)
+                  updates.set(event.file_path, null)
                 }
               }
 
               if (fsUpdateCount > 0) {
                 debug("updating fsMap, fsUpdateCount:", fsUpdateCount)
-                set({
-                  fsMap: updates,
+                set((currentState) => {
+                  const fsMap = new Map(currentState.fsMap)
+                  for (const [path, content] of updates) {
+                    if (content === null) {
+                      fsMap.delete(path)
+                    } else {
+                      fsMap.set(path, content)
+                    }
+                  }
+                  return { fsMap }
                 })
               }
             }

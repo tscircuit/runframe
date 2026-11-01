@@ -47,7 +47,7 @@ export const exportFabricationFiles = async ({
         },
       )
       for (const [fileName, fileContents] of Object.entries(gerberFiles)) {
-        zip.file(`gerber/${fileName}`, fileContents)
+        zip.file(fileName, fileContents)
       }
 
       // Generate BOM CSV

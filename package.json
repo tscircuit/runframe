@@ -127,7 +127,7 @@
     "@tscircuit/eval": "0.0.1695",
     "@tscircuit/parts-engine": "0.0.40",
     "@tscircuit/solver-utils": "^0.0.16",
-    "circuit-json-to-bom-csv": "https://pkg.pr.new/tscircuit/circuit-json-to-bom-csv/circuit-json-to-bom-csv@6ff22c843330b030f75d63131fd738074f47da0d",
+    "circuit-json-to-bom-csv": "https://pkg.pr.new/tscircuit/circuit-json-to-bom-csv/circuit-json-to-bom-csv@45e636ba2e07ac9d27f118a7cf2807bc2406c463",
     "debug": "^4.4.0",
     "format-si-unit": "^0.0.12"
   },

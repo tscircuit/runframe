@@ -11,64 +11,50 @@ export type BomQuote =
   | { status: "unsupported" | "error" }
 export type BomQuotes = Record<string, BomQuote>
 export type BomSelections = Record<string, number>
-type PurchasingSource = AssemblyBomNode["sources"][number]
+// Pricing options come only from supplier identifiers, never from purchase URLs.
+export const getSupplierOptions = (
+  node: AssemblyBomNode,
+): FetchPartAvailabilityParams[] =>
+  Object.entries(node.supplier_part_numbers ?? {}).flatMap(
+    ([supplierName, numbers]) =>
+      (numbers ?? []).map((supplierPartNumber) => ({
+        supplierName:
+          supplierName as FetchPartAvailabilityParams["supplierName"],
+        supplierPartNumber,
+      })),
+  )
 
 export const getSelectedSource = (
   node: AssemblyBomNode,
   selected: BomSelections,
-) => node.sources[selected[node.id] ?? 0]
-export const getQuoteKey = (source: PurchasingSource | undefined): string =>
-  JSON.stringify([
-    source?.supplier_name.trim().toLowerCase(),
-    source?.supplier_part_number?.trim(),
+) => {
+  const options = getSupplierOptions(node)
+  return options[selected[node.id] ?? 0] ?? options[0]
+}
+export const getQuoteKey = (
+  source: FetchPartAvailabilityParams | undefined,
+): string => JSON.stringify([source?.supplierName, source?.supplierPartNumber])
+
+export const getPurchaseUrl = (value: string): string | undefined => {
+  try {
+    const url = new URL(value)
+    if (url.protocol === "https:" || url.protocol === "http:") return url.href
+  } catch {}
+}
+
+export const getProductUrl = (
+  source: FetchPartAvailabilityParams,
+): string | undefined => {
+  if (source.supplierName === "jlcpcb")
+    return `https://jlcpcb.com/partdetail/${encodeURIComponent(source.supplierPartNumber)}`
+}
+
+/** Each material line counts once; subcircuits are structural display groups. */
+export const getMaterialNodes = (nodes: AssemblyBomNode[]): AssemblyBomNode[] =>
+  nodes.flatMap((node) => [
+    ...(node.kind === "subcircuit" ? [] : [node]),
+    ...getMaterialNodes(node.children),
   ])
-
-export const getProductUrl = (source: PurchasingSource): string | undefined => {
-  if (source.url) {
-    try {
-      const url = new URL(source.url)
-      if (url.protocol === "https:" || url.protocol === "http:") return url.href
-    } catch {}
-    return
-  }
-  if (
-    ["jlcpcb", "lcsc"].includes(source.supplier_name) &&
-    source.supplier_part_number
-  )
-    return `https://jlcpcb.com/partdetail/${encodeURIComponent(source.supplier_part_number)}`
-}
-
-const getLookup = (
-  source: PurchasingSource,
-): FetchPartAvailabilityParams | undefined => {
-  const supplierName = source.supplier_name.trim().toLowerCase()
-  if (!source.supplier_part_number?.trim()) return
-  // SupplierName is a closed engine API; arbitrary stores still retain their URLs.
-  if (
-    supplierName !== "jlcpcb" &&
-    supplierName !== "macrofab" &&
-    supplierName !== "pcbway" &&
-    supplierName !== "digikey" &&
-    supplierName !== "mouser" &&
-    supplierName !== "lcsc"
-  )
-    return
-  return {
-    supplierName,
-    supplierPartNumber: source.supplier_part_number.trim(),
-  }
-}
-
-export const getPurchasableNodes = (
-  nodes: AssemblyBomNode[],
-): AssemblyBomNode[] =>
-  nodes.flatMap((node) =>
-    !node.included_in_purchase
-      ? []
-      : node.assembly_mode === "buy"
-        ? [node]
-        : getPurchasableNodes(node.children),
-  )
 
 /** Deduplicated lookups, bounded to six concurrent requests, cancellable on edits. */
 export const loadBomQuotes = async ({
@@ -84,8 +70,8 @@ export const loadBomQuotes = async ({
   signal: AbortSignal
   onQuote: (key: string, quote: BomQuote) => void
 }) => {
-  const sources = new Map<string, PurchasingSource>()
-  for (const node of getPurchasableNodes(nodes)) {
+  const sources = new Map<string, FetchPartAvailabilityParams>()
+  for (const node of getMaterialNodes(nodes)) {
     const source = getSelectedSource(node, selected)
     if (source) sources.set(getQuoteKey(source), source)
   }
@@ -95,7 +81,7 @@ export const loadBomQuotes = async ({
     Array.from({ length: Math.min(6, pending.length) }, async () => {
       while (!signal.aborted && next < pending.length) {
         const [key, source] = pending[next++]!
-        const lookup = getLookup(source)
+        const lookup = source
         let quote: BomQuote
         try {
           const availability =
@@ -122,7 +108,7 @@ export const getBomCost = (
 ) => {
   const totals: Record<string, number> = {}
   let unpriced = 0
-  for (const node of getPurchasableNodes(nodes)) {
+  for (const node of getMaterialNodes(nodes)) {
     const quote = quotes[getQuoteKey(getSelectedSource(node, selected))]
     const availability =
       quote?.status === "ready" ? quote.availability : undefined

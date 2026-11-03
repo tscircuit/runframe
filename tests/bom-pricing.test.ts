@@ -1,22 +1,29 @@
 import { expect, test } from "bun:test"
+import type { SupplierName } from "circuit-json"
 import type { AssemblyBomNode } from "circuit-json-to-bom-csv"
 import {
   getBomCost,
   getProductUrl,
+  getPurchaseUrl,
+  getSelectedSource,
+  getSupplierOptions,
   getQuoteKey,
   loadBomQuotes,
   type BomQuotes,
 } from "../lib/components/BomTable/bom-pricing"
 
-const part = (id: string, supplier = "jlcpcb"): AssemblyBomNode => ({
+const part = (
+  id: string,
+  supplier: SupplierName = "jlcpcb",
+): AssemblyBomNode => ({
   id,
   name: id,
   quantity: 1,
   total_quantity: 2,
-  assembly_mode: "buy",
-  included_in_purchase: true,
+  kind: "assembly_bom_item",
+  purchase_urls: [],
   children: [],
-  sources: [{ supplier_name: supplier, supplier_part_number: id }],
+  supplier_part_numbers: { [supplier]: [id] },
 })
 
 test("BOM prices deduplicate requests and keep unsupported, failed and unknown distinct", async () => {
@@ -25,7 +32,12 @@ test("BOM prices deduplicate requests and keep unsupported, failed and unknown d
     part("same"),
     part("unknown"),
     part("failed"),
-    part("amazon", "amazon"),
+    part("unsupported", "mouser"),
+    {
+      ...part("amazon"),
+      supplier_part_numbers: undefined,
+      purchase_urls: ["https://amazon.com/dp/example"],
+    },
   ]
   const calls: string[] = []
   const quotes: BomQuotes = {}
@@ -34,7 +46,8 @@ test("BOM prices deduplicate requests and keep unsupported, failed and unknown d
     selected: {},
     signal: new AbortController().signal,
     engine: {
-      fetchPartAvailability: async ({ supplierPartNumber }) => {
+      fetchPartAvailability: async ({ supplierName, supplierPartNumber }) => {
+        if (supplierName === "mouser") return undefined
         calls.push(supplierPartNumber)
         if (supplierPartNumber === "failed") throw new Error("offline")
         return {
@@ -49,36 +62,47 @@ test("BOM prices deduplicate requests and keep unsupported, failed and unknown d
     },
   })
   expect(calls.sort()).toEqual(["failed", "same", "unknown"])
-  expect(quotes[getQuoteKey(nodes[3].sources[0])].status).toBe("error")
-  expect(quotes[getQuoteKey(nodes[4].sources[0])].status).toBe("unsupported")
+  expect(quotes[getQuoteKey(getSelectedSource(nodes[3], {}))].status).toBe(
+    "error",
+  )
+  expect(quotes[getQuoteKey(getSelectedSource(nodes[4], {}))].status).toBe(
+    "unsupported",
+  )
   expect(getBomCost(nodes, {}, quotes, 10)).toEqual({
     totals: { USD: 0 },
-    unpriced: 3,
+    unpriced: 4,
   })
 })
 
-test("rollups separate currencies, multiply quantities and exclude purchased children", () => {
+test("rollups separate currencies and count parent and child materials once, excluding structural groups", () => {
   const usd = part("usd"),
     eur = part("eur"),
     unknown = part("unknown")
-  const internal = { ...part("internal"), included_in_purchase: false }
+  const internal = part("internal")
   usd.children = [internal]
   const quotes: BomQuotes = {
-    [getQuoteKey(usd.sources[0])]: {
+    [getQuoteKey(getSelectedSource(usd, {}))]: {
       status: "ready",
       availability: { price: 1.5, currency: "USD", stock: 10 },
     },
-    [getQuoteKey(eur.sources[0])]: {
+    [getQuoteKey(getSelectedSource(eur, {}))]: {
       status: "ready",
       availability: { price: 2, currency: "EUR", stock: null },
     },
-    [getQuoteKey(internal.sources[0])]: {
+    [getQuoteKey(getSelectedSource(internal, {}))]: {
       status: "ready",
-      availability: { price: 999, currency: "USD", stock: 0 },
+      availability: { price: 0.5, currency: "USD", stock: 0 },
     },
   }
-  expect(getBomCost([usd, eur, unknown], {}, quotes, 3)).toEqual({
-    totals: { USD: 9, EUR: 12 },
+  expect(
+    getBomCost(
+      [{ ...part("group"), kind: "subcircuit", children: [usd, eur, unknown] }],
+      {},
+      quotes,
+      3,
+    ),
+  ).toEqual({
+    totals: { USD: 12, EUR: 12 },
     unpriced: 1,
   })
 })
@@ -114,17 +138,30 @@ test("cancellation suppresses stale quotes and bounds parallel requests", async 
   expect(pending.length).toBe(6)
 })
 
-test("product links accept arbitrary stores but reject executable URLs", () => {
+test("purchase links are independent of supplier selection and reject executable URLs", () => {
+  const node = {
+    ...part("alternatives"),
+    supplier_part_numbers: { jlcpcb: ["C1", "C2"], mouser: ["ALT"] },
+    purchase_urls: [
+      "https://amazon.com/dp/example",
+      "https://store.example/product",
+    ],
+  }
+  expect(getSupplierOptions(node)).toHaveLength(3)
+  expect(getSelectedSource(node, { alternatives: 1 })).toEqual({
+    supplierName: "jlcpcb",
+    supplierPartNumber: "C2",
+  })
+  expect(getSelectedSource(node, { alternatives: 999 })).toEqual(
+    getSelectedSource(node, {}),
+  )
+  expect(node.purchase_urls.map(getPurchaseUrl)).toEqual(node.purchase_urls)
+  expect(getPurchaseUrl("javascript:alert(1)")).toBeUndefined()
+  expect(getPurchaseUrl("data:text/html,test")).toBeUndefined()
   expect(
-    getProductUrl({
-      supplier_name: "amazon",
-      url: "https://amazon.com/dp/example",
-    }),
-  ).toBe("https://amazon.com/dp/example")
+    getProductUrl({ supplierName: "jlcpcb", supplierPartNumber: "C1" }),
+  ).toBe("https://jlcpcb.com/partdetail/C1")
   expect(
-    getProductUrl({ supplier_name: "store", url: "javascript:alert(1)" }),
-  ).toBeUndefined()
-  expect(
-    getProductUrl({ supplier_name: "store", url: "data:text/html,test" }),
+    getProductUrl({ supplierName: "lcsc", supplierPartNumber: "C1" }),
   ).toBeUndefined()
 })

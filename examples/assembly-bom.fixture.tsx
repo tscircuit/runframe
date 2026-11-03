@@ -5,65 +5,75 @@ import { BomTable } from "../lib/components/BomTable"
 
 const circuitJson: AnyCircuitElement[] = [
   {
-    type: "source_component",
-    ftype: "subassembly",
-    source_component_id: "device",
-    name: "Sensor device",
-    bom_assembly_mode: "build",
-  },
-  {
-    type: "source_component",
-    ftype: "subassembly",
-    source_component_id: "power",
-    name: "Power module",
-    parent_source_component_id: "device",
-    bom_assembly_mode: "build",
-  },
-  {
-    type: "source_component",
-    ftype: "subassembly",
-    source_component_id: "regulator",
-    name: "3.3 V regulator",
-    parent_source_component_id: "power",
-    bom_sources: [
-      { supplier_name: "jlcpcb", supplier_part_number: "C123" },
-      { supplier_name: "mouser", supplier_part_number: "ALT-123" },
+    type: "cad_assembly_bom_item",
+    cad_assembly_bom_item_id: "housing",
+    name: "ABS enclosure",
+    quantity: 1,
+    purchase_urls: [
+      "https://www.amazon.com/",
+      "https://www.hammfg.com/electronics/small-case/plastic/1591",
     ],
   },
   {
-    type: "source_component",
-    ftype: "subassembly",
-    source_component_id: "housing",
-    name: "ABS enclosure",
-    parent_source_component_id: "device",
-    bom_sources: [{ supplier_name: "amazon", url: "https://www.amazon.com/" }],
+    type: "cad_assembly_bom_item",
+    cad_assembly_bom_item_id: "screw",
+    parent_cad_assembly_bom_item_id: "housing",
+    name: "M3 mounting screw",
+    quantity: 4,
+    purchase_urls: ["https://www.mcmaster.com/screws/"],
+  },
+  {
+    type: "cad_assembly_bom_item",
+    cad_assembly_bom_item_id: "sensor",
+    parent_cad_assembly_bom_item_id: "housing",
+    name: "Sensor module",
+    quantity: 1,
+    supplier_part_numbers: { jlcpcb: ["C456"] },
+  },
+  {
+    type: "source_group",
+    source_group_id: "power",
+    subcircuit_id: "power",
+    name: "Power module",
+    is_subcircuit: true,
   },
   {
     type: "source_component",
-    ftype: "subassembly",
-    source_component_id: "module",
-    name: "Purchased sensor module",
-    parent_source_component_id: "device",
-    bom_assembly_mode: "buy",
-    bom_sources: [{ supplier_name: "jlcpcb", supplier_part_number: "C456" }],
+    ftype: "simple_chip",
+    source_component_id: "regulator",
+    source_group_id: "power",
+    name: "U1",
+    display_name: "3.3 V regulator",
+    supplier_part_numbers: { jlcpcb: ["C123", "C124"], mouser: ["ALT-123"] },
   },
   {
-    type: "source_component",
-    ftype: "subassembly",
-    source_component_id: "internal",
-    name: "Internal sensor",
-    parent_source_component_id: "module",
-    bom_sources: [{ supplier_name: "jlcpcb", supplier_part_number: "C789" }],
+    type: "pcb_component",
+    pcb_component_id: "pcb_regulator",
+    source_component_id: "regulator",
+    center: { x: 0, y: 0 },
+    width: 3,
+    height: 3,
+    rotation: 0,
+    layer: "top",
+    obstructs_within_bounds: true,
   },
 ]
 
 const partsEngine: Pick<PartsEngine, "fetchPartAvailability"> = {
-  fetchPartAvailability: async ({ supplierPartNumber }) => ({
-    price: supplierPartNumber === "C123" ? 0.65 : 2.4,
-    currency: "USD",
-    stock: 1200,
-    checkedAt: "2026-11-03T12:00:00Z",
-  }),
+  fetchPartAvailability: async ({ supplierName, supplierPartNumber }) => {
+    if (supplierName !== "jlcpcb") return undefined
+    return {
+      price:
+        supplierPartNumber === "C456"
+          ? 2.4
+          : supplierPartNumber === "C124"
+            ? 0.8
+            : 0.65,
+      currency: "USD",
+      stock: 1200,
+      checkedAt: "2026-11-03T12:00:00Z",
+    }
+  },
 }
 
 export default () => {

@@ -6,6 +6,8 @@ import {
   formatBomMoney,
   getBomCost,
   getProductUrl,
+  getPurchaseUrl,
+  getSupplierOptions,
   getQuoteKey,
   getSelectedSource,
   isPriced,
@@ -125,23 +127,24 @@ export const BomTable = ({ circuitJson, partsEngine }: BomTableProps) => {
     const availability =
       quote?.status === "ready" ? quote.availability : undefined
     const url = source && getProductUrl(source)
-    const isBuy = node.assembly_mode === "buy"
-    const included = node.included_in_purchase
-    const status = !included
-      ? "Included in purchased assembly"
-      : !isBuy
-        ? "Built from children"
-        : !source
-          ? "No source"
-          : !quote
-            ? "Checking…"
-            : quote.status === "error"
-              ? "Lookup failed"
-              : quote.status === "unsupported"
-                ? "Price unavailable"
-                : availability?.stock == null
-                  ? "Stock unknown"
-                  : `${availability.stock} in stock`
+    const options = getSupplierOptions(node)
+    const purchaseUrls = node.purchase_urls
+      .map(getPurchaseUrl)
+      .filter((url): url is string => !!url)
+    const isMaterial = node.kind !== "subcircuit"
+    const status = !isMaterial
+      ? "Subcircuit"
+      : !source
+        ? "No supplier part number"
+        : !quote
+          ? "Checking…"
+          : quote.status === "error"
+            ? "Lookup failed"
+            : quote.status === "unsupported"
+              ? "Price unavailable"
+              : availability?.stock == null
+                ? "Stock unknown"
+                : `${availability.stock} in stock`
     return (
       <Fragment key={node.id}>
         <tr
@@ -179,12 +182,11 @@ export const BomTable = ({ circuitJson, partsEngine }: BomTableProps) => {
           <td className="rf-p-2">{node.row?.value || "—"}</td>
           <td className="rf-p-2">{node.row?.footprint || "—"}</td>
           <td className="rf-p-2">
-            {isBuy && source ? (
+            {source ? (
               <>
-                {node.sources.length > 1 ? (
+                {options.length > 1 ? (
                   <select
                     aria-label={`Source for ${node.name}`}
-                    disabled={!included}
                     className="rf-max-w-48 rf-border rf-rounded rf-p-1 rf-bg-background"
                     value={selected[node.id] ?? 0}
                     onChange={(event) =>
@@ -194,20 +196,20 @@ export const BomTable = ({ circuitJson, partsEngine }: BomTableProps) => {
                       }))
                     }
                   >
-                    {node.sources.map((option, index) => (
+                    {options.map((option, index) => (
                       <option key={index} value={index}>
-                        {option.supplier_name}
-                        {option.supplier_part_number
-                          ? ` · ${option.supplier_part_number}`
+                        {option.supplierName}
+                        {option.supplierPartNumber
+                          ? ` · ${option.supplierPartNumber}`
                           : ""}
                       </option>
                     ))}
                   </select>
                 ) : (
                   <span>
-                    {source.supplier_name}
-                    {source.supplier_part_number
-                      ? ` · ${source.supplier_part_number}`
+                    {source.supplierName}
+                    {source.supplierPartNumber
+                      ? ` · ${source.supplierPartNumber}`
                       : ""}
                   </span>
                 )}
@@ -222,27 +224,34 @@ export const BomTable = ({ circuitJson, partsEngine }: BomTableProps) => {
                     Product ↗
                   </a>
                 ) : null}
-                {(source.pack_quantity ?? 1) > 1 ? (
-                  <div className="rf-text-xs rf-text-muted-foreground">
-                    Pack of {source.pack_quantity}
-                  </div>
-                ) : null}
               </>
-            ) : (
+            ) : purchaseUrls.length ? null : (
               "—"
             )}
+            {purchaseUrls.map((purchaseUrl, index) => (
+              <a
+                key={purchaseUrl}
+                className="rf-block rf-text-blue-500 rf-underline"
+                href={purchaseUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Purchase link ${index + 1} for ${node.name}`}
+              >
+                {new URL(purchaseUrl).hostname.replace(/^www\./, "")} ↗
+              </a>
+            ))}
           </td>
           <td className="rf-p-2 rf-text-right rf-whitespace-nowrap">
-            {isBuy && included && isPriced(availability)
+            {isMaterial && isPriced(availability)
               ? formatBomMoney(availability.price, availability.currency)
               : "—"}
           </td>
           <td className="rf-p-2 rf-text-right rf-whitespace-nowrap">
-            {included ? costLabel([node]) : "Included"}
+            {costLabel([node])}
           </td>
           <td className="rf-p-2 rf-text-xs">
             {status}
-            {included && isBuy && availability?.checkedAt ? (
+            {isMaterial && availability?.checkedAt ? (
               <div className="rf-text-muted-foreground">
                 Checked {availability.checkedAt}
               </div>
@@ -293,7 +302,7 @@ export const BomTable = ({ circuitJson, partsEngine }: BomTableProps) => {
                 "Qty",
                 "Value",
                 "Footprint",
-                "Source",
+                "Supplier / purchase links",
                 "Unit estimate",
                 "Subtotal",
                 "Availability",
@@ -318,11 +327,12 @@ export const BomTable = ({ circuitJson, partsEngine }: BomTableProps) => {
         </table>
       </div>
       <div className="rf-p-2 rf-text-sm" aria-live="polite">
-        Known material cost: {costLabel(nodes)}
+        Known line-item cost: {costLabel(nodes)}
       </div>
       <div className="rf-p-2 rf-text-xs rf-text-muted-foreground">
-        Estimates use the supplier’s lowest quantity tier. Pack rounding,
-        quantity discounts, shipping and tax are not included.
+        Subtotals include each material line and its descendants once. Estimates
+        use the supplier’s lowest quantity tier; quantity discounts, pack
+        rounding, shipping and tax are not included.
       </div>
     </div>
   )

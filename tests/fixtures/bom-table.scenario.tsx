@@ -2,16 +2,16 @@ import { expect, test } from "bun:test"
 import { JSDOM } from "jsdom"
 import { act } from "react"
 import { createRoot } from "react-dom/client"
-import type { SourceSubassembly } from "circuit-json"
+import type { CadAssemblyBomItem } from "circuit-json"
 import { BomTable } from "../../lib/components/BomTable"
 
 const part = (
   name: string,
-  extra: Partial<SourceSubassembly> = {},
-): SourceSubassembly => ({
-  type: "source_component",
-  ftype: "subassembly",
-  source_component_id: name,
+  extra: Partial<CadAssemblyBomItem> = {},
+): CadAssemblyBomItem => ({
+  type: "cad_assembly_bom_item",
+  cad_assembly_bom_item_id: name,
+  quantity: 1,
   name,
   ...extra,
 })
@@ -40,20 +40,17 @@ test("collapse, source changes, quantity, links and circuit replacement", async 
   })
   const root = createRoot(document.getElementById("root")!)
   const circuitJson = [
-    part("Device", { bom_assembly_mode: "build" }),
-    part("Regulator", {
-      parent_source_component_id: "Device",
-      bom_quantity: 2,
-      bom_sources: [
-        { supplier_name: "jlcpcb", supplier_part_number: "C1" },
-        { supplier_name: "jlcpcb", supplier_part_number: "C2" },
+    part("Enclosure", {
+      purchase_urls: [
+        "https://amazon.com/dp/example",
+        "https://store.example/enclosure",
       ],
     }),
-    part("Enclosure", {
-      parent_source_component_id: "Device",
-      bom_sources: [
-        { supplier_name: "amazon", url: "https://amazon.com/dp/example" },
-      ],
+    part("Regulator", {
+      parent_cad_assembly_bom_item_id: "Enclosure",
+      quantity: 2,
+      supplier_part_numbers: { jlcpcb: ["C1", "C2"] },
+      purchase_urls: ["https://store.example/regulator"],
     }),
   ]
   const calls: string[] = []
@@ -84,13 +81,13 @@ test("collapse, source changes, quantity, links and circuit replacement", async 
     )
     expect(
       document.querySelector<HTMLAnchorElement>(
-        'a[aria-label="Open product for Enclosure"]',
+        'a[aria-label="Purchase link 1 for Enclosure"]',
       )?.href,
     ).toBe("https://amazon.com/dp/example")
     await act(async () =>
       document
         .querySelector<HTMLButtonElement>(
-          'button[aria-label="Collapse Device"]',
+          'button[aria-label="Collapse Enclosure"]',
         )!
         .click(),
     )
@@ -100,7 +97,9 @@ test("collapse, source changes, quantity, links and circuit replacement", async 
     expect(document.body.textContent?.replace(/\s/g, " ")).toContain("USD 2.00")
     await act(async () =>
       document
-        .querySelector<HTMLButtonElement>('button[aria-label="Expand Device"]')!
+        .querySelector<HTMLButtonElement>(
+          'button[aria-label="Expand Enclosure"]',
+        )!
         .click(),
     )
     await act(async () => {
@@ -113,6 +112,16 @@ test("collapse, source changes, quantity, links and circuit replacement", async 
     })
     expect(document.body.textContent?.replace(/\s/g, " ")).toContain("USD 6.00")
     expect(calls).toContain("C2")
+    expect(
+      document.querySelector<HTMLAnchorElement>(
+        'a[aria-label="Purchase link 2 for Enclosure"]',
+      )?.href,
+    ).toBe("https://store.example/enclosure")
+    expect(
+      document.querySelector<HTMLAnchorElement>(
+        'a[aria-label="Purchase link 1 for Regulator"]',
+      )?.href,
+    ).toBe("https://store.example/regulator")
     const pending: Array<() => void> = []
     const slow = {
       fetchPartAvailability: async () => {

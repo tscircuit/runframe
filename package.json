@@ -69,9 +69,8 @@
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.20",
     "chokidar-cli": "^3.0.0",
-    "circuit-json": "^0.0.525",
+    "circuit-json": "https://pkg.pr.new/tscircuit/circuit-json/circuit-json@adfafe74ab33d5410d9d46417f58ba127a2acae9",
     "circuit-json-to-altium": "github:tscircuit/circuit-json-to-altium#1a50d0dd2c0737cf940d92c0315852dc0111dd87",
-    "circuit-json-to-bom-csv": "^0.0.26",
     "circuit-json-to-gerber": "^0.0.121",
     "circuit-json-to-kicad": "^0.0.263",
     "circuit-json-to-lbrn": "^0.0.74",
@@ -126,12 +125,14 @@
   "dependencies": {
     "@tscircuit/core": "^0.0.1911",
     "@tscircuit/eval": "0.0.1695",
+    "@tscircuit/parts-engine": "0.0.40",
     "@tscircuit/solver-utils": "^0.0.16",
+    "circuit-json-to-bom-csv": "https://pkg.pr.new/tscircuit/circuit-json-to-bom-csv/circuit-json-to-bom-csv@6ff22c843330b030f75d63131fd738074f47da0d",
     "debug": "^4.4.0",
     "format-si-unit": "^0.0.12"
   },
   "overrides": {
-    "circuit-json": "$circuit-json",
+    "circuit-json": "https://pkg.pr.new/tscircuit/circuit-json/circuit-json@adfafe74ab33d5410d9d46417f58ba127a2acae9",
     "altiumts": "0.0.59"
   }
 }

@@ -36,6 +36,16 @@ circuit.add(
 )
 ```
 
+### System block diagrams
+
+Choose **System** from the **More views** dropdown to display system block
+pages from Circuit JSON. The viewer uses the resolved block sizes, positions,
+and routes, with a page selector for multiple diagrams and zoom/fit controls.
+
+Use `defaultActiveTab="system"` to open it initially, or
+`availableTabs={["system"]}` for a System-only preview. Circuits without
+`system_block_page` records show an empty state.
+
 ### Using CircuitJsonPreview Directly
 
 If you already have circuit JSON and just want to display it:

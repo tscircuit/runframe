@@ -27,6 +27,7 @@ import {
   useSchematicViewerController,
 } from "@tscircuit/schematic-viewer"
 import { AssemblyViewer, PinoutViewer } from "@tscircuit/assembly-viewer"
+import { SystemBlockViewer } from "../SystemBlockViewer/SystemBlockViewer"
 import PreviewEmptyState from "../PreviewEmptyState"
 import { CircuitJsonTableViewer } from "../CircuitJsonTableViewer/CircuitJsonTableViewer"
 import { BomTable } from "../BomTable"
@@ -92,6 +93,7 @@ declare global {
 const previewPanelHeightClassName = "rf-h-[620px] rf-min-h-full rf-max-h-full"
 
 const dropdownMenuItems = [
+  "system",
   "assembly",
   "pinout",
   "analog_simulation",
@@ -698,6 +700,24 @@ export const CircuitJsonPreview = ({
             </TabsContent>
           )}
 
+          {(!availableTabs || availableTabs.includes("system")) && (
+            <TabsContent value="system" className="rf-min-h-0">
+              <div className={previewPanelHeightClassName}>
+                <ErrorBoundary
+                  resetKeys={[circuitJson]}
+                  fallback={
+                    <div role="alert">Error loading System diagram</div>
+                  }
+                >
+                  {circuitJson ? (
+                    <SystemBlockViewer circuitJson={circuitJson} />
+                  ) : (
+                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                  )}
+                </ErrorBoundary>
+              </div>
+            </TabsContent>
+          )}
           {(!availableTabs || availableTabs.includes("assembly")) && (
             <TabsContent value="assembly" className="rf-min-h-0">
               <div

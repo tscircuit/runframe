@@ -1,0 +1,176 @@
+[
+  {
+    "type": "source_group",
+    "source_group_id": "source_group_0",
+    "is_subcircuit": true,
+    "was_automatically_named": true,
+    "subcircuit_id": "subcircuit_source_group_0"
+  },
+  {
+    "type": "schematic_group",
+    "schematic_group_id": "schematic_group_0",
+    "is_subcircuit": true,
+    "subcircuit_id": "subcircuit_source_group_0",
+    "name": "unnamed_group1",
+    "center": {
+      "x": 0,
+      "y": 0
+    },
+    "width": 0,
+    "height": 0,
+    "schematic_component_ids": [],
+    "source_group_id": "source_group_0",
+    "show_as_schematic_box": false
+  },
+  {
+    "type": "pcb_group",
+    "pcb_group_id": "pcb_group_0",
+    "is_subcircuit": true,
+    "subcircuit_id": "subcircuit_source_group_0",
+    "name": "unnamed_group1",
+    "anchor_position": {
+      "x": 0,
+      "y": 0
+    },
+    "center": {
+      "x": 0,
+      "y": 0
+    },
+    "width": 0,
+    "height": 0,
+    "pcb_component_ids": [],
+    "source_group_id": "source_group_0",
+    "anchor_alignment": null
+  },
+  {
+    "type": "system_block_page",
+    "system_block_page_id": "system_block_page_0",
+    "name": "overview",
+    "display_name": "Wireless sensor node",
+    "width": 116,
+    "height": 204
+  },
+  {
+    "type": "system_block_group",
+    "system_block_group_id": "system_block_group_0",
+    "system_block_page_id": "system_block_page_0",
+    "name": "processing",
+    "display_name": "Sensing and processing",
+    "center": {
+      "x": 0,
+      "y": 32
+    },
+    "width": 100,
+    "height": 124
+  },
+  {
+    "type": "system_block_component",
+    "system_block_component_id": "system_block_component_0",
+    "system_block_page_id": "system_block_page_0",
+    "system_block_group_id": "system_block_group_0",
+    "name": "sensor",
+    "display_name": "Environment sensor",
+    "description": "Measures temperature and humidity",
+    "center": {
+      "x": 0,
+      "y": 64
+    },
+    "width": 48,
+    "height": 24
+  },
+  {
+    "type": "system_block_component",
+    "system_block_component_id": "system_block_component_1",
+    "system_block_page_id": "system_block_page_0",
+    "system_block_group_id": "system_block_group_0",
+    "name": "mcu",
+    "display_name": "Microcontroller",
+    "description": "Processes readings",
+    "center": {
+      "x": 0,
+      "y": 0
+    },
+    "width": 48,
+    "height": 24
+  },
+  {
+    "type": "system_block_component",
+    "system_block_component_id": "system_block_component_2",
+    "system_block_page_id": "system_block_page_0",
+    "name": "radio",
+    "display_name": "Radio module",
+    "description": "Transmits measurements",
+    "center": {
+      "x": 0,
+      "y": -82
+    },
+    "width": 48,
+    "height": 24
+  },
+  {
+    "type": "system_block_connection",
+    "system_block_connection_id": "system_block_connection_0",
+    "system_block_page_id": "system_block_page_0",
+    "from_system_block_component_id": "system_block_component_0",
+    "to_system_block_component_id": "system_block_component_1",
+    "label": "I2C",
+    "direction": "both",
+    "is_signal": true,
+    "is_power": false,
+    "route": [
+      {
+        "x": 0,
+        "y": 52
+      },
+      {
+        "x": 0,
+        "y": 32
+      },
+      {
+        "x": 0,
+        "y": 12
+      }
+    ],
+    "label_anchor_center": {
+      "x": -5.25,
+      "y": 32
+    }
+  },
+  {
+    "type": "system_block_connection",
+    "system_block_connection_id": "system_block_connection_1",
+    "system_block_page_id": "system_block_page_0",
+    "from_system_block_component_id": "system_block_component_1",
+    "to_system_block_component_id": "system_block_component_2",
+    "label": "SPI",
+    "direction": "both",
+    "is_signal": true,
+    "is_power": false,
+    "route": [
+      {
+        "x": 0,
+        "y": -12
+      },
+      {
+        "x": 0,
+        "y": -30
+      },
+      {
+        "x": 0,
+        "y": -50
+      },
+      {
+        "x": 0,
+        "y": -70
+      }
+    ],
+    "label_anchor_center": {
+      "x": -5.25,
+      "y": -50
+    }
+  },
+  {
+    "type": "source_project_metadata",
+    "source_filesystem_md5_hash": "fcc8b25c4cff82824fb466a04b0c437e"
+  }
+]

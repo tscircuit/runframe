@@ -122,7 +122,7 @@
     "yargs": "^17.7.2",
     "zod": "^3.25.76",
     "bun-match-svg": "^0.0.17",
-    "@tscircuit/system-block-viewer": "https://pkg.pr.new/tscircuit/system-block-viewer/@tscircuit/system-block-viewer@f68e59f"
+    "@tscircuit/system-block-viewer": "https://jscdn.tscircuit.com/@tscircuit/system-block-viewer/0.0.3.tgz"
   },
   "dependencies": {
     "@tscircuit/core": "^0.0.1911",

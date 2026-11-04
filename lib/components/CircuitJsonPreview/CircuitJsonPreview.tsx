@@ -710,7 +710,10 @@ export const CircuitJsonPreview = ({
                   }
                 >
                   {circuitJson ? (
-                    <SystemBlockViewer circuitJson={circuitJson} />
+                    <SystemBlockViewer
+                      circuitJson={circuitJson}
+                      onComponentClick={handleViewSchematicComponent}
+                    />
                   ) : (
                     <PreviewEmptyState onRunClicked={onRunClicked} />
                   )}

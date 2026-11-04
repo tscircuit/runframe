@@ -22,6 +22,7 @@ export type TabId =
   | "code"
   | "pcb"
   | "schematic"
+  | "system"
   | "assembly"
   | "pinout"
   | "cad"

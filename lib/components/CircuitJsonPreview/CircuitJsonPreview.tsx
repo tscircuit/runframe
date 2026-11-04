@@ -27,7 +27,7 @@ import {
   useSchematicViewerController,
 } from "@tscircuit/schematic-viewer"
 import { AssemblyViewer, PinoutViewer } from "@tscircuit/assembly-viewer"
-import { SystemBlockViewer } from "../SystemBlockViewer/SystemBlockViewer"
+import { SystemBlockViewer } from "@tscircuit/system-block-viewer"
 import PreviewEmptyState from "../PreviewEmptyState"
 import { CircuitJsonTableViewer } from "../CircuitJsonTableViewer/CircuitJsonTableViewer"
 import { BomTable } from "../BomTable"

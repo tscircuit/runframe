@@ -48,6 +48,7 @@ test("System dropdown renders resolved geometry, switches pages, zooms and recov
     "CustomEvent",
     "NodeFilter",
     "MouseEvent",
+    "WheelEvent",
     "KeyboardEvent",
     "MutationObserver",
     "getComputedStyle",
@@ -126,14 +127,16 @@ test("System dropdown renders resolved geometry, switches pages, zooms and recov
     expect(svg()).toContain("Environment sensor")
     expect(svg()).toContain("I2C")
     expect(svg()).not.toContain("Second-page block")
-    await act(async () =>
-      document
-        .querySelector<HTMLButtonElement>('[aria-label="Zoom in"]')!
-        .click(),
-    )
-    expect(document.querySelector('[aria-live="polite"]')?.textContent).toBe(
-      "125%",
-    )
+    expect(document.querySelector('[aria-label="Zoom in"]')).toBeNull()
+    const viewport = document.querySelector(
+      '[aria-label="System diagram viewport"]',
+    )!
+    await act(async () => {
+      viewport.dispatchEvent(
+        new WheelEvent("wheel", { deltaY: -100, clientX: 100, clientY: 100 }),
+      )
+    })
+    expect(document.querySelector("img")!.style.transform).toContain("1.1")
     const pageSelect = document.querySelector<HTMLSelectElement>(
       '[aria-label="System page"]',
     )!
@@ -143,8 +146,8 @@ test("System dropdown renders resolved geometry, switches pages, zooms and recov
     })
     expect(svg()).toContain("Second-page block")
     expect(svg()).not.toContain("Environment sensor")
-    expect(document.querySelector('[aria-live="polite"]')?.textContent).toBe(
-      "100%",
+    expect(document.querySelector("img")!.style.transform).toBe(
+      "matrix(1,0,0,1,0,0)",
     )
     // Rerunning a circuit that no longer contains the selected page falls back to the first page.
     await act(async () => root.render(render(original)))

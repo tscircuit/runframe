@@ -40,7 +40,9 @@ circuit.add(
 
 Choose **System** from the **More views** dropdown to display system block
 pages from Circuit JSON. The viewer uses the resolved block sizes, positions,
-and routes, with a page selector for multiple diagrams and zoom/fit controls.
+and routes, with a page selector for multiple diagrams. The standalone
+`@tscircuit/system-block-viewer` package provides the same drag, scroll, and
+touch gestures as schematic-viewer, without zoom buttons.
 
 Use `defaultActiveTab="system"` to open it initially, or
 `availableTabs={["system"]}` for a System-only preview. Circuits without

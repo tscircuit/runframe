@@ -13,14 +13,6 @@ mock.module("@tscircuit/pcb-viewer", () => ({
   PCBViewer: () => null,
   usePcbViewerController: () => ({ controller: {}, focusPcbComponent() {} }),
 }))
-mock.module("@tscircuit/schematic-viewer", () => ({
-  SchematicViewer: () => null,
-  AnalogSimulationViewer: () => null,
-  useSchematicViewerController: () => ({
-    controller: {},
-    focusSchematicComponent() {},
-  }),
-}))
 mock.module("@tscircuit/assembly-viewer", () => ({
   AssemblyViewer: () => null,
   PinoutViewer: () => null,
@@ -67,6 +59,18 @@ test("System dropdown renders resolved geometry, switches pages, zooms and recov
   })
   const root = createRoot(document.getElementById("root")!)
   try {
+    const { useSchematicViewerController } = await import(
+      "@tscircuit/schematic-viewer"
+    )
+    mock.module("@tscircuit/schematic-viewer", () => ({
+      SchematicViewer: ({ controller }: any) => (
+        <div
+          data-schematic-focus={controller.focusRequest?.schematicComponentId}
+        />
+      ),
+      AnalogSimulationViewer: () => null,
+      useSchematicViewerController,
+    }))
     const { CircuitJsonPreview } = await import(
       "../../lib/components/CircuitJsonPreview/CircuitJsonPreview"
     )
@@ -90,7 +94,7 @@ test("System dropdown renders resolved geometry, switches pages, zooms and recov
     const data = [...original, ...second]
     const render = (
       json: CircuitJson,
-      availableTabs?: ("pcb" | "system")[],
+      availableTabs?: ("pcb" | "system" | "schematic")[],
     ) => (
       <CircuitJsonPreview
         circuitJson={json}
@@ -181,6 +185,97 @@ test("System dropdown renders resolved geometry, switches pages, zooms and recov
       document.querySelector('[role="tab"][data-state="active"]')?.textContent,
     ).toBe("System")
     expect(svg()).toContain("Environment sensor")
+    const linked = [
+      ...original.map((element) =>
+        element.type === "system_block_component" && element.name === "sensor"
+          ? { ...element, pcb_component_ids: ["pcb_u1"] }
+          : element,
+      ),
+      {
+        type: "source_component",
+        source_component_id: "source_u1",
+        name: "U1",
+        ftype: "simple_chip",
+        manufacturer_part_number: "BME280",
+      },
+      {
+        type: "pcb_component",
+        pcb_component_id: "pcb_u1",
+        source_component_id: "source_u1",
+      },
+      {
+        type: "schematic_component",
+        schematic_component_id: "schematic_u1",
+        source_component_id: "source_u1",
+      },
+    ] as CircuitJson
+    const openDetails = async () =>
+      act(async () => {
+        document
+          .querySelector(
+            '[aria-label="Show components for Environment sensor"]',
+          )!
+          .dispatchEvent(
+            new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
+          )
+      })
+    await act(async () => root.render(render(linked, ["system"])))
+    await openDetails()
+    const details = () =>
+      document.querySelector('[aria-label="Associated components"]')!
+    expect(details().textContent).toContain("U1")
+    expect(details().querySelectorAll("button").length).toBe(1) // Close only, schematic disabled
+    await act(async () => root.render(render(linked, ["system", "schematic"])))
+    const action = Array.from(details().querySelectorAll("button")).find((e) =>
+      e.textContent?.includes("U1"),
+    )!
+    await act(async () => action.click())
+    expect(
+      document.querySelector('[role="tab"][data-state="active"]')?.textContent,
+    ).toBe("Schematic")
+    expect(
+      document
+        .querySelector("[data-schematic-focus]")
+        ?.getAttribute("data-schematic-focus"),
+    ).toBe("schematic_u1")
+    // Navigation resolves against the current JSON rather than retaining a stale schematic ID.
+    await act(async () =>
+      root.render(
+        render(
+          linked.map((e) =>
+            e.type === "schematic_component" &&
+            e.source_component_id === "source_u1"
+              ? { ...e, schematic_component_id: "schematic_u1_updated" }
+              : e,
+          ),
+          ["system"],
+        ),
+      ),
+    )
+    await openDetails()
+    await act(async () =>
+      root.render(
+        render(
+          linked.map((e) =>
+            e.type === "schematic_component" &&
+            e.source_component_id === "source_u1"
+              ? { ...e, schematic_component_id: "schematic_u1_updated" }
+              : e,
+          ),
+          ["system", "schematic"],
+        ),
+      ),
+    )
+    await act(async () =>
+      Array.from(details().querySelectorAll("button"))
+        .find((e) => e.textContent?.includes("U1"))!
+        .click(),
+    )
+    expect(
+      document
+        .querySelector("[data-schematic-focus]")
+        ?.getAttribute("data-schematic-focus"),
+    ).toBe("schematic_u1_updated")
   } finally {
     await act(async () => root.unmount())
     dom.window.close()

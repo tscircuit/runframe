@@ -122,7 +122,10 @@
     "vite": "^7.1.2",
     "yargs": "^17.7.2",
     "zod": "^3.25.76",
-    "bun-match-svg": "^0.0.17"
+    "bun-match-svg": "^0.0.17",
+    "@tscircuit/circuit-json-to-drawing": "https://jscdn.tscircuit.com/@tscircuit/circuit-json-to-drawing/0.0.4.tgz",
+    "circuit-json-to-gltf": "0.0.164",
+    "poppygl": "^0.0.38"
   },
   "dependencies": {
     "@tscircuit/core": "^0.0.1911",

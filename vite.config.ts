@@ -140,6 +140,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     exclude: [
+      "@tscircuit/circuit-json-to-drawing",
       "@resvg/resvg-js",
       "@resvg/resvg-js-darwin-arm64",
       "@resvg/resvg-wasm",

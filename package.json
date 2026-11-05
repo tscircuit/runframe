@@ -58,7 +58,7 @@
     "@tscircuit/fake-snippets": "^0.0.163",
     "@tscircuit/file-server": "^0.0.32",
     "@tscircuit/internal-dynamic-import": "^0.0.18",
-    "@tscircuit/pcb-viewer": "^1.11.446",
+    "@tscircuit/pcb-viewer": "^1.11.447",
     "@tscircuit/props": "^0.0.702",
     "@tscircuit/schematic-viewer": "^2.0.106",
     "@tscircuit/system-block-viewer": "https://jscdn.tscircuit.com/@tscircuit/system-block-viewer/0.0.5.tgz",

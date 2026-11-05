@@ -134,8 +134,5 @@
   "overrides": {
     "circuit-json": "$circuit-json",
     "altiumts": "0.0.59"
-  },
-  "peerDependencies": {
-    "circuit-to-svg": "*"
   }
 }

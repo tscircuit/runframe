@@ -129,13 +129,13 @@
     "@tscircuit/solver-utils": "^0.0.16",
     "debug": "^4.4.0",
     "format-si-unit": "^0.0.12",
-    "@tscircuit/system-block-viewer": "https://jscdn.tscircuit.com/@tscircuit/system-block-viewer/0.0.4.tgz"
+    "@tscircuit/system-block-viewer": "https://jscdn.tscircuit.com/@tscircuit/system-block-viewer/0.0.5.tgz"
   },
   "overrides": {
     "circuit-json": "$circuit-json",
     "altiumts": "0.0.59"
   },
   "peerDependencies": {
-    "circuit-to-svg": ">=0.0.456"
+    "circuit-to-svg": "*"
   }
 }

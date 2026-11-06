@@ -1,9 +1,10 @@
 import { expect, mock, test } from "bun:test"
 import { JSDOM } from "jsdom"
 import { act } from "react"
-import { createRoot } from "react-dom/client"
+import { createRoot, type Root } from "react-dom/client"
 import type { CircuitJson } from "circuit-json"
-import type { DrawingPageOutput } from "@tscircuit/circuit-json-to-drawing"
+import type { DrawingViewerProps } from "@tscircuit/drawing-viewer"
+import type { PreviewContentProps } from "../../lib/components/CircuitJsonPreview/PreviewContentProps"
 import { engineeringDrawingCircuit } from "../../examples/assets/engineering-drawing"
 
 mock.module("posthog-js", () => ({
@@ -26,36 +27,52 @@ mock.module("@tscircuit/assembly-viewer", () => ({
   AssemblyViewer: () => null,
   PinoutViewer: () => null,
 }))
-
 mock.module("lib/components/PcbViewerWithContainerHeight", () => ({
   PcbViewerWithContainerHeight: () => null,
 }))
 
-const requests: {
-  resolve: (pages: DrawingPageOutput[]) => void
-  reject: (error: Error) => void
-}[] = []
-mock.module(
-  "../../lib/components/EngineeringDrawingViewer/render-drawing-pages",
-  () => ({
-    renderDrawingPages: () =>
-      new Promise<DrawingPageOutput[]>((resolve, reject) => {
-        requests.push({ resolve, reject })
-      }),
-  }),
-)
-const pages = [
-  {
-    drawingPageId: "overview",
-    svg: '<svg xmlns="http://www.w3.org/2000/svg"><text>Overview geometry</text></svg>',
+const receivedCircuits: CircuitJson[] = []
+let viewerError: Error | undefined
+mock.module("@tscircuit/drawing-viewer", () => ({
+  DrawingViewer: ({ circuitJson }: DrawingViewerProps) => {
+    if (viewerError) throw viewerError
+    receivedCircuits.push(circuitJson)
+    return <div data-testid="drawing-viewer-package" />
   },
-  {
-    drawingPageId: "section",
-    svg: '<svg xmlns="http://www.w3.org/2000/svg"><text>Section geometry</text></svg>',
-  },
-]
+}))
 
-test("drawing pages load on selection, switch, reject stale results and recover errors", async () => {
+const renderPreview = async (
+  root: Root,
+  props: Pick<
+    PreviewContentProps,
+    "circuitJson" | "availableTabs" | "defaultActiveTab"
+  >,
+) => {
+  const { CircuitJsonPreview } = await import(
+    "../../lib/components/CircuitJsonPreview/CircuitJsonPreview"
+  )
+  await act(async () =>
+    root.render(
+      <CircuitJsonPreview
+        {...props}
+        allowSelectingVersion={false}
+        showToggleFullScreen={false}
+      />,
+    ),
+  )
+}
+
+const openMoreViews = async () => {
+  await act(async () => {
+    document
+      .querySelector('[aria-label="More views"]')!
+      .dispatchEvent(
+        new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
+      )
+  })
+}
+
+test("drawing tab delegates to DrawingViewer and preserves navigation, reruns, and error recovery", async () => {
   const dom = new JSDOM('<div id="root"></div>', {
     url: "https://host.example/",
     pretendToBeVisual: true,
@@ -90,41 +107,10 @@ test("drawing pages load on selection, switch, reject stale results and recover 
     value: true,
   })
   const root = createRoot(document.getElementById("root")!)
-  const { CircuitJsonPreview } = await import(
-    "../../lib/components/CircuitJsonPreview/CircuitJsonPreview"
-  )
-  const render = (
-    circuitJson: CircuitJson,
-    availableTabs?: ("pcb" | "engineering_drawing")[],
-  ) => (
-    <CircuitJsonPreview
-      circuitJson={circuitJson}
-      availableTabs={availableTabs}
-      allowSelectingVersion={false}
-      showToggleFullScreen={false}
-    />
-  )
-  const openMenu = async () => {
-    await act(async () => {
-      document
-        .querySelector('[aria-label="More views"]')!
-        .dispatchEvent(
-          new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
-        )
-    })
-  }
-  const svg = () =>
-    decodeURIComponent(
-      document
-        .querySelector<HTMLImageElement>("img")!
-        .src.split(",")
-        .slice(1)
-        .join(","),
-    )
   try {
-    await act(async () => root.render(render(engineeringDrawingCircuit)))
-    expect(requests).toHaveLength(0)
-    await openMenu()
+    await renderPreview(root, { circuitJson: engineeringDrawingCircuit })
+    expect(receivedCircuits).toHaveLength(0)
+    await openMoreViews()
     const drawingItem = [
       ...document.querySelectorAll<HTMLElement>('[role="menuitem"]'),
     ].find((item) => item.textContent === "Engineering Drawing")!
@@ -133,74 +119,44 @@ test("drawing pages load on selection, switch, reject stale results and recover 
     expect(
       document.querySelector('[role="tab"][data-state="active"]')?.textContent,
     ).toBe("Engineering Drawing")
-    expect(document.querySelector('[role="status"]')?.textContent).toContain(
-      "Rendering engineering drawings",
-    )
-    await act(async () => requests[0].resolve(pages))
-    expect(svg()).toContain("Overview geometry")
-    const select = document.querySelector<HTMLSelectElement>(
-      '[aria-label="Drawing page"]',
-    )!
-    expect(select.options[1].textContent).toBe("Bracket section")
-    await act(async () => {
-      select.value = "section"
-      select.dispatchEvent(new Event("change", { bubbles: true }))
-    })
-    expect(svg()).toContain("Section geometry")
-    const rerun = engineeringDrawingCircuit.filter(
-      (element) =>
-        !(
-          element.type === "drawing_page" &&
-          element.drawing_page_id === "section"
-        ) &&
-        !(
-          element.type === "drawing_part_view" &&
-          element.drawing_page_id === "section"
-        ),
-    )
-    await act(async () => root.render(render(rerun)))
-    expect(document.querySelector("img")).toBeNull()
-    await act(async () => requests[1].resolve(pages.slice(0, 1)))
-    expect(svg()).toContain("Overview geometry")
-    expect(document.querySelector('[aria-label="Drawing page"]')).toBeNull()
-    await act(async () => root.render(render([...rerun])))
-    await act(async () => root.render(render([])))
-    await act(async () => requests[2].resolve(pages))
-    expect(document.querySelector('[role="status"]')?.textContent).toContain(
-      "No engineering drawings",
-    )
-    expect(document.querySelector("img")).toBeNull()
-    await act(async () => root.render(render(engineeringDrawingCircuit)))
-    await act(async () => requests[3].reject(new Error("Model unavailable")))
-    expect(document.querySelector('[role="alert"]')?.textContent).toContain(
-      "Model unavailable",
-    )
-    expect(document.querySelector('[role="alert"] h2')?.textContent).toBe(
+    expect(
+      document.querySelector('[data-testid="drawing-viewer-package"]'),
+    ).not.toBeNull()
+    expect(receivedCircuits.at(-1)).toBe(engineeringDrawingCircuit)
+
+    const rerun = [...engineeringDrawingCircuit]
+    await renderPreview(root, { circuitJson: rerun })
+    expect(receivedCircuits.at(-1)).toBe(rerun)
+    await renderPreview(root, { circuitJson: null })
+    expect(
+      document.querySelector('[data-testid="drawing-viewer-package"]'),
+    ).toBeNull()
+    expect(document.body.textContent).toContain("Tip:")
+
+    const emptyCircuit: CircuitJson = []
+    await renderPreview(root, { circuitJson: emptyCircuit })
+    expect(receivedCircuits.at(-1)).toBe(emptyCircuit)
+    viewerError = new Error("DrawingViewer failed")
+    await renderPreview(root, { circuitJson: engineeringDrawingCircuit })
+    expect(document.querySelector('[role="alert"]')?.textContent).toBe(
       "Error loading Engineering Drawing",
     )
-    await act(async () =>
-      [...document.querySelectorAll("button")]
-        .find((button) => button.textContent === "Retry")!
-        .click(),
-    )
-    await act(async () => requests[4].resolve(pages))
-    expect(svg()).toContain("Overview geometry")
-    await act(async () => root.render(render([...engineeringDrawingCircuit])))
-    await act(async () => requests[5].reject(new Error("Invalid drawing page")))
-    expect(document.querySelector('[role="alert"]')?.textContent).toContain(
-      "Invalid drawing page",
-    )
-    await act(async () => root.render(render([...engineeringDrawingCircuit])))
-    await act(async () => requests[6].resolve(pages))
+    viewerError = undefined
+    await renderPreview(root, { circuitJson: rerun })
     expect(document.querySelector('[role="alert"]')).toBeNull()
-    expect(svg()).toContain("Overview geometry")
-    await act(async () =>
-      root.render(render(engineeringDrawingCircuit, ["pcb"])),
-    )
+    expect(receivedCircuits.at(-1)).toBe(rerun)
+
+    await renderPreview(root, {
+      circuitJson: engineeringDrawingCircuit,
+      availableTabs: ["pcb"],
+    })
+    expect(
+      document.querySelector('[data-testid="drawing-viewer-package"]'),
+    ).toBeNull()
     expect(
       document.querySelector('[role="tab"][data-state="active"]')?.textContent,
     ).toBe("PCB")
-    await openMenu()
+    await openMoreViews()
     expect(
       [...document.querySelectorAll('[role="menuitem"]')].some(
         (item) => item.textContent === "Engineering Drawing",
@@ -211,14 +167,17 @@ test("drawing pages load on selection, switch, reject stale results and recover 
         new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
       ),
     )
-    await act(async () => root.render(render([], ["engineering_drawing"])))
+    await renderPreview(root, {
+      circuitJson: engineeringDrawingCircuit,
+      availableTabs: ["engineering_drawing"],
+      defaultActiveTab: "engineering_drawing",
+    })
     expect(
       document.querySelector('[role="tab"][data-state="active"]')?.textContent,
     ).toBe("Engineering Drawing")
-    expect(document.querySelector('[role="status"]')?.textContent).toContain(
-      "No engineering drawings",
-    )
+    expect(receivedCircuits.at(-1)).toBe(engineeringDrawingCircuit)
   } finally {
+    viewerError = undefined
     await act(async () => root.unmount())
     dom.window.close()
   }

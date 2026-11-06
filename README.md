@@ -113,7 +113,9 @@ gallery directly.
 Choose **Engineering Drawing** from **More views** to preview configured
 `drawing_page` and `drawing_part_view` records in Circuit JSON. The viewer renders
 the selected CAD parts or assembly, including hidden edges, section cuts, resolved
-dimension lines, and title blocks. Multiple sheets have a page selector.
+dimension lines, and title blocks, using
+[`@tscircuit/drawing-viewer`](https://github.com/tscircuit/drawing-viewer).
+The viewer provides zoom, pan, and Fit controls for the drawing sheets.
 
 ```tsx
 <CircuitJsonPreview

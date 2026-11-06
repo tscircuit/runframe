@@ -4,13 +4,11 @@ import { Button } from "./ui/button"
 interface ErrorFallbackProps {
   error: unknown
   resetErrorBoundary?: () => void
-  title?: string
 }
 
 export const ErrorFallback = ({
   error,
   resetErrorBoundary,
-  title = "Error Loading 3D Viewer",
 }: ErrorFallbackProps) => {
   const resolvedError =
     error instanceof Error ? error : new Error(String(error))
@@ -22,7 +20,7 @@ export const ErrorFallback = ({
     >
       <div className="rf-p-4">
         <h2 className="rf-text-lg rf-font-semibold rf-text-red-800 rf-mb-3">
-          {title}
+          Error Loading 3D Viewer
         </h2>
         <p className="rf-text-xs rf-font-mono rf-whitespace-pre-wrap rf-text-red-700">
           {resolvedError.message}

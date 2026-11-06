@@ -28,7 +28,7 @@ import {
 } from "@tscircuit/schematic-viewer"
 import { AssemblyViewer, PinoutViewer } from "@tscircuit/assembly-viewer"
 import { SystemBlockViewer } from "@tscircuit/system-block-viewer"
-import { EngineeringDrawingViewer } from "../EngineeringDrawingViewer/EngineeringDrawingViewer"
+import { DrawingViewer } from "@tscircuit/drawing-viewer"
 import PreviewEmptyState from "../PreviewEmptyState"
 import { CircuitJsonTableViewer } from "../CircuitJsonTableViewer/CircuitJsonTableViewer"
 import { BomTable } from "../BomTable"
@@ -753,18 +753,12 @@ export const CircuitJsonPreview = ({
               >
                 <ErrorBoundary
                   resetKeys={[circuitJson]}
-                  fallbackRender={({ error, resetErrorBoundary }) => (
-                    <div role="alert">
-                      <ErrorFallback
-                        title="Error loading Engineering Drawing"
-                        error={error}
-                        resetErrorBoundary={resetErrorBoundary}
-                      />
-                    </div>
-                  )}
+                  fallback={
+                    <div role="alert">Error loading Engineering Drawing</div>
+                  }
                 >
                   {circuitJson ? (
-                    <EngineeringDrawingViewer circuitJson={circuitJson} />
+                    <DrawingViewer circuitJson={circuitJson} />
                   ) : (
                     <PreviewEmptyState onRunClicked={onRunClicked} />
                   )}

@@ -55,7 +55,7 @@
     "@tscircuit/capacity-autorouter": "^0.0.874",
     "@tscircuit/circuit-json-util": "^0.0.116",
     "@tscircuit/create-snippet-url": "^0.0.9",
-    "@tscircuit/drawing-viewer": "github:tscircuit/drawing-viewer#fbb428b75d62cb83112763b9dae5387618215154",
+    "@tscircuit/drawing-viewer": "https://jscdn.tscircuit.com/@tscircuit/drawing-viewer/0.0.3.tgz",
     "@tscircuit/fake-snippets": "^0.0.163",
     "@tscircuit/file-server": "^0.0.32",
     "@tscircuit/internal-dynamic-import": "^0.0.18",

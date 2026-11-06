@@ -286,6 +286,7 @@ export const SolversTabContent = ({
               <SolverDebuggerActions solverEvent={selectedSolverEvent} />
               <div className="rf-min-h-0 rf-flex-1">
                 <ErrorBoundary
+                  key={selectedSolverId}
                   fallback={
                     <div className="rf-p-4">
                       <div className="rf-bg-red-50 rf-rounded-md rf-border rf-border-red-200 rf-p-4">

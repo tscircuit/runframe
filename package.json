@@ -61,6 +61,7 @@
     "@tscircuit/internal-dynamic-import": "^0.0.18",
     "@tscircuit/pcb-viewer": "^1.11.448",
     "@tscircuit/props": "^0.0.702",
+    "@tscircuit/schematic-trace-solver": "^0.0.196",
     "@tscircuit/schematic-viewer": "^2.0.107",
     "@tscircuit/system-block-viewer": "https://jscdn.tscircuit.com/@tscircuit/system-block-viewer/0.0.5.tgz",
     "@types/bun": "latest",

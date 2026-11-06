@@ -11,7 +11,9 @@ export const getSolverConstructorArgs = (
   ]
 
   if (
-    solverEvent.solverName !== "AutoroutingPipelineSolver7_MultiGraph" ||
+    (solverEvent.solverName !== "AutoroutingPipelineSolver7_MultiGraph" &&
+      solverEvent.solverName !==
+        "AutoroutingPipelineSolver9_PreloadedTraceGraph") ||
     constructorArgs.length !== 1
   ) {
     return constructorArgs

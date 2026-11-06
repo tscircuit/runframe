@@ -108,31 +108,6 @@ and falling back to PCB or schematic PNG/SVG assets. Add `gallery` to either the
 query string or hash (for example, `?gallery` or `#gallery=true`) to open the
 gallery directly.
 
-### Engineering drawings
-
-Choose **Engineering Drawing** from **More views** to preview configured
-`drawing_page` and `drawing_part_view` records in Circuit JSON. The viewer renders
-the selected CAD parts or assembly, including hidden edges, section cuts, resolved
-dimension lines, and title blocks, using
-[`@tscircuit/drawing-viewer`](https://github.com/tscircuit/drawing-viewer).
-The viewer provides zoom, pan, and Fit controls for the drawing sheets.
-
-```tsx
-<CircuitJsonPreview
-  circuitJson={circuitJsonWithDrawingPages}
-  defaultActiveTab="engineering_drawing"
-  availableTabs={["pcb", "schematic", "cad", "engineering_drawing"]}
-/>
-```
-
-The same tab ID works with `RunFrame` and its API, CLI, and static-build wrappers.
-Drawing records must already be present in the input; the viewer does not invent
-sheets or measure dimensions. See the
-[drawing configuration documentation](https://github.com/tscircuit/circuit-json-to-drawing#drawing-configuration)
-for the schema and the current status of TSX authoring support. The
-`example66-engineering-drawing` fixture includes embedded model geometry, two
-sheets, and a section view.
-
 ### Providing the Blob URL (to avoid loading webworker from CDN)
 
 ```tsx

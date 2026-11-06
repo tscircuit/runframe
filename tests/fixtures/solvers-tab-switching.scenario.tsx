@@ -19,7 +19,9 @@ const schematicInput = {
   directConnections: [],
   netConnections: [],
   availableNetLabelOrientations: {},
-} satisfies ConstructorParameters<typeof SOLVERS.SchematicTracePipelineSolver>[0]
+} satisfies ConstructorParameters<
+  typeof SOLVERS.SchematicTracePipelineSolver
+>[0]
 
 const solverEvents: SolverStartedEvent[] = [
   {
@@ -113,7 +115,10 @@ function expectDisplayedSolver(solverName: string) {
   expect(nameButtons[0]!.getAttribute("title")).toBe(
     `Download options for ${solverName}`,
   )
-  expect(container.textContent).toMatch(/Iterations:\s*0\b/)
+  const iterationCounter = Array.from(container.querySelectorAll("div")).find(
+    (element) => element.textContent?.startsWith("Iterations:"),
+  )
+  expect(iterationCounter?.textContent).toBe("Iterations: 0")
 }
 
 for (const [firstSolver, secondSolver] of [

@@ -28,6 +28,7 @@ import {
 } from "@tscircuit/schematic-viewer"
 import { AssemblyViewer, PinoutViewer } from "@tscircuit/assembly-viewer"
 import { SystemBlockViewer } from "@tscircuit/system-block-viewer"
+import { DrawingViewer } from "@tscircuit/drawing-viewer"
 import PreviewEmptyState from "../PreviewEmptyState"
 import { CircuitJsonTableViewer } from "../CircuitJsonTableViewer/CircuitJsonTableViewer"
 import { BomTable } from "../BomTable"
@@ -95,6 +96,7 @@ const previewPanelHeightClassName = "rf-h-[620px] rf-min-h-full rf-max-h-full"
 const dropdownMenuItems = [
   "system",
   "assembly",
+  "drawing",
   "pinout",
   "analog_simulation",
   "bom",
@@ -736,6 +738,24 @@ export const CircuitJsonPreview = ({
                       editingEnabled
                       debugGrid
                     />
+                  ) : (
+                    <PreviewEmptyState onRunClicked={onRunClicked} />
+                  )}
+                </ErrorBoundary>
+              </div>
+            </TabsContent>
+          )}
+          {(!availableTabs || availableTabs.includes("drawing")) && (
+            <TabsContent value="drawing" className="rf-min-h-0">
+              <div
+                className={cn("rf-overflow-auto", previewPanelHeightClassName)}
+              >
+                <ErrorBoundary
+                  resetKeys={[circuitJson]}
+                  fallback={<div role="alert">Error loading Drawing</div>}
+                >
+                  {circuitJson ? (
+                    <DrawingViewer circuitJson={circuitJson} />
                   ) : (
                     <PreviewEmptyState onRunClicked={onRunClicked} />
                   )}

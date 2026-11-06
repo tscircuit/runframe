@@ -24,6 +24,7 @@ export type TabId =
   | "schematic"
   | "system"
   | "assembly"
+  | "drawing"
   | "pinout"
   | "cad"
   | "analog_simulation"

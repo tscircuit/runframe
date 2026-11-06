@@ -50,7 +50,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@react-hook/resize-observer": "^2.0.2",
     "@resvg/resvg-wasm": "^2.6.2",
-    "@tscircuit/3d-viewer": "^0.0.636",
+    "@tscircuit/3d-viewer": "^0.0.643",
     "@tscircuit/assembly-viewer": "^0.0.6",
     "@tscircuit/capacity-autorouter": "^0.0.874",
     "@tscircuit/circuit-json-util": "^0.0.116",
@@ -60,7 +60,7 @@
     "@tscircuit/file-server": "^0.0.32",
     "@tscircuit/internal-dynamic-import": "^0.0.18",
     "@tscircuit/pcb-viewer": "^1.11.450",
-    "@tscircuit/props": "^0.0.702",
+    "@tscircuit/props": "^0.0.714",
     "@tscircuit/schematic-trace-solver": "^0.0.196",
     "@tscircuit/schematic-viewer": "^2.0.108",
     "@tscircuit/system-block-viewer": "https://jscdn.tscircuit.com/@tscircuit/system-block-viewer/0.0.5.tgz",
@@ -127,7 +127,7 @@
     "bun-match-svg": "^0.0.17"
   },
   "dependencies": {
-    "@tscircuit/core": "^0.0.1911",
+    "@tscircuit/core": "^0.0.2234",
     "@tscircuit/eval": "0.0.1706",
     "@tscircuit/solver-utils": "^0.0.16",
     "debug": "^4.4.0",

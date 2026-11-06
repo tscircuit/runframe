@@ -1,5 +1,5 @@
 # =============================================================================
-# Do not change anything in this file.
+# Package updates are resolved by scripts/update-packages.ts.
 # This workflow automatically updates @tscircuit packages when triggered by
 # the source repository's trigger-dependent-repo-update.yml workflow.
 # =============================================================================
@@ -21,6 +21,7 @@ env:
 jobs:
   update-package:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     
     steps:
       - uses: actions/checkout@v4
@@ -28,13 +29,14 @@ jobs:
           token: ${{ secrets.TSCIRCUIT_BOT_GITHUB_TOKEN }}
       - uses: oven-sh/setup-bun@v2
       - name: Update packages
+        run: bun run scripts/update-packages.ts
+        env:
+          UPDATE_SUMMARY_PATH: ${{ runner.temp }}/package-update-summary.md
+      - name: Validate compatible dependency set
         run: |
-          IFS=',' read -ra PACKAGES <<< "${{ env.PACKAGE_NAMES }}"
-          for package in "${PACKAGES[@]}"; do
-            if [[ -n "$package" ]]; then
-              bun update --latest "$package"
-            fi
-          done
+          bun test
+          bunx tsc --noEmit
+          bun run build
       - name: Close existing PRs
         run: |
           gh pr list --repo ${{ github.repository }} --state open --author "tscircuitbot" --json number,title --jq '.[] | select(.title | startswith("chore:")) | .number' | xargs -I{} gh pr close {} --comment "Closing in favor of a new update PR"
@@ -46,7 +48,7 @@ jobs:
         with:
           commit-message: "chore: update packages ${{ env.PACKAGE_NAMES }}"
           title: "chore: update packages ${{ env.PACKAGE_NAMES }}"
-          body: "Automated package update"
+          body-path: ${{ runner.temp }}/package-update-summary.md
           branch: update-packages-${{ github.run_number }}
           base: main
           token: ${{ secrets.TSCIRCUIT_BOT_GITHUB_TOKEN }}

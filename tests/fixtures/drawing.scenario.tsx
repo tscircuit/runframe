@@ -5,7 +5,7 @@ import { createRoot, type Root } from "react-dom/client"
 import type { CircuitJson } from "circuit-json"
 import type { DrawingViewerProps } from "@tscircuit/drawing-viewer"
 import type { PreviewContentProps } from "../../lib/components/CircuitJsonPreview/PreviewContentProps"
-import { engineeringDrawingCircuit } from "../../examples/assets/engineering-drawing"
+import { createDrawingCircuitJson } from "../../examples/assets/drawing"
 
 mock.module("posthog-js", () => ({
   default: { init() {}, identify() {}, capture() {}, captureException() {} },
@@ -73,6 +73,29 @@ const openMoreViews = async () => {
 }
 
 test("drawing tab delegates to DrawingViewer and preserves navigation, reruns, and error recovery", async () => {
+  const drawingCircuit = await createDrawingCircuitJson()
+  expect(
+    drawingCircuit.filter((element) => element.type.includes("error")),
+  ).toEqual([])
+  const pages = drawingCircuit.filter(
+    (element) => element.type === "drawing_page",
+  )
+  expect(pages.map((page) => page.display_name).sort()).toEqual([
+    "Carrier overview",
+    "Mounting hole section",
+  ])
+  expect(
+    drawingCircuit.filter(
+      (element) => element.type === "drawing_dimension_line",
+    ),
+  ).toHaveLength(3)
+  expect(
+    drawingCircuit.some(
+      (element) =>
+        element.type === "drawing_part_view" && element.section?.axis === "y",
+    ),
+  ).toBe(true)
+
   const dom = new JSDOM('<div id="root"></div>', {
     url: "https://host.example/",
     pretendToBeVisual: true,
@@ -108,23 +131,23 @@ test("drawing tab delegates to DrawingViewer and preserves navigation, reruns, a
   })
   const root = createRoot(document.getElementById("root")!)
   try {
-    await renderPreview(root, { circuitJson: engineeringDrawingCircuit })
+    await renderPreview(root, { circuitJson: drawingCircuit })
     expect(receivedCircuits).toHaveLength(0)
     await openMoreViews()
     const drawingItem = [
       ...document.querySelectorAll<HTMLElement>('[role="menuitem"]'),
-    ].find((item) => item.textContent === "Engineering Drawing")!
+    ].find((item) => item.textContent === "Drawing")!
     expect(drawingItem).toBeDefined()
     await act(async () => drawingItem.click())
     expect(
       document.querySelector('[role="tab"][data-state="active"]')?.textContent,
-    ).toBe("Engineering Drawing")
+    ).toBe("Drawing")
     expect(
       document.querySelector('[data-testid="drawing-viewer-package"]'),
     ).not.toBeNull()
-    expect(receivedCircuits.at(-1)).toBe(engineeringDrawingCircuit)
+    expect(receivedCircuits.at(-1)).toBe(drawingCircuit)
 
-    const rerun = [...engineeringDrawingCircuit]
+    const rerun = [...drawingCircuit]
     await renderPreview(root, { circuitJson: rerun })
     expect(receivedCircuits.at(-1)).toBe(rerun)
     await renderPreview(root, { circuitJson: null })
@@ -137,9 +160,9 @@ test("drawing tab delegates to DrawingViewer and preserves navigation, reruns, a
     await renderPreview(root, { circuitJson: emptyCircuit })
     expect(receivedCircuits.at(-1)).toBe(emptyCircuit)
     viewerError = new Error("DrawingViewer failed")
-    await renderPreview(root, { circuitJson: engineeringDrawingCircuit })
+    await renderPreview(root, { circuitJson: drawingCircuit })
     expect(document.querySelector('[role="alert"]')?.textContent).toBe(
-      "Error loading Engineering Drawing",
+      "Error loading Drawing",
     )
     viewerError = undefined
     await renderPreview(root, { circuitJson: rerun })
@@ -147,7 +170,7 @@ test("drawing tab delegates to DrawingViewer and preserves navigation, reruns, a
     expect(receivedCircuits.at(-1)).toBe(rerun)
 
     await renderPreview(root, {
-      circuitJson: engineeringDrawingCircuit,
+      circuitJson: drawingCircuit,
       availableTabs: ["pcb"],
     })
     expect(
@@ -159,7 +182,7 @@ test("drawing tab delegates to DrawingViewer and preserves navigation, reruns, a
     await openMoreViews()
     expect(
       [...document.querySelectorAll('[role="menuitem"]')].some(
-        (item) => item.textContent === "Engineering Drawing",
+        (item) => item.textContent === "Drawing",
       ),
     ).toBe(false)
     await act(async () =>
@@ -168,14 +191,14 @@ test("drawing tab delegates to DrawingViewer and preserves navigation, reruns, a
       ),
     )
     await renderPreview(root, {
-      circuitJson: engineeringDrawingCircuit,
-      availableTabs: ["engineering_drawing"],
-      defaultActiveTab: "engineering_drawing",
+      circuitJson: drawingCircuit,
+      availableTabs: ["drawing"],
+      defaultActiveTab: "drawing",
     })
     expect(
       document.querySelector('[role="tab"][data-state="active"]')?.textContent,
-    ).toBe("Engineering Drawing")
-    expect(receivedCircuits.at(-1)).toBe(engineeringDrawingCircuit)
+    ).toBe("Drawing")
+    expect(receivedCircuits.at(-1)).toBe(drawingCircuit)
   } finally {
     viewerError = undefined
     await act(async () => root.unmount())

@@ -96,7 +96,7 @@ const previewPanelHeightClassName = "rf-h-[620px] rf-min-h-full rf-max-h-full"
 const dropdownMenuItems = [
   "system",
   "assembly",
-  "engineering_drawing",
+  "drawing",
   "pinout",
   "analog_simulation",
   "bom",
@@ -745,17 +745,14 @@ export const CircuitJsonPreview = ({
               </div>
             </TabsContent>
           )}
-          {(!availableTabs ||
-            availableTabs.includes("engineering_drawing")) && (
-            <TabsContent value="engineering_drawing" className="rf-min-h-0">
+          {(!availableTabs || availableTabs.includes("drawing")) && (
+            <TabsContent value="drawing" className="rf-min-h-0">
               <div
                 className={cn("rf-overflow-auto", previewPanelHeightClassName)}
               >
                 <ErrorBoundary
                   resetKeys={[circuitJson]}
-                  fallback={
-                    <div role="alert">Error loading Engineering Drawing</div>
-                  }
+                  fallback={<div role="alert">Error loading Drawing</div>}
                 >
                   {circuitJson ? (
                     <DrawingViewer circuitJson={circuitJson} />

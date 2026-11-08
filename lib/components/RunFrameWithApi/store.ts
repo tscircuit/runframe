@@ -156,38 +156,46 @@ export const useRunFrameStore = create<RunFrameState>()(
                 // .sort((a, b) => b.created_at.localeCompare(a.created_at)),
               }))
 
-              let fsUpdateCount = 0
+              const updatedFiles = new Map<FilePath, FileContent>()
+              const deletedFiles = new Set<FilePath>()
 
               // Process all file updates
-              const updates = new Map(state.fsMap)
               for (const event of events) {
                 if (event.event_type === "FILE_UPDATED") {
-                  fsUpdateCount++
                   const file = await getFileApi(event.file_path)
                   // Don't update the manual edits file if we're the ones who changed it
                   if (
                     event.file_path === "manual_edits.json" &&
-                    Date.now() - state.lastManualEditsChangeSentAt < 1000
+                    Date.now() - get().lastManualEditsChangeSentAt < 1000
                   ) {
                     continue
                   }
+                  deletedFiles.delete(file.file_path)
                   if (isDynamicFilePath(file.file_path)) {
-                    updates.set(file.file_path, file.text_content ?? "")
+                    updatedFiles.set(file.file_path, file.text_content ?? "")
                   } else {
-                    updates.set(file.file_path, "__STATIC_ASSET__")
+                    updatedFiles.set(file.file_path, "__STATIC_ASSET__")
                   }
                   // Track recently saved files
                   get().addRecentlySavedFile(event.file_path)
                 } else if (event.event_type === "FILE_DELETED") {
-                  fsUpdateCount++
-                  updates.delete(event.file_path)
+                  updatedFiles.delete(event.file_path)
+                  deletedFiles.add(event.file_path)
                 }
               }
 
+              const fsUpdateCount = updatedFiles.size + deletedFiles.size
               if (fsUpdateCount > 0) {
                 debug("updating fsMap, fsUpdateCount:", fsUpdateCount)
-                set({
-                  fsMap: updates,
+                set((currentState) => {
+                  const nextFsMap = new Map(currentState.fsMap)
+                  for (const deletedPath of deletedFiles) {
+                    nextFsMap.delete(deletedPath)
+                  }
+                  for (const [filePath, content] of updatedFiles) {
+                    nextFsMap.set(filePath, content)
+                  }
+                  return { fsMap: nextFsMap }
                 })
               }
             }

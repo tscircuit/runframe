@@ -74,6 +74,8 @@ export interface PreviewContentProps {
    * a title here.
    */
   leftHeaderContent?: React.ReactNode
+  /** Navigation centered in the header, with a separate row on narrow screens. */
+  centerHeaderContent?: React.ReactNode
   /**
    * Default header content, shown on the right side of the header with the PCB,
    * schematic, and CAD tabs.

@@ -1,3 +1,4 @@
+import { useFittingTabs } from "lib/hooks/use-fitting-tabs"
 import { RenderStatus } from "./RenderStatus"
 import {
   Tabs,
@@ -198,6 +199,20 @@ export const CircuitJsonPreview = ({
     return circuitJson.some((e) => e.type === "schematic_group")
   }, [circuitJson])
 
+  const hasPcb = useMemo(
+    () =>
+      !circuitJson ||
+      circuitJson.some(
+        (e) =>
+          e.type.startsWith("pcb_") &&
+          !e.type.includes("error") &&
+          !e.type.includes("warning"),
+      ),
+    [circuitJson],
+  )
+  const hasSystem = circuitJson?.some((e) => e.type === "system_block_page")
+  const hasDrawing = circuitJson?.some((e) => e.type === "drawing_page")
+
   const hasPanels = useMemo(() => {
     return circuitJson?.some((e) => e.type === "pcb_panel")
   }, [circuitJson])
@@ -210,7 +225,8 @@ export const CircuitJsonPreview = ({
     useSchematicViewerController()
   const { controller: pcbController, focusPcbComponent } =
     usePcbViewerController()
-  const pcbNavigationEnabled = !availableTabs || availableTabs.includes("pcb")
+  const pcbNavigationEnabled =
+    hasPcb && (!availableTabs || availableTabs.includes("pcb"))
   const handleViewPcbComponent = pcbNavigationEnabled
     ? ({ source_component_id }: { source_component_id: string }) => {
         const component = circuitJson?.find(
@@ -265,7 +281,9 @@ export const CircuitJsonPreview = ({
     ...(["pcb", "schematic", "cad", ...dropdownMenuItems] as TabId[]).filter(
       (tab) =>
         (!availableTabs || availableTabs.includes(tab)) &&
-        (tab !== "render_log" || showRenderLogTab),
+        (tab !== "render_log" || showRenderLogTab) &&
+        (tab !== "pcb" || hasPcb) &&
+        (tab !== "schematic" || (hasSchematicGroup && !hasPanels)),
     ),
     ...(showCodeTab ? ["code" as const] : []),
     ...resolvedExtraTabs.map((tab) => tab.tabId),
@@ -291,6 +309,20 @@ export const CircuitJsonPreview = ({
       onActiveTabChange?.(activeTab)
     }
   }, [storedActiveTab, activeTab, setActiveTabState, onActiveTabChange])
+  const optionalTabs = (["system", "drawing"] as const).filter(
+    (tab) =>
+      visibleTabIds.includes(tab) &&
+      (tab === "system" ? hasSystem : hasDrawing),
+  )
+  const { containerRef: tabContainerRef, fittingTabs } = useFittingTabs(
+    [
+      visibleTabIds.join(),
+      optionalTabs.join(),
+      activeTab,
+      showRightHeaderContent,
+      showToggleFullScreen,
+    ].join("|"),
+  )
   const activeExtraTab = resolvedExtraTabs.find(
     (tab) => tab.tabId === activeTab,
   )
@@ -388,7 +420,7 @@ export const CircuitJsonPreview = ({
           >
             <div
               className={cn(
-                "rf-flex rf-flex-1 rf-min-w-0 rf-items-center",
+                "rf-flex rf-min-w-0 rf-items-center",
                 (leftHeaderContent || showFileMenu) && "rf-basis-48",
               )}
             >
@@ -421,11 +453,14 @@ export const CircuitJsonPreview = ({
               shouldShowCrispFeedbackButton({ isCli }) && (
                 <CrispFeedbackButton />
               )}
-            <div className="rf-flex rf-min-w-0 rf-max-w-full rf-items-center rf-gap-2 rf-ml-auto">
+            <div
+              ref={tabContainerRef}
+              className="rf-flex rf-flex-1 rf-min-w-0 rf-max-w-full rf-items-center rf-justify-end rf-gap-2 rf-ml-auto"
+            >
               {showRightHeaderContent && (
                 <TabsList className="rf-min-w-0 rf-justify-start rf-overflow-x-auto rf-overflow-y-hidden">
                   {showCodeTab && <TabsTrigger value="code">Code</TabsTrigger>}
-                  {!availableTabs || availableTabs.includes("pcb") ? (
+                  {visibleTabIds.includes("pcb") ? (
                     <TabsTrigger value="pcb" className="rf-whitespace-nowrap">
                       {circuitJson && (
                         <span
@@ -440,16 +475,10 @@ export const CircuitJsonPreview = ({
                       PCB
                     </TabsTrigger>
                   ) : null}
-                  {!availableTabs || availableTabs.includes("schematic") ? (
+                  {visibleTabIds.includes("schematic") ? (
                     <TabsTrigger
                       value="schematic"
-                      className={cn(
-                        "rf-whitespace-nowrap",
-                        circuitJson && !hasSchematicGroup && "rf-opacity-50",
-                      )}
-                      disabled={
-                        circuitJson ? !hasSchematicGroup || hasPanels : false
-                      }
+                      className="rf-whitespace-nowrap"
                     >
                       {circuitJson && (
                         <span
@@ -479,6 +508,29 @@ export const CircuitJsonPreview = ({
                       3D
                     </TabsTrigger>
                   ) : null}
+                  {optionalTabs
+                    .filter((tab) => tab !== activeTab)
+                    .map((tab) => (
+                      <TabsTrigger
+                        key={tab}
+                        value={tab}
+                        data-optional-tab={tab}
+                        style={
+                          fittingTabs.includes(tab)
+                            ? undefined
+                            : {
+                                position: "absolute",
+                                visibility: "hidden",
+                                pointerEvents: "none",
+                              }
+                        }
+                        aria-hidden={!fittingTabs.includes(tab) || undefined}
+                        disabled={!fittingTabs.includes(tab)}
+                        tabIndex={fittingTabs.includes(tab) ? undefined : -1}
+                      >
+                        {capitalizeFirstLetters(tab)}
+                      </TabsTrigger>
+                    ))}
                   {!["pcb", "cad", "schematic"].includes(activeTab) && (
                     <TabsTrigger value={activeTab}>
                       {activeExtraTab?.tabName ??

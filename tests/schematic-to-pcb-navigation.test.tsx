@@ -134,6 +134,7 @@ test("schematic navigation queues PCB focus, switches tabs, and honors unavailab
   )
   const changes: string[] = []
   const circuitJson = [
+    { type: "pcb_board", pcb_board_id: "board_1" },
     { type: "schematic_group", schematic_group_id: "group_1" },
     {
       type: "schematic_component",
@@ -196,6 +197,12 @@ test("schematic navigation queues PCB focus, switches tabs, and honors unavailab
       document.querySelector('[data-active-tab="schematic"]'),
     ).not.toBeNull()
     expect(changes).toHaveLength(changeCount)
+    // A project without any PCB output must not expose PCB navigation either.
+    await render(
+      ["schematic", "pcb"],
+      circuitJson.filter((element: any) => !element.type.startsWith("pcb_")),
+    )
+    expect(document.body.textContent).not.toContain("Show on PCB")
     // If the component disappeared since the menu opened, do not navigate.
     await render(
       ["schematic", "pcb"],

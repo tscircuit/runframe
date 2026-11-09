@@ -83,6 +83,8 @@ export interface PreviewContentProps {
    * schematic, and CAD tabs.
    */
   showRightHeaderContent?: boolean
+  /** Show secondary views and version information in the header menu. */
+  showMoreViewsMenu?: boolean
   isRunningCode?: boolean
   isStreaming?: boolean
   // manualEditsFileContent?: string

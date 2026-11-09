@@ -120,6 +120,7 @@ export function ReferenceDesignViewer({
         onActiveTabChange={setActiveTab}
         leftHeaderContent={selector}
         showFileMenu={false}
+        showMoreViewsMenu={false}
         showCodeTab={false}
         showToggleFullScreen={false}
         isWebEmbedded

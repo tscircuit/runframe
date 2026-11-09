@@ -255,16 +255,18 @@ export const RunFrameStaticBuildViewer = (
     >
       {currentFileFailed ? (
         <div className="rf-w-full rf-h-full rf-flex rf-flex-col">
-          <div className="rf-flex rf-items-center rf-gap-2 rf-min-w-0 rf-w-full rf-p-4 rf-border-b rf-border-gray-200">
-            {(props.showFileMenu ?? true) && (
-              <FileMenuLeftHeader
-                isWebEmbedded={true}
-                circuitJson={null}
-                projectName={props.projectName}
-              />
-            )}
+          <div className="rf-flex rf-items-center rf-gap-2 rf-min-w-0 rf-w-full rf-flex-wrap rf-p-2 rf-border-b rf-border-gray-200 lg:rf-grid lg:rf-grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]">
+            <div className="rf-flex rf-min-w-0 rf-items-center">
+              {(props.showFileMenu ?? true) && (
+                <FileMenuLeftHeader
+                  isWebEmbedded={true}
+                  circuitJson={null}
+                  projectName={props.projectName}
+                />
+              )}
+            </div>
             {availableFiles.length > 1 && (
-              <div className="rf-flex rf-min-w-0 rf-flex-1 rf-items-center rf-gap-2">
+              <div className="rf-flex rf-w-full rf-min-w-0 rf-items-center rf-justify-center rf-gap-2">
                 {fileNavigation}
               </div>
             )}
@@ -307,22 +309,22 @@ export const RunFrameStaticBuildViewer = (
           projectName={props.projectName}
           defaultActiveTab={props.tabSelected}
           leftHeaderContent={
-            <div className="rf-flex rf-min-w-0 rf-w-full rf-items-center rf-gap-2">
-              {(props.showFileMenu ?? true) && (
-                <FileMenuLeftHeader
-                  isWebEmbedded={true}
-                  circuitJson={circuitJson}
-                  projectName={props.projectName}
-                />
-              )}
-              {availableFiles.length > 1 && (
-                <div
-                  className={`rf-flex rf-min-w-0 rf-flex-1 rf-items-center rf-gap-2 ${isLoadingCurrentFile ? "rf-opacity-50" : ""}`}
-                >
-                  {fileNavigation}
-                </div>
-              )}
-            </div>
+            (props.showFileMenu ?? true) ? (
+              <FileMenuLeftHeader
+                isWebEmbedded={true}
+                circuitJson={circuitJson}
+                projectName={props.projectName}
+              />
+            ) : undefined
+          }
+          centerHeaderContent={
+            fileNavigation && (
+              <div
+                className={`rf-flex rf-min-w-0 rf-max-w-full rf-items-center rf-gap-2 ${isLoadingCurrentFile ? "rf-opacity-50" : ""}`}
+              >
+                {fileNavigation}
+              </div>
+            )
           }
         />
       )}

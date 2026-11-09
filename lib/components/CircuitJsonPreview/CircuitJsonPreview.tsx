@@ -121,6 +121,7 @@ export const CircuitJsonPreview = ({
   errorMessage,
   errorStack,
   circuitJson,
+  prebuiltGlb,
   autoroutingGraphics,
   showRightHeaderContent = true,
   showCodeTab = false,
@@ -869,7 +870,8 @@ export const CircuitJsonPreview = ({
                     <CadViewer
                       key={`cad-${isFullScreen}`}
                       ref={setCadViewerRef}
-                      circuitJson={circuitJson}
+                      circuitJson={prebuiltGlb ? undefined : circuitJson}
+                      glbData={prebuiltGlb}
                       autoRotateDisabled={autoRotate3dViewerDisabled}
                       onViewSchematicComponent={handleViewSchematicComponent}
                     />

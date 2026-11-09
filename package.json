@@ -12,7 +12,8 @@
     "./preview": "./dist/preview.js",
     "./runner": "./dist/runner.js",
     "./standalone": "./dist/standalone.min.js",
-    "./standalone-preview": "./dist/standalone-preview.min.js"
+    "./standalone-preview": "./dist/standalone-preview.min.js",
+    "./reference-designs": "./dist/reference-designs.js"
   },
   "files": [
     "dist"
@@ -20,7 +21,7 @@
   "scripts": {
     "start": "bun run build:css && concurrently 'bun run cosmos' 'bun run build:css:watch'",
     "build": "bun run build:css && bun run build:standalone && bun run build:standalone-preview && bun run build:lib",
-    "build:lib": "tsup-node lib/preview.ts lib/runner.ts --external react-query schematic-symbols lucide-react circuit-to-svg @tscircuit/props --platform browser --format esm --dts",
+    "build:lib": "tsup-node lib/preview.ts lib/runner.ts lib/reference-designs.ts --external react-query schematic-symbols lucide-react circuit-to-svg @tscircuit/props --platform browser --format esm --dts",
     "build:css": "bun run scripts/build-css.ts",
     "build:css:watch": "chokidar 'lib/components/**/*.tsx' -c 'bun run build:css'",
     "build:site": "cosmos-export && bun run build:iframe",
@@ -123,7 +124,6 @@
     "tsup": "^8.3.5",
     "vite": "^7.1.2",
     "yargs": "^17.7.2",
-    "zod": "^3.25.76",
     "bun-match-svg": "^0.0.17"
   },
   "dependencies": {
@@ -131,7 +131,8 @@
     "@tscircuit/eval": "0.0.1720",
     "@tscircuit/solver-utils": "^0.0.16",
     "debug": "^4.4.0",
-    "format-si-unit": "^0.0.12"
+    "format-si-unit": "^0.0.12",
+    "zod": "^3.25.76"
   },
   "overrides": {
     "circuit-json": "$circuit-json",

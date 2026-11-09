@@ -1,4 +1,5 @@
 export * from "./components/CircuitJsonPreview/CircuitJsonPreview"
+export * from "./components/ReferenceDesignViewer/ReferenceDesignViewer"
 export type {
   ExtraRunFrameTab,
   ExtraRunFrameTabId,

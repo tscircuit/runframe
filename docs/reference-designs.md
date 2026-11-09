@@ -1,8 +1,9 @@
 # Prebuilt reference designs
 
-`@tscircuit/runframe/reference-designs` exports the versioned manifest schema and
-types without importing React, the evaluator, or the viewers. Build and API tools
-can validate the same contract independently of the browser UI.
+`@tscircuit/reference-designs` exports the versioned manifest schema and types.
+It is built from `lib/reference-designs.ts` and has only Zod as a dependency, so
+build and API tools do not install the viewer's compiler dependency graph. The
+same contract remains available at `@tscircuit/runframe/reference-designs`.
 
 `ReferenceDesignViewer`, exported from `@tscircuit/runframe/preview`, accepts a
 parsed `referenceDesign` and a `loadConfiguration` callback. The callback receives

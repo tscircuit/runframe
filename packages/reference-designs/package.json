@@ -1,0 +1,22 @@
+{
+  "name": "@tscircuit/reference-designs",
+  "version": "0.0.1",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tscircuit/runframe",
+    "directory": "packages/reference-designs"
+  },
+  "main": "./dist/reference-designs.js",
+  "types": "./dist/reference-designs.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/reference-designs.d.ts",
+      "import": "./dist/reference-designs.js"
+    }
+  },
+  "files": ["dist"],
+  "dependencies": {
+    "zod": "^3.25.76"
+  }
+}

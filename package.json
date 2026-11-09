@@ -20,7 +20,7 @@
   ],
   "scripts": {
     "start": "bun run build:css && concurrently 'bun run cosmos' 'bun run build:css:watch'",
-    "build": "bun run build:css && bun run build:standalone && bun run build:standalone-preview && bun run build:lib",
+    "build": "bun run build:css && bun run build:standalone && bun run build:standalone-preview && bun run build:lib && bun run build:reference-designs",
     "build:lib": "tsup-node lib/preview.ts lib/runner.ts lib/reference-designs.ts --external react-query schematic-symbols lucide-react circuit-to-svg @tscircuit/props --platform browser --format esm --dts",
     "build:css": "bun run scripts/build-css.ts",
     "build:css:watch": "chokidar 'lib/components/**/*.tsx' -c 'bun run build:css'",
@@ -33,7 +33,8 @@
     "format": "biome format --write .",
     "vercel-build": "bun run build:css && cosmos-export",
     "serve:cosmos": "serve cosmos-export",
-    "pkg-pr-new-release": "bunx pkg-pr-new publish --comment=off --peerDeps"
+    "pkg-pr-new-release": "bunx pkg-pr-new publish --comment=off --peerDeps ./ ./packages/reference-designs",
+    "build:reference-designs": "tsup-node lib/reference-designs.ts --out-dir packages/reference-designs/dist --platform neutral --format esm --dts --external zod"
   },
   "devDependencies": {
     "@babel/standalone": "^7.26.10",

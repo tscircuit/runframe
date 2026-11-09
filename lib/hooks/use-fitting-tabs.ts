@@ -45,7 +45,9 @@ export const useFittingTabs = (layoutKey: string) => {
     if (typeof ResizeObserver === "undefined") return
     const observer = new ResizeObserver(measure)
     observer.observe(container)
-    for (const child of container.querySelectorAll('[role="tab"], button')) {
+    for (const child of Array.from(
+      container.querySelectorAll('[role="tab"], button'),
+    )) {
       observer.observe(child)
     }
     return () => observer.disconnect()

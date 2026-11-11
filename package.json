@@ -112,7 +112,6 @@
     "redaxios": "^0.5.1",
     "rollup-plugin-visualizer": "^5.12.0",
     "s-expression": "^3.1.1",
-    "schematic-symbols": "^0.0.237",
     "serve": "^14.2.4",
     "source-map-explorer": "^2.5.3",
     "stepts": "^0.0.3",
@@ -131,7 +130,8 @@
     "@tscircuit/eval": "0.0.1740",
     "@tscircuit/solver-utils": "^0.0.16",
     "debug": "^4.4.0",
-    "format-si-unit": "^0.0.12"
+    "format-si-unit": "^0.0.12",
+    "schematic-symbols": "^0.0.251"
   },
   "overrides": {
     "circuit-json": "$circuit-json",

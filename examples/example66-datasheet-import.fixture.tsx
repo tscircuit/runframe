@@ -1,6 +1,6 @@
 import evalWebWorkerBlobUrl from "@tscircuit/eval/blob-url"
-import { MockLanguageModelV4 } from "ai/test"
 import { useState } from "react"
+import type { RunFrameAiConfig } from "../lib/ai/RunFrameAiProvider"
 import {
   type DatasheetAssets,
   getDatasheetAssetFiles,
@@ -8,69 +8,7 @@ import {
 import { RunFrame } from "../lib/components/RunFrame/RunFrame"
 import { useStyles } from "../lib/hooks/use-styles"
 import packageJson from "../package.json"
-
-const demoAssets: DatasheetAssets = {
-  partNumber: "DEMO-DIODE",
-  packageName: "SOD-123",
-  summary:
-    "Simulated output for exercising the dialog. These dimensions are example data.",
-  footprint: {
-    filename: "diode.footprint.tsx",
-    content: `export default () => (
-  <footprint>
-    <smtpad portHints={["1"]} pcbX={-1.65} pcbY={0} width={0.9} height={1.2} shape="rect" />
-    <smtpad portHints={["2"]} pcbX={1.65} pcbY={0} width={0.9} height={1.2} shape="rect" />
-  </footprint>
-)`,
-    notes:
-      "Example dimensions only. Verify the recommended land pattern before fabrication.",
-    sourcePages: [3],
-  },
-  symbol: {
-    filename: "diode.symbol.tsx",
-    content: `export default () => (
-  <symbol>
-    <schematicpath points={[{ x: -0.5, y: -0.5 }, { x: 0.5, y: 0 }, { x: -0.5, y: 0.5 }, { x: -0.5, y: -0.5 }]} />
-    <schematicpath points={[{ x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }]} />
-    <port name="1" pinNumber={1} aliases={["K"]} direction="right" schX={1} schY={0} />
-    <port name="2" pinNumber={2} aliases={["A"]} direction="left" schX={-1} schY={0} />
-  </symbol>
-)`,
-    notes: "Review the cathode and anode mapping.",
-    sourcePages: [1],
-  },
-  spiceModel: null,
-  component: {
-    filename: "diode.tsx",
-    content: `import Footprint from "./diode.footprint"
-import Symbol from "./diode.symbol"
-
-export default (props: { name: string }) => (
-  <chip name={props.name} pinLabels={{ pin1: ["K"], pin2: ["A"] }} footprint={<Footprint />} symbol={<Symbol />} />
-)`,
-    notes: "Combines the generated footprint and symbol.",
-    sourcePages: [1, 3],
-  },
-  warnings: [
-    "SPICE model unavailable: the datasheet does not supply sufficient model parameters.",
-  ],
-}
-
-// A deterministic SDK test model: this fixture makes no network requests.
-const model = new MockLanguageModelV4({
-  doGenerate: async () => {
-    await new Promise((resolve) => setTimeout(resolve, 600))
-    return {
-      content: [{ type: "text", text: JSON.stringify(demoAssets) }],
-      finishReason: { unified: "stop", raw: undefined },
-      usage: {
-        inputTokens: { total: 0, noCache: 0, cacheRead: 0, cacheWrite: 0 },
-        outputTokens: { total: 0, text: 0, reasoning: 0 },
-      },
-      warnings: [],
-    }
-  },
-})
+import { DatasheetPreviewAiConnection } from "./assets/DatasheetPreviewAiConnection"
 
 const boardSource = (
   componentFilename?: string,
@@ -98,6 +36,7 @@ export default function DatasheetImportFixture() {
   const [selectedFile, setSelectedFile] = useState("main.tsx")
   const [acceptedPart, setAcceptedPart] = useState<string | null>(null)
   const [hasRendered, setHasRendered] = useState(false)
+  const [ai, setAi] = useState<RunFrameAiConfig | undefined>(undefined)
 
   const acceptAssets = (assets: DatasheetAssets) => {
     const generated = getDatasheetAssetFiles(assets)
@@ -134,19 +73,33 @@ export default function DatasheetImportFixture() {
         <strong style={{ fontSize: 18, letterSpacing: -0.5 }}>tscircuit</strong>
         <span style={{ color: "#71717a" }}>examples /</span>
         <span>datasheet-demo</span>
-        <span
+        <div
           style={{
             marginLeft: "auto",
-            padding: "3px 8px",
-            background: "#f4f4f5",
-            borderRadius: 4,
-            color: "#71717a",
-            fontSize: 12,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
           }}
         >
-          Demo AI
-        </span>
+          <span style={{ color: "#71717a", fontSize: 12 }}>
+            {ai ? "AI configured" : "AI not configured"}
+          </span>
+          <DatasheetPreviewAiConnection isConfigured={!!ai} onChange={setAi} />
+        </div>
       </header>
+      {!ai && (
+        <output
+          style={{
+            padding: "8px 20px",
+            background: "#fffbeb",
+            color: "#92400e",
+            fontSize: 13,
+          }}
+        >
+          Configure a real AI backend to create assets from your datasheet. This
+          preview has no simulated generation.
+        </output>
+      )}
       <main className="workspace-panes">
         <section className="code-pane" aria-label="Project files">
           <nav className="file-tabs" aria-label="Files">
@@ -192,7 +145,7 @@ export default function DatasheetImportFixture() {
             availableTabs={["pcb", "schematic", "cad", "errors"]}
             evalVersion={packageJson.dependencies["@tscircuit/eval"]}
             evalWebWorkerBlobUrl={evalWebWorkerBlobUrl}
-            ai={{ model }}
+            ai={ai}
             onDatasheetAssetsGenerated={acceptAssets}
           />
         </section>

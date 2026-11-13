@@ -49,7 +49,7 @@ export const getDatasheetAssetFiles = (assets: DatasheetAssets) =>
   )
 
 /** Validate before displaying or handing model output to the host. */
-export const parseDatasheetAssets = (value: unknown): DatasheetAssets => {
+export const validateDatasheetAssets = (value: unknown): DatasheetAssets => {
   const result = datasheetAssetsSchema.parse(value)
   const files = getDatasheetAssetFiles(result)
   if (

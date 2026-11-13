@@ -191,8 +191,9 @@ export const DatasheetImportDialog = ({
         <DialogHeader>
           <DialogTitle>Create from datasheet</DialogTitle>
           <DialogDescription>
-            Drop a PDF to draft a footprint, symbol, SPICE model and component.
-            Review pin mapping, dimensions and model assumptions before use.
+            AI generates a footprint, symbol, component and behavioral SPICE
+            model from your PDF. Review pin mapping, dimensions and model
+            approximations before use.
           </DialogDescription>
         </DialogHeader>
         {!ai ? (

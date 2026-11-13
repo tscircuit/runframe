@@ -74,7 +74,11 @@ Runframe sends the PDF bytes directly, including diagrams and package drawings.
 Opening the dialog or choosing a file does not send a request.
 
 Results contain tscircuit TSX files for a footprint, schematic symbol and combined
-component, plus a SPICE netlist when the datasheet supports one. Missing or
+component, plus an AI-generated behavioral SPICE macro-model synthesized from
+the documented electrical characteristics. An existing SPICE netlist in the PDF
+is not required. The model describes its assumptions and omitted effects; a dual
+op amp's macro-model includes both channels and the documented physical pin map.
+Missing or
 ambiguous information produces unavailable assets and warnings. Generated files
 are drafts: review their pin mapping, dimensions, cited PDF pages and assumptions.
 Runframe validates the response structure and filenames; it does not certify the
@@ -111,7 +115,17 @@ The Cosmos `example66-datasheet-import` fixture uses the website's `RunFrame`
 component with source files, a Run button, and a hidden File menu. It opens on a
 populated 3D view, with PCB and schematic tabs and the datasheet toolbar action.
 Accepted files appear in the editor; Run updates the board with the generated
-component. The AI model is deterministic demo data; it makes no provider requests.
+component. This fixture contains no mock AI model or canned component results.
+Choose **Configure AI** to supply an authenticated Anthropic-compatible proxy URL
+(including `/v1`), a PDF-capable model ID, and an optional website session token.
+The proxy supplies the provider API key server-side, permits the preview origin,
+and must accept the uploaded PDF payload. Configuration stays in memory. Without
+a connection the preview reports that AI is not configured and cannot generate
+files; provider errors are surfaced without substituting sample assets.
+
+The preview's adapter follows tscircuit.com's `useAiApi` proxy protocol. A host
+using another AI SDK provider can supply its own `ai={{ model }}` directly to
+`RunFrame`; the library is provider-neutral.
 
 ### System block diagrams
 

@@ -11,6 +11,7 @@ import { createCliLocalCacheEngine } from "./create-cli-local-cache-engine"
 
 export interface RunFrameForCliProps {
   ai?: RunFrameWithApiProps["ai"]
+  onDatasheetAssetsGenerated?: RunFrameWithApiProps["onDatasheetAssetsGenerated"]
   debug?: boolean
   scenarioSelectorContent?: React.ReactNode
   workerBlobUrl?: string
@@ -62,6 +63,7 @@ export const RunFrameForCli = (props: RunFrameForCliProps) => {
       {LoginDialog}
       <RunFrameWithApi
         ai={props.ai}
+        onDatasheetAssetsGenerated={props.onDatasheetAssetsGenerated}
         extraTabs={props.extraTabs}
         debug={props.debug}
         forceLatestEvalVersion={!evalWebWorkerBlobUrl && shouldLoadLatestEval}

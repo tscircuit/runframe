@@ -63,6 +63,51 @@ has its own provider, and omitting `ai` disables AI for that frame.
 Model objects contain functions and cannot cross the `RunFrameWithIframe`
 `postMessage` boundary. Configure the model inside the iframe instead.
 
+### Creating components from a datasheet
+
+With `ai` configured, choose **File → Create from datasheet…**. Drop one PDF
+(up to 20 MB), optionally specify an exact part number and package, and click
+**Generate assets**. The model must support PDF input and structured JSON output;
+Runframe sends the PDF bytes directly, including diagrams and package drawings.
+Opening the dialog or choosing a file does not send a request.
+
+Results contain tscircuit TSX files for a footprint, schematic symbol and combined
+component, plus a SPICE netlist when the datasheet supports one. Missing or
+ambiguous information produces unavailable assets and warnings. Generated files
+are drafts: review their pin mapping, dimensions, cited PDF pages and assumptions.
+Runframe validates the response structure and filenames; it does not certify the
+generated circuit geometry, TSX behavior, or electrical accuracy.
+
+Inspect the source in the dialog, download a ZIP (including generation notes), or
+pass a callback to receive files after the user chooses **Use generated files**:
+
+```tsx
+import { getDatasheetAssetFiles, RunFrame } from "@tscircuit/runframe/runner"
+
+<RunFrame
+  fsMap={files}
+  ai={{ model }}
+  onDatasheetAssetsGenerated={async (assets) => {
+    const generatedFiles = getDatasheetAssetFiles(assets)
+    await saveNewFiles(generatedFiles) // Your host's file creation flow
+  }}
+/>
+```
+
+The callback is also supported by `RunFrameWithApi` and `RunFrameForCli`. The host
+owns persistence and conflict handling. Generation never executes the resulting
+TSX or overwrites project files. A failed save leaves the reviewed result available
+for retry or download. Canceling, closing, or replacing the file invalidates a
+pending generation.
+
+For a custom launcher, render the exported `DatasheetImportDialog` inside a
+`RunFrameAiProvider`. Its props are `isOpen`, `onClose`, and optional
+`onAssetsGenerated`. `generateDatasheetAssets({ ai, file, targetPart, abortSignal })`
+is also exported for hosts with their own UI.
+
+The Cosmos `example66-datasheet-import` fixture uses a deterministic demo model
+and makes no provider requests.
+
 ### System block diagrams
 
 Choose **System** from the **More views** dropdown to display system block

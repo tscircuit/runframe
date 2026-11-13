@@ -875,6 +875,7 @@ const RunFrameContent = (props: RunFrameProps) => {
             )}
             {props.showFileMenu !== false && (
               <FileMenuLeftHeader
+                onDatasheetAssetsGenerated={props.onDatasheetAssetsGenerated}
                 isWebEmbedded={props.isWebEmbedded}
                 onLoginRequired={props.onLoginRequired}
                 showSchematicDebugGrid={showSchematicDebugGrid}

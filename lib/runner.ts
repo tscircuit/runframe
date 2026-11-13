@@ -1,5 +1,6 @@
 export * from "./preview"
 export * from "./ai"
+export * from "./components/DatasheetImportDialog"
 export * from "./components/RunFrame/RunFrame"
 export * from "./components/RunFrameWithApi/RunFrameWithApi"
 export * from "./components/RunFrameForCli/RunFrameForCli"

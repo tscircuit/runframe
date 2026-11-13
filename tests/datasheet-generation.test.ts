@@ -1,0 +1,125 @@
+import { expect, test } from "bun:test"
+import { MockLanguageModelV4 } from "ai/test"
+import { getDatasheetAssetFiles } from "../lib/ai/datasheet-assets"
+import {
+  MAX_DATASHEET_BYTES,
+  generateDatasheetAssets,
+} from "../lib/ai/generate-datasheet-assets"
+import {
+  createDatasheetModel,
+  generatedAssets,
+  modelResponse,
+  pdfFile,
+} from "./fixtures/datasheet-ai"
+import { runIsolatedUiTest } from "./fixtures/run-isolated-ui-test"
+
+test("generates validated assets using the supplied model, PDF bytes and target part", async () => {
+  const model = createDatasheetModel()
+  const result = await generateDatasheetAssets({
+    ai: { model },
+    file: pdfFile(),
+    targetPart: "TEST123 SOIC-8",
+  })
+  expect(result).toEqual(generatedAssets)
+  expect(getDatasheetAssetFiles(result).map((file) => file.filename)).toEqual([
+    "test123.footprint.tsx",
+    "test123.symbol.tsx",
+  ])
+  expect(model.doGenerateCalls).toHaveLength(1)
+  const call = model.doGenerateCalls[0]
+  expect(call.responseFormat?.type).toBe("json")
+  expect(call.prompt[0].role).toBe("system")
+  expect(JSON.stringify(call.prompt)).toContain("TEST123 SOIC-8")
+  const message = call.prompt.find((message) => message.role === "user")!
+  if (message.role !== "user") throw new Error("Expected user prompt")
+  const attachment = message.content.find((part) => part.type === "file")!
+  expect(attachment.mediaType).toBe("application/pdf")
+  expect(attachment.data.type).toBe("data")
+  if (attachment.data.type !== "data") throw new Error("Expected PDF bytes")
+  expect(attachment.data.data).toBeInstanceOf(Uint8Array)
+  expect(new TextDecoder().decode(attachment.data.data)).toContain("%PDF-1.7")
+})
+
+test("rejects invalid, empty and oversized files before invoking the model", async () => {
+  const model = createDatasheetModel()
+  const invalid = [
+    new File(["abc"], "not-a-pdf.txt"),
+    new File([], "empty.pdf"),
+    new File(["not a PDF"], "fake.pdf"),
+    new File([new Uint8Array(MAX_DATASHEET_BYTES + 1)], "large.pdf"),
+  ]
+  for (const file of invalid) {
+    await expect(
+      generateDatasheetAssets({ ai: { model }, file }),
+    ).rejects.toThrow()
+  }
+  const abort = new AbortController()
+  abort.abort()
+  await expect(
+    generateDatasheetAssets({
+      ai: { model },
+      file: pdfFile(),
+      abortSignal: abort.signal,
+    }),
+  ).rejects.toThrow()
+  expect(model.doGenerateCalls).toHaveLength(0)
+})
+
+test("rejects malformed output and unsafe or conflicting filenames", async () => {
+  const invalidResults = [
+    { ...generatedAssets, partNumber: 123 },
+    {
+      ...generatedAssets,
+      footprint: { ...generatedAssets.footprint, filename: "../overwrite.tsx" },
+    },
+    {
+      ...generatedAssets,
+      footprint: { ...generatedAssets.footprint, filename: "file.exe" },
+    },
+    {
+      ...generatedAssets,
+      symbol: { ...generatedAssets.symbol, filename: "test123.footprint.tsx" },
+    },
+    {
+      ...generatedAssets,
+      symbol: { ...generatedAssets.symbol, content: "   " },
+    },
+  ]
+  for (const result of invalidResults) {
+    await expect(
+      generateDatasheetAssets({
+        ai: { model: createDatasheetModel(result) },
+        file: pdfFile(),
+      }),
+    ).rejects.toThrow()
+  }
+})
+
+test("cancellation suppresses a late model response", async () => {
+  let resolve!: (value: ReturnType<typeof modelResponse>) => void
+  const started = Promise.withResolvers<void>()
+  const model = new MockLanguageModelV4({
+    doGenerate: async () => {
+      started.resolve()
+      return new Promise((done) => {
+        resolve = done
+      })
+    },
+  })
+  const abort = new AbortController()
+  const pending = generateDatasheetAssets({
+    ai: { model },
+    file: pdfFile(),
+    abortSignal: abort.signal,
+  })
+  await started.promise
+  abort.abort()
+  resolve(modelResponse())
+  await expect(pending).rejects.toThrow()
+})
+
+test("datasheet dialog supports review, retry, cancellation and explicit acceptance", async () => {
+  await runIsolatedUiTest(
+    new URL("./fixtures/datasheet-import.tsx", import.meta.url),
+  )
+}, 20000)

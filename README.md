@@ -65,7 +65,9 @@ Model objects contain functions and cannot cross the `RunFrameWithIframe`
 
 ### Creating components from a datasheet
 
-With `ai` configured, choose **File → Create from datasheet…**. Drop one PDF
+With `ai` configured, choose **Create from datasheet** in the preview toolbar. The
+button remains visible when `showFileMenu={false}`, as used by the tscircuit.com
+editor's `SuspenseRunFrame` wrapper. Drop one PDF
 (up to 20 MB), optionally specify an exact part number and package, and click
 **Generate assets**. The model must support PDF input and structured JSON output;
 Runframe sends the PDF bytes directly, including diagrams and package drawings.
@@ -105,8 +107,11 @@ For a custom launcher, render the exported `DatasheetImportDialog` inside a
 `onAssetsGenerated`. `generateDatasheetAssets({ ai, file, targetPart, abortSignal })`
 is also exported for hosts with their own UI.
 
-The Cosmos `example66-datasheet-import` fixture uses a deterministic demo model
-and makes no provider requests.
+The Cosmos `example66-datasheet-import` fixture uses the website's `RunFrame`
+component with source files, a Run button, and a hidden File menu. It opens on a
+populated 3D view, with PCB and schematic tabs and the datasheet toolbar action.
+Accepted files appear in the editor; Run updates the board with the generated
+component. The AI model is deterministic demo data; it makes no provider requests.
 
 ### System block diagrams
 

@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useState } from "react"
-import { useRunFrameAi, type DatasheetAssets } from "../ai"
-import { DatasheetImportDialog } from "./DatasheetImportDialog"
 import { useRunFrameStore } from "./RunFrameWithApi/store"
 import type {
   FailedToSaveSnippetEvent,
@@ -51,7 +49,6 @@ import { getLatestAutoroutingLogEntry } from "lib/utils/get-latest-autorouting-l
 import { ExportAccessoryDialog } from "./ExportAccessoryDialog"
 
 export const FileMenuLeftHeader = (props: {
-  onDatasheetAssetsGenerated?: (assets: DatasheetAssets) => void | Promise<void>
   isWebEmbedded?: boolean
   shouldLoadLatestEval?: boolean
   onChangeShouldLoadLatestEval?: (shouldLoadLatestEval: boolean) => void
@@ -68,8 +65,6 @@ export const FileMenuLeftHeader = (props: {
   >
   onReportAutoroutingLog?: (key: string, data: { simpleRouteJson: any }) => void
 }) => {
-  const ai = useRunFrameAi()
-  const [isDatasheetDialogOpen, setIsDatasheetDialogOpen] = useState(false)
   const lastRunEvalVersion = useRunnerStore((s) => s.lastRunEvalVersion)
   const currentMainComponentPath = useRunFrameStore(
     (s) => s.currentMainComponentPath,
@@ -253,14 +248,6 @@ export const FileMenuLeftHeader = (props: {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="rf-z-[101]">
-            {ai && (
-              <DropdownMenuItem
-                className="rf-text-xs"
-                onSelect={() => setIsDatasheetDialogOpen(true)}
-              >
-                Create from datasheet…
-              </DropdownMenuItem>
-            )}
             {/* CLI-only menu items */}
             {!props.isWebEmbedded && (
               <>
@@ -554,13 +541,6 @@ export const FileMenuLeftHeader = (props: {
         </DropdownMenu>
       </div>
       {BugReportDialog}
-      {ai && (
-        <DatasheetImportDialog
-          isOpen={isDatasheetDialogOpen}
-          onClose={() => setIsDatasheetDialogOpen(false)}
-          onAssetsGenerated={props.onDatasheetAssetsGenerated}
-        />
-      )}
       <LbrnExportOptionsDialog
         open={isLbrnDialogOpen}
         onOpenChange={setIsLbrnDialogOpen}

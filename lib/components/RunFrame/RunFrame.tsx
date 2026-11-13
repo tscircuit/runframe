@@ -44,6 +44,7 @@ import { useStyles } from "../../hooks/use-styles"
 import { registryKy } from "../../utils/get-registry-ky"
 import { getChangesBetweenFsMaps } from "../../utils/getChangesBetweenFsMaps"
 import { FileMenuLeftHeader } from "../FileMenuLeftHeader"
+import { DatasheetImportButton } from "../DatasheetImportDialog"
 import { API_BASE } from "../RunFrameWithApi/api-base"
 import { useRunFrameStore } from "../RunFrameWithApi/store"
 import { LoadingSkeleton } from "../ui/LoadingSkeleton"
@@ -875,7 +876,6 @@ const RunFrameContent = (props: RunFrameProps) => {
             )}
             {props.showFileMenu !== false && (
               <FileMenuLeftHeader
-                onDatasheetAssetsGenerated={props.onDatasheetAssetsGenerated}
                 isWebEmbedded={props.isWebEmbedded}
                 onLoginRequired={props.onLoginRequired}
                 showSchematicDebugGrid={showSchematicDebugGrid}
@@ -892,6 +892,9 @@ const RunFrameContent = (props: RunFrameProps) => {
                 }
               />
             )}
+            <DatasheetImportButton
+              onAssetsGenerated={props.onDatasheetAssetsGenerated}
+            />
             {props.leftHeaderContent}
           </>
         }

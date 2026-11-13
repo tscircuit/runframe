@@ -123,3 +123,9 @@ test("datasheet dialog supports review, retry, cancellation and explicit accepta
     new URL("./fixtures/datasheet-import.tsx", import.meta.url),
   )
 }, 20000)
+
+test("the website preview exposes datasheet generation without a File menu", async () => {
+  await runIsolatedUiTest(
+    new URL("./fixtures/datasheet-website.tsx", import.meta.url),
+  )
+}, 20000)

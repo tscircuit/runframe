@@ -131,7 +131,8 @@
     "@tscircuit/solver-utils": "^0.0.16",
     "debug": "^4.4.0",
     "format-si-unit": "^0.0.12",
-    "schematic-symbols": "^0.0.251"
+    "schematic-symbols": "^0.0.251",
+    "ai": "^7.0.172"
   },
   "overrides": {
     "circuit-json": "$circuit-json",

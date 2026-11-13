@@ -36,6 +36,33 @@ circuit.add(
 )
 ```
 
+### Configuring AI
+
+Runframe accepts an [AI SDK](https://ai-sdk.dev/) `LanguageModel` through the
+optional `ai` prop on `RunFrame`, `RunFrameWithApi`, and `RunFrameForCli`:
+
+```tsx
+import type { LanguageModel } from "ai"
+import { RunFrame } from "@tscircuit/runframe/runner"
+
+function Preview({ model }: { model: LanguageModel }) {
+  return <RunFrame fsMap={files} ai={{ model }} />
+}
+```
+
+The host app chooses the provider and configures the model's transport to its
+authenticated backend proxy. Keep provider API keys on that backend. Runframe
+does not read environment variables, choose a default provider, or store keys.
+The model must implement an AI SDK v2, v3, or v4 language model interface.
+
+Supplying `ai` only makes the configuration available; it does not invoke the
+model. Descendants can access it with `useRunFrameAi()`. Standalone dialogs can
+share a configuration through the exported `RunFrameAiProvider`. Each frame
+has its own provider, and omitting `ai` disables AI for that frame.
+
+Model objects contain functions and cannot cross the `RunFrameWithIframe`
+`postMessage` boundary. Configure the model inside the iframe instead.
+
 ### System block diagrams
 
 Choose **System** from the **More views** dropdown to display system block

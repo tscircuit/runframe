@@ -1,5 +1,6 @@
 import { createCircuitWebWorker } from "@tscircuit/eval/worker"
 import Debug from "debug"
+import { RunFrameAiProvider } from "../../ai"
 import { HTTPError } from "ky"
 import { Loader2, Play, Square } from "lucide-react"
 import { useEffect, useMemo, useReducer, useRef, useState } from "react"
@@ -104,7 +105,13 @@ const resolveEvalVersion = async (
 
 export type { RunFrameProps }
 
-export const RunFrame = (props: RunFrameProps) => {
+export const RunFrame = (props: RunFrameProps) => (
+  <RunFrameAiProvider ai={props.ai}>
+    <RunFrameContent {...props} />
+  </RunFrameAiProvider>
+)
+
+const RunFrameContent = (props: RunFrameProps) => {
   useStyles()
 
   const isStaticCircuitJson =

@@ -1,9 +1,13 @@
 import type { ManualEditEvent, PlatformConfig } from "@tscircuit/props"
+import type { RunFrameAiConfig } from "../../ai"
 import type { TabId } from "lib/components/CircuitJsonPreview/PreviewContentProps"
 import type { RunCompletedPayload } from "./run-completion"
 import type { ExtraRunFrameTab } from "../CircuitJsonPreview/extra-runframe-tabs"
 
 export interface RunFrameProps {
+  /** Optional AI SDK model configuration. Supplying it does not start AI work. */
+  ai?: RunFrameAiConfig
+
   /**
    * Map of filenames to file contents that will be available in the worker
    */

@@ -9,7 +9,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../lib/components/ui/dialog"
-import { createDatasheetPreviewAi } from "./create-datasheet-preview-ai"
+import {
+  type DatasheetPreviewProvider,
+  createDatasheetPreviewAi,
+  datasheetPreviewProviders,
+} from "./create-datasheet-preview-ai"
 
 /** Preview-host configuration. The production website supplies its own ai prop. */
 export const DatasheetPreviewAiConnection = ({
@@ -20,14 +24,16 @@ export const DatasheetPreviewAiConnection = ({
   onChange: (ai: RunFrameAiConfig | undefined) => void
 }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [provider, setProvider] = useState<DatasheetPreviewProvider | "">("")
   const [proxyUrl, setProxyUrl] = useState("")
   const [modelId, setModelId] = useState("")
   const [sessionToken, setSessionToken] = useState("")
   const [error, setError] = useState<string | null>(null)
   const connect = () => {
     try {
+      if (!provider) throw new Error("Choose an AI provider.")
       const ai = createDatasheetPreviewAi(
-        { proxyUrl, modelId, sessionToken },
+        { provider, proxyUrl, modelId, sessionToken },
         { origin: window.location.origin },
       )
       onChange(ai)
@@ -59,19 +65,41 @@ export const DatasheetPreviewAiConnection = ({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Connect a real AI model</DialogTitle>
+            <DialogTitle>Use your own AI model</DialogTitle>
             <DialogDescription>
-              This preview requires an authenticated Anthropic-compatible
-              backend. The uploaded PDF goes to that model. No sample component
-              is returned.
+              Choose your provider, model and authenticated endpoint. Your model
+              receives the uploaded PDF and generates the component assets.
             </DialogDescription>
           </DialogHeader>
           <label className="rf-grid rf-gap-1 rf-text-sm">
-            AI proxy URL (including /v1)
+            Provider
+            <select
+              className="rf-rounded rf-border rf-bg-white rf-p-2"
+              value={provider}
+              onChange={(event) =>
+                setProvider(event.target.value as DatasheetPreviewProvider | "")
+              }
+            >
+              <option value="">Choose a provider</option>
+              {Object.entries(datasheetPreviewProviders).map(
+                ([value, { label }]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ),
+              )}
+            </select>
+          </label>
+          <label className="rf-grid rf-gap-1 rf-text-sm">
+            AI endpoint URL
             <input
               className="rf-rounded rf-border rf-p-2"
               value={proxyUrl}
-              placeholder="https://your-backend/api/anthropic/v1"
+              placeholder={
+                provider
+                  ? datasheetPreviewProviders[provider].placeholder
+                  : "Choose your provider first"
+              }
               onChange={(event) => setProxyUrl(event.target.value)}
             />
           </label>
@@ -80,7 +108,7 @@ export const DatasheetPreviewAiConnection = ({
             <input
               className="rf-rounded rf-border rf-p-2"
               value={modelId}
-              placeholder="Model enabled by your backend"
+              placeholder="Your model ID"
               onChange={(event) => setModelId(event.target.value)}
             />
           </label>
@@ -95,9 +123,10 @@ export const DatasheetPreviewAiConnection = ({
             />
           </label>
           <p className="rf-text-xs rf-text-zinc-500">
-            Use a host session token here, never a provider API key. The token
-            stays in memory and is cleared on reload. The backend must supply
-            its provider key and allow requests from this preview origin.
+            Your model must support PDF input and structured JSON output. Use a
+            host session token here, never a provider API key. The backend keeps
+            the provider key and allows this preview origin. Settings stay in
+            memory and are cleared on reload.
           </p>
           {error && (
             <p role="alert" className="rf-text-sm rf-text-red-600">

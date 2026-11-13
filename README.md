@@ -50,8 +50,8 @@ function Preview({ model }: { model: LanguageModel }) {
 }
 ```
 
-The host app chooses the provider and configures the model's transport to its
-authenticated backend proxy. Keep provider API keys on that backend. Runframe
+The host app passes the model chosen by its user and configures its transport to
+an authenticated backend proxy. Keep provider API keys on that backend. Runframe
 does not read environment variables, choose a default provider, or store keys.
 The model must implement an AI SDK v2, v3, or v4 language model interface.
 
@@ -116,16 +116,22 @@ component with source files, a Run button, and a hidden File menu. It opens on a
 populated 3D view, with PCB and schematic tabs and the datasheet toolbar action.
 Accepted files appear in the editor; Run updates the board with the generated
 component. This fixture contains no mock AI model or canned component results.
-Choose **Configure AI** to supply an authenticated Anthropic-compatible proxy URL
-(including `/v1`), a PDF-capable model ID, and an optional website session token.
+Choose **Configure AI** to select a provider protocol (OpenAI, Anthropic, Google
+Gemini, or OpenAI-compatible), enter your model ID and authenticated endpoint,
+and optionally supply a website session token. No provider or model is selected
+by default. The chosen model and endpoint must support PDF input and structured
+JSON output. Use a Responses API endpoint for OpenAI, a Messages API endpoint
+for Anthropic, a Gemini API endpoint for Google, or Chat Completions for an
+OpenAI-compatible service; include the API version in the base URL as required
+by your backend.
 The proxy supplies the provider API key server-side, permits the preview origin,
 and must accept the uploaded PDF payload. Configuration stays in memory. Without
 a connection the preview reports that AI is not configured and cannot generate
 files; provider errors are surfaced without substituting sample assets.
 
-The preview's adapter follows tscircuit.com's `useAiApi` proxy protocol. A host
-using another AI SDK provider can supply its own `ai={{ model }}` directly to
-`RunFrame`; the library is provider-neutral.
+The preview uses the official provider adapters. A host using any other AI SDK
+provider can supply its user's configured `ai={{ model }}` directly to `RunFrame`;
+the library is provider-neutral.
 
 ### System block diagrams
 

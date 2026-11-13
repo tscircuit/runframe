@@ -124,7 +124,9 @@
     "yargs": "^17.7.2",
     "zod": "^3.25.76",
     "bun-match-svg": "^0.0.17",
-    "@ai-sdk/anthropic": "^4.0.104"
+    "@ai-sdk/anthropic": "^4.0.104",
+    "@ai-sdk/openai": "^4.0.118",
+    "@ai-sdk/google": "^4.0.121"
   },
   "dependencies": {
     "@tscircuit/core": "^0.0.2293",

@@ -3,6 +3,114 @@ import { createDatasheetPreviewAi } from "../examples/assets/create-datasheet-pr
 import { generateDatasheetAssets } from "../lib/ai/generate-datasheet-assets"
 import { generatedAssets } from "./fixtures/datasheet-ai"
 
+const selectedModelId = "user-selected-model"
+const pdfBytes = "%PDF-1.7\nUser-supplied datasheet"
+const outputText = JSON.stringify(generatedAssets)
+
+const otherProviderCases = [
+  {
+    provider: "openai" as const,
+    path: "/responses",
+    response: {
+      id: "resp_test",
+      object: "response",
+      created_at: 0,
+      model: selectedModelId,
+      status: "completed",
+      output: [
+        {
+          id: "msg_test",
+          type: "message",
+          role: "assistant",
+          status: "completed",
+          content: [{ type: "output_text", text: outputText, annotations: [] }],
+        },
+      ],
+      usage: { input_tokens: 100, output_tokens: 100, total_tokens: 200 },
+    },
+    getPdfData: (body: any) =>
+      body.input
+        .find((message: any) => message.role === "user")
+        .content.find((part: any) => part.type === "input_file")
+        .file_data.split(",")[1],
+  },
+  {
+    provider: "google" as const,
+    path: `/models/${selectedModelId}:generateContent`,
+    response: {
+      candidates: [
+        {
+          content: { role: "model", parts: [{ text: outputText }] },
+          finishReason: "STOP",
+          index: 0,
+        },
+      ],
+      usageMetadata: {
+        promptTokenCount: 100,
+        candidatesTokenCount: 100,
+        totalTokenCount: 200,
+      },
+    },
+    getPdfData: (body: any) =>
+      body.contents[0].parts.find((part: any) => part.inlineData).inlineData
+        .data,
+  },
+  {
+    provider: "openai-compatible" as const,
+    path: "/chat/completions",
+    response: {
+      id: "chat_test",
+      object: "chat.completion",
+      created: 0,
+      model: selectedModelId,
+      choices: [
+        {
+          index: 0,
+          message: { role: "assistant", content: outputText },
+          finish_reason: "stop",
+        },
+      ],
+      usage: { prompt_tokens: 100, completion_tokens: 100, total_tokens: 200 },
+    },
+    getPdfData: (body: any) =>
+      body.messages
+        .find((message: any) => message.role === "user")
+        .content.find((part: any) => part.type === "file")
+        .file.file_data.split(",")[1],
+  },
+]
+
+for (const { provider, path, response, getPdfData } of otherProviderCases) {
+  test(`${provider} uses the user's endpoint, model and PDF`, async () => {
+    const calls: { url: string; init: RequestInit }[] = []
+    const ai = createDatasheetPreviewAi(
+      { provider, proxyUrl: "/chosen-backend/v1", modelId: selectedModelId },
+      {
+        origin: "https://preview.example.test",
+        fetch: (async (input, init) => {
+          calls.push({ url: String(input), init: init! })
+          return new Response(JSON.stringify(response), {
+            headers: { "content-type": "application/json" },
+          })
+        }) as typeof fetch,
+      },
+    )
+    expect(calls).toHaveLength(0)
+    const result = await generateDatasheetAssets({
+      ai,
+      file: new File([pdfBytes], "user.pdf", { type: "application/pdf" }),
+    })
+    expect(calls).toHaveLength(1)
+    expect(calls[0].url).toBe(
+      `https://preview.example.test/chosen-backend/v1${path}`,
+    )
+    const body = JSON.parse(String(calls[0].init.body))
+    if (provider !== "google") expect(body.model).toBe(selectedModelId)
+    expect(Buffer.from(getPdfData(body), "base64").toString()).toBe(pdfBytes)
+    expect(result).toEqual(generatedAssets)
+  })
+}
+
 test("the preview sends the selected PDF to its configured real-provider transport", async () => {
   const returned = {
     ...generatedAssets,
@@ -19,6 +127,7 @@ test("the preview sends the selected PDF to its configured real-provider transpo
   const calls: { url: string; init: RequestInit }[] = []
   const ai = createDatasheetPreviewAi(
     {
+      provider: "anthropic",
       proxyUrl: "/api/anthropic/v1",
       modelId: "claude-sonnet-4-5",
       sessionToken: "host-session-for-test",
@@ -73,6 +182,12 @@ test("the preview sends the selected PDF to its configured real-provider transpo
 })
 
 test("missing or invalid preview connections never fall back to sample generation", () => {
+  expect(() =>
+    createDatasheetPreviewAi(
+      { provider: "" as any, proxyUrl: "/api/v1", modelId: selectedModelId },
+      { origin: "https://preview.example.test" },
+    ),
+  ).toThrow("Choose an AI provider")
   for (const proxyUrl of [
     "",
     "https://api.anthropic.com/v1",
@@ -81,14 +196,14 @@ test("missing or invalid preview connections never fall back to sample generatio
   ]) {
     expect(() =>
       createDatasheetPreviewAi(
-        { proxyUrl, modelId: "model" },
+        { provider: "anthropic", proxyUrl, modelId: "model" },
         { origin: "https://preview.example.test" },
       ),
     ).toThrow()
   }
   expect(() =>
     createDatasheetPreviewAi(
-      { proxyUrl: "/api/anthropic/v1", modelId: "" },
+      { provider: "anthropic", proxyUrl: "/api/anthropic/v1", modelId: "" },
       { origin: "https://preview.example.test" },
     ),
   ).toThrow()

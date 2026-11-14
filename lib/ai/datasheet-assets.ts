@@ -41,6 +41,8 @@ export type DatasheetUsageKind =
 export interface DatasheetAssetSelection {
   kind: DatasheetUsageKind
   entrypoint: string
+  generationId: string
+  directory: string
 }
 
 export type DatasheetAssets = z.infer<typeof datasheetAssetsSchema>

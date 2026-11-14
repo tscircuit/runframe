@@ -3,6 +3,7 @@ import type {
   RunFrameAiConfig,
   DatasheetAssets,
   DatasheetAssetSelection,
+  DatasheetGeneration,
 } from "../../ai"
 import type { TabId } from "lib/components/CircuitJsonPreview/PreviewContentProps"
 import type { RunCompletedPayload } from "./run-completion"
@@ -12,7 +13,12 @@ export interface RunFrameProps {
   /** Optional AI SDK model configuration. Supplying it does not start AI work. */
   ai?: RunFrameAiConfig
 
-  /** Receives generated files only after the user reviews and accepts them. */
+  /** Persists the complete generation before any Use in project action. */
+  onDatasheetGenerationCreated?: (
+    generation: DatasheetGeneration,
+  ) => void | Promise<void>
+
+  /** Adds a saved output when Use in project is pressed; resolve after placement. */
   onDatasheetAssetsGenerated?: (
     assets: DatasheetAssets,
     selection?: DatasheetAssetSelection,

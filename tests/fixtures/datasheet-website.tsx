@@ -51,7 +51,8 @@ test("the website RunFrame exposes the datasheet action with its File menu hidde
   window.TSCIRCUIT_ALLOW_SELECTING_EVAL_VERSION = false
   const { RunFrame } = await import("../../lib/components/RunFrame/RunFrame")
   const model = createDatasheetModel(generatedCircuitAssets)
-  const accepted = mock(async (_assets: unknown) => {})
+  const accepted = mock(async (_assets: unknown, _selection?: unknown) => {})
+  const saved = mock(async (_generation: any) => {})
   const root = createRoot(document.getElementById("root")!)
   const button = (text: string) =>
     Array.from(document.querySelectorAll("button")).find(
@@ -81,6 +82,7 @@ test("the website RunFrame exposes the datasheet action with its File menu hidde
           availableTabs={["pcb", "cad"]}
           ai={enabled ? { model } : undefined}
           onDatasheetAssetsGenerated={accepted}
+          onDatasheetGenerationCreated={saved}
         />,
       ),
     )
@@ -112,23 +114,47 @@ test("the website RunFrame exposes the datasheet action with its File menu hidde
       Object.defineProperty(event, "dataTransfer", {
         value: { files: [pdfFile()] },
       })
-      document
-        .querySelector('input[type="file"]')!
-        .parentElement!.dispatchEvent(event)
+      document.querySelector(".ds-upload")!.dispatchEvent(event)
     })
-    await click(button("Generate assets")!)
-    for (let i = 0; i < 100 && !button("Use simulation circuit"); i++) {
+    await click(button("Generate")!)
+    for (
+      let i = 0;
+      i < 100 &&
+      !document.querySelector(
+        'article[aria-label="Simulation circuit"] button:not(:disabled)',
+      );
+      i++
+    ) {
       await act(async () => {
         await new Promise((resolve) => setTimeout(resolve, 5))
       })
     }
     expect(accepted).not.toHaveBeenCalled()
-    await click(button("Use simulation circuit")!)
+    await click(
+      document.querySelector(
+        'article[aria-label="Simulation circuit"] button',
+      ) as HTMLElement,
+    )
+    expect(saved).toHaveBeenCalledTimes(1)
+    const generation = saved.mock.calls[0][0]
     expect(accepted).toHaveBeenCalledWith(generatedCircuitAssets, {
       kind: "simulationCircuit",
-      entrypoint: generatedCircuitAssets.simulationCircuit!.filename,
+      generationId: generation.id,
+      directory: generation.directory,
+      entrypoint:
+        generation.directory +
+        "/" +
+        generatedCircuitAssets.simulationCircuit!.filename,
     })
-    expect(document.querySelector('[role="dialog"]')).toBeNull()
+    expect(document.querySelector('[role="dialog"]')).not.toBeNull()
+    expect(
+      document
+        .querySelector('article[aria-label="Simulation circuit"] button')
+        ?.getAttribute("aria-pressed"),
+    ).toBe("true")
+    await click(
+      document.querySelector('button[aria-label="Close"]') as HTMLElement,
+    )
     await render(false)
     expect(button("Create from datasheet")).toBeUndefined()
   } finally {

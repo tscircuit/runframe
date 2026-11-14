@@ -1,36 +1,31 @@
 import evalWebWorkerBlobUrl from "@tscircuit/eval/blob-url"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import { FileCode2, Folder } from "lucide-react"
 import type { RunFrameAiConfig } from "../lib/ai/RunFrameAiProvider"
 import {
   type DatasheetAssets,
   type DatasheetAssetSelection,
-  type DatasheetUsageKind,
-  getDatasheetAssetFiles,
-} from "../lib/ai/datasheet-assets"
+  type DatasheetGeneration,
+  addDatasheetToBoard,
+} from "../lib/ai"
 import { RunFrame } from "../lib/components/RunFrame/RunFrame"
 import { useStyles } from "../lib/hooks/use-styles"
 import packageJson from "../package.json"
 import { DatasheetPreviewAiConnection } from "./assets/DatasheetPreviewAiConnection"
+import {
+  loadDatasheetProjectFiles,
+  saveDatasheetProjectFiles,
+} from "./assets/datasheet-project-files"
 
-const boardSource = (
-  componentFilename?: string,
-  isCircuit = false,
-) => `${componentFilename ? `import DatasheetComponent from "./${componentFilename.replace(/\.tsx$/, "")}"\n\n` : ""}export default () => (
-  ${
-    isCircuit
-      ? '<board routingDisabled width="60mm" height="40mm"><DatasheetComponent name="Example" /></board>'
-      : `
-  <board width="30mm" height="22mm">
+const boardSource = () => `export default () => (
+  <board routingDisabled>
     <resistor name="R1" resistance="1k" footprint="0805" pcbX={-6} pcbY={4} schX={-2} schY={1} />
     <resistor name="R2" resistance="10k" footprint="0805" pcbX={6} pcbY={4} schX={2} schY={1} />
     <capacitor name="C1" capacitance="100nF" footprint="0805" pcbX={-6} pcbY={-4} schX={-2} schY={-1} />
     <capacitor name="C2" capacitance="10uF" footprint="1206" pcbX={6} pcbY={-4} schX={2} schY={-1} />
     <trace from=".R1 > .pin2" to=".C1 > .pin1" />
     <trace from=".R2 > .pin2" to=".C2 > .pin1" />
-    ${componentFilename ? '<DatasheetComponent name="U1" />' : ""}
   </board>
-  `
-  }
 )
 `
 
@@ -43,35 +38,67 @@ export default function DatasheetImportFixture() {
     "main.tsx": boardSource(),
   })
   const [selectedFile, setSelectedFile] = useState("main.tsx")
-  const [acceptedPart, setAcceptedPart] = useState<string | null>(null)
   const [hasRendered, setHasRendered] = useState(false)
   const [ai, setAi] = useState<RunFrameAiConfig | undefined>(undefined)
-  const [previewMode, setPreviewMode] =
-    useState<DatasheetUsageKind>("component")
-
-  const acceptAssets = (
-    assets: DatasheetAssets,
+  const [loadingFiles, setLoadingFiles] = useState(true)
+  const [projectError, setProjectError] = useState<string | null>(null)
+  const filesRef = useRef(files)
+  filesRef.current = files
+  useEffect(() => {
+    let current = true
+    loadDatasheetProjectFiles()
+      .then(async (saved) => {
+        if (!current) return
+        if (!Object.keys(saved).length)
+          await saveDatasheetProjectFiles({ "main.tsx": boardSource() })
+        if (current && Object.keys(saved).length) setFiles(saved)
+      })
+      .catch((error) => {
+        if (current) setProjectError(error.message)
+      })
+      .finally(() => {
+        if (current) setLoadingFiles(false)
+      })
+    return () => {
+      current = false
+    }
+  }, [])
+  const saveGeneration = async (generation: DatasheetGeneration) => {
+    await saveDatasheetProjectFiles(generation.files)
+    setFiles((previous) => ({ ...previous, ...generation.files }))
+  }
+  const acceptAssets = async (
+    _assets: DatasheetAssets,
     selection?: DatasheetAssetSelection,
   ) => {
-    const generated = getDatasheetAssetFiles(assets, selection?.kind)
-    for (const file of generated) {
-      if (file.filename in files)
-        throw new Error(`File already exists: ${file.filename}`)
-    }
-    setFiles((previous) => ({
-      ...previous,
-      ...Object.fromEntries(
-        generated.map((file) => [file.filename, file.content]),
-      ),
-      "main.tsx": boardSource(
-        selection?.entrypoint ?? assets.component?.filename,
-        selection?.kind === "simulationCircuit" ||
-          selection?.kind === "referenceCircuit",
-      ),
-    }))
-    setAcceptedPart(assets.partNumber)
-    setPreviewMode(selection?.kind ?? "component")
+    if (!selection) return
+    const updated = await addDatasheetToBoard({
+      source: filesRef.current["main.tsx"],
+      boardPath: "main.tsx",
+      selection,
+    })
+    await saveDatasheetProjectFiles({ "main.tsx": updated })
+    setFiles((previous) => ({ ...previous, "main.tsx": updated }))
   }
+  const generatedFolders = Array.from(
+    new Set(
+      Object.keys(files)
+        .filter((path) => path.startsWith("generated/"))
+        .map((path) => path.split("/").slice(0, 2).join("/")),
+    ),
+  )
+  const fileButton = (path: string) => (
+    <button
+      type="button"
+      key={path}
+      title={path}
+      aria-pressed={path === selectedFile}
+      onClick={() => setSelectedFile(path)}
+    >
+      <FileCode2 size={13} />
+      <span>{path.split("/").at(-1)}</span>
+    </button>
+  )
 
   return (
     <div className="datasheet-website-fixture">
@@ -79,10 +106,17 @@ export default function DatasheetImportFixture() {
         .datasheet-website-fixture { height: 100dvh; display: flex; flex-direction: column; color: #18181b; background: #fff; font-family: ui-sans-serif, system-ui, sans-serif; }
         .datasheet-website-fixture .workspace-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #e4e4e7; font-size: 14px; }
         .datasheet-website-fixture .workspace-panes { display: grid; grid-template-columns: minmax(260px, 0.38fr) minmax(0, 0.62fr); flex: 1; min-height: 0; }
-        .datasheet-website-fixture .code-pane { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid #e4e4e7; background: #fafafa; }
-        .datasheet-website-fixture .file-tabs { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px; border-bottom: 1px solid #e4e4e7; }
-        .datasheet-website-fixture .file-tabs button { padding: 6px 10px; border-radius: 4px; font-size: 12px; }
-        .datasheet-website-fixture .file-tabs button[aria-pressed=true] { color: #1d4ed8; background: #dbeafe; }
+        .datasheet-website-fixture .code-pane { display: grid; grid-template-columns: 170px minmax(0,1fr); min-height: 0; border-right: 1px solid #e4e4e7; background: #fafafa; }
+        .datasheet-website-fixture .file-tree { min-width:0; overflow:auto; padding:8px; border-right:1px solid #e4e4e7; font-size:11px; }
+        .datasheet-website-fixture .file-tree h2 { margin:0 0 8px; padding:5px 6px; font-size:11px; font-weight:600; color:#71717a; }
+        .datasheet-website-fixture .file-tree button { display:flex; align-items:center; gap:6px; width:100%; height:29px; padding:0 7px; border:0; border-radius:4px; background:transparent; color:#52525b; text-align:left; font-size:11px; cursor:pointer; }
+        .datasheet-website-fixture .file-tree button span { white-space:nowrap; text-overflow:ellipsis; overflow:hidden; }
+        .datasheet-website-fixture .file-tree button svg { flex-shrink:0; }
+        .datasheet-website-fixture .file-tree button[aria-pressed=true] { color:#18181b; background:#eaeaec; }
+        .datasheet-website-fixture .file-tree summary { cursor:pointer; padding:7px 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#71717a; }
+        .datasheet-website-fixture .file-tree details>div { padding-left:9px; }
+        .datasheet-website-fixture .source-pane { display:flex; flex-direction:column; min-height:0; min-width:0; }
+        .datasheet-website-fixture .source-path { height:36px; flex:none; border-bottom:1px solid #e4e4e7; padding:10px 16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:11px; color:#71717a; }
         .datasheet-website-fixture .code-pane textarea { width: 100%; flex: 1; min-height: 0; resize: none; border: 0; outline-offset: -2px; padding: 16px; font: 12px/1.8 ui-monospace, SFMono-Regular, monospace; background: transparent; }
         .datasheet-website-fixture .tscircuit-runframe { height: 100%; min-height: 0; overflow: hidden; }
         .datasheet-website-fixture .tscircuit-runframe [role=tabpanel][data-state=active], .datasheet-website-fixture .tscircuit-runframe [role=tabpanel][data-state=active] > div { min-height: 0 !important; }
@@ -106,68 +140,67 @@ export default function DatasheetImportFixture() {
           <DatasheetPreviewAiConnection isConfigured={!!ai} onChange={setAi} />
         </div>
       </header>
-      {!ai && (
-        <output
+      {projectError && (
+        <p
+          role="alert"
           style={{
+            margin: 0,
             padding: "8px 20px",
-            background: "#fffbeb",
-            color: "#92400e",
-            fontSize: 13,
+            color: "#b42318",
+            fontSize: 12,
           }}
         >
-          Configure a real AI backend to create assets from your datasheet. This
-          preview has no simulated generation.
-        </output>
+          {projectError}
+        </p>
       )}
       <main className="workspace-panes">
         <section className="code-pane" aria-label="Project files">
-          <nav className="file-tabs" aria-label="Files">
-            {Object.keys(files).map((filename) => (
-              <button
-                type="button"
-                key={filename}
-                aria-pressed={filename === selectedFile}
-                onClick={() => setSelectedFile(filename)}
-              >
-                {filename}
-              </button>
+          <nav className="file-tree" aria-label="Files">
+            <h2>Files</h2>
+            {fileButton("main.tsx")}
+            {generatedFolders.map((folder) => (
+              <details key={folder} open>
+                <summary title={folder}>
+                  <Folder
+                    size={12}
+                    style={{ display: "inline", marginRight: 5 }}
+                  />
+                  {folder.split("/").at(-1)}
+                </summary>
+                <div>
+                  {Object.keys(files)
+                    .filter((path) => path.startsWith(folder + "/"))
+                    .map(fileButton)}
+                </div>
+              </details>
             ))}
           </nav>
-          <textarea
-            aria-label={`${selectedFile} source`}
-            spellCheck={false}
-            value={files[selectedFile]}
-            onChange={(event) =>
-              setFiles((previous) => ({
-                ...previous,
-                [selectedFile]: event.target.value,
-              }))
-            }
-          />
-          {acceptedPart && (
-            <output
-              style={{ padding: "10px 16px", fontSize: 12, color: "#15803d" }}
-            >
-              Added {acceptedPart} to project files. Run to update the preview.
-            </output>
-          )}
+          <div className="source-pane">
+            <div className="source-path" title={selectedFile}>
+              {selectedFile}
+            </div>
+            <textarea
+              aria-label={`${selectedFile} source`}
+              spellCheck={false}
+              value={files[selectedFile]}
+              onChange={(event) =>
+                setFiles((previous) => ({
+                  ...previous,
+                  [selectedFile]: event.target.value,
+                }))
+              }
+            />
+          </div>
         </section>
         <section className="tscircuit-runframe" aria-label="Circuit preview">
           <RunFrame
-            key={previewMode}
             fsMap={files}
             mainComponentPath="main.tsx"
             showFileMenu={false}
             showRunButton={hasRendered}
             onRenderFinished={() => setHasRendered(true)}
             isWebEmbedded
-            defaultActiveTab={
-              previewMode === "simulationCircuit"
-                ? "analog_simulation"
-                : previewMode === "referenceCircuit"
-                  ? "schematic"
-                  : "cad"
-            }
+            defaultActiveTab="cad"
             availableTabs={[
               "pcb",
               "schematic",
@@ -179,6 +212,8 @@ export default function DatasheetImportFixture() {
             evalWebWorkerBlobUrl={evalWebWorkerBlobUrl}
             ai={ai}
             onDatasheetAssetsGenerated={acceptAssets}
+            onDatasheetGenerationCreated={saveGeneration}
+            isLoadingFiles={loadingFiles}
           />
         </section>
       </main>

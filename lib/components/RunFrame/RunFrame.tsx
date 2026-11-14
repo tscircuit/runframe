@@ -894,6 +894,7 @@ const RunFrameContent = (props: RunFrameProps) => {
             )}
             <DatasheetImportButton
               onAssetsGenerated={props.onDatasheetAssetsGenerated}
+              onGenerationCreated={props.onDatasheetGenerationCreated}
             />
             {props.leftHeaderContent}
           </>

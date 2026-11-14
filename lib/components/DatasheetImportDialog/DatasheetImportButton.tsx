@@ -10,7 +10,11 @@ import {
 /** A toolbar action that also works when the host hides Runframe's File menu. */
 export const DatasheetImportButton = ({
   onAssetsGenerated,
-}: Pick<DatasheetImportDialogProps, "onAssetsGenerated">) => {
+  onGenerationCreated,
+}: Pick<
+  DatasheetImportDialogProps,
+  "onAssetsGenerated" | "onGenerationCreated"
+>) => {
   const ai = useRunFrameAi()
   const [isOpen, setIsOpen] = useState(false)
   if (!ai) return null
@@ -30,6 +34,7 @@ export const DatasheetImportButton = ({
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onAssetsGenerated={onAssetsGenerated}
+        onGenerationCreated={onGenerationCreated}
       />
     </>
   )

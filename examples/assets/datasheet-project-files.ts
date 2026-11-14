@@ -5,9 +5,7 @@ const projectDirectory = async () => {
   return root.getDirectoryHandle("runframe-datasheet-project", { create: true })
 }
 
-export const saveDatasheetProjectFiles = async (
-  files: Record<string, string>,
-) => {
+const writeProjectFiles = async (files: Record<string, string>) => {
   const root = await projectDirectory()
   for (const [path, content] of Object.entries(files)) {
     const segments = path.split("/")
@@ -20,15 +18,15 @@ export const saveDatasheetProjectFiles = async (
     const writer = await handle.createWritable()
     try {
       await writer.write(content)
-    } finally {
       await writer.close()
+    } catch (error) {
+      await writer.abort().catch(() => {})
+      throw error
     }
   }
 }
 
-export const loadDatasheetProjectFiles = async (): Promise<
-  Record<string, string>
-> => {
+const readProjectFiles = async (): Promise<Record<string, string>> => {
   const files: Record<string, string> = {}
   const read = async (directory: FileSystemDirectoryHandle, prefix = "") => {
     const iterable = directory as FileSystemDirectoryHandle & {
@@ -40,10 +38,28 @@ export const loadDatasheetProjectFiles = async (): Promise<
         await read(entry as FileSystemDirectoryHandle, `${path}/`)
       else
         files[path] = await (
-          await (entry as FileSystemFileHandle).getFile()
+          await (await directory.getFileHandle(name)).getFile()
         ).text()
     }
   }
   await read(await projectDirectory())
   return files
 }
+
+// Atomic file replacement invalidates previously enumerated handles. Keep local
+// snapshots and writes in one queue so a reader never observes an in-flight swap.
+let queue: Promise<unknown> = Promise.resolve()
+const withProjectFiles = <T>(operation: () => Promise<T>): Promise<T> => {
+  const pending = queue.then(
+    async (): Promise<T> =>
+      navigator.locks
+        ? await navigator.locks.request("runframe-datasheet-project", operation)
+        : await operation(),
+  )
+  queue = pending.catch(() => {})
+  return pending
+}
+export const saveDatasheetProjectFiles = (files: Record<string, string>) =>
+  withProjectFiles(() => writeProjectFiles(files))
+export const loadDatasheetProjectFiles = () =>
+  withProjectFiles(readProjectFiles)

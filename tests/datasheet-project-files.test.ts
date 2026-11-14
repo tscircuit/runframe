@@ -2,12 +2,106 @@ import { expect, test } from "bun:test"
 import {
   createDatasheetGeneration,
   saveDatasheetGenerationToApi,
+  readDatasheetGenerations,
 } from "../lib/ai/datasheet-generation"
-import { addDatasheetToBoard } from "../lib/ai/add-datasheet-to-board"
+import {
+  addDatasheetToBoard,
+  getPlacedDatasheetEntrypoints,
+} from "../lib/ai/add-datasheet-to-board"
+import { validateDatasheetSource } from "../lib/ai/validate-datasheet-source"
 import { generatedCircuitAssets } from "./fixtures/datasheet-ai"
 
 const generation = () =>
   createDatasheetGeneration(generatedCircuitAssets, "family.pdf")
+
+test("saved generations reopen from current files and reject incomplete or unsafe manifests", () => {
+  const record = generation()
+  const restored = readDatasheetGenerations(record.files)
+  expect(restored).toEqual([record])
+  const updated = {
+    ...record.files,
+    [record.directory + "/test123.component.tsx"]:
+      "export default () => <chip name='Changed' />",
+  }
+  expect(
+    readDatasheetGenerations(new Map(Object.entries(updated)))[0].assets
+      .component!.content,
+  ).toContain("Changed")
+  const missing = { ...record.files }
+  delete missing[record.directory + "/test123.component.tsx"]
+  expect(readDatasheetGenerations(missing)).toEqual([])
+  for (const transform of [
+    () => "{broken",
+    (manifest: any) => JSON.stringify({ ...manifest, version: 99 }),
+    (manifest: any) =>
+      JSON.stringify({
+        ...manifest,
+        assets: [...manifest.assets, manifest.assets[0]],
+      }),
+    (manifest: any) =>
+      JSON.stringify({
+        ...manifest,
+        assets: manifest.assets.map((asset: any) => ({
+          ...asset,
+          filename: "../main.tsx",
+        })),
+      }),
+  ]) {
+    const path = record.directory + "/generation.json"
+    const files = {
+      ...record.files,
+      [path]: transform(JSON.parse(record.files[path])),
+    }
+    expect(readDatasheetGenerations(files)).toEqual([])
+  }
+})
+
+test("placement detection survives reload, explicit extensions, unused imports and removal", async () => {
+  const record = generation()
+  const path = record.directory + "/test123.component.tsx"
+  const source = `import Existing from "../${path}"; import Unused from "../${record.directory}/test123.reference.tsx"; export default () => <board><Existing name="U1" /></board>`
+  expect(
+    await getPlacedDatasheetEntrypoints(source, "boards/main.tsx"),
+  ).toEqual(new Set([path]))
+  expect(
+    await getPlacedDatasheetEntrypoints(
+      source.replace('<Existing name="U1" />', ""),
+      "boards/main.tsx",
+    ),
+  ).toEqual(new Set())
+  expect(
+    await addDatasheetToBoard({
+      source,
+      boardPath: "boards/main.tsx",
+      selection: {
+        kind: "component",
+        generationId: record.id,
+        directory: record.directory,
+        entrypoint: path,
+      },
+    }),
+  ).toBe(source)
+})
+
+test("source review blocks broken selected modules and preserves independent chip use", async () => {
+  const assets = structuredClone(generatedCircuitAssets)
+  assets.referenceCircuit!.content = "export default () => <group"
+  await expect(
+    validateDatasheetSource(assets, "component"),
+  ).resolves.toBeUndefined()
+  await expect(
+    validateDatasheetSource(assets, "referenceCircuit"),
+  ).rejects.toThrow("test123.reference.tsx")
+  assets.component!.content = "export const Chip = () => <chip />"
+  await expect(validateDatasheetSource(assets, "component")).rejects.toThrow(
+    "default component",
+  )
+  assets.component!.content =
+    'import Missing from "./missing"; export default () => <Missing/>'
+  await expect(validateDatasheetSource(assets, "component")).rejects.toThrow(
+    "does not resolve",
+  )
+})
 
 test("each generation saves all artifacts and notes into a unique directory", () => {
   const first = generation(),

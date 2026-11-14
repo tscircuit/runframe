@@ -1,16 +1,12 @@
 import { useEffect, useId, useRef, useState } from "react"
 import {
-  Activity,
   Check,
-  CircuitBoard,
-  Cpu,
-  Download,
   FileCode2,
   FileText,
-  Folder,
   Loader2,
   Upload,
   X,
+  ChevronDown,
 } from "lucide-react"
 import { useRunFrameAi } from "../../ai/RunFrameAiProvider"
 import {
@@ -36,11 +32,21 @@ import {
   DialogDescription,
   DialogTitle,
 } from "../ui/dialog"
+import { GeneratedFiles } from "./GeneratedFiles"
+import {
+  getGenerationViews,
+  targets,
+  type GenerationView,
+  type DatasheetPlacement,
+} from "./generation-view"
 import { datasheetDialogStyles } from "./datasheet-dialog-styles"
+import { validateDatasheetSource } from "../../ai/validate-datasheet-source"
 
 export interface DatasheetImportDialogProps {
   isOpen: boolean
   onClose: () => void
+  savedGenerations?: readonly DatasheetGeneration[]
+  placement?: DatasheetPlacement
   /** Save all artifacts before enabling project actions. */
   onGenerationCreated?: (
     generation: DatasheetGeneration,
@@ -51,22 +57,35 @@ export interface DatasheetImportDialogProps {
     selection?: DatasheetAssetSelection,
   ) => void | Promise<void>
 }
-type GenerationView = {
-  generation: DatasheetGeneration
-  saved: boolean
-  added: Set<DatasheetUsageKind>
-}
-const targets = [
-  { kind: "component", label: "Chip", icon: Cpu },
-  { kind: "simulationCircuit", label: "Simulation circuit", icon: Activity },
-  { kind: "referenceCircuit", label: "Reference circuit", icon: CircuitBoard },
-] as const
+const GenerationEmptyState = ({
+  configured,
+  generating,
+}: { configured: boolean; generating: boolean }) => (
+  <div className="ds-empty">
+    <div className="ds-empty-icon">
+      {generating ? (
+        <Loader2 className="ds-spin" size={22} />
+      ) : (
+        <FileCode2 size={22} />
+      )}
+    </div>
+    <span>
+      {!configured
+        ? "Configure AI to generate components"
+        : generating
+          ? "Generating components…"
+          : "No generation yet"}
+    </span>
+  </div>
+)
 
 export const DatasheetImportDialog = ({
   isOpen,
   onClose,
   onGenerationCreated,
   onAssetsGenerated,
+  savedGenerations = [],
+  placement,
 }: DatasheetImportDialogProps) => {
   useStyles()
   const ai = useRunFrameAi()
@@ -77,7 +96,7 @@ export const DatasheetImportDialog = ({
   const [file, setFile] = useState<File | null>(null)
   const [simulation, setSimulation] = useState(false)
   const [reference, setReference] = useState(false)
-  const [records, setRecords] = useState<GenerationView[]>([])
+  const [localRecords, setRecords] = useState<GenerationView[]>([])
   const [activeId, setActiveId] = useState("")
   const [tab, setTab] = useState<"components" | "files">("components")
   const [selectedPath, setSelectedPath] = useState("")
@@ -87,7 +106,11 @@ export const DatasheetImportDialog = ({
   const [adding, setAdding] = useState<DatasheetUsageKind | null>(null)
   const [downloading, setDownloading] = useState(false)
   const [dragging, setDragging] = useState(false)
-  const active = records.find((record) => record.generation.id === activeId)
+  const records = getGenerationViews(savedGenerations, localRecords, placement)
+  const active =
+    records.find((record) => record.generation.id === activeId) ??
+    records.at(-1)
+  const checkingPlacement = !!placement && !placement.entrypoints
   const busy = generating || savingGeneration || adding !== null
 
   const cancel = () => {
@@ -109,7 +132,7 @@ export const DatasheetImportDialog = ({
     onClose()
   }
   const selectFile = (files: FileList | File[]) => {
-    if (busy || saving.current) return
+    if (busy || saving.current || !ai) return
     setError(null)
     setDragging(false)
     try {
@@ -191,6 +214,7 @@ export const DatasheetImportDialog = ({
       !active?.saved ||
       !onAssetsGenerated ||
       busy ||
+      checkingPlacement ||
       saving.current ||
       active.added.has(kind)
     )
@@ -202,19 +226,31 @@ export const DatasheetImportDialog = ({
     setAdding(kind)
     setError(null)
     try {
+      await validateDatasheetSource(generation.assets, kind)
       await onAssetsGenerated(generation.assets, {
         kind,
         generationId: generation.id,
         directory: generation.directory,
         entrypoint: `${generation.directory}/${asset.filename}`,
       })
-      setRecords((previous) =>
-        previous.map((record) =>
+      setRecords((previous) => {
+        const existing = previous.some(
+          (record) => record.generation.id === generation.id,
+        )
+          ? previous
+          : [...previous, active]
+        return existing.map((record) =>
           record.generation.id === generation.id
-            ? { ...record, added: new Set([...record.added, kind]) }
+            ? {
+                ...record,
+                added: new Set([...record.added, kind]),
+                addedIn: placement
+                  ? { source: placement.source, boardPath: placement.boardPath }
+                  : undefined,
+              }
             : record,
-        ),
-      )
+        )
+      })
     } catch (error) {
       setError(
         error instanceof Error
@@ -247,10 +283,6 @@ export const DatasheetImportDialog = ({
       setDownloading(false)
     }
   }
-  const files = Object.entries(active?.generation.files ?? {})
-  const sourcePath = files.some(([path]) => path === selectedPath)
-    ? selectedPath
-    : files[0]?.[0]
   const retrySave = active && !active.saved && !busy
   const status =
     error ??
@@ -275,7 +307,7 @@ export const DatasheetImportDialog = ({
     >
       <DialogContent
         className="rf-datasheet-dialog"
-        overlayClassName="ds-overlay"
+        overlayClassName="rf-datasheet-overlay"
         aria-describedby={`${id}-description`}
       >
         <style>{datasheetDialogStyles}</style>
@@ -300,6 +332,7 @@ export const DatasheetImportDialog = ({
             type="file"
             accept="application/pdf,.pdf"
             className="rf-sr-only"
+            tabIndex={-1}
             aria-label="PDF datasheet"
             disabled={busy || !ai}
             onChange={(event) => {
@@ -312,7 +345,7 @@ export const DatasheetImportDialog = ({
             data-dragging={dragging}
             onDragOver={(event) => {
               event.preventDefault()
-              if (!busy) setDragging(true)
+              if (!busy && ai) setDragging(true)
             }}
             onDragLeave={() => setDragging(false)}
             onDrop={(event) => {
@@ -410,7 +443,7 @@ export const DatasheetImportDialog = ({
           </div>
           <select
             aria-label="Generation"
-            value={activeId}
+            value={active?.generation.id ?? ""}
             disabled={!records.length || busy}
             onChange={(event) => {
               setActiveId(event.target.value)
@@ -426,127 +459,105 @@ export const DatasheetImportDialog = ({
           </select>
         </div>
         <div className="ds-content">
-          {!active ? (
-            <div className="ds-empty">
-              <div className="ds-empty-icon">
-                {generating ? (
-                  <Loader2 className="ds-spin" size={22} />
-                ) : (
-                  <FileCode2 size={22} />
-                )}
-              </div>
-              <span>
-                {!ai
-                  ? "Configure AI to generate components"
-                  : generating
-                    ? "Generating components…"
-                    : "No generation yet"}
-              </span>
-            </div>
-          ) : tab === "components" ? (
-            <section
-              role="tabpanel"
-              id={`${id}-components`}
-              aria-label="Generated components"
-              className="ds-components"
-            >
-              <div className="ds-result-heading">
-                <strong title={active.generation.assets.partNumber}>
-                  {active.generation.assets.partNumber}
-                </strong>
-                <span title={active.generation.assets.packageName}>
-                  {active.generation.assets.packageName}
-                </span>
-              </div>
-              <div className="ds-component-list">
-                {targets.map(({ kind, label, icon: Icon }) => {
-                  const available = !!active.generation.assets[kind]
-                  const added = active.added.has(kind)
-                  return (
-                    <article
-                      key={kind}
-                      className="ds-component-row"
-                      aria-label={label}
-                      data-available={available}
-                    >
-                      <Icon size={19} className="ds-component-icon" />
-                      <span className="ds-component-label">{label}</span>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="ds-use-button"
-                        aria-label="Use in project"
-                        disabled={
-                          !available ||
-                          !active.saved ||
-                          busy ||
-                          added ||
-                          !onAssetsGenerated
-                        }
-                        aria-pressed={added}
-                        onClick={() => useInProject(kind)}
+          <section
+            role="tabpanel"
+            id={`${id}-components`}
+            aria-labelledby={`${id}-components-tab`}
+            hidden={tab !== "components"}
+            className="ds-components"
+          >
+            {!active ? (
+              <GenerationEmptyState configured={!!ai} generating={generating} />
+            ) : (
+              <>
+                <div className="ds-result-heading">
+                  <strong title={active.generation.assets.partNumber}>
+                    {active.generation.assets.partNumber}
+                  </strong>
+                  <span title={active.generation.assets.packageName}>
+                    {active.generation.assets.packageName}
+                  </span>
+                </div>
+                <div className="ds-component-list">
+                  {targets.map(({ kind, label, icon: Icon }) => {
+                    const available = !!active.generation.assets[kind]
+                    const added = active.added.has(kind)
+                    return (
+                      <article
+                        key={kind}
+                        className="ds-component-row"
+                        aria-label={label}
+                        data-available={available}
                       >
-                        <span className="ds-button-icon">
-                          {adding === kind ? (
-                            <Loader2 size={14} className="ds-spin" />
-                          ) : added ? (
-                            <Check size={14} aria-label="Added to project" />
-                          ) : null}
+                        <Icon size={19} className="ds-component-icon" />
+                        <span
+                          id={`${id}-${kind}-label`}
+                          className="ds-component-label"
+                        >
+                          {label}
                         </span>
-                        Use in project
-                      </Button>
-                    </article>
-                  )
-                })}
-              </div>
-            </section>
-          ) : (
-            <section
-              role="tabpanel"
-              id={`${id}-files`}
-              aria-label="Generated files"
-              className="ds-files"
-            >
-              <div className="ds-folder-bar">
-                <Folder size={14} />
-                <span title={active.generation.directory}>
-                  {active.generation.directory}
-                </span>
-                <button
-                  type="button"
-                  className="ds-icon-button"
-                  onClick={download}
-                  disabled={downloading}
-                  aria-label="Download generation"
-                >
-                  <Download size={15} />
-                </button>
-              </div>
-              <div className="ds-file-panes">
-                <nav aria-label="Generated file list">
-                  {files.map(([path]) => (
-                    <button
-                      type="button"
-                      key={path}
-                      aria-current={sourcePath === path ? "true" : undefined}
-                      onClick={() => setSelectedPath(path)}
-                    >
-                      <FileCode2 size={14} />
-                      <span title={path.split("/").at(-1)}>
-                        {path.split("/").at(-1)}
-                      </span>
-                    </button>
-                  ))}
-                </nav>
-                <pre aria-label="File source">
-                  <code>
-                    {sourcePath ? active.generation.files[sourcePath] : ""}
-                  </code>
-                </pre>
-              </div>
-            </section>
-          )}
+                        {!available ? (
+                          <span className="ds-unavailable">Not generated</span>
+                        ) : (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="ds-use-button"
+                            aria-label="Use in project"
+                            aria-describedby={`${id}-${kind}-label`}
+                            disabled={
+                              !available ||
+                              !active.saved ||
+                              busy ||
+                              checkingPlacement ||
+                              added ||
+                              !onAssetsGenerated
+                            }
+                            aria-pressed={added}
+                            onClick={() => useInProject(kind)}
+                          >
+                            <span className="ds-button-icon">
+                              {adding === kind ? (
+                                <Loader2 size={14} className="ds-spin" />
+                              ) : added ? (
+                                <Check
+                                  size={14}
+                                  aria-label="Added to project"
+                                />
+                              ) : null}
+                            </span>
+                            Use in project
+                          </Button>
+                        )}
+                      </article>
+                    )
+                  })}
+                </div>
+              </>
+            )}
+          </section>
+          <section
+            role="tabpanel"
+            id={`${id}-files`}
+            aria-labelledby={`${id}-files-tab`}
+            hidden={tab !== "files"}
+            className="ds-files"
+          >
+            {!active ? (
+              <GenerationEmptyState configured={!!ai} generating={generating} />
+            ) : (
+              <>
+                <GeneratedFiles
+                  generation={active.generation}
+                  selectedPath={selectedPath}
+                  onSelectPath={setSelectedPath}
+                  onDownload={download}
+                  downloading={downloading}
+                />
+              </>
+            )}
+          </section>
         </div>
         <footer className="ds-footer">
           <div
@@ -559,7 +570,23 @@ export const DatasheetImportDialog = ({
             ) : active?.saved && !error ? (
               <Check size={13} />
             ) : null}
-            <span>{status}</span>
+            {error ? (
+              <details className="ds-error-details" key={error}>
+                <summary aria-label="View error details">
+                  <span>{error.split("\n")[0].slice(0, 180)}</span>
+                  <ChevronDown size={13} />
+                </summary>
+                <pre
+                  className="ds-error-message"
+                  tabIndex={0}
+                  aria-label="Error details"
+                >
+                  {error}
+                </pre>
+              </details>
+            ) : (
+              <span>{status}</span>
+            )}
           </div>
           <div className="ds-footer-actions">
             <Button
@@ -575,7 +602,7 @@ export const DatasheetImportDialog = ({
               type="button"
               size="sm"
               className="ds-generate-button"
-              disabled={!ai || !file || busy}
+              disabled={busy || (!retrySave && (!ai || !file))}
               onClick={() =>
                 retrySave ? persist(active.generation) : generate()
               }

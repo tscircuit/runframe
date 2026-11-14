@@ -1,5 +1,5 @@
 import evalWebWorkerBlobUrl from "@tscircuit/eval/blob-url"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { FileCode2, Folder } from "lucide-react"
 import type { RunFrameAiConfig } from "../lib/ai/RunFrameAiProvider"
 import {
@@ -16,6 +16,7 @@ import {
   loadDatasheetProjectFiles,
   saveDatasheetProjectFiles,
 } from "./assets/datasheet-project-files"
+import { createProjectFileWriter } from "./assets/create-project-file-writer"
 
 const boardSource = () => `export default () => (
   <board routingDisabled>
@@ -42,16 +43,46 @@ export default function DatasheetImportFixture() {
   const [ai, setAi] = useState<RunFrameAiConfig | undefined>(undefined)
   const [loadingFiles, setLoadingFiles] = useState(true)
   const [projectError, setProjectError] = useState<string | null>(null)
+  const [savingFiles, setSavingFiles] = useState(false)
+  const writer = useMemo(
+    () =>
+      createProjectFileWriter({
+        save: saveDatasheetProjectFiles,
+        onState: ({ pending, error }) => {
+          setSavingFiles(pending)
+          setProjectError(error)
+        },
+      }),
+    [],
+  )
   const filesRef = useRef(files)
   filesRef.current = files
+  const updateFiles = (changes: Record<string, string>) => {
+    const next = { ...filesRef.current, ...changes }
+    filesRef.current = next
+    setFiles(next)
+  }
+  useEffect(() => {
+    const beforeUnload = (event: BeforeUnloadEvent) => {
+      if (!writer.hasPendingChanges()) return
+      void writer.flush().catch(() => {})
+      event.preventDefault()
+      event.returnValue = ""
+    }
+    window.addEventListener("beforeunload", beforeUnload)
+    return () => {
+      window.removeEventListener("beforeunload", beforeUnload)
+      void writer.flush().catch(() => {})
+    }
+  }, [writer])
   useEffect(() => {
     let current = true
     loadDatasheetProjectFiles()
       .then(async (saved) => {
         if (!current) return
-        if (!Object.keys(saved).length)
-          await saveDatasheetProjectFiles({ "main.tsx": boardSource() })
-        if (current && Object.keys(saved).length) setFiles(saved)
+        if (!saved["main.tsx"])
+          await writer.commit({ "main.tsx": boardSource() })
+        if (current && Object.keys(saved).length) updateFiles(saved)
       })
       .catch((error) => {
         if (current) setProjectError(error.message)
@@ -64,8 +95,8 @@ export default function DatasheetImportFixture() {
     }
   }, [])
   const saveGeneration = async (generation: DatasheetGeneration) => {
-    await saveDatasheetProjectFiles(generation.files)
-    setFiles((previous) => ({ ...previous, ...generation.files }))
+    await writer.commit(generation.files)
+    updateFiles(generation.files)
   }
   const acceptAssets = async (
     _assets: DatasheetAssets,
@@ -77,8 +108,8 @@ export default function DatasheetImportFixture() {
       boardPath: "main.tsx",
       selection,
     })
-    await saveDatasheetProjectFiles({ "main.tsx": updated })
-    setFiles((previous) => ({ ...previous, "main.tsx": updated }))
+    await writer.commit({ "main.tsx": updated })
+    updateFiles({ "main.tsx": updated })
   }
   const generatedFolders = Array.from(
     new Set(
@@ -103,20 +134,23 @@ export default function DatasheetImportFixture() {
   return (
     <div className="datasheet-website-fixture">
       <style>{`
-        .datasheet-website-fixture { height: 100dvh; display: flex; flex-direction: column; color: #18181b; background: #fff; font-family: ui-sans-serif, system-ui, sans-serif; }
+        .datasheet-website-fixture { position:relative; height: 100dvh; display: flex; flex-direction: column; color: #18181b; background: #fff; font-family: ui-sans-serif, system-ui, sans-serif; }
         .datasheet-website-fixture .workspace-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #e4e4e7; font-size: 14px; }
         .datasheet-website-fixture .workspace-panes { display: grid; grid-template-columns: minmax(260px, 0.38fr) minmax(0, 0.62fr); flex: 1; min-height: 0; }
         .datasheet-website-fixture .code-pane { display: grid; grid-template-columns: 170px minmax(0,1fr); min-height: 0; border-right: 1px solid #e4e4e7; background: #fafafa; }
-        .datasheet-website-fixture .file-tree { min-width:0; overflow:auto; padding:8px; border-right:1px solid #e4e4e7; font-size:11px; }
+        .datasheet-website-fixture .file-tree { min-width:0; overflow:auto; padding:8px; border-right:1px solid #e4e4e7; font-size:12px; }
         .datasheet-website-fixture .file-tree h2 { margin:0 0 8px; padding:5px 6px; font-size:11px; font-weight:600; color:#71717a; }
-        .datasheet-website-fixture .file-tree button { display:flex; align-items:center; gap:6px; width:100%; height:29px; padding:0 7px; border:0; border-radius:4px; background:transparent; color:#52525b; text-align:left; font-size:11px; cursor:pointer; }
+        .datasheet-website-fixture .file-tree button { display:flex; align-items:center; gap:6px; width:100%; height:29px; padding:0 7px; border:0; border-radius:4px; background:transparent; color:#52525b; text-align:left; font-size:12px; cursor:pointer; }
         .datasheet-website-fixture .file-tree button span { white-space:nowrap; text-overflow:ellipsis; overflow:hidden; }
         .datasheet-website-fixture .file-tree button svg { flex-shrink:0; }
         .datasheet-website-fixture .file-tree button[aria-pressed=true] { color:#18181b; background:#eaeaec; }
         .datasheet-website-fixture .file-tree summary { cursor:pointer; padding:7px 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#71717a; }
         .datasheet-website-fixture .file-tree details>div { padding-left:9px; }
         .datasheet-website-fixture .source-pane { display:flex; flex-direction:column; min-height:0; min-width:0; }
-        .datasheet-website-fixture .source-path { height:36px; flex:none; border-bottom:1px solid #e4e4e7; padding:10px 16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:11px; color:#71717a; }
+        .datasheet-website-fixture .source-path { display:flex; align-items:center; justify-content:space-between; gap:12px; height:36px; flex:none; border-bottom:1px solid #e4e4e7; padding:0 16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:12px; color:#71717a; }
+        .datasheet-website-fixture .source-path>span:first-child { min-width:0; overflow:hidden; text-overflow:ellipsis; }
+        .datasheet-website-fixture .source-path [role=status], .datasheet-website-fixture .source-path button { flex:none; font-size:11px; }
+        .datasheet-website-fixture .source-path button { border:0; background:none; cursor:pointer; color:#b42318; }
         .datasheet-website-fixture .code-pane textarea { width: 100%; flex: 1; min-height: 0; resize: none; border: 0; outline-offset: -2px; padding: 16px; font: 12px/1.8 ui-monospace, SFMono-Regular, monospace; background: transparent; }
         .datasheet-website-fixture .tscircuit-runframe { height: 100%; min-height: 0; overflow: hidden; }
         .datasheet-website-fixture .tscircuit-runframe [role=tabpanel][data-state=active], .datasheet-website-fixture .tscircuit-runframe [role=tabpanel][data-state=active] > div { min-height: 0 !important; }
@@ -143,8 +177,20 @@ export default function DatasheetImportFixture() {
       {projectError && (
         <p
           role="alert"
+          tabIndex={0}
           style={{
             margin: 0,
+            position: "absolute",
+            left: 16,
+            bottom: 16,
+            maxWidth: "min(440px, calc(100% - 32px))",
+            maxHeight: "min(160px, 30dvh)",
+            overflow: "auto",
+            overflowWrap: "anywhere",
+            background: "#fff",
+            border: "1px solid #fecdca",
+            borderRadius: 6,
+            zIndex: 30,
             padding: "8px 20px",
             color: "#b42318",
             fontSize: 12,
@@ -177,18 +223,48 @@ export default function DatasheetImportFixture() {
           </nav>
           <div className="source-pane">
             <div className="source-path" title={selectedFile}>
-              {selectedFile}
+              <span>{selectedFile}</span>
+              {projectError && writer.hasPendingChanges() ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    void writer.flush().catch(() => {})
+                  }}
+                >
+                  Retry save
+                </button>
+              ) : (
+                <span role="status">
+                  {loadingFiles
+                    ? "Loading…"
+                    : savingFiles
+                      ? "Saving…"
+                      : "Saved"}
+                </span>
+              )}
             </div>
             <textarea
               aria-label={`${selectedFile} source`}
               spellCheck={false}
+              disabled={loadingFiles}
               value={files[selectedFile]}
-              onChange={(event) =>
-                setFiles((previous) => ({
-                  ...previous,
-                  [selectedFile]: event.target.value,
-                }))
-              }
+              onChange={(event) => {
+                const content = event.target.value
+                updateFiles({ [selectedFile]: content })
+                writer.edit(selectedFile, content)
+              }}
+              onBlur={() => {
+                void writer.flush().catch(() => {})
+              }}
+              onKeyDown={(event) => {
+                if (
+                  (event.ctrlKey || event.metaKey) &&
+                  event.key.toLowerCase() === "s"
+                ) {
+                  event.preventDefault()
+                  void writer.flush().catch(() => {})
+                }
+              }}
             />
           </div>
         </section>

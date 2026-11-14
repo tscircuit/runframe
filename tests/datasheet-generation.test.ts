@@ -17,6 +17,12 @@ import {
 } from "./fixtures/datasheet-ai"
 import { runIsolatedUiTest } from "./fixtures/run-isolated-ui-test"
 
+test("generated imports fit a sized board without moving existing components", async () => {
+  await runIsolatedUiTest(
+    new URL("./fixtures/datasheet-placement.tsx", import.meta.url),
+  )
+}, 20000)
+
 test("generates validated assets using the supplied model and uploaded PDF only", async () => {
   const model = createDatasheetModel()
   const result = await generateDatasheetAssets({

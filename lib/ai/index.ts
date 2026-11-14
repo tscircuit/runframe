@@ -14,7 +14,11 @@ export { getDatasheetAssetFiles } from "./datasheet-assets"
 export { generateDatasheetAssets } from "./generate-datasheet-assets"
 export {
   createDatasheetGeneration,
+  readDatasheetGenerations,
   saveDatasheetGenerationToApi,
   type DatasheetGeneration,
 } from "./datasheet-generation"
-export { addDatasheetToBoard } from "./add-datasheet-to-board"
+export {
+  addDatasheetToBoard,
+  getPlacedDatasheetEntrypoints,
+} from "./add-datasheet-to-board"

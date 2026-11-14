@@ -135,6 +135,11 @@ test("the website RunFrame exposes the datasheet action with its File menu hidde
         'article[aria-label="Simulation circuit"] button',
       ) as HTMLElement,
     )
+    for (let i = 0; i < 100 && accepted.mock.calls.length === 0; i++) {
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 5))
+      })
+    }
     expect(saved).toHaveBeenCalledTimes(1)
     const generation = saved.mock.calls[0][0]
     expect(accepted).toHaveBeenCalledWith(generatedCircuitAssets, {

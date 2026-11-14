@@ -903,6 +903,8 @@ const RunFrameContent = (props: RunFrameProps) => {
               />
             )}
             <DatasheetImportButton
+              fsMap={fsMap}
+              boardPath={props.mainComponentPath ?? props.entrypoint}
               onAssetsGenerated={props.onDatasheetAssetsGenerated}
               onGenerationCreated={props.onDatasheetGenerationCreated}
             />

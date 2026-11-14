@@ -94,7 +94,9 @@ The fixed-size dialog has **Components** and **Files** tabs. Each available chip
 simulation circuit or reference circuit has a **Use in project** button. Using an
 output adds it to the existing board, keeps the dialog open, and disables that
 button with a tick. Each output can be used independently. Generation history
-retains these states when switching between results or reopening the dialog.
+reopens from the project files after reload, even without an AI connection. Used
+states follow the current board; removing an instance makes its action available
+again.
 **Download generation** in the Files tab exports the whole directory as a ZIP.
 
 The default ngspice engine uses unique internal device names, so repeated labels
@@ -111,12 +113,14 @@ is not required. The model describes its assumptions and omitted effects; a dual
 op amp's macro-model includes both channels and the documented physical pin map.
 Insufficient information produces unavailable assets and warnings. Generated files
 are drafts: review their pin mapping, dimensions, cited PDF pages and assumptions.
-Runframe validates the response structure and filenames; it does not certify the
-generated circuit geometry, TSX behavior, or electrical accuracy.
+Runframe validates response structure and filenames. Before adding an output it
+checks the selected TSX modules for syntax, default exports and local imports.
+These checks do not certify circuit geometry, runtime behavior or electrical accuracy.
 
 `RunFrameWithApi` and `RunFrameForCli` save generations through the project file
 API and append the selected module to the current TSX board. The source must
-contain exactly one `<board>`. Existing source and board attributes are preserved.
+contain exactly one `<board>`. Existing source, board attributes and manually placed components are preserved;
+new imports use native PCB placement.
 Custom hosts can supply persistence and placement callbacks:
 
 ```tsx
@@ -157,6 +161,9 @@ For a custom launcher, render the exported `DatasheetImportDialog` inside a
 generateReferenceCircuit, abortSignal })` is also exported; both generation flags
 default to false. `createDatasheetGeneration(assets, sourceFileName)` prepares the
 folder and manifest, and `saveDatasheetGenerationToApi` persists it.
+`readDatasheetGenerations(fsMap)` restores complete generation manifests and their
+current source files; `getPlacedDatasheetEntrypoints(source, boardPath)` identifies
+modules used in the board. RunFrame connects these automatically to the dialog.
 `getDatasheetAssetFiles(assets)` collects all generated assets, or accepts a
 usage kind to filter the optional circuit modules. Generation saves source files;
 **Run** executes the board after placement. Canceling or closing invalidates a
@@ -166,15 +173,15 @@ The Cosmos `example66-datasheet-import` fixture uses the website's `RunFrame`
 component with source files, a Run button, and a hidden File menu. It opens on a
 populated 3D view, with PCB and schematic tabs and the datasheet toolbar action.
 All generations appear as folders in the file tree and are persisted in the
-browser's Origin Private File System. Reloading restores the project. **Use in
+browser's Origin Private File System. Editor changes autosave through a serialized
+write queue; failed writes remain retryable. Reloading restores the project and
+generation history. **Use in
 project** appends to the populated board; **Run** renders the combined result. This fixture contains no mock AI model or canned component results.
 Choose **Configure AI**. OpenAI is selected by default and uses the hardcoded
 `gpt-6-astra` model, with no model ID input. Anthropic, Google Gemini and
 OpenAI-compatible services remain available with an explicit model ID. The
-standard providers have **Sign in** links to their
-official account consoles. These open a new tab; they do not perform OAuth or
-automatically grant Runframe model access. For this personal preview, return with
-a provider API key. Standard provider addresses are automatic. No connection is
+standard providers have **Get API key** links to their official key-management
+pages. For this personal preview, return with a provider API key. Standard provider addresses are automatic. No connection is
 active until the user configures it. Keys stay in tab memory, go only to that
 provider, and clear on reload or disconnect.
 

@@ -83,8 +83,7 @@ export const DatasheetPreviewAiConnection = ({
           <DialogHeader>
             <DialogTitle>Connect your AI</DialogTitle>
             <DialogDescription>
-              Connect your AI provider to generate component assets from a
-              datasheet. OpenAI uses GPT-6 Astra automatically.
+              Connect a provider to generate from PDFs.
             </DialogDescription>
           </DialogHeader>
           <label className="rf-grid rf-gap-1 rf-text-sm">
@@ -110,22 +109,17 @@ export const DatasheetPreviewAiConnection = ({
               )}
             </select>
           </label>
-          {providerInfo?.signInUrl && (
-            <div className="rf-grid rf-gap-2 rf-rounded rf-border rf-p-3">
-              <Button asChild variant="outline">
+          {!isCustom && providerInfo?.signInUrl && (
+            <div className="rf-flex rf-justify-end">
+              <Button asChild variant="link" size="sm">
                 <a
                   href={providerInfo.signInUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Sign in to {providerInfo.label} ↗
+                  Get {providerInfo.label} API key ↗
                 </a>
               </Button>
-              <p className="rf-text-xs rf-text-zinc-500">
-                Opens the official provider site in a new tab. Sign in there to
-                get an API key, then return here. This link does not connect
-                your account to Runframe automatically.
-              </p>
             </div>
           )}
           {providerInfo && (
@@ -196,9 +190,7 @@ export const DatasheetPreviewAiConnection = ({
               <p className="rf-text-xs rf-text-zinc-500">
                 {isCustom
                   ? "Your server manages provider credentials and must allow this preview origin."
-                  : "The provider address is automatic. Your key stays in this tab's memory and is sent only to the selected provider."}{" "}
-                Settings clear on reload. Your model must support PDFs and
-                structured JSON output.
+                  : "Your key stays in this tab and clears on reload."}
               </p>
             </>
           )}

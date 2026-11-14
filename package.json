@@ -126,7 +126,8 @@
     "bun-match-svg": "^0.0.17",
     "@ai-sdk/anthropic": "^4.0.104",
     "@ai-sdk/openai": "^4.0.118",
-    "@ai-sdk/google": "^4.0.121"
+    "@ai-sdk/google": "^4.0.121",
+    "@babel/types": "7.29.14"
   },
   "dependencies": {
     "@tscircuit/ngspice-spice-engine": "0.0.20",

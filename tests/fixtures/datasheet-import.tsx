@@ -90,6 +90,7 @@ test("generations save before use, remain open, track additions and retain retry
     expect(button("Generate").disabled).toBe(true)
     expect(document.querySelector("input[type=radio]")).toBeNull()
     await drop([new File(["bad"], "wrong.txt")])
+    await until(() => !!document.querySelector("[role=alert]"))
     expect(document.querySelector("[role=alert]")?.textContent).toContain(
       "Choose a PDF",
     )
@@ -126,6 +127,7 @@ test("generations save before use, remain open, track additions and retain retry
       throw new Error("Board save failed")
     })
     await act(async () => useButton("Chip").click())
+    await until(() => !!document.querySelector("[role=alert]"))
     expect(document.querySelector("[role=alert]")?.textContent).toContain(
       "Board save failed",
     )
@@ -136,6 +138,9 @@ test("generations save before use, remain open, track additions and retain retry
       ["Reference circuit", "referenceCircuit"],
     ] as const) {
       await act(async () => useButton(label).click())
+      await until(
+        () => useButton(label).getAttribute("aria-pressed") === "true",
+      )
       expect(useButton(label).disabled).toBe(true)
       expect(useButton(label).getAttribute("aria-pressed")).toBe("true")
       expect(

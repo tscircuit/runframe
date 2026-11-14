@@ -1,7 +1,10 @@
 import {
   getDatasheetAssetFiles,
+  validateDatasheetAssets,
+  datasheetAssetLabels,
   type DatasheetAssets,
 } from "./datasheet-assets"
+import { z } from "zod"
 
 export interface DatasheetGeneration {
   id: string
@@ -10,6 +13,86 @@ export interface DatasheetGeneration {
   sourceFileName: string
   assets: DatasheetAssets
   files: Record<string, string>
+}
+
+const manifestSchema = z.object({
+  version: z.literal(1),
+  id: z.string().uuid(),
+  createdAt: z.string().datetime(),
+  sourceFileName: z.string(),
+  partNumber: z.string(),
+  packageName: z.string(),
+  summary: z.string(),
+  warnings: z.array(z.string()),
+  assets: z.array(
+    z.object({
+      kind: z.enum([
+        "footprint",
+        "symbol",
+        "spiceModel",
+        "component",
+        "simulationCircuit",
+        "referenceCircuit",
+      ]),
+      filename: z.string(),
+      notes: z.string(),
+      sourcePages: z.array(z.number()),
+    }),
+  ),
+})
+
+/** Reopen complete generations from their manifest and current project sources. */
+export const readDatasheetGenerations = (
+  files: ReadonlyMap<string, string> | Record<string, string>,
+): DatasheetGeneration[] => {
+  const entries = files instanceof Map ? [...files] : Object.entries(files)
+  const fs = new Map(entries)
+  const generations: DatasheetGeneration[] = []
+  const ids = new Set<string>()
+  for (const [path, content] of entries) {
+    if (!/^generated\/[a-zA-Z0-9_-]+\/generation\.json$/.test(path)) continue
+    try {
+      const manifest = manifestSchema.parse(JSON.parse(content))
+      if (ids.has(manifest.id)) continue
+      const directory = path.slice(0, -"/generation.json".length)
+      const kinds = manifest.assets.map((asset) => asset.kind)
+      if (new Set(kinds).size !== kinds.length) continue
+      const sources = Object.fromEntries(
+        manifest.assets.map((asset) => [
+          asset.kind,
+          {
+            ...asset,
+            content: fs.get(`${directory}/${asset.filename}`),
+          },
+        ]),
+      )
+      const assets = validateDatasheetAssets({
+        ...Object.fromEntries(
+          Object.keys(datasheetAssetLabels).map((kind) => [kind, null]),
+        ),
+        ...manifest,
+        ...sources,
+      })
+      generations.push({
+        id: manifest.id,
+        directory,
+        createdAt: manifest.createdAt,
+        sourceFileName: manifest.sourceFileName,
+        assets,
+        files: Object.fromEntries(
+          entries.filter(([name]) => name.startsWith(directory + "/")),
+        ),
+      })
+      ids.add(manifest.id)
+    } catch {
+      // Incomplete saves and user-edited manifests remain visible in the file
+      // tree, but cannot become actionable generations with missing source.
+    }
+  }
+  return generations.sort(
+    (a, b) =>
+      a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id),
+  )
 }
 
 export const createDatasheetGeneration = (

@@ -81,6 +81,12 @@ export interface PreviewContentProps {
    * schematic, and CAD tabs.
    */
   showRightHeaderContent?: boolean
+  /**
+   * Whether to show the header at all: the left content, the render status
+   * and the tabs. Set to false when the host draws its own header and picks
+   * the tab with `activeTab`. Defaults to true.
+   */
+  showHeader?: boolean
   isRunningCode?: boolean
   isStreaming?: boolean
   // manualEditsFileContent?: string
@@ -93,6 +99,14 @@ export interface PreviewContentProps {
    * Alias for defaultActiveTab
    */
   defaultTab?: TabId
+
+  /**
+   * The tab to show, when the host picks the tab. While set, the preview does
+   * not switch tabs on its own: a switch it would have made (to the errors
+   * tab after a failed run, for example) is only reported through
+   * `onActiveTabChange`, and the host decides whether to follow it.
+   */
+  activeTab?: TabId
 
   /**
    * Tabs to display. Defaults to all

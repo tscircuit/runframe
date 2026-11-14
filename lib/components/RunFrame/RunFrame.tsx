@@ -285,9 +285,10 @@ export const RunFrame = (props: RunFrameProps) => {
     AutoroutingPhase[]
   >([])
   const autoroutingCaptureGeneration = useRef(0)
-  const [activeTab, setActiveTab] = useState<TabId>(
+  const [uncontrolledActiveTab, setActiveTab] = useState<TabId>(
     props.defaultActiveTab ?? props.defaultTab ?? "pcb",
   )
+  const activeTab = props.activeTab ?? uncontrolledActiveTab
   usePostHogActivity({
     source: "runframe",
     component: "RunFrame",
@@ -776,6 +777,8 @@ export const RunFrame = (props: RunFrameProps) => {
         fsMap={fsMap}
         defaultActiveTab={props.defaultActiveTab ?? props.defaultTab}
         defaultTab={props.defaultTab}
+        activeTab={props.activeTab}
+        showHeader={props.showHeader}
         availableTabs={props.availableTabs}
         extraTabs={filterExtraRunFrameTabs(
           props.extraTabs,
@@ -887,7 +890,10 @@ export const RunFrame = (props: RunFrameProps) => {
             {props.leftHeaderContent}
           </>
         }
-        onActiveTabChange={setActiveTab}
+        onActiveTabChange={(tab) => {
+          if (props.activeTab === undefined) setActiveTab(tab)
+          props.onActiveTabChange?.(tab)
+        }}
         circuitJson={circuitJson}
         renderLog={renderLog}
         activeEffectName={activeEffectName}

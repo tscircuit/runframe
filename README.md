@@ -170,6 +170,50 @@ window.addEventListener("message", (event) => {
 })
 ```
 
+| Event | Sent when | Fields |
+| --- | --- | --- |
+| `error` | Running the code threw | `error_message` |
+| `render_started` | A run begins | |
+| `circuit_json_changed` | A run has its first Circuit JSON, and again its final one | `circuit_json_element_counts` |
+| `render_finished` | A run rendered to the end | `circuit_json_element_counts` |
+| `run_completed` | A run ends, whether it rendered or threw | `has_execution_error`, `error_count` |
+| `active_tab_changed` | The tab changes, or RunFrame asks the host for a tab (see below) | `tab` |
+
+`circuit_json_element_counts` says how many elements of each type the circuit
+has, for example `{ "pcb_board": 1, "system_block_page": 1 }`. A host can use
+it to tell which views have something to show without receiving the whole
+Circuit JSON.
+
+#### Drawing your own header
+
+A host that has its own tabs can hide RunFrame's header and pick the tab:
+
+```tsx
+iframe.contentWindow.postMessage(
+  {
+    runframe_type: "runframe_props_changed",
+    runframe_props: { showHeader: false, activeTab: "schematic" },
+  },
+  "*",
+)
+```
+
+Send `activeTab` again to switch tabs; props are merged, so the files do not
+need to be sent again. While `activeTab` is set, RunFrame does not switch tabs
+on its own. Where it would have, such as to `errors` after a failed run and
+back afterwards, it sends `active_tab_changed` and the host decides whether to
+follow.
+
+The ready message lists what the deployed iframe supports, so a host can tell
+an older deployment from a newer one:
+
+```tsx
+{
+  runframe_type: "runframe_ready_to_receive",
+  runframe_capabilities: ["show_header", "active_tab", "render_events"],
+}
+```
+
 ## Development
 
 ### File-Server Interaction with Edit Events

@@ -97,10 +97,12 @@ button with a tick. Each output can be used independently. Generation history
 retains these states when switching between results or reopening the dialog.
 **Download generation** in the Files tab exports the whole directory as a ZIP.
 
-The current simulator analyzes the complete board, including reference circuits.
-Unconnected networks can produce floating-node errors. Run the generated test
-circuit independently until the other circuits have their supplies and inputs
-connected.
+The default ngspice engine uses unique internal device names, so repeated labels
+such as `C1` in separate groups do not collide. It analyzes the simulation group's
+circuit and includes components wired across its boundary. Unrelated reference
+circuitry stays on the board without being included in that analysis. This also
+applies to previously saved generations; regeneration is unnecessary. Hosts that
+provide a custom ngspice engine retain their own execution behavior.
 
 Results contain tscircuit TSX files for a footprint, schematic symbol and combined
 component, plus an AI-generated behavioral SPICE macro-model synthesized from

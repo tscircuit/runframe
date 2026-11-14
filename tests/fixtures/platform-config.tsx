@@ -5,7 +5,14 @@ import { JSDOM } from "jsdom"
 import { act } from "react"
 import { createRoot } from "react-dom/client"
 
-const createWorker = mock(async (_options: unknown) => ({}))
+const getCircuitJson = mock(async () => [])
+const simulate = mock(async (_source: string) => ({
+  simulationResultCircuitJson: [],
+}))
+const createWorker = mock(async (_options: unknown) => ({ getCircuitJson }))
+mock.module("@tscircuit/ngspice-spice-engine", () => ({
+  createNgspiceSpiceEngine: async () => ({ simulate }),
+}))
 const previewConfigs: (PlatformConfig | undefined)[] = []
 mock.module("@tscircuit/eval/worker", () => ({
   createCircuitWebWorker: createWorker,
@@ -95,7 +102,15 @@ test("shared circuit hooks reach the evaluator and schematic viewer unchanged", 
       platform: PlatformConfig
       projectConfig: Partial<PlatformConfig>
     }
-    expect(options.platform).toBe(platformConfig)
+    expect(options.platform).toMatchObject(platformConfig)
+    expect(options.platform.partsEngine).toBe(platformConfig.partsEngine)
+    expect(options.platform.platformFetch).toBe(platformConfig.platformFetch)
+    expect(options.platform.spiceEngineMap?.ngspice.simulate).toBeInstanceOf(
+      Function,
+    )
+    await options.platform.spiceEngineMap!.ngspice.simulate("* no probes\n.END")
+    expect(getCircuitJson).toHaveBeenCalledTimes(1)
+    expect(simulate).toHaveBeenCalledWith("* no probes\n.END")
     expect(options).not.toHaveProperty("partsEngineOptions")
     expect(options.projectConfig).toMatchObject({
       projectBaseUrl: platformConfig.projectBaseUrl,
@@ -122,6 +137,30 @@ test("shared circuit hooks reach the evaluator and schematic viewer unchanged", 
     ).not.toBeNull()
     expect(previewConfigs.at(-1)).toBe(platformConfig)
     expect(createWorker).toHaveBeenCalledTimes(1)
+    await act(async () => root.unmount())
+    globalThis.runFrameWorker = undefined
+    root = createRoot(document.getElementById("root")!)
+    const customEngine = {
+      simulate: mock(async () => ({ simulationResultCircuitJson: [] })),
+    }
+    await act(async () => {
+      root.render(
+        <RunFrame
+          fsMap={{}}
+          isLoadingFiles
+          showFileMenu={false}
+          platformConfig={{
+            ...platformConfig,
+            spiceEngineMap: { ngspice: customEngine },
+          }}
+        />,
+      )
+    })
+    expect(createWorker).toHaveBeenCalledTimes(2)
+    const customOptions = createWorker.mock.calls[1][0] as {
+      platform: PlatformConfig
+    }
+    expect(customOptions.platform.spiceEngineMap?.ngspice).toBe(customEngine)
   } finally {
     await act(async () => root.unmount())
     globalThis.fetch = previousFetch

@@ -62,6 +62,8 @@ import {
 } from "./run-completion"
 import { useRunnerStore } from "./runner-store/use-runner-store"
 import { useMutex } from "./useMutex"
+import { createRunframeNgspiceEngine } from "../../simulation/create-runframe-ngspice-engine"
+import { deduplicateSimulationGraphs } from "../../simulation/deduplicate-simulation-graphs"
 import {
   captureAutoroutingPhase,
   type AutoroutingPhase,
@@ -194,7 +196,7 @@ const RunFrameContent = (props: RunFrameProps) => {
         partsEngineOptions.jlcSearchBaseUrl !== undefined ||
         partsEngineOptions.datasheetApiBaseUrl !== undefined
       // Resolve once for both preload and execution, then recheck the cache.
-      const worker =
+      const worker: Awaited<ReturnType<typeof createCircuitWebWorker>> =
         globalThis.runFrameWorker ??
         (await createCircuitWebWorker({
           evalVersion,
@@ -207,7 +209,15 @@ const RunFrameContent = (props: RunFrameProps) => {
               props.platformConfig?.projectBaseUrl ??
               `${API_BASE}/files/static`,
           }),
-          ...(props.platformConfig && { platform: props.platformConfig }),
+          platform: {
+            ...props.platformConfig,
+            spiceEngineMap: {
+              ngspice: createRunframeNgspiceEngine(() =>
+                worker.getCircuitJson(),
+              ),
+              ...props.platformConfig?.spiceEngineMap,
+            },
+          },
           verbose: true,
           ...(props.enableFetchProxy && {
             enableFetchProxy: props.enableFetchProxy,
@@ -602,7 +612,7 @@ const RunFrameContent = (props: RunFrameProps) => {
       if (!settled.success) throw settled.error
 
       debug("getting final circuit json")
-      circuitJson = await worker.getCircuitJson()
+      circuitJson = deduplicateSimulationGraphs(await worker.getCircuitJson())
       if (!isCurrentRun()) return
       props.onCircuitJsonChange?.(circuitJson)
       setCircuitJson(circuitJson)

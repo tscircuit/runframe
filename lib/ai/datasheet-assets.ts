@@ -1,9 +1,6 @@
 import { z } from "zod"
 
-const filename = z
-  .string()
-  .max(120)
-  .regex(/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/)
+const filename = z.string().max(120)
 
 const asset = z.object({
   filename,
@@ -12,9 +9,15 @@ const asset = z.object({
   sourcePages: z.array(z.number().int().positive()).max(100),
 })
 
-const tsxAsset = asset.extend({ filename: filename.regex(/\.tsx$/) })
+// A single pattern preserves basename and extension checks without emitting
+// allOf, which OpenAI Structured Outputs does not support.
+const tsxAsset = asset.extend({
+  filename: filename.regex(/^[a-zA-Z0-9][a-zA-Z0-9._-]*\.tsx$/),
+})
 const spiceAsset = asset.extend({
-  filename: filename.regex(/\.(cir|spice|lib|subckt)$/),
+  filename: filename.regex(
+    /^[a-zA-Z0-9][a-zA-Z0-9._-]*\.(cir|spice|lib|subckt)$/,
+  ),
 })
 
 export const datasheetAssetsSchema = z.object({

@@ -1,6 +1,9 @@
 import { expect, test } from "bun:test"
 import { MockLanguageModelV4 } from "ai/test"
-import { getDatasheetAssetFiles } from "../lib/ai/datasheet-assets"
+import {
+  getDatasheetAssetFiles,
+  validateDatasheetAssets,
+} from "../lib/ai/datasheet-assets"
 import {
   MAX_DATASHEET_BYTES,
   generateDatasheetAssets,
@@ -78,6 +81,18 @@ test("rejects malformed output and unsafe or conflicting filenames", async () =>
     },
     {
       ...generatedAssets,
+      footprint: { ...generatedAssets.footprint, filename: ".hidden.tsx" },
+    },
+    {
+      ...generatedAssets,
+      spiceModel: { ...generatedAssets.footprint, filename: "../model.cir" },
+    },
+    {
+      ...generatedAssets,
+      spiceModel: { ...generatedAssets.footprint, filename: "model.tsx" },
+    },
+    {
+      ...generatedAssets,
       symbol: { ...generatedAssets.symbol, filename: "test123.footprint.tsx" },
     },
     {
@@ -92,6 +107,18 @@ test("rejects malformed output and unsafe or conflicting filenames", async () =>
         file: pdfFile(),
       }),
     ).rejects.toThrow()
+  }
+})
+
+test("accepts safe SPICE basenames with every supported extension", () => {
+  for (const extension of ["cir", "spice", "lib", "subckt"]) {
+    const spiceModel = {
+      ...generatedAssets.footprint!,
+      filename: `TEST123.model-v1.${extension}`,
+    }
+    expect(
+      validateDatasheetAssets({ ...generatedAssets, spiceModel }).spiceModel,
+    ).toEqual(spiceModel)
   }
 })
 

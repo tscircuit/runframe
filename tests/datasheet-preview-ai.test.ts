@@ -11,6 +11,34 @@ const selectedModelId = "user-selected-model"
 const pdfBytes = "%PDF-1.7\nUser-supplied datasheet"
 const outputText = JSON.stringify(generatedAssets)
 
+// OpenAI accepts a subset of JSON Schema, even when the schema is valid for Zod.
+const expectSupportedOpenAiSchema = (schema: any) => {
+  for (const keyword of [
+    "allOf",
+    "not",
+    "dependentRequired",
+    "dependentSchemas",
+    "if",
+    "then",
+    "else",
+  ]) {
+    expect(schema).not.toHaveProperty(keyword)
+  }
+  if (schema.type === "object") {
+    expect(schema.additionalProperties).toBe(false)
+    expect([...schema.required].sort()).toEqual(
+      Object.keys(schema.properties).sort(),
+    )
+  }
+  for (const property of Object.values(schema.properties ?? {})) {
+    expectSupportedOpenAiSchema(property)
+  }
+  for (const alternative of schema.anyOf ?? []) {
+    expectSupportedOpenAiSchema(alternative)
+  }
+  if (schema.items) expectSupportedOpenAiSchema(schema.items)
+}
+
 const otherProviderCases = [
   {
     provider: "openai" as const,
@@ -213,6 +241,9 @@ test("OpenAI uses GPT-6 Astra without asking for a model ID", async () => {
   const body = JSON.parse(String(calls[0].init.body))
   expect(body.model).toBe(OPENAI_DATASHEET_MODEL_ID)
   expect(body.model).toBe("gpt-6-astra")
+  expect(body.text.format.type).toBe("json_schema")
+  expect(body.text.format.strict).toBe(true)
+  expectSupportedOpenAiSchema(body.text.format.schema)
   expect(result).toEqual(generatedAssets)
 })
 

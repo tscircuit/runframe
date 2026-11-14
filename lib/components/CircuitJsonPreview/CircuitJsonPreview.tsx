@@ -394,7 +394,11 @@ export const CircuitJsonPreview = ({
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab as any}
-          className="rf-flex-grow rf-flex rf-flex-col rf-h-full"
+          className={cn(
+            "rf-flex-grow rf-flex rf-flex-col rf-h-full",
+            // The gap above each panel separates it from the header.
+            !showHeader && "[&>[role=tabpanel]]:!rf-mt-0",
+          )}
         >
           {showHeader && (
             <div

@@ -2,6 +2,7 @@ import type { ManualEditEvent, PlatformConfig } from "@tscircuit/props"
 import type { TabId } from "lib/components/CircuitJsonPreview/PreviewContentProps"
 import type { RunCompletedPayload } from "./run-completion"
 import type { ExtraRunFrameTab } from "../CircuitJsonPreview/extra-runframe-tabs"
+import type { RunFrameController } from "./useRunFrameController"
 
 export interface RunFrameProps {
   /**
@@ -62,6 +63,13 @@ export interface RunFrameProps {
    * Whether to show the file menu
    */
   showFileMenu?: boolean
+
+  /**
+   * Whether to show the header at all: the run button, the file menu, the
+   * render status and the tabs. Set to false when the host draws its own
+   * header and picks the tab with `activeTab`. Defaults to true.
+   */
+  showHeader?: boolean
 
   /**
    * Called when the circuit JSON changes
@@ -126,6 +134,23 @@ export interface RunFrameProps {
    * Alias for defaultActiveTab
    */
   defaultTab?: TabId
+
+  /**
+   * The tab to show, when the host picks the tab. While set, RunFrame does not
+   * switch tabs on its own: a switch it would have made (to the errors tab
+   * after a failed run, for example) is only reported through
+   * `onActiveTabChange`, and the host decides whether to follow it.
+   */
+  activeTab?: TabId
+
+  /**
+   * Called when the active tab changes, or, with `activeTab` set, when
+   * RunFrame asks for a different tab.
+   */
+  onActiveTabChange?: (tab: TabId) => void
+
+  /** Connect the controller returned by useRunFrameController. */
+  controller?: RunFrameController
 
   /**
    * Tabs to display. Defaults to all

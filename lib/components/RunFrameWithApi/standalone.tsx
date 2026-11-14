@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client"
 import { RunFrameWithApi } from "./RunFrameWithApi"
 import { RunFrameForCli } from "../RunFrameForCli/RunFrameForCli"
 import { RunFrame } from "../RunFrame/RunFrame"
+import { RunFrameInIframe } from "../RunFrameInIframe/RunFrameInIframe"
 import { RunFrameStaticBuildViewer } from "../RunFrameStaticBuildViewer/RunFrameStaticBuildViewer"
 import type { CircuitJsonFileReference } from "../RunFrameStaticBuildViewer/RunFrameStaticBuildViewer"
 import type { ComponentProps } from "react"
@@ -11,6 +12,11 @@ import { useExtraRunFrameTabsFromWindow } from "../../hooks/use-extra-runframe-t
 declare global {
   interface Window {
     TSCIRCUIT_USE_RUNFRAME_FOR_CLI?: boolean
+    /**
+     * Set by a page that loads this bundle inside an iframe and drives it from
+     * the parent window, the way runframe.tscircuit.com/iframe.html is driven.
+     */
+    TSCIRCUIT_USE_RUNFRAME_PROPS_FROM_PARENT?: boolean
     TSCIRCUIT_RUNFRAME_STATIC_FILE_LIST?: CircuitJsonFileReference[]
     TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH?: string
     TSCIRCUIT_PACKAGE_NAME?: string
@@ -92,15 +98,24 @@ function StandaloneApp({
   defaultMainComponentPath,
   projectName,
   isCli,
+  usePropsFromParent,
   fsMap,
 }: {
   staticFileList?: CircuitJsonFileReference[]
   defaultMainComponentPath?: string
   projectName?: string
   isCli?: boolean
+  usePropsFromParent?: boolean
   fsMap: Map<string, string>
 }) {
   const extraTabs = useExtraRunFrameTabsFromWindow()
+  if (usePropsFromParent) {
+    return (
+      <RunFrameInIframe
+        defaultProps={{ ...runframeStandaloneProps, extraTabs }}
+      />
+    )
+  }
   if (Array.isArray(staticFileList)) {
     return (
       <RunFrameStaticBuildViewer
@@ -133,8 +148,9 @@ function StandaloneApp({
   const defaultMainComponentPath = window.TSCIRCUIT_DEFAULT_MAIN_COMPONENT_PATH
   const projectName = window.TSCIRCUIT_PACKAGE_NAME
   const isCli = window.TSCIRCUIT_USE_RUNFRAME_FOR_CLI
+  const usePropsFromParent = window.TSCIRCUIT_USE_RUNFRAME_PROPS_FROM_PARENT
   const { fsMap } =
-    !Array.isArray(staticFileList) && !isCli
+    !Array.isArray(staticFileList) && !isCli && !usePropsFromParent
       ? await loadScriptsAsFsMap()
       : { fsMap: new Map<string, string>() }
 
@@ -144,6 +160,7 @@ function StandaloneApp({
       defaultMainComponentPath={defaultMainComponentPath}
       projectName={projectName}
       isCli={isCli}
+      usePropsFromParent={usePropsFromParent}
       fsMap={fsMap}
     />,
   )

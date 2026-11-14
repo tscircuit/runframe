@@ -4,7 +4,10 @@
  */
 import { useEffect, useRef, useState } from "react"
 import type { RunFrameProps } from "../RunFrame/RunFrameProps"
-import { isRunFrameReadyMessageFromChild } from "./iframe-message-source"
+import {
+  isRunFrameEventMessageFromChild,
+  isRunFrameReadyMessageFromChild,
+} from "./iframe-message-source"
 import { useStableRunFrameProps } from "./use-stable-runframe-props"
 import { postRunFrameProps } from "./post-runframe-props"
 
@@ -14,9 +17,21 @@ export interface RunFrameWithIframeProps extends RunFrameProps {
 
 export const RunFrameWithIframe = ({
   iframeUrl = "https://runframe.tscircuit.com/iframe.html",
+  controller,
   ...runFrameProps
 }: RunFrameWithIframeProps) => {
-  const stableProps = useStableRunFrameProps(runFrameProps)
+  // The controller's callback cannot cross the iframe boundary: its tab goes
+  // as a prop, and the iframe's events come back to it as messages.
+  const stableProps = useStableRunFrameProps(
+    controller
+      ? {
+          ...runFrameProps,
+          activeTab: controller.activeTab ?? runFrameProps.activeTab,
+        }
+      : runFrameProps,
+  )
+  const latestController = useRef(controller)
+  latestController.current = controller
   const [error, setError] = useState<Error | null>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const latestProps = useRef(stableProps)
@@ -27,6 +42,11 @@ export const RunFrameWithIframe = ({
     ready.current = false
     const origin = new URL(iframeUrl, window.location.href).origin
     const handleMessage = (event: MessageEvent) => {
+      const child = iframeRef.current?.contentWindow
+      if (isRunFrameEventMessageFromChild({ event, child, origin })) {
+        latestController.current?.onEvent(event.data.runframe_event)
+        return
+      }
       if (
         isRunFrameReadyMessageFromChild({
           event,

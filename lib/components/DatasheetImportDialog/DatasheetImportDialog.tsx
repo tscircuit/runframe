@@ -137,7 +137,7 @@ export const DatasheetImportDialog = ({
     setDragging(false)
     try {
       if (files.length !== 1) throw new Error("Choose one PDF datasheet.")
-      validateDatasheetFile(files[0])
+      validateDatasheetFile(files[0], ai?.maxDatasheetBytes)
       setFile(files[0])
     } catch (error) {
       setError(
@@ -367,7 +367,7 @@ export const DatasheetImportDialog = ({
               <span className="ds-upload-size">
                 {file
                   ? `${(file.size / 1024 / 1024).toFixed(1)} MB`
-                  : "Up to 20 MB"}
+                  : `Up to ${(ai?.maxDatasheetBytes ?? 20 * 1024 * 1024) / 1024 / 1024} MB`}
               </span>
             </button>
           </div>

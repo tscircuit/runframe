@@ -5,6 +5,8 @@ import { type ReactNode, createContext, useContext } from "react"
 export interface RunFrameAiConfig {
   /** An AI SDK model configured by the host with the user's provider and authentication. */
   model: LanguageModel
+  /** Optional upload limit imposed by the host's transport. Defaults to 20 MB. */
+  maxDatasheetBytes?: number
 }
 
 const RunFrameAiContext = createContext<RunFrameAiConfig | undefined>(undefined)

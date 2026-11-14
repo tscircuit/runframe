@@ -2,6 +2,10 @@ import { createAnthropic } from "@ai-sdk/anthropic"
 import { createGoogleGenerativeAI } from "@ai-sdk/google"
 import { createOpenAI } from "@ai-sdk/openai"
 import type { RunFrameAiConfig } from "../../lib/ai/RunFrameAiProvider"
+import {
+  PREVIEW_MAX_DATASHEET_BYTES,
+  createDatasheetRelayFetch,
+} from "./datasheet-relay-fetch"
 
 // https://developers.openai.com/api/docs/models/gpt-6-astra
 export const OPENAI_DATASHEET_MODEL_ID = "gpt-6-astra"
@@ -39,7 +43,7 @@ export interface DatasheetPreviewConnection {
   provider: DatasheetPreviewProvider
   proxyUrl?: string
   modelId?: string
-  /** User-supplied provider key, held in memory and sent only to that provider. */
+  /** User-supplied key, held in memory and relayed to its provider per request. */
   apiKey?: string
   useCustomEndpoint?: boolean
   /** Host application session token, never a provider API key. Kept in memory. */
@@ -105,27 +109,33 @@ export const createDatasheetPreviewAi = (
       throw new Error("Enter your provider API key.")
     baseURL = provider.baseUrl!
     apiKey = connection.apiKey.trim()
-    if (connection.provider === "anthropic") {
-      headers = { "anthropic-dangerous-direct-browser-access": "true" }
-    }
   }
   const settings = {
     baseURL,
     apiKey,
     headers,
-    fetch: ((input, init) =>
-      (options.fetch ?? globalThis.fetch)(input, {
-        ...init,
-        credentials: isCustom ? "include" : "omit",
-      })) as typeof globalThis.fetch,
+    fetch: isCustom
+      ? (((input, init) =>
+          (options.fetch ?? globalThis.fetch)(input, {
+            ...init,
+            credentials: "include",
+          })) as typeof globalThis.fetch)
+      : createDatasheetRelayFetch(
+          connection.provider,
+          options.origin,
+          options.fetch ?? globalThis.fetch,
+        ),
   }
+  const limits = isCustom
+    ? {}
+    : { maxDatasheetBytes: PREVIEW_MAX_DATASHEET_BYTES }
   switch (connection.provider) {
     case "anthropic":
-      return { model: createAnthropic(settings)(modelId) }
+      return { ...limits, model: createAnthropic(settings)(modelId) }
     case "google":
-      return { model: createGoogleGenerativeAI(settings)(modelId) }
+      return { ...limits, model: createGoogleGenerativeAI(settings)(modelId) }
     case "openai":
-      return { model: createOpenAI(settings).responses(modelId) }
+      return { ...limits, model: createOpenAI(settings).responses(modelId) }
     case "openai-compatible":
       return { model: createOpenAI(settings).chat(modelId) }
   }

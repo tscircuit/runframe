@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/datasheet-ai.js": {
+      "maxDuration": 300
+    }
+  }
+}

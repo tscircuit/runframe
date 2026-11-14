@@ -7,13 +7,18 @@ import {
 
 export const MAX_DATASHEET_BYTES = 20 * 1024 * 1024
 
-export const validateDatasheetFile = (file: File): void => {
+export const validateDatasheetFile = (
+  file: File,
+  maxBytes = MAX_DATASHEET_BYTES,
+): void => {
   if (!file.name.toLowerCase().endsWith(".pdf")) {
     throw new Error("Choose a PDF datasheet.")
   }
   if (file.size === 0) throw new Error("The datasheet is empty.")
-  if (file.size > MAX_DATASHEET_BYTES) {
-    throw new Error("The datasheet must be 20 MB or smaller.")
+  if (file.size > maxBytes) {
+    throw new Error(
+      `The datasheet must be ${maxBytes / 1024 / 1024} MB or smaller.`,
+    )
   }
 }
 
@@ -45,7 +50,7 @@ export const generateDatasheetAssets = async ({
   generateReferenceCircuit?: boolean
   abortSignal?: AbortSignal
 }): Promise<DatasheetAssets> => {
-  validateDatasheetFile(file)
+  validateDatasheetFile(file, ai.maxDatasheetBytes)
   abortSignal?.throwIfAborted()
   const data = new Uint8Array(await file.arrayBuffer())
   abortSignal?.throwIfAborted()

@@ -190,7 +190,7 @@ export const DatasheetPreviewAiConnection = ({
               <p className="rf-text-xs rf-text-zinc-500">
                 {isCustom
                   ? "Your server manages provider credentials and must allow this preview origin."
-                  : "Your key stays in this tab and clears on reload."}
+                  : "Your key clears on reload. Requests pass through this preview’s server; keys are not stored."}
               </p>
             </>
           )}

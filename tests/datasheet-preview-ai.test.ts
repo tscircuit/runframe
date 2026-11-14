@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test"
+import { gunzipSync } from "node:zlib"
 import {
   OPENAI_DATASHEET_MODEL_ID,
   createDatasheetPreviewAi,
-  datasheetPreviewProviders,
 } from "../examples/assets/create-datasheet-preview-ai"
 import { generateDatasheetAssets } from "../lib/ai/generate-datasheet-assets"
 import { generatedAssets, providerAssets } from "./fixtures/datasheet-ai"
@@ -237,8 +237,18 @@ test("OpenAI uses GPT-6 Astra without asking for a model ID", async () => {
     file: new File([pdfBytes], "user.pdf", { type: "application/pdf" }),
   })
   expect(calls).toHaveLength(1)
-  expect(calls[0].url).toBe("https://api.openai.com/v1/responses")
-  const body = JSON.parse(String(calls[0].init.body))
+  expect(calls[0].url).toBe("https://preview.example.test/api/datasheet-ai")
+  const headers = new Headers(calls[0].init.headers)
+  expect(headers.get("x-datasheet-path")).toBe("/v1/responses")
+  const body = JSON.parse(
+    gunzipSync(Buffer.from(calls[0].init.body as ArrayBuffer)).toString(),
+  )
+  const fileData = body.input
+    .find((message: any) => message.role === "user")
+    .content.find((part: any) => part.type === "input_file").file_data
+  expect(Buffer.from(fileData.split(",")[1], "base64").toString()).toBe(
+    pdfBytes,
+  )
   expect(body.model).toBe(OPENAI_DATASHEET_MODEL_ID)
   expect(body.model).toBe("gpt-6-astra")
   expect(body.text.format.type).toBe("json_schema")
@@ -248,7 +258,7 @@ test("OpenAI uses GPT-6 Astra without asking for a model ID", async () => {
 })
 
 for (const provider of ["openai", "anthropic", "google"] as const) {
-  test(`${provider} connects to its automatic address and never substitutes output on auth failure`, async () => {
+  test(`${provider} relays to its automatic address and surfaces auth failure`, async () => {
     const calls: { url: string; init: RequestInit }[] = []
     const ai = createDatasheetPreviewAi(
       {
@@ -277,11 +287,11 @@ for (const provider of ["openai", "anthropic", "google"] as const) {
       }),
     ).rejects.toThrow()
     expect(calls).toHaveLength(1)
-    expect(new URL(calls[0].url).origin).toBe(
-      new URL(datasheetPreviewProviders[provider].baseUrl).origin,
-    )
-    expect(calls[0].init.credentials).toBe("omit")
+    expect(calls[0].url).toBe("https://preview.example.test/api/datasheet-ai")
+    expect(calls[0].init.credentials).toBe("same-origin")
     const headers = new Headers(calls[0].init.headers)
+    expect(headers.get("x-datasheet-provider")).toBe(provider)
+    expect(headers.get("content-type")).toBe("application/gzip")
     const credentialHeader = {
       openai: "authorization",
       anthropic: "x-api-key",

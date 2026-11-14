@@ -182,8 +182,12 @@ Choose **Configure AI**. OpenAI is selected by default and uses the hardcoded
 OpenAI-compatible services remain available with an explicit model ID. The
 standard providers have **Get API key** links to their official key-management
 pages. For this personal preview, return with a provider API key. Standard provider addresses are automatic. No connection is
-active until the user configures it. Keys stay in tab memory, go only to that
-provider, and clear on reload or disconnect.
+active until the user configures it. Keys stay in tab memory and clear on reload
+or disconnect. Standard-provider requests pass through the preview's same-origin
+server, which forwards the key to the selected provider without storing or
+logging it. The hosted preview accepts PDFs up to 4 MB and compresses requests
+to fit the hosting upload limit. Custom hosts default to 20 MB and can set
+`ai.maxDatasheetBytes` to match their transport.
 
 Production websites should manage authentication and provider keys on their
 backend and supply the resulting `ai={{ model }}`. The preview also supports

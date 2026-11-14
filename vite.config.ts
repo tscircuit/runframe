@@ -6,6 +6,7 @@ import { getNodeHandler } from "winterspec/adapters/node"
 import fakeRegistryBundle from "@tscircuit/fake-snippets/bundle"
 import { createDatabase } from "@tscircuit/fake-snippets"
 import ky from "ky"
+import datasheetAiHandler from "./api/datasheet-ai.js"
 
 const registryDb = createDatabase()
 
@@ -61,6 +62,17 @@ function fakeRegistryPlugin(): Plugin {
 }
 
 const plugins: any[] = [react()]
+
+plugins.push({
+  name: "datasheet-ai-relay",
+  configureServer(server) {
+    server.middlewares.use((req, res, next) => {
+      if (req.url === "/api/datasheet-ai") {
+        void datasheetAiHandler(req, res)
+      } else next()
+    })
+  },
+} satisfies Plugin)
 
 if (!process.env.VERCEL && !process.env.STANDALONE) {
   plugins.push(fileServerPlugin())

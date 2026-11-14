@@ -1,9 +1,9 @@
 import type { LanguageModel } from "ai"
-import { createContext, useContext, type ReactNode } from "react"
+import { type ReactNode, createContext, useContext } from "react"
 
 /** AI is opt-in. The host owns provider selection, authentication and transport. */
 export interface RunFrameAiConfig {
-  /** An AI SDK model configured to use the host's authenticated backend proxy. */
+  /** An AI SDK model configured by the host with the user's provider and authentication. */
   model: LanguageModel
 }
 

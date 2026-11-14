@@ -8,6 +8,7 @@ import { useSyncPageTitle } from "lib/hooks/use-sync-page-title"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { RunFrame } from "../RunFrame/RunFrame"
 import type { RunFrameProps } from "../RunFrame/RunFrameProps"
+import { addDatasheetToBoard, saveDatasheetGenerationToApi } from "../../ai"
 import { cn } from "lib/utils"
 import type { RunCompletedPayload } from "../RunFrame/run-completion"
 import { API_BASE } from "./api-base"
@@ -76,6 +77,8 @@ export const guessManualEditsFilePath = (files: string[]) =>
 
 export interface RunFrameWithApiProps {
   ai?: RunFrameProps["ai"]
+  onDatasheetAssetsGenerated?: RunFrameProps["onDatasheetAssetsGenerated"]
+  onDatasheetGenerationCreated?: RunFrameProps["onDatasheetGenerationCreated"]
   extraTabs?: ExtraRunFrameTab[]
   /**
    * Base URL for the API endpoints
@@ -302,9 +305,57 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
     [pushEvent],
   )
 
+  const saveGeneration: NonNullable<
+    RunFrameProps["onDatasheetGenerationCreated"]
+  > = async (generation) => {
+    if (props.onDatasheetGenerationCreated)
+      return props.onDatasheetGenerationCreated(generation)
+    await saveDatasheetGenerationToApi(generation, {
+      apiBaseUrl: apiBaseUrl ?? API_BASE,
+    })
+    useRunFrameStore.setState((state) => ({
+      fsMap: new Map([...state.fsMap, ...Object.entries(generation.files)]),
+    }))
+  }
+
+  const useGeneratedAsset: NonNullable<
+    RunFrameProps["onDatasheetAssetsGenerated"]
+  > = async (assets, selection) => {
+    if (props.onDatasheetAssetsGenerated)
+      return props.onDatasheetAssetsGenerated(assets, selection)
+    if (!selection) throw new Error("Choose a generated component to add.")
+    const source = useRunFrameStore.getState().fsMap.get(componentPath)
+    if (typeof source !== "string")
+      throw new Error("Open a board file to add this component.")
+    const updated = await addDatasheetToBoard({
+      source,
+      boardPath: componentPath,
+      selection,
+    })
+    if (updated === source) return
+    const response = await fetch(
+      `${(apiBaseUrl ?? API_BASE).replace(/\/$/, "")}/files/upsert`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          file_path: componentPath,
+          text_content: updated,
+          initiator: "runframe",
+        }),
+      },
+    )
+    if (!response.ok) throw new Error("Could not update the board. Try again.")
+    useRunFrameStore.setState((state) => ({
+      fsMap: new Map(state.fsMap).set(componentPath, updated),
+    }))
+  }
+
   return (
     <RunFrame
       ai={props.ai}
+      onDatasheetAssetsGenerated={useGeneratedAsset}
+      onDatasheetGenerationCreated={saveGeneration}
       extraTabs={filterExtraRunFrameTabs(props.extraTabs, componentPath)}
       fsMap={fsMap}
       showFileMenu={props.showFileMenu}

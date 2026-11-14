@@ -50,8 +50,8 @@ function Preview({ model }: { model: LanguageModel }) {
 }
 ```
 
-The host app chooses the provider and configures the model's transport to its
-authenticated backend proxy. Keep provider API keys on that backend. Runframe
+The host app passes the model chosen by its user and configures its transport to
+an authenticated backend proxy. Keep provider API keys on that backend. Runframe
 does not read environment variables, choose a default provider, or store keys.
 The model must implement an AI SDK v2, v3, or v4 language model interface.
 
@@ -62,6 +62,132 @@ has its own provider, and omitting `ai` disables AI for that frame.
 
 Model objects contain functions and cannot cross the `RunFrameWithIframe`
 `postMessage` boundary. Configure the model inside the iframe instead.
+
+### Creating components from a datasheet
+
+With `ai` configured, choose **Create from datasheet** in the preview toolbar. The
+button remains visible when `showFileMenu={false}`, as used by the tscircuit.com
+editor's `SuspenseRunFrame` wrapper. Drop one PDF (up to 20 MB) and click
+**Generate**. The AI automatically chooses a documented part and package,
+including for family datasheets, and saves its selection notes with the files. There is
+no part/package entry or clarification step. The model must support PDF input
+and structured JSON output; Runframe sends the PDF bytes directly, including
+package drawings. Opening the dialog, choosing a file or changing a toggle does
+not send a request.
+
+Two optional toggles, both off by default, add reusable circuit modules:
+
+- **Simulation circuit** creates a connected tscircuit group with the
+  chip's behavioral model, supplies, stimulus, loads, probes and ngspice transient
+  analysis. The standalone chip and SPICE model are still available.
+- **Reference circuit** creates a reference application group with the
+  chip and supporting wiring/components, without simulation analysis, probes,
+  artificial test sources or an attached SPICE model.
+
+Every completed generation is automatically saved in its own directory:
+`generated/<part>-<timestamp>-<id>/`. It contains all generated TSX and SPICE files,
+plus `generation.json` with the source filename, selection rationale, warnings,
+asset notes and cited PDF pages. Project actions stay disabled until saving
+succeeds. A failed save can be retried without calling the model again.
+
+The fixed-size dialog has **Components** and **Files** tabs. Each available chip,
+simulation circuit or reference circuit has a **Use in project** button. Using an
+output adds it to the existing board, keeps the dialog open, and disables that
+button with a tick. Each output can be used independently. Generation history
+retains these states when switching between results or reopening the dialog.
+**Download generation** in the Files tab exports the whole directory as a ZIP.
+
+The current simulator analyzes the complete board, including reference circuits.
+Unconnected networks can produce floating-node errors. Run the generated test
+circuit independently until the other circuits have their supplies and inputs
+connected.
+
+Results contain tscircuit TSX files for a footprint, schematic symbol and combined
+component, plus an AI-generated behavioral SPICE macro-model synthesized from
+the documented electrical characteristics. An existing SPICE netlist in the PDF
+is not required. The model describes its assumptions and omitted effects; a dual
+op amp's macro-model includes both channels and the documented physical pin map.
+Insufficient information produces unavailable assets and warnings. Generated files
+are drafts: review their pin mapping, dimensions, cited PDF pages and assumptions.
+Runframe validates the response structure and filenames; it does not certify the
+generated circuit geometry, TSX behavior, or electrical accuracy.
+
+`RunFrameWithApi` and `RunFrameForCli` save generations through the project file
+API and append the selected module to the current TSX board. The source must
+contain exactly one `<board>`. Existing source and board attributes are preserved.
+Custom hosts can supply persistence and placement callbacks:
+
+```tsx
+import { addDatasheetToBoard, RunFrame } from "@tscircuit/runframe/runner"
+
+<RunFrame
+  fsMap={files}
+  ai={{ model }}
+  onDatasheetGenerationCreated={async (generation) => {
+    await saveProjectFiles(generation.files) // Map of full paths to source text
+  }}
+  onDatasheetAssetsGenerated={async (_assets, selection) => {
+    if (!selection) return
+    const source = await addDatasheetToBoard({
+      source: await readProjectFile("main.tsx"),
+      boardPath: "main.tsx",
+      selection,
+    })
+    await saveProjectFiles({ "main.tsx": source })
+  }}
+/>
+```
+
+Update the host's `fsMap` after saving to make the new source available to Run.
+`onDatasheetGenerationCreated` receives `{ id, directory, createdAt,
+sourceFileName, assets, files }`; it runs once per result before use actions are
+enabled. Without a custom persistence callback, the dialog uses
+`/api/files/upsert` (or `window.TSCIRCUIT_FILESERVER_API_BASE_URL`). The placement
+callback receives the assets and `{ kind, generationId, directory, entrypoint }`;
+`entrypoint` is the full project path of the selected module. A rejected callback
+keeps the action available for retry. One-argument placement callbacks remain
+supported.
+
+For a custom launcher, render the exported `DatasheetImportDialog` inside a
+`RunFrameAiProvider`. Its props are `isOpen`, `onClose`, and optional
+`onGenerationCreated` and `onAssetsGenerated` callbacks.
+`generateDatasheetAssets({ ai, file, generateSimulationCircuit,
+generateReferenceCircuit, abortSignal })` is also exported; both generation flags
+default to false. `createDatasheetGeneration(assets, sourceFileName)` prepares the
+folder and manifest, and `saveDatasheetGenerationToApi` persists it.
+`getDatasheetAssetFiles(assets)` collects all generated assets, or accepts a
+usage kind to filter the optional circuit modules. Generation saves source files;
+**Run** executes the board after placement. Canceling or closing invalidates a
+pending model request.
+
+The Cosmos `example66-datasheet-import` fixture uses the website's `RunFrame`
+component with source files, a Run button, and a hidden File menu. It opens on a
+populated 3D view, with PCB and schematic tabs and the datasheet toolbar action.
+All generations appear as folders in the file tree and are persisted in the
+browser's Origin Private File System. Reloading restores the project. **Use in
+project** appends to the populated board; **Run** renders the combined result. This fixture contains no mock AI model or canned component results.
+Choose **Configure AI**. OpenAI is selected by default and uses the hardcoded
+`gpt-6-astra` model, with no model ID input. Anthropic, Google Gemini and
+OpenAI-compatible services remain available with an explicit model ID. The
+standard providers have **Sign in** links to their
+official account consoles. These open a new tab; they do not perform OAuth or
+automatically grant Runframe model access. For this personal preview, return with
+a provider API key. Standard provider addresses are automatic. No connection is
+active until the user configures it. Keys stay in tab memory, go only to that
+provider, and clear on reload or disconnect.
+
+Production websites should manage authentication and provider keys on their
+backend and supply the resulting `ai={{ model }}`. The preview also supports
+**Use my own server** with an optional website session token. The server supplies
+its own provider key, permits the preview origin, and accepts the PDF payload.
+Use a Responses API base URL for OpenAI, Messages for Anthropic, Gemini for
+Google, or Chat Completions for an OpenAI-compatible service. Configuration stays
+in memory. Without a connection the preview reports that AI is not configured
+and cannot generate files; provider errors are surfaced without substituting sample assets.
+
+The preview uses the official provider adapters. A host using any other AI SDK
+provider can supply its user's configured `ai={{ model }}` directly to `RunFrame`;
+the library is provider-neutral.
 
 ### System block diagrams
 

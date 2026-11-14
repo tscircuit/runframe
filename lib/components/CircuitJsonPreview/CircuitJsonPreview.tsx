@@ -8,8 +8,8 @@ import {
 import { cn } from "lib/utils"
 import { getWindowVar } from "lib/utils/get-registry-ky"
 import { hasSimulationAnalysisResult } from "lib/utils/has-simulation-analysis-result"
-import { CadViewer } from "@tscircuit/3d-viewer"
 import { resolveExtraRunFrameTabs } from "./extra-runframe-tabs"
+import { CadTabContent } from "./CadTabContent"
 import { ExtraIframeTabContent } from "./ExtraIframeTabContent"
 import { usePcbViewerController } from "@tscircuit/pcb-viewer"
 import {
@@ -19,7 +19,6 @@ import {
   useMemo,
   type ComponentProps,
 } from "react"
-import { ErrorFallback } from "../ErrorFallback"
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary"
 import { ErrorTabContent } from "../ErrorTabContent/ErrorTabContent"
 import {
@@ -883,32 +882,16 @@ export const CircuitJsonPreview = ({
           )}
 
           {(!availableTabs || availableTabs.includes("cad")) && (
-            <TabsContent value="cad" className="rf-min-h-0">
-              <div
-                className={cn("rf-overflow-auto", previewPanelHeightClassName)}
-              >
-                <ErrorBoundary
-                  fallbackRender={({ error, resetErrorBoundary }) => (
-                    <ErrorFallback
-                      error={error}
-                      resetErrorBoundary={resetErrorBoundary}
-                    />
-                  )}
-                >
-                  {circuitJson ? (
-                    <CadViewer
-                      key={`cad-${isFullScreen}`}
-                      ref={setCadViewerRef}
-                      circuitJson={circuitJson}
-                      autoRotateDisabled={autoRotate3dViewerDisabled}
-                      onViewSchematicComponent={handleViewSchematicComponent}
-                    />
-                  ) : (
-                    <PreviewEmptyState onRunClicked={onRunClicked} />
-                  )}
-                </ErrorBoundary>
-              </div>
-            </TabsContent>
+            <CadTabContent
+              active={activeTab === "cad"}
+              circuitJson={circuitJson}
+              className={cn("rf-overflow-auto", previewPanelHeightClassName)}
+              emptyState={<PreviewEmptyState onRunClicked={onRunClicked} />}
+              isFullScreen={isFullScreen}
+              cadViewerRef={setCadViewerRef}
+              autoRotateDisabled={autoRotate3dViewerDisabled}
+              onViewSchematicComponent={handleViewSchematicComponent}
+            />
           )}
 
           {(!availableTabs || availableTabs.includes("analog_simulation")) && (

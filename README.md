@@ -41,6 +41,30 @@ host-built controls. Configuration is local to each frame. Function adapters
 cannot cross `RunFrameWithIframe`'s structured-clone boundary; configure AI in
 the iframe's own React host instead.
 
+### Prompt generator
+
+With `ai` configured, the toolbar offers **Prompt generator**, including when
+`showFileMenu={false}`. Set `showPromptGenerator={true}` to offer copy/download
+without an AI connection, or `false` to hide it. This prop also works on the API
+and CLI wrappers. Existing frames without AI keep their current toolbar.
+
+The dialog builds an editable prompt for component import, simulation or a
+custom task. Options include footprint, symbol, **Add SPICE model** and **Run a
+simulation and show results**. An optional PDF can be selected or dropped in.
+Copied/downloaded prompts name the PDF; attach it separately in your agent.
+**Send to AI** sends the exact displayed prompt and original PDF to the host
+adapter, with cancellation and error handling. The response is displayed as
+text for review; this dialog does not execute code or apply generated files.
+It does not send the project file map implicitly.
+
+The simulation prompt directs the agent to use tscircuit's installed APIs and
+Runframe's existing simulation view, report actual execution and measurements,
+and state approximations in synthesized SPICE models.
+
+Hosts with their own header can render `PromptGeneratorButton` or a controlled
+`PromptGeneratorDialog` from `/runner` and supply `ai` directly. The pure
+`buildRunFramePrompt` helper is exported for other host interfaces.
+
 ```tsx
 import { RunFrame } from "@tscircuit/runframe/runner"
 

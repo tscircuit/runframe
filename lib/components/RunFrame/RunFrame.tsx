@@ -13,6 +13,7 @@ import { filterExtraRunFrameTabs } from "../CircuitJsonPreview/extra-runframe-ta
 import { Button } from "../ui/button"
 import { RunFrameErrorFallback } from "./RunFrameErrorFallback"
 import { RunFrameAiProvider } from "../../ai/RunFrameAiProvider"
+import { PromptGeneratorButton } from "../PromptGeneratorDialog/PromptGeneratorDialog"
 
 // TODO waiting for core PR: https://github.com/tscircuit/core/pull/489
 // import { orderedRenderPhases } from "@tscircuit/core"
@@ -905,6 +906,9 @@ const RunFrameContent = (propsFromHost: RunFrameProps) => {
                   props.onChangeShouldLoadLatestEval
                 }
               />
+            )}
+            {(props.showPromptGenerator ?? Boolean(props.ai)) && (
+              <PromptGeneratorButton />
             )}
             {props.leftHeaderContent}
           </>

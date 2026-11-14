@@ -8,6 +8,7 @@ import {
 } from "../../ai/build-runframe-prompt"
 import { useStyles } from "../../hooks/use-styles"
 import { openForDownload } from "../../optional-features/exporting/open-for-download"
+import { zIndexMap } from "../../utils/z-index-map"
 import { Button } from "../ui/button"
 import {
   Dialog,
@@ -132,7 +133,11 @@ export const PromptGeneratorDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="!rf-max-w-4xl rf-w-[calc(100vw-2rem)] rf-max-h-[90dvh] rf-overflow-y-auto">
+      <DialogContent
+        className="!rf-max-w-4xl rf-w-[calc(100vw-2rem)] rf-max-h-[90dvh] rf-overflow-y-auto"
+        style={{ zIndex: zIndexMap.promptGeneratorDialog }}
+        overlayStyle={{ zIndex: zIndexMap.promptGeneratorOverlay }}
+      >
         <DialogHeader>
           <DialogTitle>Prompt generator</DialogTitle>
           <DialogDescription>

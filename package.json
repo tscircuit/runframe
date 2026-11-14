@@ -2,7 +2,7 @@
   "name": "@tscircuit/runframe",
   "main": "dist/preview.js",
   "type": "module",
-  "version": "0.0.3236",
+  "version": "0.0.3237",
   "repository": {
     "type": "git",
     "url": "https://github.com/tscircuit/runframe"
@@ -59,7 +59,7 @@
     "@tscircuit/fake-snippets": "^0.0.163",
     "@tscircuit/file-server": "^0.0.32",
     "@tscircuit/internal-dynamic-import": "^0.0.18",
-    "@tscircuit/pcb-viewer": "^1.11.450",
+    "@tscircuit/pcb-viewer": "^1.11.451",
     "@tscircuit/props": "^0.0.719",
     "@tscircuit/schematic-trace-solver": "^0.0.196",
     "@tscircuit/schematic-viewer": "^2.0.109",
@@ -127,7 +127,7 @@
   },
   "dependencies": {
     "@tscircuit/core": "^0.0.2293",
-    "@tscircuit/eval": "0.0.1769",
+    "@tscircuit/eval": "0.0.1770",
     "@tscircuit/solver-utils": "^0.0.16",
     "debug": "^4.4.0",
     "format-si-unit": "^0.0.12",

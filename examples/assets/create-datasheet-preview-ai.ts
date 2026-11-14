@@ -4,18 +4,29 @@ import { createOpenAI } from "@ai-sdk/openai"
 import type { RunFrameAiConfig } from "../../lib/ai/RunFrameAiProvider"
 
 export const datasheetPreviewProviders = {
-  openai: { label: "OpenAI", placeholder: "https://your-backend/openai/v1" },
+  openai: {
+    label: "OpenAI",
+    signInUrl: "https://platform.openai.com/api-keys",
+    baseUrl: "https://api.openai.com/v1",
+    placeholder: "https://your-server/openai/v1",
+  },
   anthropic: {
     label: "Anthropic",
-    placeholder: "https://your-backend/anthropic/v1",
+    signInUrl: "https://platform.claude.com/settings/keys",
+    baseUrl: "https://api.anthropic.com/v1",
+    placeholder: "https://your-server/anthropic/v1",
   },
   google: {
     label: "Google Gemini",
-    placeholder: "https://your-backend/google/v1beta",
+    signInUrl: "https://aistudio.google.com/apikey",
+    baseUrl: "https://generativelanguage.googleapis.com/v1beta",
+    placeholder: "https://your-server/google/v1beta",
   },
   "openai-compatible": {
     label: "OpenAI-compatible",
-    placeholder: "https://your-backend/v1",
+    signInUrl: null,
+    baseUrl: null,
+    placeholder: "https://your-server/v1",
   },
 } as const
 
@@ -23,13 +34,16 @@ export type DatasheetPreviewProvider = keyof typeof datasheetPreviewProviders
 
 export interface DatasheetPreviewConnection {
   provider: DatasheetPreviewProvider
-  proxyUrl: string
+  proxyUrl?: string
   modelId: string
+  /** User-supplied provider key, held in memory and sent only to that provider. */
+  apiKey?: string
+  useCustomEndpoint?: boolean
   /** Host application session token, never a provider API key. Kept in memory. */
   sessionToken?: string
 }
 
-/** The user chooses the provider protocol, endpoint and model. No default model. */
+/** Personal preview connection. Production hosts supply their authenticated model. */
 export const createDatasheetPreviewAi = (
   connection: DatasheetPreviewConnection,
   options: { origin: string; fetch?: typeof globalThis.fetch },
@@ -37,39 +51,66 @@ export const createDatasheetPreviewAi = (
   if (!Object.hasOwn(datasheetPreviewProviders, connection.provider)) {
     throw new Error("Choose an AI provider.")
   }
-  if (!connection.proxyUrl.trim() || !connection.modelId.trim()) {
-    throw new Error("Provide the AI proxy URL and model ID.")
+  if (!connection.modelId.trim()) {
+    throw new Error("Enter your model ID.")
   }
-  const url = new URL(connection.proxyUrl, options.origin)
-  const isLocalhost = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)
-  if (url.protocol !== "https:" && !(url.protocol === "http:" && isLocalhost)) {
-    throw new Error("Use an HTTPS AI proxy, or localhost for development.")
-  }
-  if (url.username || url.password || url.search || url.hash) {
-    throw new Error(
-      "The proxy URL must not contain credentials, a query or a fragment.",
+  const provider = datasheetPreviewProviders[connection.provider]
+  const isCustom =
+    provider.baseUrl === null ||
+    (connection.useCustomEndpoint ?? Boolean(connection.proxyUrl?.trim()))
+  let baseURL: string
+  let apiKey: string
+  let headers: Record<string, string> | undefined
+  if (isCustom) {
+    if (!connection.proxyUrl?.trim())
+      throw new Error("Enter your custom server address.")
+    const url = new URL(connection.proxyUrl, options.origin)
+    const isLocalhost = ["localhost", "127.0.0.1", "[::1]"].includes(
+      url.hostname,
     )
+    if (
+      url.protocol !== "https:" &&
+      !(url.protocol === "http:" && isLocalhost)
+    ) {
+      throw new Error("Use an HTTPS server, or localhost for development.")
+    }
+    if (url.username || url.password || url.search || url.hash) {
+      throw new Error(
+        "The server address must not contain credentials, a query or a fragment.",
+      )
+    }
+    if (
+      Object.values(datasheetPreviewProviders).some(
+        (entry) =>
+          entry.baseUrl && new URL(entry.baseUrl).hostname === url.hostname,
+      )
+    ) {
+      throw new Error(
+        "For a standard provider, use the API key connection instead of a custom server.",
+      )
+    }
+    baseURL = url.href.replace(/\/+$/, "")
+    // Custom servers manage their own provider key; do not forward a direct key.
+    apiKey = "{REPLACE_ON_SERVER}"
+    const token = connection.sessionToken?.trim()
+    headers = token ? { Authorization: `Bearer ${token}` } : undefined
+  } else {
+    if (!connection.apiKey?.trim())
+      throw new Error("Enter your provider API key.")
+    baseURL = provider.baseUrl!
+    apiKey = connection.apiKey.trim()
+    if (connection.provider === "anthropic") {
+      headers = { "anthropic-dangerous-direct-browser-access": "true" }
+    }
   }
-  if (
-    [
-      "api.anthropic.com",
-      "api.openai.com",
-      "generativelanguage.googleapis.com",
-    ].includes(url.hostname)
-  ) {
-    throw new Error(
-      "Use your backend proxy. Provider API keys must stay on the server.",
-    )
-  }
-  const token = connection.sessionToken?.trim()
   const settings = {
-    baseURL: url.href.replace(/\/+$/, ""),
-    apiKey: "{REPLACE_ON_SERVER}",
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    baseURL,
+    apiKey,
+    headers,
     fetch: ((input, init) =>
       (options.fetch ?? globalThis.fetch)(input, {
         ...init,
-        credentials: "include",
+        credentials: isCustom ? "include" : "omit",
       })) as typeof globalThis.fetch,
   }
   const modelId = connection.modelId.trim()

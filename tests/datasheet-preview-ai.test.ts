@@ -1,5 +1,8 @@
 import { expect, test } from "bun:test"
-import { createDatasheetPreviewAi } from "../examples/assets/create-datasheet-preview-ai"
+import {
+  createDatasheetPreviewAi,
+  datasheetPreviewProviders,
+} from "../examples/assets/create-datasheet-preview-ai"
 import { generateDatasheetAssets } from "../lib/ai/generate-datasheet-assets"
 import { generatedAssets } from "./fixtures/datasheet-ai"
 
@@ -131,6 +134,7 @@ test("the preview sends the selected PDF to its configured real-provider transpo
       proxyUrl: "/api/anthropic/v1",
       modelId: "claude-sonnet-4-5",
       sessionToken: "host-session-for-test",
+      apiKey: "provider-key-must-not-reach-custom-server",
     },
     {
       origin: "https://preview.example.test",
@@ -167,6 +171,9 @@ test("the preview sends the selected PDF to its configured real-provider transpo
     "Bearer host-session-for-test",
   )
   expect(calls[0].init.credentials).toBe("include")
+  expect(JSON.stringify(calls[0].init)).not.toContain(
+    "provider-key-must-not-reach-custom-server",
+  )
   const body = JSON.parse(String(calls[0].init.body))
   const attachment = body.messages[0].content.find(
     (part: any) => part.type === "document",
@@ -180,6 +187,51 @@ test("the preview sends the selected PDF to its configured real-provider transpo
   expect(result.partNumber).toBe("LM358")
   expect(result.spiceModel?.content).toBe(returned.spiceModel.content)
 })
+
+for (const provider of ["openai", "anthropic", "google"] as const) {
+  test(`${provider} connects to its automatic address and never substitutes output on auth failure`, async () => {
+    const calls: { url: string; init: RequestInit }[] = []
+    const ai = createDatasheetPreviewAi(
+      {
+        provider,
+        modelId: selectedModelId,
+        apiKey: "personal-preview-test-key",
+      },
+      {
+        origin: "https://preview.example.test",
+        fetch: (async (input, init) => {
+          calls.push({ url: String(input), init: init! })
+          return new Response(
+            JSON.stringify({
+              error: { message: "Provider rejected credentials" },
+            }),
+            { status: 401, headers: { "content-type": "application/json" } },
+          )
+        }) as typeof fetch,
+      },
+    )
+    expect(calls).toHaveLength(0)
+    await expect(
+      generateDatasheetAssets({
+        ai,
+        file: new File([pdfBytes], "user.pdf", { type: "application/pdf" }),
+      }),
+    ).rejects.toThrow()
+    expect(calls).toHaveLength(1)
+    expect(new URL(calls[0].url).origin).toBe(
+      new URL(datasheetPreviewProviders[provider].baseUrl).origin,
+    )
+    expect(calls[0].init.credentials).toBe("omit")
+    const headers = new Headers(calls[0].init.headers)
+    const credentialHeader = {
+      openai: "authorization",
+      anthropic: "x-api-key",
+      google: "x-goog-api-key",
+    }[provider]
+    expect(headers.get(credentialHeader)).toContain("personal-preview-test-key")
+    expect(calls[0].url).not.toContain("personal-preview-test-key")
+  })
+}
 
 test("missing or invalid preview connections never fall back to sample generation", () => {
   expect(() =>

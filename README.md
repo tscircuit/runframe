@@ -116,18 +116,22 @@ component with source files, a Run button, and a hidden File menu. It opens on a
 populated 3D view, with PCB and schematic tabs and the datasheet toolbar action.
 Accepted files appear in the editor; Run updates the board with the generated
 component. This fixture contains no mock AI model or canned component results.
-Choose **Configure AI** to select a provider protocol (OpenAI, Anthropic, Google
-Gemini, or OpenAI-compatible), enter your model ID and authenticated endpoint,
-and optionally supply a website session token. No provider or model is selected
-by default. The chosen model and endpoint must support PDF input and structured
-JSON output. Use a Responses API endpoint for OpenAI, a Messages API endpoint
-for Anthropic, a Gemini API endpoint for Google, or Chat Completions for an
-OpenAI-compatible service; include the API version in the base URL as required
-by your backend.
-The proxy supplies the provider API key server-side, permits the preview origin,
-and must accept the uploaded PDF payload. Configuration stays in memory. Without
-a connection the preview reports that AI is not configured and cannot generate
-files; provider errors are surfaced without substituting sample assets.
+Choose **Configure AI** and select OpenAI, Anthropic, Google Gemini, or an
+OpenAI-compatible service. The standard providers have **Sign in** links to their
+official account consoles. These open a new tab; they do not perform OAuth or
+automatically grant Runframe model access. For this personal preview, return with
+a provider API key and enter your chosen PDF-capable model ID. Standard provider
+addresses are automatic. No provider or model is selected by default. Keys stay
+in tab memory, go only to that provider, and clear on reload or disconnect.
+
+Production websites should manage authentication and provider keys on their
+backend and supply the resulting `ai={{ model }}`. The preview also supports
+**Use my own server** with an optional website session token. The server supplies
+its own provider key, permits the preview origin, and accepts the PDF payload.
+Use a Responses API base URL for OpenAI, Messages for Anthropic, Gemini for
+Google, or Chat Completions for an OpenAI-compatible service. Configuration stays
+in memory. Without a connection the preview reports that AI is not configured
+and cannot generate files; provider errors are surfaced without substituting sample assets.
 
 The preview uses the official provider adapters. A host using any other AI SDK
 provider can supply its user's configured `ai={{ model }}` directly to `RunFrame`;

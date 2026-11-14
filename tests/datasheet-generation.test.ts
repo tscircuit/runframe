@@ -10,6 +10,7 @@ import {
 } from "../lib/ai/generate-datasheet-assets"
 import {
   createDatasheetModel,
+  ambiguousAssets,
   generatedAssets,
   modelResponse,
   pdfFile,
@@ -41,6 +42,36 @@ test("generates validated assets using the supplied model, PDF bytes and target 
   if (attachment.data.type !== "data") throw new Error("Expected PDF bytes")
   expect(attachment.data.data).toBeInstanceOf(Uint8Array)
   expect(new TextDecoder().decode(attachment.data.data)).toContain("%PDF-1.7")
+})
+
+test("a blank part yields selectable variants and the same PDF is reused after selection", async () => {
+  const model = new MockLanguageModelV4({
+    doGenerate: [modelResponse(ambiguousAssets), modelResponse()],
+  })
+  const file = pdfFile()
+  const first = await generateDatasheetAssets({ ai: { model }, file })
+  expect(getDatasheetAssetFiles(first)).toHaveLength(0)
+  expect(first.clarification?.options).toHaveLength(2)
+  const option = first.clarification!.options[0]
+  const selected = `${option.partNumber}, ${option.packageName}`
+  const second = await generateDatasheetAssets({
+    ai: { model },
+    file,
+    targetPart: selected,
+  })
+  expect(second).toEqual(generatedAssets)
+  expect(second).not.toHaveProperty("clarification")
+  const messages = model.doGenerateCalls.map((call) =>
+    call.prompt.find((message) => message.role === "user"),
+  )
+  expect(JSON.stringify(messages[0])).toContain("Not selected")
+  expect(JSON.stringify(messages[1])).toContain(selected)
+  const attachments = messages.map((message) =>
+    message?.role === "user"
+      ? message.content.find((part) => part.type === "file")
+      : undefined,
+  )
+  expect(attachments[0]).toEqual(attachments[1])
 })
 
 test("rejects invalid, empty and oversized files before invoking the model", async () => {
@@ -145,7 +176,7 @@ test("cancellation suppresses a late model response", async () => {
   await expect(pending).rejects.toThrow()
 })
 
-test("datasheet dialog supports review, retry, cancellation and explicit acceptance", async () => {
+test("datasheet dialog supports variant selection, review, retry, cancellation and explicit acceptance", async () => {
   await runIsolatedUiTest(
     new URL("./fixtures/datasheet-import.tsx", import.meta.url),
   )

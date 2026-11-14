@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from "react"
 import { useRunFrameAi } from "../../ai/RunFrameAiProvider"
 import {
   type DatasheetAssets,
+  type DatasheetClarification,
   datasheetAssetLabels,
   getDatasheetAssetFiles,
 } from "../../ai/datasheet-assets"
@@ -39,6 +40,8 @@ export const DatasheetImportDialog = ({
   const [file, setFile] = useState<File | null>(null)
   const [targetPart, setTargetPart] = useState("")
   const [assets, setAssets] = useState<DatasheetAssets | null>(null)
+  const [clarification, setClarification] =
+    useState<DatasheetClarification | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -58,6 +61,7 @@ export const DatasheetImportDialog = ({
     // A changed model or a closed dialog invalidates pending results.
     invalidate()
     setAssets(null)
+    setClarification(null)
     setError(null)
     setFile(null)
     setTargetPart("")
@@ -78,6 +82,7 @@ export const DatasheetImportDialog = ({
     if (saving.current) return
     invalidate()
     setAssets(null)
+    setClarification(null)
     setError(null)
     setFile(null)
     try {
@@ -100,6 +105,7 @@ export const DatasheetImportDialog = ({
     request.current = controller
     setIsGenerating(true)
     setAssets(null)
+    setClarification(null)
     setError(null)
     try {
       const result = await generateDatasheetAssets({
@@ -108,7 +114,11 @@ export const DatasheetImportDialog = ({
         targetPart,
         abortSignal: controller.signal,
       })
-      if (request.current === controller) setAssets(result)
+      if (request.current === controller) {
+        const { clarification: nextClarification, ...generated } = result
+        setClarification(nextClarification ?? null)
+        setAssets(nextClarification ? null : generated)
+      }
     } catch (error) {
       if (!controller.signal.aborted && request.current === controller) {
         setError(
@@ -230,11 +240,10 @@ export const DatasheetImportDialog = ({
               {file && <p className="rf-text-sm">Selected: {file.name}</p>}
             </div>
             <label htmlFor={`${id}-part`} className="rf-text-sm rf-space-y-1">
-              <span className="rf-block">
-                Part number and package (optional)
-              </span>
+              <span className="rf-block">Part number and package</span>
               <input
                 id={`${id}-part`}
+                aria-describedby={`${id}-part-help`}
                 className="rf-w-full rf-rounded rf-border rf-p-2"
                 placeholder="e.g. LM358, SOIC-8"
                 maxLength={200}
@@ -247,6 +256,59 @@ export const DatasheetImportDialog = ({
                 }}
               />
             </label>
+            <p id={`${id}-part-help`} className="rf-text-xs rf-text-zinc-500">
+              Leave blank to identify the part. If the PDF covers several
+              variants or packages, choose one before generating files.
+            </p>
+            {clarification && (
+              <fieldset
+                className="rf-grid rf-gap-3 rf-rounded rf-border rf-border-blue-200 rf-bg-blue-50 rf-p-4"
+                disabled={isGenerating || isSaving}
+              >
+                <legend className="rf-px-1 rf-font-semibold">
+                  Choose a part and package
+                </legend>
+                <p className="rf-text-sm">{clarification.question}</p>
+                <div className="rf-grid rf-max-h-64 rf-gap-2 rf-overflow-y-auto">
+                  {clarification.options.map((option, index) => {
+                    const selection = `${option.partNumber}, ${option.packageName}`
+                    return (
+                      <label
+                        key={index}
+                        className="rf-flex rf-cursor-pointer rf-items-start rf-gap-3 rf-rounded rf-border rf-bg-white rf-p-3 rf-text-sm"
+                      >
+                        <input
+                          type="radio"
+                          name={`${id}-variant`}
+                          value={selection}
+                          checked={targetPart === selection}
+                          onChange={() => {
+                            setTargetPart(selection)
+                            setAssets(null)
+                            setError(null)
+                          }}
+                        />
+                        <span>
+                          <strong>
+                            {option.partNumber} — {option.packageName}
+                          </strong>
+                          <span className="rf-block">{option.description}</span>
+                          {option.sourcePages.length > 0 && (
+                            <span className="rf-block rf-text-xs rf-text-zinc-500">
+                              PDF pages {option.sourcePages.join(", ")}
+                            </span>
+                          )}
+                        </span>
+                      </label>
+                    )
+                  })}
+                </div>
+                <p className="rf-text-xs">
+                  Or enter another part and package above. Your PDF is still
+                  selected; generate after choosing the variant you need.
+                </p>
+              </fieldset>
+            )}
             <p className="rf-text-xs rf-text-zinc-500">
               Generate sends this PDF to the AI service configured by your host
               app.
@@ -254,13 +316,20 @@ export const DatasheetImportDialog = ({
             <div className="rf-flex rf-flex-wrap rf-gap-2 rf-items-center">
               <Button
                 onClick={generate}
-                disabled={!file || isGenerating || isSaving}
+                disabled={
+                  !file ||
+                  isGenerating ||
+                  isSaving ||
+                  (!!clarification && !targetPart.trim())
+                }
               >
                 {isGenerating
                   ? "Generating…"
-                  : assets
-                    ? "Generate again"
-                    : "Generate assets"}
+                  : clarification
+                    ? "Generate selected part"
+                    : assets
+                      ? "Generate again"
+                      : "Generate assets"}
               </Button>
               {isGenerating && (
                 <>
@@ -280,13 +349,15 @@ export const DatasheetImportDialog = ({
             {error}
           </p>
         )}
-        {assets && (
+        {assets && !clarification && (
           <section
             className="rf-space-y-3 rf-break-words"
             aria-label="Generated assets"
           >
             <h3 className="rf-font-semibold">
-              {assets.partNumber} {assets.packageName}
+              {files.length > 0
+                ? `${assets.partNumber} ${assets.packageName}`
+                : "No assets generated"}
             </h3>
             <p className="rf-text-sm">{assets.summary}</p>
             {assets.warnings.length > 0 && (
@@ -299,28 +370,29 @@ export const DatasheetImportDialog = ({
                 ))}
               </ul>
             )}
-            {Object.entries(datasheetAssetLabels).map(([kind, label]) => {
-              const asset = assets[kind as keyof typeof datasheetAssetLabels]
-              return asset ? (
-                <details key={kind} className="rf-rounded rf-border rf-p-3">
-                  <summary className="rf-cursor-pointer rf-text-sm rf-font-medium">
-                    {label}: {asset.filename}
-                  </summary>
-                  <p className="rf-my-2 rf-text-xs">{asset.notes}</p>
-                  <p className="rf-text-xs rf-text-zinc-500">
-                    Source pages:{" "}
-                    {asset.sourcePages.join(", ") || "Not supplied"}
+            {files.length > 0 &&
+              Object.entries(datasheetAssetLabels).map(([kind, label]) => {
+                const asset = assets[kind as keyof typeof datasheetAssetLabels]
+                return asset ? (
+                  <details key={kind} className="rf-rounded rf-border rf-p-3">
+                    <summary className="rf-cursor-pointer rf-text-sm rf-font-medium">
+                      {label}: {asset.filename}
+                    </summary>
+                    <p className="rf-my-2 rf-text-xs">{asset.notes}</p>
+                    <p className="rf-text-xs rf-text-zinc-500">
+                      Source pages:{" "}
+                      {asset.sourcePages.join(", ") || "Not supplied"}
+                    </p>
+                    <pre className="rf-mt-2 rf-max-h-64 rf-overflow-auto rf-bg-zinc-100 rf-p-3 rf-text-xs">
+                      <code>{asset.content}</code>
+                    </pre>
+                  </details>
+                ) : (
+                  <p key={kind} className="rf-text-sm rf-text-zinc-500">
+                    {label}: unavailable from this datasheet
                   </p>
-                  <pre className="rf-mt-2 rf-max-h-64 rf-overflow-auto rf-bg-zinc-100 rf-p-3 rf-text-xs">
-                    <code>{asset.content}</code>
-                  </pre>
-                </details>
-              ) : (
-                <p key={kind} className="rf-text-sm rf-text-zinc-500">
-                  {label}: unavailable from this datasheet
-                </p>
-              )
-            })}
+                )
+              })}
           </section>
         )}
         <DialogFooter>

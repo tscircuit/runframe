@@ -5,11 +5,11 @@ import {
   datasheetPreviewProviders,
 } from "../examples/assets/create-datasheet-preview-ai"
 import { generateDatasheetAssets } from "../lib/ai/generate-datasheet-assets"
-import { generatedAssets } from "./fixtures/datasheet-ai"
+import { generatedAssets, providerAssets } from "./fixtures/datasheet-ai"
 
 const selectedModelId = "user-selected-model"
 const pdfBytes = "%PDF-1.7\nUser-supplied datasheet"
-const outputText = JSON.stringify(generatedAssets)
+const outputText = JSON.stringify(providerAssets())
 
 // OpenAI accepts a subset of JSON Schema, even when the schema is valid for Zod.
 const expectSupportedOpenAiSchema = (schema: any) => {
@@ -175,7 +175,9 @@ test("the preview sends the selected PDF to its configured real-provider transpo
             type: "message",
             role: "assistant",
             model: "claude-sonnet-4-5",
-            content: [{ type: "text", text: JSON.stringify(returned) }],
+            content: [
+              { type: "text", text: JSON.stringify(providerAssets(returned)) },
+            ],
             stop_reason: "end_turn",
             stop_sequence: null,
             usage: { input_tokens: 100, output_tokens: 100 },

@@ -73,13 +73,18 @@ editor's `SuspenseRunFrame` wrapper. Drop one PDF
 Runframe sends the PDF bytes directly, including diagrams and package drawings.
 Opening the dialog or choosing a file does not send a request.
 
+When a PDF covers multiple electrical variants or packages, the dialog offers
+documented part/package choices instead of treating the ambiguity as a completed
+generation. No choice is preselected. Select a combination (or enter a different
+part and package), then choose **Generate selected part**. The uploaded PDF stays
+selected throughout this step.
+
 Results contain tscircuit TSX files for a footprint, schematic symbol and combined
 component, plus an AI-generated behavioral SPICE macro-model synthesized from
 the documented electrical characteristics. An existing SPICE netlist in the PDF
 is not required. The model describes its assumptions and omitted effects; a dual
 op amp's macro-model includes both channels and the documented physical pin map.
-Missing or
-ambiguous information produces unavailable assets and warnings. Generated files
+Insufficient information produces unavailable assets and warnings. Generated files
 are drafts: review their pin mapping, dimensions, cited PDF pages and assumptions.
 Runframe validates the response structure and filenames; it does not certify the
 generated circuit geometry, TSX behavior, or electrical accuracy.
@@ -109,7 +114,10 @@ pending generation.
 For a custom launcher, render the exported `DatasheetImportDialog` inside a
 `RunFrameAiProvider`. Its props are `isOpen`, `onClose`, and optional
 `onAssetsGenerated`. `generateDatasheetAssets({ ai, file, targetPart, abortSignal })`
-is also exported for hosts with their own UI.
+is also exported for hosts with their own UI. Its result can include
+`clarification` with a question and supported `options`; handle this selection
+step before persisting files, then call it again with the same file and the
+chosen `targetPart`. Accepted-file callbacks still receive `DatasheetAssets`.
 
 The Cosmos `example66-datasheet-import` fixture uses the website's `RunFrame`
 component with source files, a Run button, and a hidden File menu. It opens on a

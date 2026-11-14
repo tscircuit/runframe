@@ -15,7 +15,7 @@ export const generatedAssets: DatasheetAssets = {
   symbol: {
     filename: "test123.symbol.tsx",
     content:
-      'export default () => <symbol><port name="1" schX={0} schY={0} direction="left" /></symbol>',
+      'export default () => <symbol><port name="1" pinNumber={1} schX={0} schY={0} direction="left" /></symbol>',
     notes: "Check the pin map.",
     sourcePages: [2],
   },
@@ -26,8 +26,42 @@ export const generatedAssets: DatasheetAssets = {
   ],
 }
 
+export const ambiguousAssets = {
+  partNumber: "LM158/LM258/LM358/LM2904 family",
+  packageName: "Multiple packages",
+  summary:
+    "The datasheet covers multiple electrical variants and pin mappings.",
+  footprint: null,
+  symbol: null,
+  spiceModel: null,
+  component: null,
+  warnings: [],
+  clarification: {
+    question: "Which electrical variant and package do you want to create?",
+    options: [
+      {
+        partNumber: "LM358",
+        packageName: "D (SOIC-8)",
+        description: "Original dual amplifier in the 8-pin SOIC package.",
+        sourcePages: [1, 3, 10],
+      },
+      {
+        partNumber: "LM358B",
+        packageName: "D (SOIC-8)",
+        description: "B variant, with different electrical specifications.",
+        sourcePages: [1, 3, 6],
+      },
+    ],
+  },
+}
+
+export const providerAssets = (value: unknown = generatedAssets) =>
+  value && typeof value === "object" ? { clarification: null, ...value } : value
+
 export const modelResponse = (value: unknown = generatedAssets) => ({
-  content: [{ type: "text" as const, text: JSON.stringify(value) }],
+  content: [
+    { type: "text" as const, text: JSON.stringify(providerAssets(value)) },
+  ],
   finishReason: { unified: "stop" as const, raw: undefined },
   usage: {
     inputTokens: { total: 100, noCache: 100, cacheRead: 0, cacheWrite: 0 },

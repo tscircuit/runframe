@@ -31,6 +31,34 @@ export const datasheetAssetsSchema = z.object({
   warnings: z.array(z.string().max(4_000)).max(50),
 })
 
+const datasheetClarificationSchema = z.object({
+  question: z.string().min(1).max(1_000),
+  options: z
+    .array(
+      z.object({
+        partNumber: z.string().min(1).max(100),
+        packageName: z.string().min(1).max(90),
+        description: z.string().max(800),
+        sourcePages: z.array(z.number().int().positive()).max(100),
+      }),
+    )
+    .min(1)
+    .max(20),
+})
+
+// Provider output requires every property, including nullable clarification.
+// Keep the host's accepted-assets format independent of this intermediate step.
+export const datasheetGenerationSchema = datasheetAssetsSchema.extend({
+  clarification: datasheetClarificationSchema.nullable(),
+})
+
+export type DatasheetClarification = z.infer<
+  typeof datasheetClarificationSchema
+>
+export type DatasheetGenerationResult = DatasheetAssets & {
+  clarification?: DatasheetClarification
+}
+
 export type DatasheetAssets = z.infer<typeof datasheetAssetsSchema>
 export type DatasheetAsset = z.infer<typeof asset>
 export type DatasheetAssetKind =

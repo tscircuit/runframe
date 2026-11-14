@@ -132,7 +132,7 @@ export const DatasheetImportDialog = ({
     onClose()
   }
   const selectFile = (files: FileList | File[]) => {
-    if (busy || saving.current || !ai) return
+    if (busy || saving.current) return
     setError(null)
     setDragging(false)
     try {
@@ -292,11 +292,13 @@ export const DatasheetImportDialog = ({
         ? "Generating…"
         : adding
           ? "Adding to project…"
-          : active?.saved
-            ? "Saved to project files"
-            : file
-              ? "Ready to generate"
-              : "No file selected")
+          : !ai && !retrySave
+            ? "Configure AI to generate"
+            : active?.saved
+              ? "Saved to project files"
+              : file
+                ? "Ready to generate"
+                : "No file selected")
 
   return (
     <Dialog
@@ -334,7 +336,7 @@ export const DatasheetImportDialog = ({
             className="rf-sr-only"
             tabIndex={-1}
             aria-label="PDF datasheet"
-            disabled={busy || !ai}
+            disabled={busy}
             onChange={(event) => {
               if (event.target.files?.length) selectFile(event.target.files)
               event.target.value = ""
@@ -345,7 +347,7 @@ export const DatasheetImportDialog = ({
             data-dragging={dragging}
             onDragOver={(event) => {
               event.preventDefault()
-              if (!busy && ai) setDragging(true)
+              if (!busy) setDragging(true)
             }}
             onDragLeave={() => setDragging(false)}
             onDrop={(event) => {
@@ -357,7 +359,7 @@ export const DatasheetImportDialog = ({
               type="button"
               className="ds-upload-trigger"
               onClick={() => fileInput.current?.click()}
-              disabled={busy || !ai}
+              disabled={busy}
               aria-label={file ? `Change PDF: ${file.name}` : "Upload PDF"}
             >
               {file ? <FileText size={20} /> : <Upload size={20} />}
@@ -377,7 +379,7 @@ export const DatasheetImportDialog = ({
                 type="checkbox"
                 role="switch"
                 checked={simulation}
-                disabled={busy || !ai}
+                disabled={busy}
                 onChange={(event) => setSimulation(event.target.checked)}
               />
               <span>Simulation circuit</span>
@@ -387,7 +389,7 @@ export const DatasheetImportDialog = ({
                 type="checkbox"
                 role="switch"
                 checked={reference}
-                disabled={busy || !ai}
+                disabled={busy}
                 onChange={(event) => setReference(event.target.checked)}
               />
               <span>Reference circuit</span>
@@ -567,7 +569,7 @@ export const DatasheetImportDialog = ({
           >
             {savingGeneration || generating || adding ? (
               <Loader2 className="ds-spin" size={13} />
-            ) : active?.saved && !error ? (
+            ) : active?.saved && !error && ai ? (
               <Check size={13} />
             ) : null}
             {error ? (

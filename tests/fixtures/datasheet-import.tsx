@@ -50,10 +50,10 @@ test("generations save before use, remain open, track additions and retain retry
   const saved = mock(async (_generation: any) => {})
   const close = mock(() => {})
   const model = createDatasheetModel(generatedCircuitAssets)
-  const render = async (selected = model, open = true) =>
+  const render = async (selected: typeof model | null = model, open = true) =>
     act(async () =>
       root.render(
-        <RunFrameAiProvider ai={{ model: selected }}>
+        <RunFrameAiProvider ai={selected ? { model: selected } : undefined}>
           <DatasheetImportDialog
             isOpen={open}
             onClose={close}
@@ -86,8 +86,26 @@ test("generations save before use, remain open, track additions and retain retry
       `article[aria-label="${kind}"] button`,
     )!
   try {
-    await render()
+    await render(null)
     expect(button("Generate").disabled).toBe(true)
+    const uploadButton = document.querySelector<HTMLButtonElement>(
+      'button[aria-label="Upload PDF"]',
+    )!
+    expect(uploadButton.disabled).toBe(false)
+    const input =
+      document.querySelector<HTMLInputElement>('input[type="file"]')!
+    expect(input.disabled).toBe(false)
+    let pickerOpened = false
+    input.addEventListener(
+      "click",
+      (event) => {
+        pickerOpened = true
+        event.preventDefault()
+      },
+      { once: true },
+    )
+    await act(async () => uploadButton.click())
+    expect(pickerOpened).toBe(true)
     expect(document.querySelector("input[type=radio]")).toBeNull()
     await drop([new File(["bad"], "wrong.txt")])
     await until(() => !!document.querySelector("[role=alert]"))
@@ -103,8 +121,22 @@ test("generations save before use, remain open, track additions and retain retry
       document.querySelectorAll<HTMLInputElement>("input[role=switch]"),
     )
     expect(switches.every((s) => !s.checked)).toBe(true)
+    expect(switches.every((s) => !s.disabled)).toBe(true)
     await act(async () => switches.forEach((s) => s.click()))
+    expect(document.querySelector(".ds-upload-name")?.textContent).toBe(
+      pdfFile().name,
+    )
+    expect(button("Generate").disabled).toBe(true)
+    expect(document.querySelector(".ds-status")?.textContent).toBe(
+      "Configure AI to generate",
+    )
+    await click("Generate")
     expect(model.doGenerateCalls).toHaveLength(0)
+    await render()
+    expect(button("Generate").disabled).toBe(false)
+    expect(document.querySelector(".ds-upload-name")?.textContent).toBe(
+      pdfFile().name,
+    )
     let finishSave!: () => void
     saved.mockImplementationOnce(
       () => new Promise<void>((resolve) => (finishSave = resolve)),

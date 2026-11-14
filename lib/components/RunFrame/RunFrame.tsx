@@ -12,6 +12,7 @@ import type { SolverStartedEvent } from "../CircuitJsonPreview/PreviewContentPro
 import { filterExtraRunFrameTabs } from "../CircuitJsonPreview/extra-runframe-tabs"
 import { Button } from "../ui/button"
 import { RunFrameErrorFallback } from "./RunFrameErrorFallback"
+import { RunFrameAiProvider } from "../../ai/RunFrameAiProvider"
 
 // TODO waiting for core PR: https://github.com/tscircuit/core/pull/489
 // import { orderedRenderPhases } from "@tscircuit/core"
@@ -114,6 +115,14 @@ export type {
 } from "../RunFrameWithIframe/RunFrameIframeEvent"
 
 export const RunFrame = (propsFromHost: RunFrameProps) => {
+  return (
+    <RunFrameAiProvider ai={propsFromHost.ai}>
+      <RunFrameContent {...propsFromHost} />
+    </RunFrameAiProvider>
+  )
+}
+
+const RunFrameContent = (propsFromHost: RunFrameProps) => {
   const props = connectRunFrameController(propsFromHost)
   useStyles()
 

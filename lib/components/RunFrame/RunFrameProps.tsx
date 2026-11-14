@@ -3,8 +3,12 @@ import type { TabId } from "lib/components/CircuitJsonPreview/PreviewContentProp
 import type { RunCompletedPayload } from "./run-completion"
 import type { ExtraRunFrameTab } from "../CircuitJsonPreview/extra-runframe-tabs"
 import type { RunFrameController } from "./useRunFrameController"
+import type { RunFrameAi } from "../../ai/RunFrameAiProvider"
 
 export interface RunFrameProps {
+  /** Optional host AI adapter. Configuration alone never invokes it. */
+  ai?: RunFrameAi
+
   /**
    * Map of filenames to file contents that will be available in the worker
    */

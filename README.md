@@ -11,6 +11,36 @@ Schematic, 3D and other previews.
 
 ## Usage
 
+### Optional AI adapter
+
+`RunFrame`, `RunFrameWithApi` and `RunFrameForCli` accept an optional `ai`
+adapter. Configuring it never calls a model. The host owns the provider,
+credentials, tool execution and authenticated backend; Runframe adds no AI SDK
+dependency. A later user action can send a reviewed prompt and explicit file
+attachments to this adapter and display its text response.
+
+```tsx
+import type { RunFrameAi } from "@tscircuit/runframe/runner"
+
+const ai: RunFrameAi = {
+  async generate({ prompt, attachments, signal }) {
+    const body = new FormData()
+    body.append("prompt", prompt)
+    for (const file of attachments) body.append("files", file, file.name)
+    const response = await fetch("/api/ai", { method: "POST", body, signal })
+    if (!response.ok) throw new Error("AI request failed")
+    return response.text()
+  },
+}
+
+// <RunFrame fsMap={files} ai={ai} />
+```
+
+`RunFrameAiProvider` and `useRunFrameAi` are also exported from `/runner` for
+host-built controls. Configuration is local to each frame. Function adapters
+cannot cross `RunFrameWithIframe`'s structured-clone boundary; configure AI in
+the iframe's own React host instead.
+
 ```tsx
 import { RunFrame } from "@tscircuit/runframe/runner"
 

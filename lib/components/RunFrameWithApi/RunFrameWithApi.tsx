@@ -75,6 +75,7 @@ export const guessManualEditsFilePath = (files: string[]) =>
   files.find((file) => file.endsWith(".json"))
 
 export interface RunFrameWithApiProps {
+  ai?: RunFrameProps["ai"]
   extraTabs?: ExtraRunFrameTab[]
   /**
    * Base URL for the API endpoints
@@ -303,6 +304,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
 
   return (
     <RunFrame
+      ai={props.ai}
       extraTabs={filterExtraRunFrameTabs(props.extraTabs, componentPath)}
       fsMap={fsMap}
       showFileMenu={props.showFileMenu}

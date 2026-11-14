@@ -76,6 +76,7 @@ export const guessManualEditsFilePath = (files: string[]) =>
 
 export interface RunFrameWithApiProps {
   ai?: RunFrameProps["ai"]
+  showPromptGenerator?: boolean
   extraTabs?: ExtraRunFrameTab[]
   /**
    * Base URL for the API endpoints
@@ -305,6 +306,7 @@ export const RunFrameWithApi = (props: RunFrameWithApiProps) => {
   return (
     <RunFrame
       ai={props.ai}
+      showPromptGenerator={props.showPromptGenerator}
       extraTabs={filterExtraRunFrameTabs(props.extraTabs, componentPath)}
       fsMap={fsMap}
       showFileMenu={props.showFileMenu}

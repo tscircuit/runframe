@@ -1,5 +1,7 @@
 export * from "./preview"
 export * from "./ai/RunFrameAiProvider"
+export * from "./ai/build-runframe-prompt"
+export * from "./components/PromptGeneratorDialog/PromptGeneratorDialog"
 export * from "./components/RunFrame/RunFrame"
 export * from "./components/RunFrameWithApi/RunFrameWithApi"
 export * from "./components/RunFrameForCli/RunFrameForCli"

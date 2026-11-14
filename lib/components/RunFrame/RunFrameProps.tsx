@@ -9,6 +9,9 @@ export interface RunFrameProps {
   /** Optional host AI adapter. Configuration alone never invokes it. */
   ai?: RunFrameAi
 
+  /** Show the prompt generator. Defaults to true when ai is supplied. */
+  showPromptGenerator?: boolean
+
   /**
    * Map of filenames to file contents that will be available in the worker
    */

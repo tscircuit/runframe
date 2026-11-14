@@ -10,19 +10,18 @@ import {
 } from "../lib/ai/generate-datasheet-assets"
 import {
   createDatasheetModel,
-  ambiguousAssets,
+  generatedCircuitAssets,
   generatedAssets,
   modelResponse,
   pdfFile,
 } from "./fixtures/datasheet-ai"
 import { runIsolatedUiTest } from "./fixtures/run-isolated-ui-test"
 
-test("generates validated assets using the supplied model, PDF bytes and target part", async () => {
+test("generates validated assets using the supplied model and uploaded PDF only", async () => {
   const model = createDatasheetModel()
   const result = await generateDatasheetAssets({
     ai: { model },
     file: pdfFile(),
-    targetPart: "TEST123 SOIC-8",
   })
   expect(result).toEqual(generatedAssets)
   expect(getDatasheetAssetFiles(result).map((file) => file.filename)).toEqual([
@@ -33,7 +32,6 @@ test("generates validated assets using the supplied model, PDF bytes and target 
   const call = model.doGenerateCalls[0]
   expect(call.responseFormat?.type).toBe("json")
   expect(call.prompt[0].role).toBe("system")
-  expect(JSON.stringify(call.prompt)).toContain("TEST123 SOIC-8")
   const message = call.prompt.find((message) => message.role === "user")!
   if (message.role !== "user") throw new Error("Expected user prompt")
   const attachment = message.content.find((part) => part.type === "file")!
@@ -44,34 +42,68 @@ test("generates validated assets using the supplied model, PDF bytes and target 
   expect(new TextDecoder().decode(attachment.data.data)).toContain("%PDF-1.7")
 })
 
-test("a blank part yields selectable variants and the same PDF is reused after selection", async () => {
-  const model = new MockLanguageModelV4({
-    doGenerate: [modelResponse(ambiguousAssets), modelResponse()],
-  })
-  const file = pdfFile()
-  const first = await generateDatasheetAssets({ ai: { model }, file })
-  expect(getDatasheetAssetFiles(first)).toHaveLength(0)
-  expect(first.clarification?.options).toHaveLength(2)
-  const option = first.clarification!.options[0]
-  const selected = `${option.partNumber}, ${option.packageName}`
-  const second = await generateDatasheetAssets({
-    ai: { model },
-    file,
-    targetPart: selected,
-  })
-  expect(second).toEqual(generatedAssets)
-  expect(second).not.toHaveProperty("clarification")
-  const messages = model.doGenerateCalls.map((call) =>
-    call.prompt.find((message) => message.role === "user"),
-  )
-  expect(JSON.stringify(messages[0])).toContain("Not selected")
-  expect(JSON.stringify(messages[1])).toContain(selected)
-  const attachments = messages.map((message) =>
-    message?.role === "user"
-      ? message.content.find((part) => part.type === "file")
-      : undefined,
-  )
-  expect(attachments[0]).toEqual(attachments[1])
+test("generation toggles control additional circuits while retaining the standalone chip", async () => {
+  for (const generateSimulationCircuit of [false, true]) {
+    for (const generateReferenceCircuit of [false, true]) {
+      const model = createDatasheetModel(generatedCircuitAssets)
+      const result = await generateDatasheetAssets({
+        ai: { model },
+        file: pdfFile(),
+        generateSimulationCircuit,
+        generateReferenceCircuit,
+      })
+      expect(result.component).toEqual(generatedCircuitAssets.component)
+      expect(result.spiceModel).toEqual(generatedCircuitAssets.spiceModel)
+      expect(result.simulationCircuit).toEqual(
+        generateSimulationCircuit
+          ? generatedCircuitAssets.simulationCircuit
+          : null,
+      )
+      expect(result.referenceCircuit).toEqual(
+        generateReferenceCircuit
+          ? generatedCircuitAssets.referenceCircuit
+          : null,
+      )
+      expect(model.doGenerateCalls).toHaveLength(1)
+      expect(JSON.stringify(model.doGenerateCalls[0].prompt)).toContain(
+        `simulationCircuit=${generateSimulationCircuit ? "enabled" : "disabled"}`,
+      )
+      expect(JSON.stringify(model.doGenerateCalls[0].prompt)).toContain(
+        `referenceCircuit=${generateReferenceCircuit ? "enabled" : "disabled"}`,
+      )
+    }
+  }
+})
+
+test("accepting a chip or circuit includes only the selected circuit and chip dependencies", () => {
+  const chip = getDatasheetAssetFiles(generatedCircuitAssets, "component")
+  expect(chip.map((x) => x.kind)).toEqual([
+    "footprint",
+    "symbol",
+    "spiceModel",
+    "component",
+  ])
+  for (const kind of ["simulationCircuit", "referenceCircuit"] as const) {
+    const files = getDatasheetAssetFiles(generatedCircuitAssets, kind)
+    expect(files).toHaveLength(5)
+    expect(files.at(-1)?.kind).toBe(kind)
+  }
+  expect(getDatasheetAssetFiles(generatedCircuitAssets)).toHaveLength(6)
+  expect(() =>
+    validateDatasheetAssets({ ...generatedCircuitAssets, component: null }),
+  ).toThrow()
+  expect(() =>
+    validateDatasheetAssets({ ...generatedCircuitAssets, spiceModel: null }),
+  ).toThrow()
+  expect(() =>
+    validateDatasheetAssets({
+      ...generatedCircuitAssets,
+      referenceCircuit: {
+        ...generatedCircuitAssets.referenceCircuit!,
+        filename: generatedCircuitAssets.simulationCircuit!.filename,
+      },
+    }),
+  ).toThrow("duplicate filenames")
 })
 
 test("rejects invalid, empty and oversized files before invoking the model", async () => {
@@ -176,7 +208,7 @@ test("cancellation suppresses a late model response", async () => {
   await expect(pending).rejects.toThrow()
 })
 
-test("datasheet dialog supports variant selection, review, retry, cancellation and explicit acceptance", async () => {
+test("datasheet dialog supports upload-only generation, circuit selection, review, retry, cancellation and explicit acceptance", async () => {
   await runIsolatedUiTest(
     new URL("./fixtures/datasheet-import.tsx", import.meta.url),
   )
@@ -185,5 +217,11 @@ test("datasheet dialog supports variant selection, review, retry, cancellation a
 test("the website preview exposes datasheet generation without a File menu", async () => {
   await runIsolatedUiTest(
     new URL("./fixtures/datasheet-website.tsx", import.meta.url),
+  )
+}, 20000)
+
+test("generated circuit APIs preserve model pin mapping and biased simulation stimuli", async () => {
+  await runIsolatedUiTest(
+    new URL("./fixtures/datasheet-circuit-runtime.tsx", import.meta.url),
   )
 }, 20000)

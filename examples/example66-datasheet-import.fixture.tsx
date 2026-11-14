@@ -3,6 +3,8 @@ import { useState } from "react"
 import type { RunFrameAiConfig } from "../lib/ai/RunFrameAiProvider"
 import {
   type DatasheetAssets,
+  type DatasheetAssetSelection,
+  type DatasheetUsageKind,
   getDatasheetAssetFiles,
 } from "../lib/ai/datasheet-assets"
 import { RunFrame } from "../lib/components/RunFrame/RunFrame"
@@ -12,7 +14,12 @@ import { DatasheetPreviewAiConnection } from "./assets/DatasheetPreviewAiConnect
 
 const boardSource = (
   componentFilename?: string,
+  isCircuit = false,
 ) => `${componentFilename ? `import DatasheetComponent from "./${componentFilename.replace(/\.tsx$/, "")}"\n\n` : ""}export default () => (
+  ${
+    isCircuit
+      ? '<board routingDisabled width="60mm" height="40mm"><DatasheetComponent name="Example" /></board>'
+      : `
   <board width="30mm" height="22mm">
     <resistor name="R1" resistance="1k" footprint="0805" pcbX={-6} pcbY={4} schX={-2} schY={1} />
     <resistor name="R2" resistance="10k" footprint="0805" pcbX={6} pcbY={4} schX={2} schY={1} />
@@ -22,6 +29,8 @@ const boardSource = (
     <trace from=".R2 > .pin2" to=".C2 > .pin1" />
     ${componentFilename ? '<DatasheetComponent name="U1" />' : ""}
   </board>
+  `
+  }
 )
 `
 
@@ -37,9 +46,14 @@ export default function DatasheetImportFixture() {
   const [acceptedPart, setAcceptedPart] = useState<string | null>(null)
   const [hasRendered, setHasRendered] = useState(false)
   const [ai, setAi] = useState<RunFrameAiConfig | undefined>(undefined)
+  const [previewMode, setPreviewMode] =
+    useState<DatasheetUsageKind>("component")
 
-  const acceptAssets = (assets: DatasheetAssets) => {
-    const generated = getDatasheetAssetFiles(assets)
+  const acceptAssets = (
+    assets: DatasheetAssets,
+    selection?: DatasheetAssetSelection,
+  ) => {
+    const generated = getDatasheetAssetFiles(assets, selection?.kind)
     for (const file of generated) {
       if (file.filename in files)
         throw new Error(`File already exists: ${file.filename}`)
@@ -49,9 +63,14 @@ export default function DatasheetImportFixture() {
       ...Object.fromEntries(
         generated.map((file) => [file.filename, file.content]),
       ),
-      "main.tsx": boardSource(assets.component?.filename),
+      "main.tsx": boardSource(
+        selection?.entrypoint ?? assets.component?.filename,
+        selection?.kind === "simulationCircuit" ||
+          selection?.kind === "referenceCircuit",
+      ),
     }))
     setAcceptedPart(assets.partNumber)
+    setPreviewMode(selection?.kind ?? "component")
   }
 
   return (
@@ -135,14 +154,27 @@ export default function DatasheetImportFixture() {
         </section>
         <section className="tscircuit-runframe" aria-label="Circuit preview">
           <RunFrame
+            key={previewMode}
             fsMap={files}
             mainComponentPath="main.tsx"
             showFileMenu={false}
             showRunButton={hasRendered}
             onRenderFinished={() => setHasRendered(true)}
             isWebEmbedded
-            defaultActiveTab="cad"
-            availableTabs={["pcb", "schematic", "cad", "errors"]}
+            defaultActiveTab={
+              previewMode === "simulationCircuit"
+                ? "analog_simulation"
+                : previewMode === "referenceCircuit"
+                  ? "schematic"
+                  : "cad"
+            }
+            availableTabs={[
+              "pcb",
+              "schematic",
+              "cad",
+              "analog_simulation",
+              "errors",
+            ]}
             evalVersion={packageJson.dependencies["@tscircuit/eval"]}
             evalWebWorkerBlobUrl={evalWebWorkerBlobUrl}
             ai={ai}

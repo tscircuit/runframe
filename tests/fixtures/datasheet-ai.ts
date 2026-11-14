@@ -21,42 +21,47 @@ export const generatedAssets: DatasheetAssets = {
   },
   spiceModel: null,
   component: null,
+  simulationCircuit: null,
+  referenceCircuit: null,
   warnings: [
     "The datasheet does not provide enough parameters for a SPICE model.",
   ],
 }
 
-export const ambiguousAssets = {
-  partNumber: "LM158/LM258/LM358/LM2904 family",
-  packageName: "Multiple packages",
-  summary:
-    "The datasheet covers multiple electrical variants and pin mappings.",
-  footprint: null,
-  symbol: null,
-  spiceModel: null,
-  component: null,
-  warnings: [],
-  clarification: {
-    question: "Which electrical variant and package do you want to create?",
-    options: [
-      {
-        partNumber: "LM358",
-        packageName: "D (SOIC-8)",
-        description: "Original dual amplifier in the 8-pin SOIC package.",
-        sourcePages: [1, 3, 10],
-      },
-      {
-        partNumber: "LM358B",
-        packageName: "D (SOIC-8)",
-        description: "B variant, with different electrical specifications.",
-        sourcePages: [1, 3, 6],
-      },
-    ],
+export const generatedCircuitAssets: DatasheetAssets = {
+  ...generatedAssets,
+  component: {
+    filename: "test123.component.tsx",
+    content: "export default (props) => <chip {...props} />",
+    notes: "Standalone chip, without simulation enabled.",
+    sourcePages: [2],
+  },
+  spiceModel: {
+    filename: "test123.lib",
+    content: ".SUBCKT TEST123 1 2\nR1 1 2 1k\n.ENDS TEST123",
+    notes: "Behavioral approximation.",
+    sourcePages: [2],
+  },
+  simulationCircuit: {
+    filename: "test123.simulation.tsx",
+    content:
+      'export default () => <group subcircuit><analogsimulation duration="1ms" /></group>',
+    notes: "Connected simulation testbench.",
+    sourcePages: [4],
+  },
+  referenceCircuit: {
+    filename: "test123.reference.tsx",
+    content:
+      'export default () => <group subcircuit><resistor name="R1" resistance="1k" /></group>',
+    notes: "Reference application without analysis or sources.",
+    sourcePages: [4],
   },
 }
 
 export const providerAssets = (value: unknown = generatedAssets) =>
-  value && typeof value === "object" ? { clarification: null, ...value } : value
+  value && typeof value === "object"
+    ? { simulationCircuit: null, referenceCircuit: null, ...value }
+    : value
 
 export const modelResponse = (value: unknown = generatedAssets) => ({
   content: [

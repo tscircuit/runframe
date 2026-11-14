@@ -2,7 +2,8 @@ import { useEffect, useId, useRef, useState } from "react"
 import { useRunFrameAi } from "../../ai/RunFrameAiProvider"
 import {
   type DatasheetAssets,
-  type DatasheetClarification,
+  type DatasheetAssetSelection,
+  type DatasheetUsageKind,
   datasheetAssetLabels,
   getDatasheetAssetFiles,
 } from "../../ai/datasheet-assets"
@@ -25,8 +26,11 @@ import {
 export interface DatasheetImportDialogProps {
   isOpen: boolean
   onClose: () => void
-  /** Called only after the user reviews and chooses Use generated files. */
-  onAssetsGenerated?: (assets: DatasheetAssets) => void | Promise<void>
+  /** Called after review, with the chosen chip or circuit entrypoint. */
+  onAssetsGenerated?: (
+    assets: DatasheetAssets,
+    selection?: DatasheetAssetSelection,
+  ) => void | Promise<void>
 }
 
 export const DatasheetImportDialog = ({
@@ -38,10 +42,11 @@ export const DatasheetImportDialog = ({
   const ai = useRunFrameAi()
   const id = useId()
   const [file, setFile] = useState<File | null>(null)
-  const [targetPart, setTargetPart] = useState("")
+  const [generateSimulationCircuit, setGenerateSimulationCircuit] =
+    useState(false)
+  const [generateReferenceCircuit, setGenerateReferenceCircuit] =
+    useState(false)
   const [assets, setAssets] = useState<DatasheetAssets | null>(null)
-  const [clarification, setClarification] =
-    useState<DatasheetClarification | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -61,10 +66,10 @@ export const DatasheetImportDialog = ({
     // A changed model or a closed dialog invalidates pending results.
     invalidate()
     setAssets(null)
-    setClarification(null)
     setError(null)
     setFile(null)
-    setTargetPart("")
+    setGenerateSimulationCircuit(false)
+    setGenerateReferenceCircuit(false)
     return () => {
       session.current++
       request.current?.abort()
@@ -82,7 +87,6 @@ export const DatasheetImportDialog = ({
     if (saving.current) return
     invalidate()
     setAssets(null)
-    setClarification(null)
     setError(null)
     setFile(null)
     try {
@@ -105,20 +109,16 @@ export const DatasheetImportDialog = ({
     request.current = controller
     setIsGenerating(true)
     setAssets(null)
-    setClarification(null)
     setError(null)
     try {
       const result = await generateDatasheetAssets({
         ai,
         file,
-        targetPart,
+        generateSimulationCircuit,
+        generateReferenceCircuit,
         abortSignal: controller.signal,
       })
-      if (request.current === controller) {
-        const { clarification: nextClarification, ...generated } = result
-        setClarification(nextClarification ?? null)
-        setAssets(nextClarification ? null : generated)
-      }
+      if (request.current === controller) setAssets(result)
     } catch (error) {
       if (!controller.signal.aborted && request.current === controller) {
         setError(
@@ -135,14 +135,19 @@ export const DatasheetImportDialog = ({
     }
   }
 
-  const accept = async () => {
+  const accept = async (kind?: DatasheetUsageKind) => {
     if (!assets || !onAssetsGenerated || saving.current) return
     saving.current = true
     setIsSaving(true)
     setError(null)
     const currentSession = session.current
     try {
-      await onAssetsGenerated(assets)
+      const selected = kind ? assets[kind] : null
+      if (kind && selected) {
+        await onAssetsGenerated(assets, { kind, entrypoint: selected.filename })
+      } else {
+        await onAssetsGenerated(assets)
+      }
       if (session.current === currentSession) onClose()
     } catch (error) {
       if (session.current === currentSession) {
@@ -239,76 +244,57 @@ export const DatasheetImportDialog = ({
               />
               {file && <p className="rf-text-sm">Selected: {file.name}</p>}
             </div>
-            <label htmlFor={`${id}-part`} className="rf-text-sm rf-space-y-1">
-              <span className="rf-block">Part number and package</span>
-              <input
-                id={`${id}-part`}
-                aria-describedby={`${id}-part-help`}
-                className="rf-w-full rf-rounded rf-border rf-p-2"
-                placeholder="e.g. LM358, SOIC-8"
-                maxLength={200}
-                value={targetPart}
-                disabled={isGenerating || isSaving}
-                onChange={(event) => {
-                  setTargetPart(event.target.value)
-                  setAssets(null)
-                  setError(null)
-                }}
-              />
-            </label>
-            <p id={`${id}-part-help`} className="rf-text-xs rf-text-zinc-500">
-              Leave blank to identify the part. If the PDF covers several
-              variants or packages, choose one before generating files.
-            </p>
-            {clarification && (
-              <fieldset
-                className="rf-grid rf-gap-3 rf-rounded rf-border rf-border-blue-200 rf-bg-blue-50 rf-p-4"
-                disabled={isGenerating || isSaving}
-              >
-                <legend className="rf-px-1 rf-font-semibold">
-                  Choose a part and package
-                </legend>
-                <p className="rf-text-sm">{clarification.question}</p>
-                <div className="rf-grid rf-max-h-64 rf-gap-2 rf-overflow-y-auto">
-                  {clarification.options.map((option, index) => {
-                    const selection = `${option.partNumber}, ${option.packageName}`
-                    return (
-                      <label
-                        key={index}
-                        className="rf-flex rf-cursor-pointer rf-items-start rf-gap-3 rf-rounded rf-border rf-bg-white rf-p-3 rf-text-sm"
-                      >
-                        <input
-                          type="radio"
-                          name={`${id}-variant`}
-                          value={selection}
-                          checked={targetPart === selection}
-                          onChange={() => {
-                            setTargetPart(selection)
-                            setAssets(null)
-                            setError(null)
-                          }}
-                        />
-                        <span>
-                          <strong>
-                            {option.partNumber} — {option.packageName}
-                          </strong>
-                          <span className="rf-block">{option.description}</span>
-                          {option.sourcePages.length > 0 && (
-                            <span className="rf-block rf-text-xs rf-text-zinc-500">
-                              PDF pages {option.sourcePages.join(", ")}
-                            </span>
-                          )}
-                        </span>
-                      </label>
-                    )
-                  })}
-                </div>
-                <p className="rf-text-xs">
-                  Or enter another part and package above. Your PDF is still
-                  selected; generate after choosing the variant you need.
+            <fieldset
+              className="rf-grid rf-gap-3 rf-rounded rf-border rf-p-3"
+              disabled={isGenerating || isSaving}
+            >
+              <legend className="rf-px-1 rf-text-sm rf-font-medium">
+                Additional circuits
+              </legend>
+              <div>
+                <label className="rf-flex rf-items-center rf-gap-2 rf-text-sm">
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    checked={generateSimulationCircuit}
+                    onChange={(event) => {
+                      setGenerateSimulationCircuit(event.target.checked)
+                      setAssets(null)
+                      setError(null)
+                    }}
+                  />
+                  Generate simulation circuit
+                </label>
+                <p className="rf-mt-1 rf-text-xs rf-text-zinc-500">
+                  A connected test circuit with power, stimulus, probes and
+                  SPICE analysis. The chip and model are still generated
+                  separately.
                 </p>
-              </fieldset>
-            )}
+              </div>
+              <div>
+                <label className="rf-flex rf-items-center rf-gap-2 rf-text-sm">
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    checked={generateReferenceCircuit}
+                    onChange={(event) => {
+                      setGenerateReferenceCircuit(event.target.checked)
+                      setAssets(null)
+                      setError(null)
+                    }}
+                  />
+                  Generate reference circuit
+                </label>
+                <p className="rf-mt-1 rf-text-xs rf-text-zinc-500">
+                  Application wiring and supporting components, without
+                  simulations or test sources.
+                </p>
+              </div>
+            </fieldset>
+            <p className="rf-text-xs rf-text-zinc-500">
+              The AI selects a documented part and package automatically and
+              identifies its choice in the result.
+            </p>
             <p className="rf-text-xs rf-text-zinc-500">
               Generate sends this PDF to the AI service configured by your host
               app.
@@ -316,20 +302,13 @@ export const DatasheetImportDialog = ({
             <div className="rf-flex rf-flex-wrap rf-gap-2 rf-items-center">
               <Button
                 onClick={generate}
-                disabled={
-                  !file ||
-                  isGenerating ||
-                  isSaving ||
-                  (!!clarification && !targetPart.trim())
-                }
+                disabled={!file || isGenerating || isSaving}
               >
                 {isGenerating
                   ? "Generating…"
-                  : clarification
-                    ? "Generate selected part"
-                    : assets
-                      ? "Generate again"
-                      : "Generate assets"}
+                  : assets
+                    ? "Generate again"
+                    : "Generate assets"}
               </Button>
               {isGenerating && (
                 <>
@@ -349,7 +328,7 @@ export const DatasheetImportDialog = ({
             {error}
           </p>
         )}
-        {assets && !clarification && (
+        {assets && (
           <section
             className="rf-space-y-3 rf-break-words"
             aria-label="Generated assets"
@@ -373,6 +352,13 @@ export const DatasheetImportDialog = ({
             {files.length > 0 &&
               Object.entries(datasheetAssetLabels).map(([kind, label]) => {
                 const asset = assets[kind as keyof typeof datasheetAssetLabels]
+                if (
+                  !asset &&
+                  ((kind === "simulationCircuit" &&
+                    !generateSimulationCircuit) ||
+                    (kind === "referenceCircuit" && !generateReferenceCircuit))
+                )
+                  return null
                 return asset ? (
                   <details key={kind} className="rf-rounded rf-border rf-p-3">
                     <summary className="rf-cursor-pointer rf-text-sm rf-font-medium">
@@ -409,9 +395,36 @@ export const DatasheetImportDialog = ({
                 {isDownloading ? "Preparing download…" : "Download ZIP"}
               </Button>
               {onAssetsGenerated && (
-                <Button onClick={accept} disabled={isSaving}>
-                  {isSaving ? "Saving…" : "Use generated files"}
-                </Button>
+                <div className="rf-flex rf-flex-wrap rf-gap-2">
+                  {assets?.component ? (
+                    <Button
+                      onClick={() => accept("component")}
+                      disabled={isSaving}
+                    >
+                      Use chip alone
+                    </Button>
+                  ) : (
+                    <Button onClick={() => accept()} disabled={isSaving}>
+                      {isSaving ? "Saving…" : "Use generated files"}
+                    </Button>
+                  )}
+                  {assets?.simulationCircuit && (
+                    <Button
+                      onClick={() => accept("simulationCircuit")}
+                      disabled={isSaving}
+                    >
+                      Use simulation circuit
+                    </Button>
+                  )}
+                  {assets?.referenceCircuit && (
+                    <Button
+                      onClick={() => accept("referenceCircuit")}
+                      disabled={isSaving}
+                    >
+                      Use reference circuit
+                    </Button>
+                  )}
+                </div>
               )}
             </>
           )}

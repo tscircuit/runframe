@@ -192,7 +192,6 @@ test("the preview sends the selected PDF to its configured real-provider transpo
   const result = await generateDatasheetAssets({
     ai,
     file: new File([document], "lm358.pdf", { type: "application/pdf" }),
-    targetPart: "LM358 SOIC-8 (D)",
   })
   expect(calls).toHaveLength(1)
   expect(calls[0].url).toBe(
@@ -214,7 +213,6 @@ test("the preview sends the selected PDF to its configured real-provider transpo
     document,
   )
   expect(body.model).toBe("claude-sonnet-4-5")
-  expect(JSON.stringify(body.messages)).toContain("LM358 SOIC-8 (D)")
   expect(result.partNumber).toBe("LM358")
   expect(result.spiceModel?.content).toBe(returned.spiceModel.content)
 })

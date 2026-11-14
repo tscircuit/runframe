@@ -2,7 +2,11 @@ import { expect, mock, test } from "bun:test"
 import { JSDOM } from "jsdom"
 import { act } from "react"
 import { createRoot } from "react-dom/client"
-import { createDatasheetModel, generatedAssets, pdfFile } from "./datasheet-ai"
+import {
+  createDatasheetModel,
+  generatedCircuitAssets,
+  pdfFile,
+} from "./datasheet-ai"
 
 mock.module("@tscircuit/3d-viewer", () => ({
   CadViewer: () => <div data-testid="3d-viewer" />,
@@ -46,7 +50,7 @@ test("the website RunFrame exposes the datasheet action with its File menu hidde
   window.TSCIRCUIT_TELEMETRY_DISABLED = true
   window.TSCIRCUIT_ALLOW_SELECTING_EVAL_VERSION = false
   const { RunFrame } = await import("../../lib/components/RunFrame/RunFrame")
-  const model = createDatasheetModel()
+  const model = createDatasheetModel(generatedCircuitAssets)
   const accepted = mock(async (_assets: unknown) => {})
   const root = createRoot(document.getElementById("root")!)
   const button = (text: string) =>
@@ -98,6 +102,12 @@ test("the website RunFrame exposes the datasheet action with its File menu hidde
     expect(document.querySelector('[role="dialog"]')).not.toBeNull()
     expect(model.doGenerateCalls).toHaveLength(0)
     await act(async () => {
+      for (const input of document.querySelectorAll<HTMLInputElement>(
+        'input[role="switch"]',
+      ))
+        input.click()
+    })
+    await act(async () => {
       const event = new Event("drop", { bubbles: true, cancelable: true })
       Object.defineProperty(event, "dataTransfer", {
         value: { files: [pdfFile()] },
@@ -107,14 +117,17 @@ test("the website RunFrame exposes the datasheet action with its File menu hidde
         .parentElement!.dispatchEvent(event)
     })
     await click(button("Generate assets")!)
-    for (let i = 0; i < 100 && !button("Use generated files"); i++) {
+    for (let i = 0; i < 100 && !button("Use simulation circuit"); i++) {
       await act(async () => {
         await new Promise((resolve) => setTimeout(resolve, 5))
       })
     }
     expect(accepted).not.toHaveBeenCalled()
-    await click(button("Use generated files")!)
-    expect(accepted).toHaveBeenCalledWith(generatedAssets)
+    await click(button("Use simulation circuit")!)
+    expect(accepted).toHaveBeenCalledWith(generatedCircuitAssets, {
+      kind: "simulationCircuit",
+      entrypoint: generatedCircuitAssets.simulationCircuit!.filename,
+    })
     expect(document.querySelector('[role="dialog"]')).toBeNull()
     await render(false)
     expect(button("Create from datasheet")).toBeUndefined()

@@ -6,7 +6,7 @@ import { createRoot } from "react-dom/client"
 import { RunFrameAiProvider } from "../../lib/ai/RunFrameAiProvider"
 import {
   createDatasheetModel,
-  ambiguousAssets,
+  generatedCircuitAssets,
   generatedAssets,
   modelResponse,
   pdfFile,
@@ -119,66 +119,65 @@ test("dialog generates only on request, reviews files, and accepts explicitly", 
     expect(accepted).toHaveBeenCalledWith(generatedAssets)
     expect(close).toHaveBeenCalledTimes(1)
 
-    let multiPartAttempt = 0
-    const multiPart = new MockLanguageModelV4({
-      doGenerate: async () => {
-        multiPartAttempt++
-        if (multiPartAttempt === 1) return modelResponse(ambiguousAssets)
-        if (multiPartAttempt === 2)
-          throw new Error("Temporary provider failure")
-        return modelResponse()
-      },
-    })
-    await render(multiPart)
-    await drop([pdfFile()])
-    const partInput = document.querySelector(
-      'input[placeholder="e.g. LM358, SOIC-8"]',
-    ) as HTMLInputElement
-    expect(partInput.value).toBe("")
-    await click("Generate assets")
-    await until(
-      () => document.querySelectorAll('input[type="radio"]').length === 2,
-    )
-    expect(multiPart.doGenerateCalls).toHaveLength(1)
-    expect(document.body.textContent).toContain("Choose a part and package")
-    expect(document.body.textContent).toContain("Selected: test123.pdf")
-    expect(document.body.textContent).not.toContain("Footprint: unavailable")
-    expect(document.querySelector('[aria-label="Generated assets"]')).toBeNull()
-    expect(button("Download ZIP")).toBeUndefined()
-    expect(button("Use generated files")).toBeUndefined()
-    expect(button("Generate selected part").disabled).toBe(true)
-    const choices = Array.from(
-      document.querySelectorAll<HTMLInputElement>('input[type="radio"]'),
-    )
-    expect(choices.every((choice) => !choice.checked)).toBe(true)
-    await act(async () => choices[0].click())
-    expect(partInput.value).toBe("LM358, D (SOIC-8)")
-    expect(multiPart.doGenerateCalls).toHaveLength(1)
-    expect(button("Generate selected part").disabled).toBe(false)
-    await click("Generate selected part")
-    await until(() => Boolean(document.querySelector('[role="alert"]')))
-    expect(document.querySelector('[role="alert"]')?.textContent).toContain(
-      "Temporary provider failure",
-    )
-    expect(partInput.value).toBe("LM358, D (SOIC-8)")
-    expect(document.body.textContent).toContain("Selected: test123.pdf")
-    expect(accepted).toHaveBeenCalledTimes(1)
-    await click("Generate assets")
-    await until(() => Boolean(button("Use generated files")))
-    expect(multiPart.doGenerateCalls).toHaveLength(3)
-    expect(JSON.stringify(multiPart.doGenerateCalls[2].prompt)).toContain(
-      "LM358, D (SOIC-8)",
-    )
+    const circuits = createDatasheetModel(generatedCircuitAssets)
+    await render(circuits)
+    expect(
+      document.querySelector('input[placeholder="e.g. LM358, SOIC-8"]'),
+    ).toBeNull()
     expect(document.querySelector('input[type="radio"]')).toBeNull()
-    expect(document.body.textContent).toContain("Selected: test123.pdf")
-    expect(accepted).toHaveBeenCalledTimes(1)
-    await click("Use generated files")
-    expect(accepted).toHaveBeenLastCalledWith(generatedAssets)
-    expect(accepted).toHaveBeenCalledTimes(2)
+    const switches = Array.from(
+      document.querySelectorAll<HTMLInputElement>('input[role="switch"]'),
+    )
+    expect(switches).toHaveLength(2)
+    expect(switches.every((input) => !input.checked)).toBe(true)
+    await act(async () => {
+      switches[0].click()
+      switches[1].click()
+    })
+    expect(circuits.doGenerateCalls).toHaveLength(0)
+    await drop([pdfFile()])
+    await click("Generate assets")
+    await until(() => Boolean(button("Use simulation circuit")))
+    expect(button("Use chip alone")).toBeDefined()
+    expect(button("Use reference circuit")).toBeDefined()
+    expect(document.querySelector('input[type="radio"]')).toBeNull()
+    expect(circuits.doGenerateCalls).toHaveLength(1)
+    expect(switches.every((input) => input.checked)).toBe(true)
+    await click("Use chip alone")
+    expect(accepted).toHaveBeenLastCalledWith(generatedCircuitAssets, {
+      kind: "component",
+      entrypoint: generatedCircuitAssets.component!.filename,
+    })
+    accepted.mockImplementationOnce(async () => {
+      throw new Error("Could not save circuit")
+    })
+    await click("Use simulation circuit")
+    expect(document.querySelector('[role="alert"]')?.textContent).toContain(
+      "Could not save circuit",
+    )
+    expect(button("Use chip alone")).toBeDefined()
+    expect(button("Use simulation circuit")).toBeDefined()
+    await click("Use simulation circuit")
+    expect(accepted).toHaveBeenLastCalledWith(generatedCircuitAssets, {
+      kind: "simulationCircuit",
+      entrypoint: generatedCircuitAssets.simulationCircuit!.filename,
+    })
+    await click("Use reference circuit")
+    expect(accepted).toHaveBeenLastCalledWith(generatedCircuitAssets, {
+      kind: "referenceCircuit",
+      entrypoint: generatedCircuitAssets.referenceCircuit!.filename,
+    })
+    await act(async () => switches[1].click())
+    expect(document.querySelector('[aria-label="Generated assets"]')).toBeNull()
+    await click("Generate assets")
+    await until(() => Boolean(button("Use simulation circuit")))
+    expect(button("Use reference circuit")).toBeUndefined()
+    expect(circuits.doGenerateCalls).toHaveLength(2)
 
     const noAssets = createDatasheetModel({
-      ...ambiguousAssets,
-      clarification: null,
+      ...generatedAssets,
+      footprint: null,
+      symbol: null,
       warnings: [
         "The document contains no usable dimensions or pin information.",
       ],

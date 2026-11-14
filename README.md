@@ -67,17 +67,27 @@ Model objects contain functions and cannot cross the `RunFrameWithIframe`
 
 With `ai` configured, choose **Create from datasheet** in the preview toolbar. The
 button remains visible when `showFileMenu={false}`, as used by the tscircuit.com
-editor's `SuspenseRunFrame` wrapper. Drop one PDF
-(up to 20 MB), optionally specify an exact part number and package, and click
-**Generate assets**. The model must support PDF input and structured JSON output;
-Runframe sends the PDF bytes directly, including diagrams and package drawings.
-Opening the dialog or choosing a file does not send a request.
+editor's `SuspenseRunFrame` wrapper. Drop one PDF (up to 20 MB) and click
+**Generate assets**. The AI automatically chooses a documented part and package,
+including for family datasheets, and explains its choice in the result. There is
+no part/package entry or clarification step. The model must support PDF input
+and structured JSON output; Runframe sends the PDF bytes directly, including
+package drawings. Opening the dialog, choosing a file or changing a toggle does
+not send a request.
 
-When a PDF covers multiple electrical variants or packages, the dialog offers
-documented part/package choices instead of treating the ambiguity as a completed
-generation. No choice is preselected. Select a combination (or enter a different
-part and package), then choose **Generate selected part**. The uploaded PDF stays
-selected throughout this step.
+Two optional toggles, both off by default, add reusable circuit modules:
+
+- **Generate simulation circuit** creates a connected tscircuit group with the
+  chip's behavioral model, supplies, stimulus, loads, probes and ngspice transient
+  analysis. The standalone chip and SPICE model are still available.
+- **Generate reference circuit** creates a reference application group with the
+  chip and supporting wiring/components, without simulation analysis, probes,
+  artificial test sources or an attached SPICE model.
+
+After review, choose **Use chip alone**, **Use simulation circuit** or
+**Use reference circuit** when that output is available. Download ZIP includes
+all generated files. Acceptance supplies the chosen module to the host through
+an optional second callback argument, `{ kind, entrypoint }`.
 
 Results contain tscircuit TSX files for a footprint, schematic symbol and combined
 component, plus an AI-generated behavioral SPICE macro-model synthesized from
@@ -90,7 +100,7 @@ Runframe validates the response structure and filenames; it does not certify the
 generated circuit geometry, TSX behavior, or electrical accuracy.
 
 Inspect the source in the dialog, download a ZIP (including generation notes), or
-pass a callback to receive files after the user chooses **Use generated files**:
+pass a callback to receive files and the chosen chip/circuit entrypoint:
 
 ```tsx
 import { getDatasheetAssetFiles, RunFrame } from "@tscircuit/runframe/runner"
@@ -98,9 +108,12 @@ import { getDatasheetAssetFiles, RunFrame } from "@tscircuit/runframe/runner"
 <RunFrame
   fsMap={files}
   ai={{ model }}
-  onDatasheetAssetsGenerated={async (assets) => {
-    const generatedFiles = getDatasheetAssetFiles(assets)
+  onDatasheetAssetsGenerated={async (assets, selection) => {
+    const generatedFiles = getDatasheetAssetFiles(assets, selection?.kind)
     await saveNewFiles(generatedFiles) // Your host's file creation flow
+    if (selection) {
+      await useGeneratedModule(selection.entrypoint) // Place it in your board
+    }
   }}
 />
 ```
@@ -113,11 +126,14 @@ pending generation.
 
 For a custom launcher, render the exported `DatasheetImportDialog` inside a
 `RunFrameAiProvider`. Its props are `isOpen`, `onClose`, and optional
-`onAssetsGenerated`. `generateDatasheetAssets({ ai, file, targetPart, abortSignal })`
-is also exported for hosts with their own UI. Its result can include
-`clarification` with a question and supported `options`; handle this selection
-step before persisting files, then call it again with the same file and the
-chosen `targetPart`. Accepted-file callbacks still receive `DatasheetAssets`.
+`onAssetsGenerated`. `generateDatasheetAssets({ ai, file,
+generateSimulationCircuit, generateReferenceCircuit, abortSignal })` is also
+exported for custom hosts; both generation flags default to false. The returned
+`simulationCircuit` and `referenceCircuit` are nullable TSX assets. Use
+`getDatasheetAssetFiles(assets, selection?.kind)` to include the selected circuit
+and shared chip dependencies; omit the selection to collect every generated file.
+The `entrypoint` is a reusable module for placement inside the host's board.
+One-argument callbacks remain supported.
 
 The Cosmos `example66-datasheet-import` fixture uses the website's `RunFrame`
 component with source files, a Run button, and a hidden File menu. It opens on a

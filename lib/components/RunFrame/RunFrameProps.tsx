@@ -2,6 +2,7 @@ import type { ManualEditEvent, PlatformConfig } from "@tscircuit/props"
 import type { TabId } from "lib/components/CircuitJsonPreview/PreviewContentProps"
 import type { RunCompletedPayload } from "./run-completion"
 import type { ExtraRunFrameTab } from "../CircuitJsonPreview/extra-runframe-tabs"
+import type { RunFrameController } from "./useRunFrameController"
 
 export interface RunFrameProps {
   /**
@@ -147,6 +148,9 @@ export interface RunFrameProps {
    * RunFrame asks for a different tab.
    */
   onActiveTabChange?: (tab: TabId) => void
+
+  /** Connect the controller returned by useRunFrameController. */
+  controller?: RunFrameController
 
   /**
    * Tabs to display. Defaults to all

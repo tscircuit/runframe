@@ -4,7 +4,7 @@ import {
   type RunFrameIframeReadyMessage,
   type RunFrameNestedEvent,
 } from "lib/components/RunFrameWithIframe/RunFrameIframeEvent"
-import { getCircuitJsonElementCounts } from "lib/components/RunFrameWithIframe/get-circuit-json-element-counts"
+import { getRunFrameEventCallbacks } from "lib/components/RunFrame/get-run-frame-event-callbacks"
 import { RunFrame, type RunFrameProps } from "lib/runner"
 import React, { useEffect, useReducer, useState } from "react"
 import { createRoot } from "react-dom/client"
@@ -61,37 +61,7 @@ function IframeApp() {
           showToggleFullScreen={false}
           defaultActiveTab="cad"
           {...propsFromParent}
-          onError={(error) => {
-            postEventToParent({
-              type: "error",
-              error_message: error.message ?? error.toString(),
-            })
-          }}
-          onRenderStarted={() => postEventToParent({ type: "render_started" })}
-          onCircuitJsonChange={(circuitJson) => {
-            postEventToParent({
-              type: "circuit_json_changed",
-              circuit_json_element_counts:
-                getCircuitJsonElementCounts(circuitJson),
-            })
-          }}
-          onRenderFinished={({ circuitJson }) => {
-            postEventToParent({
-              type: "render_finished",
-              circuit_json_element_counts:
-                getCircuitJsonElementCounts(circuitJson),
-            })
-          }}
-          onRunCompleted={(payload) => {
-            postEventToParent({
-              type: "run_completed",
-              has_execution_error: payload.hasExecutionError,
-              error_count: payload.errors?.length ?? 0,
-            })
-          }}
-          onActiveTabChange={(tab) => {
-            postEventToParent({ type: "active_tab_changed", tab })
-          }}
+          {...getRunFrameEventCallbacks(postEventToParent)}
         />
       )}
     </div>

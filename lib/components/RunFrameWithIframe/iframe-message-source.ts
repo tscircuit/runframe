@@ -12,6 +12,26 @@ export function isRunFramePropsMessageFromParent(
   )
 }
 
+export function isRunFrameEventMessageFromChild({
+  event,
+  child,
+  origin,
+}: {
+  event: Pick<MessageEvent, "source" | "origin" | "data">
+  child: Window | null | undefined
+  origin: string
+}) {
+  return (
+    Boolean(child) &&
+    event.source === child &&
+    event.origin === origin &&
+    // Older deployments name the envelope in `type` alone.
+    (event.data?.runframe_type === "runframe_event" ||
+      event.data?.type === "runframe_event") &&
+    typeof event.data.runframe_event?.type === "string"
+  )
+}
+
 export function isRunFrameReadyMessageFromChild({
   event,
   child,

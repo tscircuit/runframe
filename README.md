@@ -184,7 +184,54 @@ has, for example `{ "pcb_board": 1, "system_block_page": 1 }`. A host can use
 it to tell which views have something to show without receiving the whole
 Circuit JSON.
 
-#### Drawing your own header
+### Controlling RunFrame from the host
+
+`useRunFrameController` lets a host that has its own tabs drive RunFrame and
+follow what it does, the same way `usePcbViewerController` and
+`useSchematicViewerController` work for the viewers:
+
+```tsx
+import { RunFrame, useRunFrameController } from "@tscircuit/runframe/runner"
+
+const App = () => {
+  const {
+    controller,
+    activeTab,
+    setActiveTab,
+    isRunning,
+    circuitJsonElementCounts,
+    errorMessage,
+  } = useRunFrameController()
+
+  return (
+    <>
+      <button onClick={() => setActiveTab("pcb")}>PCB</button>
+      <button
+        onClick={() => setActiveTab("system")}
+        disabled={!circuitJsonElementCounts?.system_block_page}
+      >
+        System
+      </button>
+      <RunFrame fsMap={fsMap} controller={controller} showHeader={false} />
+    </>
+  )
+}
+```
+
+- `setActiveTab` may be called before RunFrame mounts.
+- `activeTab` follows RunFrame when it switches by itself, for example to
+  `errors` after a run throws and back once a later run renders.
+- `circuitJsonElementCounts` says how many elements of each type the last
+  render has, so a host can tell which views have something to show.
+- `showHeader={false}` removes RunFrame's own header: the run button, the file
+  menu, the render status and the tabs.
+
+`RunFrameWithIframe` takes the same `controller`.
+
+#### Drawing your own header around the iframe
+
+Without React, or without the package, the same control is available over
+`postMessage`.
 
 A host that has its own tabs can hide RunFrame's header and pick the tab:
 

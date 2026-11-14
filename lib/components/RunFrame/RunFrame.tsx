@@ -53,6 +53,7 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip"
 import type { RunFrameProps } from "./RunFrameProps"
+import { connectRunFrameController } from "./useRunFrameController"
 import { getRunFrameProjectConfig } from "./get-run-frame-project-config"
 import {
   type RunCompletedPayload,
@@ -103,8 +104,17 @@ const resolveEvalVersion = async (
 }
 
 export type { RunFrameProps }
+export {
+  useRunFrameController,
+  type RunFrameController,
+} from "./useRunFrameController"
+export type {
+  CircuitJsonElementCounts,
+  RunFrameNestedEvent,
+} from "../RunFrameWithIframe/RunFrameIframeEvent"
 
-export const RunFrame = (props: RunFrameProps) => {
+export const RunFrame = (propsFromHost: RunFrameProps) => {
+  const props = connectRunFrameController(propsFromHost)
   useStyles()
 
   const isStaticCircuitJson =

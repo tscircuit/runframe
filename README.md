@@ -116,13 +116,15 @@ component with source files, a Run button, and a hidden File menu. It opens on a
 populated 3D view, with PCB and schematic tabs and the datasheet toolbar action.
 Accepted files appear in the editor; Run updates the board with the generated
 component. This fixture contains no mock AI model or canned component results.
-Choose **Configure AI** and select OpenAI, Anthropic, Google Gemini, or an
-OpenAI-compatible service. The standard providers have **Sign in** links to their
+Choose **Configure AI**. OpenAI is selected by default and uses the hardcoded
+`gpt-6-astra` model, with no model ID input. Anthropic, Google Gemini and
+OpenAI-compatible services remain available with an explicit model ID. The
+standard providers have **Sign in** links to their
 official account consoles. These open a new tab; they do not perform OAuth or
 automatically grant Runframe model access. For this personal preview, return with
-a provider API key and enter your chosen PDF-capable model ID. Standard provider
-addresses are automatic. No provider or model is selected by default. Keys stay
-in tab memory, go only to that provider, and clear on reload or disconnect.
+a provider API key. Standard provider addresses are automatic. No connection is
+active until the user configures it. Keys stay in tab memory, go only to that
+provider, and clear on reload or disconnect.
 
 Production websites should manage authentication and provider keys on their
 backend and supply the resulting `ai={{ model }}`. The preview also supports

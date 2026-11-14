@@ -3,6 +3,9 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google"
 import { createOpenAI } from "@ai-sdk/openai"
 import type { RunFrameAiConfig } from "../../lib/ai/RunFrameAiProvider"
 
+// https://developers.openai.com/api/docs/models/gpt-6-astra
+export const OPENAI_DATASHEET_MODEL_ID = "gpt-6-astra"
+
 export const datasheetPreviewProviders = {
   openai: {
     label: "OpenAI",
@@ -35,7 +38,7 @@ export type DatasheetPreviewProvider = keyof typeof datasheetPreviewProviders
 export interface DatasheetPreviewConnection {
   provider: DatasheetPreviewProvider
   proxyUrl?: string
-  modelId: string
+  modelId?: string
   /** User-supplied provider key, held in memory and sent only to that provider. */
   apiKey?: string
   useCustomEndpoint?: boolean
@@ -51,7 +54,10 @@ export const createDatasheetPreviewAi = (
   if (!Object.hasOwn(datasheetPreviewProviders, connection.provider)) {
     throw new Error("Choose an AI provider.")
   }
-  if (!connection.modelId.trim()) {
+  const modelId =
+    connection.modelId?.trim() ||
+    (connection.provider === "openai" ? OPENAI_DATASHEET_MODEL_ID : "")
+  if (!modelId) {
     throw new Error("Enter your model ID.")
   }
   const provider = datasheetPreviewProviders[connection.provider]
@@ -113,7 +119,6 @@ export const createDatasheetPreviewAi = (
         credentials: isCustom ? "include" : "omit",
       })) as typeof globalThis.fetch,
   }
-  const modelId = connection.modelId.trim()
   switch (connection.provider) {
     case "anthropic":
       return { model: createAnthropic(settings)(modelId) }

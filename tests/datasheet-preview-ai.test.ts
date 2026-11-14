@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test"
 import {
+  OPENAI_DATASHEET_MODEL_ID,
   createDatasheetPreviewAi,
   datasheetPreviewProviders,
 } from "../examples/assets/create-datasheet-preview-ai"
@@ -186,6 +187,33 @@ test("the preview sends the selected PDF to its configured real-provider transpo
   expect(JSON.stringify(body.messages)).toContain("LM358 SOIC-8 (D)")
   expect(result.partNumber).toBe("LM358")
   expect(result.spiceModel?.content).toBe(returned.spiceModel.content)
+})
+
+test("OpenAI uses GPT-6 Astra without asking for a model ID", async () => {
+  const calls: { url: string; init: RequestInit }[] = []
+  const ai = createDatasheetPreviewAi(
+    { provider: "openai", apiKey: "personal-preview-test-key" },
+    {
+      origin: "https://preview.example.test",
+      fetch: (async (input, init) => {
+        calls.push({ url: String(input), init: init! })
+        return new Response(JSON.stringify(otherProviderCases[0].response), {
+          headers: { "content-type": "application/json" },
+        })
+      }) as typeof fetch,
+    },
+  )
+  expect(calls).toHaveLength(0)
+  const result = await generateDatasheetAssets({
+    ai,
+    file: new File([pdfBytes], "user.pdf", { type: "application/pdf" }),
+  })
+  expect(calls).toHaveLength(1)
+  expect(calls[0].url).toBe("https://api.openai.com/v1/responses")
+  const body = JSON.parse(String(calls[0].init.body))
+  expect(body.model).toBe(OPENAI_DATASHEET_MODEL_ID)
+  expect(body.model).toBe("gpt-6-astra")
+  expect(result).toEqual(generatedAssets)
 })
 
 for (const provider of ["openai", "anthropic", "google"] as const) {

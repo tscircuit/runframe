@@ -11,6 +11,7 @@ import {
 } from "../../lib/components/ui/dialog"
 import {
   type DatasheetPreviewProvider,
+  OPENAI_DATASHEET_MODEL_ID,
   createDatasheetPreviewAi,
   datasheetPreviewProviders,
 } from "./create-datasheet-preview-ai"
@@ -24,7 +25,7 @@ export const DatasheetPreviewAiConnection = ({
   onChange: (ai: RunFrameAiConfig | undefined) => void
 }) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [provider, setProvider] = useState<DatasheetPreviewProvider | "">("")
+  const [provider, setProvider] = useState<DatasheetPreviewProvider>("openai")
   const [proxyUrl, setProxyUrl] = useState("")
   const [modelId, setModelId] = useState("")
   const [apiKey, setApiKey] = useState("")
@@ -44,7 +45,7 @@ export const DatasheetPreviewAiConnection = ({
         {
           provider,
           proxyUrl,
-          modelId,
+          modelId: provider === "openai" ? OPENAI_DATASHEET_MODEL_ID : modelId,
           apiKey,
           useCustomEndpoint,
           sessionToken,
@@ -82,8 +83,8 @@ export const DatasheetPreviewAiConnection = ({
           <DialogHeader>
             <DialogTitle>Connect your AI</DialogTitle>
             <DialogDescription>
-              Sign in to your provider, then connect your chosen model to
-              generate component assets from a datasheet.
+              Connect your AI provider to generate component assets from a
+              datasheet. OpenAI uses GPT-6 Astra automatically.
             </DialogDescription>
           </DialogHeader>
           <label className="rf-grid rf-gap-1 rf-text-sm">
@@ -92,7 +93,7 @@ export const DatasheetPreviewAiConnection = ({
               className="rf-rounded rf-border rf-bg-white rf-p-2"
               value={provider}
               onChange={(event) => {
-                setProvider(event.target.value as DatasheetPreviewProvider | "")
+                setProvider(event.target.value as DatasheetPreviewProvider)
                 clearSecrets()
                 setProxyUrl("")
                 setModelId("")
@@ -100,7 +101,6 @@ export const DatasheetPreviewAiConnection = ({
                 setError(null)
               }}
             >
-              <option value="">Choose a provider</option>
               {Object.entries(datasheetPreviewProviders).map(
                 ([value, { label }]) => (
                   <option key={value} value={value}>
@@ -178,15 +178,21 @@ export const DatasheetPreviewAiConnection = ({
                   />
                 </label>
               )}
-              <label className="rf-grid rf-gap-1 rf-text-sm">
-                PDF-capable model ID
-                <input
-                  className="rf-rounded rf-border rf-p-2"
-                  value={modelId}
-                  placeholder="Your model ID"
-                  onChange={(event) => setModelId(event.target.value)}
-                />
-              </label>
+              {provider === "openai" ? (
+                <p className="rf-text-sm">
+                  Model: <strong>GPT-6 Astra</strong>
+                </p>
+              ) : (
+                <label className="rf-grid rf-gap-1 rf-text-sm">
+                  PDF-capable model ID
+                  <input
+                    className="rf-rounded rf-border rf-p-2"
+                    value={modelId}
+                    placeholder="Your model ID"
+                    onChange={(event) => setModelId(event.target.value)}
+                  />
+                </label>
+              )}
               <p className="rf-text-xs rf-text-zinc-500">
                 {isCustom
                   ? "Your server manages provider credentials and must allow this preview origin."

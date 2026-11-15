@@ -38,7 +38,7 @@ const getReferencedSchematicFilenames = (rootSchematic: string) =>
 
 test("KiCad project ZIP includes hierarchical child schematic files", async () => {
   const projectName = "project"
-  const rootSchematicFilename = `.kicad_sch`
+  const rootSchematicFilename = `${projectName}.kicad_sch`
 
   setDynamicImportResolver(async (moduleName: string) => {
     if (moduleName !== "circuit-json-to-kicad") {

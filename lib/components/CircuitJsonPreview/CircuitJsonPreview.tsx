@@ -8,6 +8,10 @@ import {
 import { cn } from "lib/utils"
 import { getWindowVar } from "lib/utils/get-registry-ky"
 import { hasSimulationAnalysisResult } from "lib/utils/has-simulation-analysis-result"
+import {
+  isCircuitJsonError,
+  isCircuitJsonWarning,
+} from "lib/utils/classify-circuit-json-elements"
 import { resolveExtraRunFrameTabs } from "./extra-runframe-tabs"
 import { CadTabContent } from "./CadTabContent"
 import { ExtraIframeTabContent } from "./ExtraIframeTabContent"
@@ -183,16 +187,12 @@ export const CircuitJsonPreview = ({
 
   const circuitJsonErrors = useMemo<CircuitJsonError[] | null>(() => {
     if (!circuitJson) return null
-    return circuitJson.filter(
-      (e) => (e && "error_type" in e) || e.type.includes("error"),
-    ) as any
+    return circuitJson.filter(isCircuitJsonError) as any
   }, [circuitJson])
 
   const circuitJsonWarnings = useMemo<CircuitJsonError[] | null>(() => {
     if (!circuitJson) return null
-    return circuitJson.filter(
-      (e) => (e && "warning_type" in e) || e.type.includes("warning"),
-    ) as any
+    return circuitJson.filter(isCircuitJsonWarning) as any
   }, [circuitJson])
 
   const hasSchematicGroup = useMemo(() => {

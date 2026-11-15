@@ -1,20 +1,7 @@
-import { expect, mock, test } from "bun:test"
+import { setDynamicImportResolver } from "@tscircuit/internal-dynamic-import"
+import { expect, test } from "bun:test"
 import type { CircuitJson } from "circuit-json"
-import * as circuitJsonToKicad from "circuit-json-to-kicad"
-
-mock.module("@tscircuit/internal-dynamic-import", () => ({
-  default: async (moduleName: string) => {
-    if (moduleName !== "circuit-json-to-kicad") {
-      throw new Error(`Unexpected dynamic import: ${moduleName}`)
-    }
-
-    return circuitJsonToKicad
-  },
-}))
-
-const { createKicadProjectZip } = await import(
-  "../lib/optional-features/exporting/formats/export-kicad-project"
-)
+import { createKicadProjectZip } from "../lib/optional-features/exporting/formats/export-kicad-project"
 
 const hierarchicalCircuitJson: CircuitJson = [
   {
@@ -51,25 +38,78 @@ const getReferencedSchematicFilenames = (rootSchematic: string) =>
 
 test("KiCad project ZIP includes hierarchical child schematic files", async () => {
   const projectName = "project"
-  const rootSchematicFilename = `${projectName}.kicad_sch`
-  const zip = await createKicadProjectZip({
-    circuitJson: hierarchicalCircuitJson,
-    projectName,
-  })
-  const archivedFilenames = Object.keys(zip.files).sort()
-  const rootSchematic = await zip.file(rootSchematicFilename)!.async("string")
-  const referencedSchematicFilenames =
-    getReferencedSchematicFilenames(rootSchematic)
-  const missingSchematicFilenames = referencedSchematicFilenames.filter(
-    (filename) => !zip.file(filename),
-  )
+  const rootSchematicFilename = `.kicad_sch`
 
-  expect(referencedSchematicFilenames).toEqual([
-    "logic.kicad_sch",
-    "power.kicad_sch",
-  ])
-  expect(
-    archivedFilenames.filter((filename) => filename.endsWith(".kicad_sch")),
-  ).toEqual(["logic.kicad_sch", "power.kicad_sch", rootSchematicFilename])
-  expect(missingSchematicFilenames).toEqual([])
+  setDynamicImportResolver(async (moduleName: string) => {
+    if (moduleName !== "circuit-json-to-kicad") {
+      throw new Error(`Unexpected dynamic import: ${moduleName}`)
+    }
+
+    return {
+      CircuitJsonToKicadSchConverter: class {
+        runUntilFinished() {}
+        getOutputString() {
+          return '(kicad_sch (sheet (property "Sheetfile" "power.kicad_sch")) (sheet (property "Sheetfile" "logic.kicad_sch")))'
+        }
+        getOutputFiles({ schematicFilename }: { schematicFilename: string }) {
+          return [
+            {
+              filename: schematicFilename,
+              content:
+                '(kicad_sch (sheet (property "Sheetfile" "power.kicad_sch")) (sheet (property "Sheetfile" "logic.kicad_sch")))',
+            },
+            {
+              filename: "power.kicad_sch",
+              content: '(kicad_sch (property "Sheetname" "Power"))',
+            },
+            {
+              filename: "logic.kicad_sch",
+              content: '(kicad_sch (property "Sheetname" "Logic"))',
+            },
+          ]
+        }
+      },
+      CircuitJsonToKicadPcbConverter: class {
+        runUntilFinished() {}
+        getOutputString() {
+          return "(kicad_pcb)"
+        }
+        getModel3dSourcePaths() {
+          return []
+        }
+      },
+      CircuitJsonToKicadProConverter: class {
+        runUntilFinished() {}
+        getOutputString() {
+          return "{}"
+        }
+      },
+      resolveAndLoadKicad3dModelFiles: async () => {},
+    }
+  })
+
+  try {
+    const zip = await createKicadProjectZip({
+      circuitJson: hierarchicalCircuitJson,
+      projectName,
+    })
+    const archivedFilenames = Object.keys(zip.files).sort()
+    const rootSchematic = await zip.file(rootSchematicFilename)!.async("string")
+    const referencedSchematicFilenames =
+      getReferencedSchematicFilenames(rootSchematic)
+    const missingSchematicFilenames = referencedSchematicFilenames.filter(
+      (filename) => !zip.file(filename),
+    )
+
+    expect(referencedSchematicFilenames).toEqual([
+      "logic.kicad_sch",
+      "power.kicad_sch",
+    ])
+    expect(
+      archivedFilenames.filter((filename) => filename.endsWith(".kicad_sch")),
+    ).toEqual(["logic.kicad_sch", "power.kicad_sch", rootSchematicFilename])
+    expect(missingSchematicFilenames).toEqual([])
+  } finally {
+    setDynamicImportResolver(undefined)
+  }
 }, 30_000)

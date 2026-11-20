@@ -159,7 +159,7 @@ export const useRunFrameStore = create<RunFrameState>()(
               let fsUpdateCount = 0
 
               // Process all file updates
-              const updates = new Map(state.fsMap)
+              const updates = new Map<FilePath, FileContent | null>()
               for (const event of events) {
                 if (event.event_type === "FILE_UPDATED") {
                   fsUpdateCount++
@@ -167,7 +167,7 @@ export const useRunFrameStore = create<RunFrameState>()(
                   // Don't update the manual edits file if we're the ones who changed it
                   if (
                     event.file_path === "manual_edits.json" &&
-                    Date.now() - state.lastManualEditsChangeSentAt < 1000
+                    Date.now() - get().lastManualEditsChangeSentAt < 1000
                   ) {
                     continue
                   }
@@ -180,16 +180,27 @@ export const useRunFrameStore = create<RunFrameState>()(
                   get().addRecentlySavedFile(event.file_path)
                 } else if (event.event_type === "FILE_DELETED") {
                   fsUpdateCount++
-                  updates.delete(event.file_path)
+                  updates.set(event.file_path, null)
                 }
               }
 
               if (fsUpdateCount > 0) {
                 debug("updating fsMap, fsUpdateCount:", fsUpdateCount)
-                set({
-                  fsMap: updates,
+                set((currentState) => {
+                  // Merge only this batch's changes into the latest files.
+                  // Saves can finish while event or file requests are pending.
+                  const fsMap = new Map(currentState.fsMap)
+                  for (const [path, content] of updates) {
+                    if (content === null) fsMap.delete(path)
+                    else fsMap.set(path, content)
+                  }
+                  return { fsMap }
                 })
               }
+            }
+
+            if (get().error !== null) {
+              set({ error: null })
             }
           } catch (error) {
             set({ error: error as Error })

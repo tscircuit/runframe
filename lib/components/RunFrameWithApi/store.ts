@@ -156,38 +156,49 @@ export const useRunFrameStore = create<RunFrameState>()(
                 // .sort((a, b) => b.created_at.localeCompare(a.created_at)),
               }))
 
-              let fsUpdateCount = 0
+              const batchChanges: Array<{
+                filePath: FilePath
+                fileContent: FileContent | null
+              }> = []
 
-              // Process all file updates
-              const updates = new Map(state.fsMap)
               for (const event of events) {
                 if (event.event_type === "FILE_UPDATED") {
-                  fsUpdateCount++
                   const file = await getFileApi(event.file_path)
                   // Don't update the manual edits file if we're the ones who changed it
                   if (
                     event.file_path === "manual_edits.json" &&
-                    Date.now() - state.lastManualEditsChangeSentAt < 1000
+                    Date.now() - get().lastManualEditsChangeSentAt < 1000
                   ) {
                     continue
                   }
-                  if (isDynamicFilePath(file.file_path)) {
-                    updates.set(file.file_path, file.text_content ?? "")
-                  } else {
-                    updates.set(file.file_path, "__STATIC_ASSET__")
-                  }
+                  batchChanges.push({
+                    filePath: file.file_path,
+                    fileContent: isDynamicFilePath(file.file_path)
+                      ? (file.text_content ?? "")
+                      : "__STATIC_ASSET__",
+                  })
                   // Track recently saved files
                   get().addRecentlySavedFile(event.file_path)
                 } else if (event.event_type === "FILE_DELETED") {
-                  fsUpdateCount++
-                  updates.delete(event.file_path)
+                  batchChanges.push({
+                    filePath: event.file_path,
+                    fileContent: null,
+                  })
                 }
               }
 
-              if (fsUpdateCount > 0) {
-                debug("updating fsMap, fsUpdateCount:", fsUpdateCount)
-                set({
-                  fsMap: updates,
+              if (batchChanges.length > 0) {
+                debug("updating fsMap, fsUpdateCount:", batchChanges.length)
+                set((currentState) => {
+                  const fsMap = new Map(currentState.fsMap)
+                  for (const change of batchChanges) {
+                    if (change.fileContent === null) {
+                      fsMap.delete(change.filePath)
+                    } else {
+                      fsMap.set(change.filePath, change.fileContent)
+                    }
+                  }
+                  return { fsMap }
                 })
               }
             }
